@@ -1,0 +1,19 @@
+.gocache/
+.gomodcache/
+
+# Go build/test artifacts
+*.exe
+*.test
+coverage.out
+dist/
+build/
+
+# Local editor and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local scratch outputs
+tmp/
+*.log
