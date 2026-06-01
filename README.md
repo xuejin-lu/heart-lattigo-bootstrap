@@ -16,7 +16,8 @@ usage accounting.
 |   |-- BOOTSTRAPPING_DETAILS.md
 |   `-- slim_bootstrapping.pdf
 |-- reports/
-|   `-- bootstrap_usage_report.csv
+|   |-- bootstrap_usage_report.csv
+|   `-- bootstrap_usage_report.xls
 |-- scripts/
 |   `-- publish_github.ps1
 |-- .github/workflows/
@@ -64,6 +65,36 @@ go run . -mode=bootstrap-usage -config .\configs\bootstrap_config.example.json -
 ```
 
 The command prints the per-stage usage and writes the CSV report.
+
+## Run the N=65536 Case
+
+The checked-in example config is set to:
+
+```json
+"log_n": 16
+```
+
+That means:
+
+```text
+N = 2^16 = 65536
+slots = N / 2 = 32768
+```
+
+Generate the functional-unit usage report for this case:
+
+```powershell
+go run . -mode=bootstrap-usage -config .\configs\bootstrap_config.example.json -out .\reports\bootstrap_usage_report.csv -format csv -by-step=true
+```
+
+Run the dedicated N=65536 correctness test:
+
+```powershell
+go test -run TestSlimBootstrapperHWN65536 -v
+```
+
+This case is much slower and uses more memory than the smaller default
+development test because all polynomial and RNS loops scale with `N`.
 
 ## Change Bootstrapping Parameters
 

@@ -12,7 +12,23 @@ import (
 )
 
 func TestSlimBootstrapperHW(t *testing.T) {
-	params, btpParams := newSlimBootstrappingTestParameters(t)
+	testSlimBootstrapperHW(t, DefaultBootstrapConfig(), 0, 1e-7)
+}
+
+func TestSlimBootstrapperHWN65536(t *testing.T) {
+	cfg := DefaultBootstrapConfig()
+	cfg.LogN = 16
+
+	testSlimBootstrapperHW(t, cfg, 1<<16, 1e-4)
+}
+
+func testSlimBootstrapperHW(t *testing.T, cfg BootstrapConfig, expectedN int, referenceTolerance float64) {
+	t.Helper()
+
+	params, btpParams := newSlimBootstrappingTestParametersFromConfig(t, cfg)
+	if expectedN > 0 && params.N() != expectedN {
+		t.Fatalf("N mismatch: got=%d want=%d", params.N(), expectedN)
+	}
 
 	kgen := rlwe.NewKeyGenerator(params)
 	sk, pk := kgen.GenKeyPairNew()
@@ -101,8 +117,8 @@ func TestSlimBootstrapperHW(t *testing.T) {
 
 	for i := 0; i < 8; i++ {
 		t.Logf("slot %02d: want=%0.12f ref=%0.12f hw=%0.12f", i, valuesWant[i], valuesRef[i], valuesHW[i])
-		if diff := cmplx.Abs(valuesHW[i] - valuesRef[i]); diff > 1e-7 {
-			t.Fatalf("slot %d differs from reference: hw=%0.12f ref=%0.12f diff=%e", i, valuesHW[i], valuesRef[i], diff)
+		if diff := cmplx.Abs(valuesHW[i] - valuesRef[i]); diff > referenceTolerance {
+			t.Fatalf("slot %d differs from reference: hw=%0.12f ref=%0.12f diff=%e tolerance=%e", i, valuesHW[i], valuesRef[i], diff, referenceTolerance)
 		}
 		if err := cmplx.Abs(valuesHW[i] - valuesWant[i]); err > 0.1 {
 			t.Fatalf("slot %d differs from wanted value: got=%0.12f want=%0.12f absErr=%e", i, valuesHW[i], valuesWant[i], err)
@@ -237,7 +253,13 @@ func TestHardwareEvalModMatchesReferenceOnReferenceInput(t *testing.T) {
 func newSlimBootstrappingTestParameters(t *testing.T) (ckks.Parameters, bootstrapping.Parameters) {
 	t.Helper()
 
-	params, btp, err := NewBootstrapParametersFromConfig(DefaultBootstrapConfig())
+	return newSlimBootstrappingTestParametersFromConfig(t, DefaultBootstrapConfig())
+}
+
+func newSlimBootstrappingTestParametersFromConfig(t *testing.T, cfg BootstrapConfig) (ckks.Parameters, bootstrapping.Parameters) {
+	t.Helper()
+
+	params, btp, err := NewBootstrapParametersFromConfig(cfg)
 	if err != nil {
 		t.Fatalf("NewBootstrapParametersFromConfig: %v", err)
 	}

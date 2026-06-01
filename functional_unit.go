@@ -3,6 +3,8 @@ package main
 import (
 	"math"
 	"math/big"
+	"math/bits"
+	"sync"
 
 	"github.com/tuneinsight/lattigo/v6/ring"
 )
@@ -11,39 +13,54 @@ import (
 // Montgomery arithmetic helpers
 // -------------------------------------------------------------------------
 
+type montgomeryConstants struct {
+	negQInv uint64
+	bred    [2]uint64
+}
+
+var montgomeryConstantsCache sync.Map
+
+func getMontgomeryConstants(q uint64) montgomeryConstants {
+	if cached, ok := montgomeryConstantsCache.Load(q); ok {
+		return cached.(montgomeryConstants)
+	}
+
+	constants := montgomeryConstants{
+		negQInv: genNegMRedConstant(q),
+		bred:    ring.GenBRedConstant(q),
+	}
+	actual, _ := montgomeryConstantsCache.LoadOrStore(q, constants)
+	return actual.(montgomeryConstants)
+}
+
+func genNegMRedConstant(q uint64) uint64 {
+	qInv := uint64(1)
+	qPow := q
+	for i := 0; i < 63; i++ {
+		qInv *= qPow
+		qPow *= qPow
+	}
+	return -qInv
+}
+
 func mredParams(q uint64) uint64 {
-	bigQ := new(big.Int).SetUint64(q)
-	bigR := new(big.Int).Lsh(big.NewInt(1), 64)
-	qInvBig := new(big.Int).ModInverse(bigQ, bigR)
-	negQInv := new(big.Int).Sub(bigR, qInvBig)
-	return negQInv.Uint64()
+	return getMontgomeryConstants(q).negQInv
 }
 
 func mForm(a, q uint64) uint64 {
-	bigA := new(big.Int).SetUint64(a)
-	bigR := new(big.Int).Lsh(big.NewInt(1), 64)
-	bigQ := new(big.Int).SetUint64(q)
-	result := new(big.Int).Mul(bigA, bigR)
-	result.Mod(result, bigQ)
-	return result.Uint64()
+	return ring.MForm(a, q, getMontgomeryConstants(q).bred)
 }
 
 func mRed(x, y, q, qInv uint64) uint64 {
-	bigX := new(big.Int).SetUint64(x)
-	bigY := new(big.Int).SetUint64(y)
-	bigQ := new(big.Int).SetUint64(q)
-	bigR := new(big.Int).Lsh(big.NewInt(1), 64)
-	t := new(big.Int).Mul(bigX, bigY)
-	bigQInv := new(big.Int).SetUint64(qInv)
-	m := new(big.Int).Mul(t, bigQInv)
-	m.And(m, new(big.Int).Sub(bigR, big.NewInt(1)))
-	u := new(big.Int).Mul(m, bigQ)
-	u.Add(u, t)
-	u.Rsh(u, 64)
-	if u.Cmp(bigQ) >= 0 {
-		u.Sub(u, bigQ)
+	hi, lo := bits.Mul64(x, y)
+	m := lo * qInv
+	mHi, mLo := bits.Mul64(m, q)
+	_, carry := bits.Add64(lo, mLo, 0)
+	u, _ := bits.Add64(hi, mHi, carry)
+	if u >= q {
+		u -= q
 	}
-	return u.Uint64()
+	return u
 }
 
 // -------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 {
-  "log_n": 13,
+  "log_n": 16,
   "log_default_scale": 45,
   "secret_hamming": 192,
   "q0": [55],
