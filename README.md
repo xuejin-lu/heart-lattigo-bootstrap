@@ -120,26 +120,6 @@ description. The included slim bootstrapping paper is useful background, but it
 describes FV/BGV slim mode. This code implements CKKS EvalMod-based
 bootstrapping.
 
-## GitHub Target
-
-Suggested repository name:
-
-```text
-heart-lattigo-hw-bootstrap
-```
-
-Suggested remote URL:
-
-```text
-https://github.com/kenny0915/heart-lattigo-hw-bootstrap.git
-```
-
-After installing Git and GitHub CLI, authenticate once:
-
-```powershell
-gh auth login
-```
-
 Then publish this directory:
 
 ```powershell
