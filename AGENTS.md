@@ -1,5 +1,30 @@
 # Experiment repository guidance
 
+## Mandatory startup preflight
+
+This section has highest priority for every new Codex run in this project.
+
+When the user says `開始`, `start`, `continue`, or otherwise asks to begin the current task, **do not trust the local `CURRENT_TASK.md` or any remembered task status yet**. A local task marked `COMPLETE` may be stale because the orchestrator can update the remote repository between Codex runs.
+
+Before deciding whether there is work to do:
+
+1. Go to the primary repository `heart-lattigo-bootstrap`.
+2. Check the current branch and `git status --short`.
+3. If the worktree is dirty, the branch is not `main`, or another unsafe local condition exists, stop and report it. Never reset, stash, overwrite, discard, or switch away from user work automatically.
+4. If the worktree is clean and the branch is `main`, run:
+   - `git fetch origin`
+   - `git pull --ff-only origin main`
+5. If fetch or fast-forward pull fails, stop and report the exact failure. Do not continue from stale local instructions.
+6. **Only after the remote sync succeeds**, re-read the freshly synchronized:
+   - `AGENTS.md`
+   - `CURRENT_TASK.md`
+   - the specification referenced by `CURRENT_TASK.md`
+7. Only now may you decide that the current task is `READY`, `COMPLETE`, superseded, or otherwise actionable.
+
+A previous local `CURRENT_TASK.md` saying `COMPLETE` is never sufficient reason to skip the startup fetch.
+
+If the synchronized task requires work in the secondary `lattigo` repository, then perform the secondary repository's own safe synchronization procedure before reading or editing its task-relevant files.
+
 ## Project role
 
 This repository is the primary project and experiment harness for CKKS bootstrapping experiments.
@@ -16,18 +41,16 @@ The core experiment contract is:
 
 > Keep the experiment frontend, workload, parameters, and measurement method fixed; change only the Lattigo implementation/commit being tested.
 
-## Start here
+## Task execution after startup sync
 
-Before starting a task:
+After the mandatory startup preflight has completed:
 
-1. Safely synchronize the primary repository branch requested by the task. Never reset, stash, overwrite, or discard dirty work automatically.
-2. Read this `AGENTS.md`.
-3. Read `CURRENT_TASK.md`.
-4. Read the referenced specification in `specs/`.
-5. If the task requires modifying the secondary `lattigo` repository, then read that repository's `AGENTS.md` and `docs/FAST_CKKS_SPEC.md` before editing it.
-6. Inspect current source before editing. Repository evidence overrides assumptions from previous work.
-7. Implement only the requested scope, run the required tests/benchmarks, review the diff, commit, and push.
-8. Report commits, tests, benchmark evidence, and any unresolved compatibility gap.
+1. Read the synchronized `CURRENT_TASK.md`.
+2. Read the referenced specification in `specs/`.
+3. If the task requires modifying the secondary `lattigo` repository, read that repository's `AGENTS.md` and `docs/FAST_CKKS_SPEC.md` after safely synchronizing the required secondary branch.
+4. Inspect current source before editing. Repository evidence overrides assumptions from previous work.
+5. Implement only the requested scope, run the required tests/benchmarks, review the diff, commit, and push.
+6. Report commits, tests, benchmark evidence, and any unresolved compatibility gap.
 
 ## Permanent architecture rules
 
