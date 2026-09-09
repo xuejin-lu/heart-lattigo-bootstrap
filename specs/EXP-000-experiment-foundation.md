@@ -44,6 +44,12 @@ If tooling permits a non-destructive annotated or lightweight tag, also create:
 
 Do not move the legacy branch forward during this task.
 
+Two temporary setup branches may exist from control-plane preparation:
+- `experiment-foundation`
+- `exp-000-control-plane`
+
+If they still point only to the legacy base and contain no unique work, delete them from the remote during cleanup. Do not delete `legacy-hardware-model`.
+
 ## Phase B — Convert primary `main` into experiment harness
 
 Inspect the current tree and remove active-mainline hardware simulator implementation that is not needed by the experiment frontend, including legacy hardware evaluator/functional-unit infrastructure and hardware-only tests/reports.
