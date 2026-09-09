@@ -1,5 +1,5 @@
 {
-  "log_n": 16,
+  "log_n": 13,
   "log_default_scale": 45,
   "secret_hamming": 192,
   "q0": [55],
@@ -17,5 +17,7 @@
   "mod1_double_angle": 3,
   "mod1_k": 16,
   "log_message_ratio": 10,
-  "mod1_inv_degree": 0
+  "mod1_inv_degree": 0,
+  "repetitions": 3,
+  "warmup": 1
 }

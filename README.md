@@ -1,127 +1,76 @@
-# HEART Lattigo Hardware Bootstrapping Model
+# CKKS bootstrapping experiment harness
 
-This repository contains a Go hardware golden model for CKKS bootstrapping on
-top of [Lattigo v6](https://github.com/tuneinsight/lattigo). The current focus
-is a fully hardware-modeled slim CKKS bootstrapping path with functional-unit
-usage accounting.
+`heart-lattigo-bootstrap` is the control plane for reproducible CKKS
+bootstrapping experiments. The primary source, configuration, workload, and
+measurement method stay fixed while the Lattigo checkout at `../lattigo` is
+changed between Standard and Fast implementations.
 
-## Repository Layout
+The old hardware golden model is preserved at the `legacy-hardware-model`
+branch and is not part of the active `main` experiment path.
+
+## Run the harness
+
+Requirements: Go 1.25 or newer, with the Lattigo checkout available at
+`../lattigo` (or set `LATTIGO_REPO` for metadata collection).
+
+```text
+go test ./...
+go run . -config configs/bootstrap_config.example.json -out results/exp-000.json
+```
+
+The runner performs the configured warm-up count, then measures complete
+bootstrap calls for the configured repetition count. It writes JSON containing
+per-bootstrap elapsed time, allocation metrics, effective parameters, and
+reproducibility metadata for both repositories and the host.
+
+Use `-repetitions` and `-warmup` to override the JSON configuration without
+editing it:
+
+```text
+go run . -config configs/bootstrap_config.example.json -repetitions 3 -warmup 1
+```
+
+## Standard/Fast compatibility check
+
+The `go.mod` replacement points to the sibling Lattigo checkout. Keep the
+primary repository and command unchanged, and change only that checkout:
+
+```text
+# Run A: Standard
+cd ../lattigo && git checkout main
+cd ../heart-lattigo-bootstrap
+go run . -config configs/bootstrap_config.example.json -repetitions 3 -warmup 1 -out /tmp/standard.json
+
+# Run B: Fast
+cd ../lattigo && git checkout fast-ckks
+cd ../heart-lattigo-bootstrap
+go run . -config configs/bootstrap_config.example.json -repetitions 3 -warmup 1 -out /tmp/fast.json
+```
+
+The frontend calls the ordinary bootstrapping construction API in both runs;
+it has no Standard/Fast selector and does not import Fast-only packages. The
+Fast branch adapts that public construction path inside Lattigo and keeps the
+Fast evaluator behind the backend boundary.
+
+## Parameter adaptation
+
+The historical configuration values remain the experiment input. Because the
+current Fast Stage-A contract requires a Standard ring with a residual level of
+at most one, `q0` and the first `q_slots_to_coeffs` prime form the residual
+ciphertext. Lattigo's bootstrapping parameter builder then creates the full
+circuit chain from the configured DFT factorization and EvalMod settings. The
+effective generated parameters are recorded in each result.
+
+## Repository layout
 
 ```text
 .
-|-- *.go                         Go source and tests for the hardware model
-|-- configs/
-|   `-- bootstrap_config.example.json
-|-- docs/
-|   |-- BOOTSTRAPPING_DETAILS.md
-|   `-- slim_bootstrapping.pdf
-|-- reports/
-|   |-- bootstrap_usage_report.csv
-|   `-- bootstrap_usage_report.xls
-|-- scripts/
-|   `-- publish_github.ps1
-|-- .github/workflows/
-|   `-- go.yml
-|-- go.mod
-`-- go.sum
-```
-
-## Main Components
-
-| File | Purpose |
-| --- | --- |
-| `bootstrapping_hw.go` | Hardware-modeled CKKS bootstrapping flow |
-| `hardware_evaluator.go` | CKKS evaluator wrapper routed through hardware units |
-| `functional_unit.go` | NTT, base conversion, automorphism, EWU, and scaling units |
-| `functional_unit_usage.go` | Functional-unit usage counters |
-| `basic_operation.go` | Local ciphertext operation helpers |
-| `bootstrap_config.go` | Bootstrapping parameter configuration |
-| `bootstrap_usage_report.go` | Usage report generator |
-| `docs/BOOTSTRAPPING_DETAILS.md` | Step-by-step bootstrapping method notes |
-
-## Requirements
-
-- Go 1.25 or newer
-- Lattigo v6.2.0, resolved through `go.mod`
-
-## Run Tests
-
-```powershell
-go test ./...
-```
-
-The full bootstrapping correctness test can take several minutes:
-
-```powershell
-go test -run TestSlimBootstrapperHW -v
-```
-
-## Generate Functional-Unit Usage
-
-Use the default example parameter set:
-
-```powershell
-go run . -mode=bootstrap-usage -config .\configs\bootstrap_config.example.json -out .\reports\bootstrap_usage_report.csv -format csv -by-step=true
-```
-
-The command prints the per-stage usage and writes the CSV report.
-
-## Run the N=65536 Case
-
-The checked-in example config is set to:
-
-```json
-"log_n": 16
-```
-
-That means:
-
-```text
-N = 2^16 = 65536
-slots = N / 2 = 32768
-```
-
-Generate the functional-unit usage report for this case:
-
-```powershell
-go run . -mode=bootstrap-usage -config .\configs\bootstrap_config.example.json -out .\reports\bootstrap_usage_report.csv -format csv -by-step=true
-```
-
-Run the dedicated N=65536 correctness test:
-
-```powershell
-go test -run TestSlimBootstrapperHWN65536 -v
-```
-
-This case is much slower and uses more memory than the smaller default
-development test because all polynomial and RNS loops scale with `N`.
-
-## Change Bootstrapping Parameters
-
-Edit:
-
-```text
-configs/bootstrap_config.example.json
-```
-
-The config exposes the ring size, Q/P prime layout, DFT levels, slot count,
-EvalMod degree, double-angle rounds, and related bootstrapping settings.
-
-## Current Method
-
-The active code path is CKKS bootstrapping:
-
-```text
-SlotsToCoeffs -> ScaleDown -> ModUp -> CoeffsToSlots -> EvalMod -> Recombine
-```
-
-See `docs/BOOTSTRAPPING_DETAILS.md` for the detailed operation-level
-description. The included slim bootstrapping paper is useful background, but it
-describes FV/BGV slim mode. This code implements CKKS EvalMod-based
-bootstrapping.
-
-Then publish this directory:
-
-```powershell
-.\scripts\publish_github.ps1 -Owner kenny0915 -RepoName heart-lattigo-hw-bootstrap -Visibility public
+├── AGENTS.md
+├── CURRENT_TASK.md
+├── bootstrap_config.go
+├── configs/
+├── main.go
+├── results/
+├── runner.go
+└── specs/
 ```

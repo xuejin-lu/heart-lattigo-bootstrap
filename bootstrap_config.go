@@ -1,17 +1,19 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
 
 	"github.com/tuneinsight/lattigo/v6/circuits/ckks/bootstrapping"
-	"github.com/tuneinsight/lattigo/v6/circuits/ckks/dft"
 	"github.com/tuneinsight/lattigo/v6/circuits/ckks/mod1"
 	"github.com/tuneinsight/lattigo/v6/ring"
 	"github.com/tuneinsight/lattigo/v6/schemes/ckks"
 )
 
-// BootstrapConfig is the single place to set the hardware bootstrapping test
-// parameters used by tests and by the functional-unit usage report.
+// BootstrapConfig is the experiment's single parameter source of truth.
+// The historical q_* fields are retained so old parameter intent remains
+// explicit in result metadata and configuration files.
 type BootstrapConfig struct {
 	LogN             int   `json:"log_n"`
 	LogDefaultScale  int   `json:"log_default_scale"`
@@ -32,6 +34,8 @@ type BootstrapConfig struct {
 	Mod1K            int   `json:"mod1_k"`
 	LogMessageRatio  int   `json:"log_message_ratio"`
 	Mod1InvDegree    int   `json:"mod1_inv_degree"`
+	Repetitions      int   `json:"repetitions"`
+	Warmup           int   `json:"warmup"`
 }
 
 func DefaultBootstrapConfig() BootstrapConfig {
@@ -55,79 +59,110 @@ func DefaultBootstrapConfig() BootstrapConfig {
 		Mod1K:            16,
 		LogMessageRatio:  10,
 		Mod1InvDegree:    0,
+		Repetitions:      3,
+		Warmup:           1,
 	}
 }
 
+func LoadBootstrapConfig(path string) (BootstrapConfig, error) {
+	cfg := DefaultBootstrapConfig()
+	if path == "" {
+		return cfg, nil
+	}
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return BootstrapConfig{}, fmt.Errorf("read config: %w", err)
+	}
+	if err := json.Unmarshal(data, &cfg); err != nil {
+		return BootstrapConfig{}, fmt.Errorf("parse config: %w", err)
+	}
+	return cfg, nil
+}
+
+func factorization(depths, scales []int) ([][]int, error) {
+	if len(depths) != len(scales) || len(depths) == 0 {
+		return nil, fmt.Errorf("DFT levels and prime scales must have the same non-zero length")
+	}
+	result := make([][]int, len(depths))
+	for i, depth := range depths {
+		if depth <= 0 || scales[i] <= 0 {
+			return nil, fmt.Errorf("DFT depth and prime scale must be positive at index %d", i)
+		}
+		result[i] = make([]int, depth)
+		for j := range result[i] {
+			result[i][j] = scales[i]
+		}
+	}
+	return result, nil
+}
+
+// NewBootstrapParametersFromConfig adapts the historical configuration to the
+// bounded public contract shared by Standard and Fast. The first two Q primes
+// form the residual ciphertext; the bootstrapping package then constructs the
+// full circuit Q chain from the same DFT and EvalMod intent.
 func NewBootstrapParametersFromConfig(cfg BootstrapConfig) (ckks.Parameters, bootstrapping.Parameters, error) {
-	if cfg.LogN <= 0 {
-		return ckks.Parameters{}, bootstrapping.Parameters{}, fmt.Errorf("LogN must be positive")
+	if cfg.LogN <= 0 || cfg.LogDefaultScale <= 0 {
+		return ckks.Parameters{}, bootstrapping.Parameters{}, fmt.Errorf("log_n and log_default_scale must be positive")
 	}
-	if cfg.LogDefaultScale <= 0 {
-		return ckks.Parameters{}, bootstrapping.Parameters{}, fmt.Errorf("LogDefaultScale must be positive")
+	if len(cfg.Q0) != 1 || len(cfg.QSlotsToCoeffs) == 0 {
+		return ckks.Parameters{}, bootstrapping.Parameters{}, fmt.Errorf("configuration must provide q0 and at least one q_slots_to_coeffs prime")
 	}
-	if len(cfg.QCircuitSlots) == 0 {
-		cfg.QCircuitSlots = []int{cfg.LogDefaultScale}
+	if len(cfg.P) == 0 || cfg.SecretHamming <= 0 {
+		return ckks.Parameters{}, bootstrapping.Parameters{}, fmt.Errorf("configuration must provide P primes and a positive secret hamming weight")
 	}
 
-	logQ := append([]int{}, cfg.Q0...)
-	logQ = append(logQ, cfg.QSlotsToCoeffs...)
-	logQ = append(logQ, cfg.QCircuitSlots...)
-	logQ = append(logQ, cfg.QEvalMod...)
-	logQ = append(logQ, cfg.QCoeffsToSlots...)
-
-	params, err := ckks.NewParametersFromLiteral(ckks.ParametersLiteral{
+	residualLogQ := []int{cfg.Q0[0], cfg.QSlotsToCoeffs[0]}
+	residual, err := ckks.NewParametersFromLiteral(ckks.ParametersLiteral{
 		LogN:            cfg.LogN,
-		LogQ:            logQ,
-		LogP:            cfg.P,
+		LogQ:            residualLogQ,
 		LogDefaultScale: cfg.LogDefaultScale,
 		Xs:              ring.Ternary{H: cfg.SecretHamming},
 	})
 	if err != nil {
-		return ckks.Parameters{}, bootstrapping.Parameters{}, fmt.Errorf("ckks parameters: %w", err)
+		return ckks.Parameters{}, bootstrapping.Parameters{}, fmt.Errorf("residual CKKS parameters: %w", err)
+	}
+
+	c2s, err := factorization(cfg.CoeffsToSlotsDFT, cfg.QCoeffsToSlots)
+	if err != nil {
+		return ckks.Parameters{}, bootstrapping.Parameters{}, fmt.Errorf("coeffs-to-slots configuration: %w", err)
+	}
+	s2c, err := factorization(cfg.SlotsToCoeffsDFT, cfg.QSlotsToCoeffs)
+	if err != nil {
+		return ckks.Parameters{}, bootstrapping.Parameters{}, fmt.Errorf("slots-to-coeffs configuration: %w", err)
 	}
 
 	logSlots := cfg.LogSlots
 	if logSlots < 0 {
-		logSlots = params.LogMaxSlots()
+		logSlots = residual.LogMaxSlots()
+	}
+	if logSlots < 0 || logSlots > residual.LogMaxSlots() {
+		return ckks.Parameters{}, bootstrapping.Parameters{}, fmt.Errorf("log_slots=%d is outside [0,%d]", logSlots, residual.LogMaxSlots())
 	}
 
-	coeffsToSlots := dft.MatrixLiteral{
-		Type:         dft.HomomorphicEncode,
-		Format:       dft.RepackImagAsReal,
-		LogSlots:     logSlots,
-		LevelQ:       params.MaxLevelQ(),
-		LevelP:       params.MaxLevelP(),
-		LogBSGSRatio: cfg.LogBSGSRatio,
-		Levels:       append([]int{}, cfg.CoeffsToSlotsDFT...),
+	logN, evalModScale, mod1Degree, doubleAngle, k, logMessageRatio, invDegree :=
+		cfg.LogN, cfg.Mod1LogScale, cfg.Mod1Degree, cfg.Mod1DoubleAngle, cfg.Mod1K, cfg.LogMessageRatio, cfg.Mod1InvDegree
+	effectiveLiteral := bootstrapping.ParametersLiteral{
+		LogN:     &logN,
+		LogP:     append([]int(nil), cfg.P...),
+		Xs:       ring.Ternary{H: cfg.SecretHamming},
+		LogSlots: &logSlots,
+		CoeffsToSlotsFactorizationDepthAndLogScales: c2s,
+		SlotsToCoeffsFactorizationDepthAndLogScales: s2c,
+		EvalModLogScale:       &evalModScale,
+		EphemeralSecretWeight: intPtr(0),
+		Mod1Type:              mod1.CosDiscrete,
+		LogMessageRatio:       &logMessageRatio,
+		K:                     &k,
+		Mod1Degree:            &mod1Degree,
+		DoubleAngle:           &doubleAngle,
+		Mod1InvDegree:         &invDegree,
 	}
-
-	mod1Params := mod1.ParametersLiteral{
-		LevelQ:          params.MaxLevel() - coeffsToSlots.Depth(true),
-		LogScale:        cfg.Mod1LogScale,
-		Mod1Type:        mod1.CosDiscrete,
-		Mod1Degree:      cfg.Mod1Degree,
-		DoubleAngle:     cfg.Mod1DoubleAngle,
-		K:               cfg.Mod1K,
-		LogMessageRatio: cfg.LogMessageRatio,
-		Mod1InvDegree:   cfg.Mod1InvDegree,
+	btp, err := bootstrapping.NewParametersFromLiteral(residual, effectiveLiteral)
+	if err != nil {
+		return ckks.Parameters{}, bootstrapping.Parameters{}, fmt.Errorf("bootstrapping parameters: %w", err)
 	}
-
-	slotsToCoeffs := dft.MatrixLiteral{
-		Type:         dft.HomomorphicDecode,
-		LogSlots:     logSlots,
-		LogBSGSRatio: cfg.LogBSGSRatio,
-		LevelP:       params.MaxLevelP(),
-		Levels:       append([]int{}, cfg.SlotsToCoeffsDFT...),
-	}
-	slotsToCoeffs.LevelQ = len(slotsToCoeffs.Levels)
-
-	return params, bootstrapping.Parameters{
-		ResidualParameters:      params,
-		BootstrappingParameters: params,
-		SlotsToCoeffsParameters: slotsToCoeffs,
-		Mod1ParametersLiteral:   mod1Params,
-		CoeffsToSlotsParameters: coeffsToSlots,
-		EphemeralSecretWeight:   0,
-		CircuitOrder:            bootstrapping.DecodeThenModUp,
-	}, nil
+	btp.CircuitOrder = bootstrapping.ModUpThenEncode
+	return residual, btp, nil
 }
+
+func intPtr(value int) *int { return &value }

@@ -4,6 +4,10 @@ go 1.25.0
 
 require github.com/tuneinsight/lattigo/v6 v6.2.0
 
+// Local backend linkage is intentional: Standard and Fast runs use the same
+// primary source/config/command while only the checkout at ../lattigo changes.
+replace github.com/tuneinsight/lattigo/v6 => ../lattigo
+
 require (
 	github.com/ALTree/bigfloat v0.2.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
