@@ -1,0 +1,20 @@
+{
+  "log_n": 13,
+  "log_default_scale": 45,
+  "secret_hamming": 192,
+  "q0": [55],
+  "q_slots_to_coeffs": [39, 39, 39],
+  "q_coeffs_to_slots": [56, 56, 56, 56],
+  "p": [61, 61, 61, 61, 61],
+  "slots_to_coeffs_dft_levels": [1, 1, 1],
+  "coeffs_to_slots_dft_levels": [1, 1, 1, 1],
+  "log_slots": -1,
+  "mod1_log_scale": 60,
+  "mod1_degree": 30,
+  "mod1_double_angle": 3,
+  "mod1_k": 16,
+  "log_message_ratio": 10,
+  "mod1_inv_degree": 0,
+  "repetitions": 3,
+  "warmup": 1
+}
