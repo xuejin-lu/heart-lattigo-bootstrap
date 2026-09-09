@@ -61,6 +61,19 @@ ciphertext. Lattigo's bootstrapping parameter builder then creates the full
 circuit chain from the configured DFT factorization and EvalMod settings. The
 effective generated parameters are recorded in each result.
 
+The legacy `q_circuit_slots`, `q_eval_mod`, and `log_bsgs_ratio` fields are
+not active knobs in this compatibility path and are removed from the JSON
+schema. The loader rejects them as unknown fields so an old configuration
+cannot silently claim to change the workload.
+
+## Continuous integration
+
+GitHub Actions checks out this repository and `xuejin-lu/lattigo` as sibling
+directories, then runs the same `go test ./...` command against both the
+Standard `main` backend and Fast `fast-ckks` backend. The full end-to-end
+runner remains the documented local acceptance command because CI is limited
+to compile/unit tests.
+
 ## Repository layout
 
 ```text

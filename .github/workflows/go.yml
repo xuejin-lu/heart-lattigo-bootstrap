@@ -9,16 +9,35 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        backend:
+          - name: standard
+            ref: main
+          - name: fast
+            ref: fast-ckks
 
     steps:
-      - name: Checkout
+      - name: Checkout primary repository
         uses: actions/checkout@v4
+        with:
+          path: heart-lattigo-bootstrap
+
+      - name: Checkout Lattigo backend (${{ matrix.backend.name }})
+        uses: actions/checkout@v4
+        with:
+          repository: xuejin-lu/lattigo
+          ref: ${{ matrix.backend.ref }}
+          path: lattigo
 
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version-file: go.mod
+          go-version-file: heart-lattigo-bootstrap/go.mod
           cache: true
+          cache-dependency-path: heart-lattigo-bootstrap/go.sum
 
-      - name: Test
+      - name: Test primary harness
+        working-directory: heart-lattigo-bootstrap
         run: go test ./...

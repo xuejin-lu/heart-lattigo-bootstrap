@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -12,21 +13,18 @@ import (
 )
 
 // BootstrapConfig is the experiment's single parameter source of truth.
-// The historical q_* fields are retained so old parameter intent remains
-// explicit in result metadata and configuration files.
+// Fields removed from the legacy hardware/DecodeThenModUp configuration are
+// intentionally not represented here; LoadBootstrapConfig rejects them.
 type BootstrapConfig struct {
 	LogN             int   `json:"log_n"`
 	LogDefaultScale  int   `json:"log_default_scale"`
 	SecretHamming    int   `json:"secret_hamming"`
 	Q0               []int `json:"q0"`
 	QSlotsToCoeffs   []int `json:"q_slots_to_coeffs"`
-	QCircuitSlots    []int `json:"q_circuit_slots"`
-	QEvalMod         []int `json:"q_eval_mod"`
 	QCoeffsToSlots   []int `json:"q_coeffs_to_slots"`
 	P                []int `json:"p"`
 	SlotsToCoeffsDFT []int `json:"slots_to_coeffs_dft_levels"`
 	CoeffsToSlotsDFT []int `json:"coeffs_to_slots_dft_levels"`
-	LogBSGSRatio     int   `json:"log_bsgs_ratio"`
 	LogSlots         int   `json:"log_slots"`
 	Mod1LogScale     int   `json:"mod1_log_scale"`
 	Mod1Degree       int   `json:"mod1_degree"`
@@ -45,13 +43,10 @@ func DefaultBootstrapConfig() BootstrapConfig {
 		SecretHamming:    192,
 		Q0:               []int{55},
 		QSlotsToCoeffs:   []int{39, 39, 39},
-		QCircuitSlots:    []int{45},
-		QEvalMod:         []int{60, 60, 60, 60, 60, 60, 60, 60},
 		QCoeffsToSlots:   []int{56, 56, 56, 56},
 		P:                []int{61, 61, 61, 61, 61},
 		SlotsToCoeffsDFT: []int{1, 1, 1},
 		CoeffsToSlotsDFT: []int{1, 1, 1, 1},
-		LogBSGSRatio:     1,
 		LogSlots:         -1,
 		Mod1LogScale:     60,
 		Mod1Degree:       30,
@@ -73,7 +68,9 @@ func LoadBootstrapConfig(path string) (BootstrapConfig, error) {
 	if err != nil {
 		return BootstrapConfig{}, fmt.Errorf("read config: %w", err)
 	}
-	if err := json.Unmarshal(data, &cfg); err != nil {
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	if err := decoder.Decode(&cfg); err != nil {
 		return BootstrapConfig{}, fmt.Errorf("parse config: %w", err)
 	}
 	return cfg, nil

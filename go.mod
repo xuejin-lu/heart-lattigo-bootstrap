@@ -1,4 +1,4 @@
-module github.com/kenny0915/heart-lattigo-hw-bootstrap
+module github.com/xuejin-lu/heart-lattigo-bootstrap
 
 go 1.25.0
 
