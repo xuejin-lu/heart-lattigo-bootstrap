@@ -1,0 +1,51 @@
+{
+  "schema_version": "exp-001.v1",
+  "timestamp": "2026-09-09T19:56:49Z",
+  "primary_commit": "7b01e8b16ae03fdf11a619b9adef799a823cb195",
+  "standard_backend_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+  "fast_backend_commit": "d5429b1c368a6828ef1bb8a229e3f57458ad6491",
+  "command": "go run . -config configs/bootstrap_config.example.json -repetitions=10 -warmup=3 -out <result-file>.json",
+  "measurement_boundary": "complete eval.Bootstrap(ct); input construction, keys, evaluator construction, and warm-up excluded",
+  "identity_checks": {
+    "primary_commit_match": true,
+    "primary_dirty_state_match": true,
+    "effective_parameters_match": true,
+    "config_match": true,
+    "environment_match": true,
+    "warmup_match": true,
+    "repetition_match": true,
+    "all_output_levels_expected": true
+  },
+  "environment": {
+    "go_version": "go1.26.4",
+    "os": "darwin",
+    "architecture": "arm64",
+    "cpu": "Apple M4",
+    "logical_cpus": 10
+  },
+  "standard": {
+    "repetitions": 10,
+    "warmup": 3,
+    "elapsed_ns": {
+      "median": 296984542.0,
+      "mean": 297393050.1,
+      "min": 291943417,
+      "max": 306994167
+    },
+    "alloc_bytes_median": 91849028.0,
+    "allocs_median": 34626.0
+  },
+  "fast": {
+    "repetitions": 10,
+    "warmup": 3,
+    "elapsed_ns": {
+      "median": 23796520.5,
+      "mean": 23885358.1,
+      "min": 23373125,
+      "max": 24649792
+    },
+    "alloc_bytes_median": 4074824.0,
+    "allocs_median": 7163.0
+  },
+  "median_speedup": 12.480166669744849
+}

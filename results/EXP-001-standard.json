@@ -1,0 +1,176 @@
+{
+  "schema_version": "exp-000.v1",
+  "timestamp": "2026-09-09T19:56:04.450597Z",
+  "primary_repository": {
+    "path": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap",
+    "commit": "7b01e8b16ae03fdf11a619b9adef799a823cb195",
+    "ref": "main",
+    "dirty": true
+  },
+  "lattigo_repository": {
+    "path": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/../lattigo",
+    "commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+    "dirty": false
+  },
+  "environment": {
+    "go_version": "go1.26.4",
+    "os": "darwin",
+    "architecture": "arm64",
+    "cpu": "Apple M4",
+    "logical_cpus": 10
+  },
+  "config": {
+    "log_n": 13,
+    "log_default_scale": 45,
+    "secret_hamming": 192,
+    "q0": [
+      55
+    ],
+    "q_slots_to_coeffs": [
+      39,
+      39,
+      39
+    ],
+    "q_coeffs_to_slots": [
+      56,
+      56,
+      56,
+      56
+    ],
+    "p": [
+      61,
+      61,
+      61,
+      61,
+      61
+    ],
+    "slots_to_coeffs_dft_levels": [
+      1,
+      1,
+      1
+    ],
+    "coeffs_to_slots_dft_levels": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "log_slots": -1,
+    "mod1_log_scale": 60,
+    "mod1_degree": 30,
+    "mod1_double_angle": 3,
+    "mod1_k": 16,
+    "log_message_ratio": 10,
+    "mod1_inv_degree": 0,
+    "repetitions": 10,
+    "warmup": 3
+  },
+  "effective_parameters": {
+    "residual_log_n": 13,
+    "residual_max_level": 1,
+    "bootstrap_log_n": 13,
+    "bootstrap_max_level": 16,
+    "bootstrap_log_slots": 12,
+    "bootstrap_log_q": [
+      55,
+      39,
+      40,
+      39,
+      40,
+      60,
+      60,
+      61,
+      60,
+      60,
+      60,
+      61,
+      61,
+      56,
+      57,
+      56,
+      56
+    ],
+    "bootstrap_log_p": [
+      61,
+      61,
+      62,
+      61,
+      62
+    ],
+    "circuit_order": "ModUpThenEncode"
+  },
+  "warmup": 3,
+  "repetitions": 10,
+  "measurements": [
+    {
+      "repetition": 1,
+      "elapsed_ns": 306994167,
+      "alloc_bytes": 91932960,
+      "allocs": 34723,
+      "output_level": 1
+    },
+    {
+      "repetition": 2,
+      "elapsed_ns": 292492375,
+      "alloc_bytes": 92042848,
+      "allocs": 34630,
+      "output_level": 1
+    },
+    {
+      "repetition": 3,
+      "elapsed_ns": 299369709,
+      "alloc_bytes": 91639872,
+      "allocs": 34612,
+      "output_level": 1
+    },
+    {
+      "repetition": 4,
+      "elapsed_ns": 304554375,
+      "alloc_bytes": 91854240,
+      "allocs": 34659,
+      "output_level": 1
+    },
+    {
+      "repetition": 5,
+      "elapsed_ns": 300534958,
+      "alloc_bytes": 91639872,
+      "allocs": 34612,
+      "output_level": 1
+    },
+    {
+      "repetition": 6,
+      "elapsed_ns": 298574000,
+      "alloc_bytes": 91639872,
+      "allocs": 34612,
+      "output_level": 1
+    },
+    {
+      "repetition": 7,
+      "elapsed_ns": 295395084,
+      "alloc_bytes": 92076976,
+      "allocs": 34743,
+      "output_level": 1
+    },
+    {
+      "repetition": 8,
+      "elapsed_ns": 291943417,
+      "alloc_bytes": 92194208,
+      "allocs": 34710,
+      "output_level": 1
+    },
+    {
+      "repetition": 9,
+      "elapsed_ns": 292100333,
+      "alloc_bytes": 91843816,
+      "allocs": 34622,
+      "output_level": 1
+    },
+    {
+      "repetition": 10,
+      "elapsed_ns": 291972083,
+      "alloc_bytes": 91639872,
+      "allocs": 34612,
+      "output_level": 1
+    }
+  ]
+}
