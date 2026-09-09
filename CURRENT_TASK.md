@@ -1,4 +1,4 @@
 # Current Task
 
-Task: Implement `specs/EXP-000-P-review-fix.md`
-Status: COMPLETE
+Task: Implement `specs/EXP-001-bootstrap-speed-baseline.md`
+Status: READY
