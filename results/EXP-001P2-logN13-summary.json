@@ -1,0 +1,64 @@
+{
+  "schema_version": "exp-001p2-pair.v1",
+  "profile": {
+    "log_n": 13,
+    "n": 8192,
+    "log_slots": 12,
+    "logical_slots": 4096
+  },
+  "primary_commit": "1e91682e14fd9939ffb2d72c6770ed85a3870bbf",
+  "standard_backend_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+  "fast_backend_commit": "6f1c957f95d0dfef6bf73bc01413a7ab55cfb8dc",
+  "identity_checks": {
+    "primary_commit_match": true,
+    "primary_clean_both": true,
+    "secondary_clean_both": true,
+    "config_match": true,
+    "effective_parameters_match": true,
+    "environment_match": true,
+    "counts_match": true,
+    "expected_n": true,
+    "expected_log_slots": true,
+    "output_levels_expected": true,
+    "standard_commit_pinned": true,
+    "fast_commit_is_new": true
+  },
+  "environment": {
+    "go_version": "go1.26.4",
+    "os": "darwin",
+    "architecture": "arm64",
+    "cpu": "Apple M4",
+    "logical_cpus": 10
+  },
+  "warmup": 3,
+  "repetitions": 10,
+  "standard": {
+    "timing": {
+      "median_elapsed_ns": 294458916.5,
+      "mean_elapsed_ns": 294363270.9,
+      "min_elapsed_ns": 290468291,
+      "max_elapsed_ns": 299418792
+    },
+    "median_alloc_bytes": 91639872,
+    "median_allocs": 34612
+  },
+  "fast": {
+    "timing": {
+      "median_elapsed_ns": 23455645.5,
+      "mean_elapsed_ns": 23518671,
+      "min_elapsed_ns": 23290917,
+      "max_elapsed_ns": 24156834
+    },
+    "median_alloc_bytes": 4074824,
+    "median_allocs": 7163
+  },
+  "median_speedup": 12.553861137609706,
+  "allocation_byte_ratio": 22.489283463531187,
+  "allocation_count_ratio": 4.832053608823119,
+  "command_template": "go run . -config configs/bootstrap_config.logN<N>.json -repetitions=10 -warmup=3 -out /tmp/<raw-result>.json",
+  "measurement_boundary": "complete eval.Bootstrap(ct) only inside timed section",
+  "raw_results": {
+    "standard": "results/EXP-001P-logN13-standard.json",
+    "fast": "results/EXP-001P2-logN13-fast.json"
+  }
+}
