@@ -1,5 +1,11 @@
 # Experiment repository guidance
 
+## User-facing language
+
+All user-facing progress updates, warnings, questions, error explanations, and final reports must be written in **Traditional Chinese (Taiwan usage)** unless the user explicitly asks for another language.
+
+Keep source code, shell commands, file paths, Git refs, API/type/function names, and other technical identifiers in their original form. Do not convert technical identifiers merely to satisfy the language rule.
+
 ## Mandatory startup preflight
 
 This section has highest priority for every new Codex run in this project.
