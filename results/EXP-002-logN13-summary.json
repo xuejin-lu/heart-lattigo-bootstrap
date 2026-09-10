@@ -1,0 +1,283 @@
+{
+  "schema_version": "exp-002-stage-pair.v1",
+  "profile": {
+    "effective_log_slots": 12,
+    "log_n": 13
+  },
+  "primary_commit": "8186f50e7b591b7f76b39fb89b47c32ad1cc1410",
+  "standard_backend_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+  "fast_backend_commit": "ce79b861c9b4ecb45f7a42ca5de2e98dbbdb9ef2",
+  "identity_checks": {
+    "all_correctness": true,
+    "config_match": true,
+    "counts_match": true,
+    "effective_parameters_match": true,
+    "environment_match": true,
+    "fast_commit_expected": true,
+    "primary_clean_both": true,
+    "primary_commit_match": true,
+    "secondary_clean_both": true,
+    "stage_counts_match": true,
+    "standard_commit_pinned": true
+  },
+  "environment": {
+    "go_version": "go1.26.4",
+    "os": "darwin",
+    "architecture": "arm64",
+    "cpu": "Apple M4",
+    "logical_cpus": 10
+  },
+  "warmup": 3,
+  "repetitions": 10,
+  "standard_full_bootstrap": {
+    "count": 10,
+    "median_elapsed_ns": 303629500,
+    "mean_elapsed_ns": 318349887.5,
+    "min_elapsed_ns": 292594917,
+    "max_elapsed_ns": 429453958,
+    "median_alloc_bytes": 91642328,
+    "median_allocs": 34613,
+    "median_percent_of_full_time": 100
+  },
+  "fast_full_bootstrap": {
+    "count": 10,
+    "median_elapsed_ns": 24323437.5,
+    "mean_elapsed_ns": 24392249.8,
+    "min_elapsed_ns": 24012291,
+    "max_elapsed_ns": 24879500,
+    "median_alloc_bytes": 4074824,
+    "median_allocs": 7163,
+    "median_percent_of_full_time": 100
+  },
+  "full_bootstrap_median_speedup": 12.48300122053061,
+  "stage_sum_median_ns": {
+    "fast": 23996875,
+    "standard": 297688395
+  },
+  "unattributed_overhead_median_ns": {
+    "fast": 326562.5,
+    "standard": 5941105
+  },
+  "top_stages_by_standard_time": [
+    "coeffs_to_slots",
+    "eval_mod_real",
+    "eval_mod_imag"
+  ],
+  "top_stages_by_fast_time": [
+    "eval_mod_real",
+    "eval_mod_imag",
+    "coeffs_to_slots"
+  ],
+  "top_saved_time_contributors": [
+    "coeffs_to_slots",
+    "eval_mod_real",
+    "eval_mod_imag"
+  ],
+  "stages": [
+    {
+      "stage": "coeffs_to_slots",
+      "standard": {
+        "count": 10,
+        "median_elapsed_ns": 131944666.5,
+        "mean_elapsed_ns": 136189775,
+        "min_elapsed_ns": 129641167,
+        "max_elapsed_ns": 161560125,
+        "median_alloc_bytes": 33600920,
+        "median_allocs": 12080,
+        "median_percent_of_full_time": 43.455812593967316
+      },
+      "fast": {
+        "count": 10,
+        "median_elapsed_ns": 4206437.5,
+        "mean_elapsed_ns": 4235866.7,
+        "min_elapsed_ns": 3992083,
+        "max_elapsed_ns": 4643792,
+        "median_alloc_bytes": 541664,
+        "median_allocs": 505,
+        "median_percent_of_full_time": 17.293762446200294
+      },
+      "median_speedup_standard_over_fast": 31.367318901089103,
+      "median_saved_ns": 127738229
+    },
+    {
+      "stage": "eval_mod_real",
+      "standard": {
+        "count": 10,
+        "median_elapsed_ns": 65008041.5,
+        "mean_elapsed_ns": 66595941.7,
+        "min_elapsed_ns": 63260750,
+        "max_elapsed_ns": 73001667,
+        "median_alloc_bytes": 22247880,
+        "median_allocs": 9000,
+        "median_percent_of_full_time": 21.410318002697366
+      },
+      "fast": {
+        "count": 10,
+        "median_elapsed_ns": 7874646,
+        "mean_elapsed_ns": 7951354.1,
+        "min_elapsed_ns": 7764083,
+        "max_elapsed_ns": 8473875,
+        "median_alloc_bytes": 1360800,
+        "median_allocs": 2963,
+        "median_percent_of_full_time": 32.37472499518211
+      },
+      "median_speedup_standard_over_fast": 8.255360494935264,
+      "median_saved_ns": 57133395.5
+    },
+    {
+      "stage": "eval_mod_imag",
+      "standard": {
+        "count": 10,
+        "median_elapsed_ns": 64174291.5,
+        "mean_elapsed_ns": 67905712.6,
+        "min_elapsed_ns": 62842125,
+        "max_elapsed_ns": 84025792,
+        "median_alloc_bytes": 22247880,
+        "median_allocs": 9000,
+        "median_percent_of_full_time": 21.13572347219226
+      },
+      "fast": {
+        "count": 10,
+        "median_elapsed_ns": 7830208.5,
+        "mean_elapsed_ns": 7870437.5,
+        "min_elapsed_ns": 7691834,
+        "max_elapsed_ns": 8438416,
+        "median_alloc_bytes": 1360800,
+        "median_allocs": 2963,
+        "median_percent_of_full_time": 32.192030834457505
+      },
+      "median_speedup_standard_over_fast": 8.195732144297308,
+      "median_saved_ns": 56344083
+    },
+    {
+      "stage": "slots_to_coeffs",
+      "standard": {
+        "count": 10,
+        "median_elapsed_ns": 34254645.5,
+        "mean_elapsed_ns": 35733195.7,
+        "min_elapsed_ns": 33484708,
+        "max_elapsed_ns": 44811167,
+        "median_alloc_bytes": 11438328,
+        "median_allocs": 4356,
+        "median_percent_of_full_time": 11.28172509588166
+      },
+      "fast": {
+        "count": 10,
+        "median_elapsed_ns": 3758791.5,
+        "mean_elapsed_ns": 3780616.4,
+        "min_elapsed_ns": 3634166,
+        "max_elapsed_ns": 4078500,
+        "median_alloc_bytes": 279176,
+        "median_allocs": 558,
+        "median_percent_of_full_time": 15.453372904220467
+      },
+      "median_speedup_standard_over_fast": 9.113207130536503,
+      "median_saved_ns": 30495854
+    },
+    {
+      "stage": "mod_up",
+      "standard": {
+        "count": 10,
+        "median_elapsed_ns": 2285437.5,
+        "mean_elapsed_ns": 2179879.3,
+        "min_elapsed_ns": 1639959,
+        "max_elapsed_ns": 2678000,
+        "median_alloc_bytes": 2099536,
+        "median_allocs": 68,
+        "median_percent_of_full_time": 0.7527060117676313
+      },
+      "fast": {
+        "count": 10,
+        "median_elapsed_ns": 259708.5,
+        "mean_elapsed_ns": 264841.7,
+        "min_elapsed_ns": 253000,
+        "max_elapsed_ns": 287042,
+        "median_alloc_bytes": 133616,
+        "median_allocs": 49,
+        "median_percent_of_full_time": 1.0677294276353826
+      },
+      "median_speedup_standard_over_fast": 8.800010396271205,
+      "median_saved_ns": 2025729
+    },
+    {
+      "stage": "scale_down",
+      "standard": {
+        "count": 10,
+        "median_elapsed_ns": 18750,
+        "mean_elapsed_ns": 21525.1,
+        "min_elapsed_ns": 16292,
+        "max_elapsed_ns": 51417,
+        "median_alloc_bytes": 3744,
+        "median_allocs": 102,
+        "median_percent_of_full_time": 0.006175289291719019
+      },
+      "fast": {
+        "count": 10,
+        "median_elapsed_ns": 14770.5,
+        "mean_elapsed_ns": 16774.9,
+        "min_elapsed_ns": 13750,
+        "max_elapsed_ns": 22792,
+        "median_alloc_bytes": 2944,
+        "median_allocs": 76,
+        "median_percent_of_full_time": 0.06072538061283484
+      },
+      "median_speedup_standard_over_fast": 1.269422159033208,
+      "median_saved_ns": 3979.5
+    },
+    {
+      "stage": "pack_and_switch_n1_to_n2",
+      "standard": {
+        "count": 10,
+        "median_elapsed_ns": 1562.5,
+        "mean_elapsed_ns": 2537.5,
+        "min_elapsed_ns": 1084,
+        "max_elapsed_ns": 10625,
+        "median_alloc_bytes": 1456,
+        "median_allocs": 2,
+        "median_percent_of_full_time": 0.0005146074409765849
+      },
+      "fast": {
+        "count": 10,
+        "median_elapsed_ns": 16000,
+        "mean_elapsed_ns": 18066.7,
+        "min_elapsed_ns": 12417,
+        "max_elapsed_ns": 30417,
+        "median_alloc_bytes": 133472,
+        "median_allocs": 15,
+        "median_percent_of_full_time": 0.0657801760133616
+      },
+      "median_speedup_standard_over_fast": 0.09765625,
+      "median_saved_ns": -14437.5
+    },
+    {
+      "stage": "unpack_and_switch_n2_to_n1",
+      "standard": {
+        "count": 10,
+        "median_elapsed_ns": 1000,
+        "mean_elapsed_ns": 1041.7,
+        "min_elapsed_ns": 917,
+        "max_elapsed_ns": 1333,
+        "median_alloc_bytes": 64,
+        "median_allocs": 2,
+        "median_percent_of_full_time": 0.00032934876222501437
+      },
+      "fast": {
+        "count": 10,
+        "median_elapsed_ns": 36312.5,
+        "mean_elapsed_ns": 37508.4,
+        "min_elapsed_ns": 33958,
+        "max_elapsed_ns": 42667,
+        "median_alloc_bytes": 263168,
+        "median_allocs": 16,
+        "median_percent_of_full_time": 0.14929016509282456
+      },
+      "median_speedup_standard_over_fast": 0.027538726333907058,
+      "median_saved_ns": -35312.5
+    }
+  ],
+  "command_template": "go run . -stages -config configs/bootstrap_config.logN\u003cN\u003e.json -repetitions=10 -warmup=3 -out /tmp/\u003craw-result\u003e.json",
+  "raw_results": {
+    "fast": "results/EXP-002-logN13-fast.json",
+    "standard": "results/EXP-002-logN13-standard.json"
+  }
+}
