@@ -49,5 +49,77 @@
     "logN16.stage_counts_match": true,
     "logN16.standard_commit_pinned": true
   },
-  "command_template": "go run . -stages -config configs/bootstrap_config.logN\u003cN\u003e.json -repetitions=10 -warmup=3 -out /tmp/\u003craw-result\u003e.json"
+  "command_template": "go run . -stages -config configs/bootstrap_config.logN\u003cN\u003e.json -repetitions=10 -warmup=3 -out /tmp/\u003craw-result\u003e.json",
+  "stage_context": {
+    "logN13": {
+      "logical_packing_work": {
+        "classification": "trivial",
+        "reason": "Residual LogN equals bootstrap LogN, LogSlots equals LogMaxSlots, and the single input ciphertext leaves logPackCTs=0."
+      },
+      "n1_to_n2_ring_degree_switch": {
+        "classification": "trivial",
+        "reason": "Residual and bootstrap parameters have the same LogN, so N1 equals N2 and the N1-to-N2 switch branch is not entered."
+      },
+      "n2_to_n1_ring_degree_switch": {
+        "classification": "trivial",
+        "reason": "Residual and bootstrap parameters have the same LogN, so N2 equals N1 and the N2-to-N1 switch branch is not entered."
+      },
+      "packing_boundary_call": {
+        "classification": "present_boundary_trivial_work",
+        "present": true,
+        "reason": "The public PackAndSwitchN1ToN2/UnpackAndSwitchN2ToN1 calls are measured; one full-slot ciphertext has logPackCTs=0, so no logical pack fan-in/fan-out is performed."
+      },
+      "profile_evidence": {
+        "bootstrap_log_n": 13,
+        "bootstrap_log_slots": 12,
+        "input_ciphertext_count": 1,
+        "log_max_slots": 12,
+        "log_slots_equals_log_max_slots": true,
+        "packing_log_pack_cts": 0,
+        "residual_log_n": 13,
+        "residual_log_n_equals_bootstrap_log_n": true,
+        "trace_automorphism_iterations": 0,
+        "trace_gap": 1
+      },
+      "trace_inside_mod_up": {
+        "classification": "trivial",
+        "reason": "ModUp calls Trace with logN=LogSlots=LogN-1; gap=1 and the Trace automorphism loop has zero effective iterations."
+      }
+    },
+    "logN16": {
+      "logical_packing_work": {
+        "classification": "trivial",
+        "reason": "Residual LogN equals bootstrap LogN, LogSlots equals LogMaxSlots, and the single input ciphertext leaves logPackCTs=0."
+      },
+      "n1_to_n2_ring_degree_switch": {
+        "classification": "trivial",
+        "reason": "Residual and bootstrap parameters have the same LogN, so N1 equals N2 and the N1-to-N2 switch branch is not entered."
+      },
+      "n2_to_n1_ring_degree_switch": {
+        "classification": "trivial",
+        "reason": "Residual and bootstrap parameters have the same LogN, so N2 equals N1 and the N2-to-N1 switch branch is not entered."
+      },
+      "packing_boundary_call": {
+        "classification": "present_boundary_trivial_work",
+        "present": true,
+        "reason": "The public PackAndSwitchN1ToN2/UnpackAndSwitchN2ToN1 calls are measured; one full-slot ciphertext has logPackCTs=0, so no logical pack fan-in/fan-out is performed."
+      },
+      "profile_evidence": {
+        "bootstrap_log_n": 16,
+        "bootstrap_log_slots": 15,
+        "input_ciphertext_count": 1,
+        "log_max_slots": 15,
+        "log_slots_equals_log_max_slots": true,
+        "packing_log_pack_cts": 0,
+        "residual_log_n": 16,
+        "residual_log_n_equals_bootstrap_log_n": true,
+        "trace_automorphism_iterations": 0,
+        "trace_gap": 1
+      },
+      "trace_inside_mod_up": {
+        "classification": "trivial",
+        "reason": "ModUp calls Trace with logN=LogSlots=LogN-1; gap=1 and the Trace automorphism loop has zero effective iterations."
+      }
+    }
+  }
 }

@@ -279,5 +279,66 @@
   "raw_results": {
     "fast": "results/EXP-002-logN16-fast.json",
     "standard": "results/EXP-002-logN16-standard.json"
+  },
+  "eval_mod_total": {
+    "aggregate": true,
+    "description": "Aggregate of eval_mod_real + eval_mod_imag per repetition; not an additional physical stage.",
+    "fast": {
+      "count": 10,
+      "max_elapsed_ns": 172896750,
+      "mean_elapsed_ns": 152339491.6,
+      "median_alloc_bytes": 19236672,
+      "median_allocs": 5926,
+      "median_elapsed_ns": 148641145.5,
+      "median_percent_of_full_time": 57.86847491279915,
+      "min_elapsed_ns": 136686875
+    },
+    "median_saved_ns": 1255137771,
+    "median_speedup_standard_over_fast": 9.444080316913327,
+    "standard": {
+      "count": 10,
+      "max_elapsed_ns": 2144548708,
+      "mean_elapsed_ns": 1566657499.7,
+      "median_alloc_bytes": 350024592,
+      "median_allocs": 18000,
+      "median_elapsed_ns": 1403778916.5,
+      "median_percent_of_full_time": 24.54597806205233,
+      "min_elapsed_ns": 1261290541
+    }
+  },
+  "stage_context": {
+    "logical_packing_work": {
+      "classification": "trivial",
+      "reason": "Residual LogN equals bootstrap LogN, LogSlots equals LogMaxSlots, and the single input ciphertext leaves logPackCTs=0."
+    },
+    "n1_to_n2_ring_degree_switch": {
+      "classification": "trivial",
+      "reason": "Residual and bootstrap parameters have the same LogN, so N1 equals N2 and the N1-to-N2 switch branch is not entered."
+    },
+    "n2_to_n1_ring_degree_switch": {
+      "classification": "trivial",
+      "reason": "Residual and bootstrap parameters have the same LogN, so N2 equals N1 and the N2-to-N1 switch branch is not entered."
+    },
+    "packing_boundary_call": {
+      "classification": "present_boundary_trivial_work",
+      "present": true,
+      "reason": "The public PackAndSwitchN1ToN2/UnpackAndSwitchN2ToN1 calls are measured; one full-slot ciphertext has logPackCTs=0, so no logical pack fan-in/fan-out is performed."
+    },
+    "profile_evidence": {
+      "bootstrap_log_n": 16,
+      "bootstrap_log_slots": 15,
+      "input_ciphertext_count": 1,
+      "log_max_slots": 15,
+      "log_slots_equals_log_max_slots": true,
+      "packing_log_pack_cts": 0,
+      "residual_log_n": 16,
+      "residual_log_n_equals_bootstrap_log_n": true,
+      "trace_automorphism_iterations": 0,
+      "trace_gap": 1
+    },
+    "trace_inside_mod_up": {
+      "classification": "trivial",
+      "reason": "ModUp calls Trace with logN=LogSlots=LogN-1; gap=1 and the Trace automorphism loop has zero effective iterations."
+    }
   }
 }
