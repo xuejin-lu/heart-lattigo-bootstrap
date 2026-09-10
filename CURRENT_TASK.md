@@ -1,4 +1,4 @@
 # Current Task
 
-Task: Implement `specs/EXP-002-bootstrap-stage-breakdown.md`
+Task: Implement `specs/EXP-002-P-review-fix.md`
 Status: READY
