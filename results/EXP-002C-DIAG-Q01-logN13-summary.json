@@ -1,0 +1,2586 @@
+{
+  "schema_version": "exp-002c-diag-q01-summary.v1",
+  "task": "EXP-002-C-DIAG-Q01",
+  "config": {
+    "log_n": 13,
+    "log_default_scale": 45,
+    "secret_hamming": 192,
+    "q0": [
+      55
+    ],
+    "q_slots_to_coeffs": [
+      39,
+      39,
+      39
+    ],
+    "q_coeffs_to_slots": [
+      56,
+      56,
+      56,
+      56
+    ],
+    "p": [
+      61,
+      61,
+      61,
+      61,
+      61
+    ],
+    "slots_to_coeffs_dft_levels": [
+      1,
+      1,
+      1
+    ],
+    "coeffs_to_slots_dft_levels": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "log_slots": -1,
+    "mod1_log_scale": 60,
+    "mod1_degree": 30,
+    "mod1_double_angle": 3,
+    "mod1_k": 16,
+    "log_message_ratio": 10,
+    "mod1_inv_degree": 0,
+    "repetitions": 3,
+    "warmup": 1
+  },
+  "effective_parameters": {
+    "residual_log_n": 13,
+    "residual_max_level": 1,
+    "bootstrap_log_n": 13,
+    "bootstrap_max_level": 16,
+    "bootstrap_log_slots": 12,
+    "bootstrap_log_q": [
+      55,
+      39,
+      40,
+      39,
+      40,
+      60,
+      60,
+      61,
+      60,
+      60,
+      60,
+      61,
+      61,
+      56,
+      57,
+      56,
+      56
+    ],
+    "bootstrap_log_p": [
+      61,
+      61,
+      62,
+      61,
+      62
+    ],
+    "circuit_order": "ModUpThenEncode"
+  },
+  "workload": {
+    "identifier": "reproducibleInput.v1",
+    "formula": "real=((i%7)-3)/16; imag=((i%5)-2)/32; value=real+imag*i",
+    "logical_slots": 4096
+  },
+  "threshold": 0.01,
+  "q01_moduli": [
+    36028797018652673,
+    549755731969
+  ],
+  "q01_parameter_match": true,
+  "standard_lattigo": {
+    "path": "/Users/xuejinlu/Developer/xuejin-lu/lattigo",
+    "commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+    "dirty": false
+  },
+  "fast_lattigo": {
+    "path": "/Users/xuejinlu/Developer/xuejin-lu/lattigo",
+    "commit": "ce79b861c9b4ecb45f7a42ca5de2e98dbbdb9ef2",
+    "ref": "fast-ckks",
+    "dirty": false
+  },
+  "standard_primary": {
+    "path": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap",
+    "commit": "a9230b954903ed1fc899e8ee288ef71cb8023102",
+    "ref": "main",
+    "dirty": false
+  },
+  "fast_primary": {
+    "path": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap",
+    "commit": "a9230b954903ed1fc899e8ee288ef71cb8023102",
+    "ref": "main",
+    "dirty": false
+  },
+  "no_logn16_run": true,
+  "no_lattigo_source_modification": true,
+  "standard_projection_oracle": {
+    "all_stages_valid": true,
+    "stages": [
+      {
+        "name": "Q1_mod_up",
+        "order": 1,
+        "oracle_valid": true,
+        "branches": [
+          {
+            "branch": "single",
+            "present": true,
+            "standard_oracle_valid": true,
+            "full_vs_q01": {
+              "sample_count": 4096,
+              "max_abs_complex": 0,
+              "mean_abs_complex": 0,
+              "rmse_complex": 0,
+              "max_abs_real": 0,
+              "max_abs_imag": 0,
+              "max_component_abs": 0,
+              "max_abs_complex_indices": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7
+              ],
+              "max_component_indices": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7
+              ],
+              "pass_threshold": true,
+              "threshold": 0.01
+            },
+            "projection": {
+              "source": {
+                "level": 16,
+                "scale": "1.125899906842624000000000000000000000000e+15",
+                "scale_float64": 1125899906842624,
+                "scale_log2": 50,
+                "n": 8192,
+                "log_slots": 12,
+                "is_ntt": true,
+                "is_montgomery": false,
+                "q_moduli": [
+                  36028797018652673,
+                  549755731969
+                ],
+                "maintained_rows_q0_q1": [
+                  {
+                    "component": 0,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "bc9f373b284a17904ed58968922031f67abc27c73d277e1f8afb7d887f52e068"
+                  },
+                  {
+                    "component": 0,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "e552fa8a8add2ae1e019c9495c8e01a16dba58feeacb1def888d80385c5361c5"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  }
+                ]
+              },
+              "source_after_projection": {
+                "level": 16,
+                "scale": "1.125899906842624000000000000000000000000e+15",
+                "scale_float64": 1125899906842624,
+                "scale_log2": 50,
+                "n": 8192,
+                "log_slots": 12,
+                "is_ntt": true,
+                "is_montgomery": false,
+                "q_moduli": [
+                  36028797018652673,
+                  549755731969
+                ],
+                "maintained_rows_q0_q1": [
+                  {
+                    "component": 0,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "bc9f373b284a17904ed58968922031f67abc27c73d277e1f8afb7d887f52e068"
+                  },
+                  {
+                    "component": 0,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "e552fa8a8add2ae1e019c9495c8e01a16dba58feeacb1def888d80385c5361c5"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  }
+                ]
+              },
+              "diagnostic_before_normalize": {
+                "level": 1,
+                "scale": "1.125899906842624000000000000000000000000e+15",
+                "scale_float64": 1125899906842624,
+                "scale_log2": 50,
+                "n": 8192,
+                "log_slots": 12,
+                "is_ntt": true,
+                "is_montgomery": false,
+                "q_moduli": [
+                  36028797018652673,
+                  549755731969
+                ],
+                "maintained_rows_q0_q1": [
+                  {
+                    "component": 0,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "bc9f373b284a17904ed58968922031f67abc27c73d277e1f8afb7d887f52e068"
+                  },
+                  {
+                    "component": 0,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "e552fa8a8add2ae1e019c9495c8e01a16dba58feeacb1def888d80385c5361c5"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  }
+                ]
+              },
+              "diagnostic_after_normalize": {
+                "level": 1,
+                "scale": "1.125899906842624000000000000000000000000e+15",
+                "scale_float64": 1125899906842624,
+                "scale_log2": 50,
+                "n": 8192,
+                "log_slots": 12,
+                "is_ntt": true,
+                "is_montgomery": false,
+                "q_moduli": [
+                  36028797018652673,
+                  549755731969
+                ],
+                "maintained_rows_q0_q1": [
+                  {
+                    "component": 0,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "bc9f373b284a17904ed58968922031f67abc27c73d277e1f8afb7d887f52e068"
+                  },
+                  {
+                    "component": 0,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "e552fa8a8add2ae1e019c9495c8e01a16dba58feeacb1def888d80385c5361c5"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  }
+                ]
+              },
+              "rows_copied_exactly": true,
+              "source_unchanged": true
+            }
+          }
+        ]
+      },
+      {
+        "name": "Q2_coeffs_to_slots",
+        "order": 2,
+        "oracle_valid": true,
+        "branches": [
+          {
+            "branch": "real",
+            "present": true,
+            "standard_oracle_valid": true,
+            "full_vs_q01": {
+              "sample_count": 4096,
+              "max_abs_complex": 0,
+              "mean_abs_complex": 0,
+              "rmse_complex": 0,
+              "max_abs_real": 0,
+              "max_abs_imag": 0,
+              "max_component_abs": 0,
+              "max_abs_complex_indices": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7
+              ],
+              "max_component_indices": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7
+              ],
+              "pass_threshold": true,
+              "threshold": 0.01
+            },
+            "projection": {
+              "source": {
+                "level": 12,
+                "scale": "1.125899906842624000000000000000000000000e+15",
+                "scale_float64": 1125899906842624,
+                "scale_log2": 50,
+                "n": 8192,
+                "log_slots": 12,
+                "is_ntt": true,
+                "is_montgomery": false,
+                "q_moduli": [
+                  36028797018652673,
+                  549755731969
+                ],
+                "maintained_rows_q0_q1": [
+                  {
+                    "component": 0,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "1a2c8151354b625df88ac8786fa4860e534f9332ac21c89d98c6b8fd5a456388"
+                  },
+                  {
+                    "component": 0,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "50e4e203c4a0c9d8c939852a32ca725898e83b83cc9bab2b5ff857ba2aa1746a"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  }
+                ]
+              },
+              "source_after_projection": {
+                "level": 12,
+                "scale": "1.125899906842624000000000000000000000000e+15",
+                "scale_float64": 1125899906842624,
+                "scale_log2": 50,
+                "n": 8192,
+                "log_slots": 12,
+                "is_ntt": true,
+                "is_montgomery": false,
+                "q_moduli": [
+                  36028797018652673,
+                  549755731969
+                ],
+                "maintained_rows_q0_q1": [
+                  {
+                    "component": 0,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "1a2c8151354b625df88ac8786fa4860e534f9332ac21c89d98c6b8fd5a456388"
+                  },
+                  {
+                    "component": 0,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "50e4e203c4a0c9d8c939852a32ca725898e83b83cc9bab2b5ff857ba2aa1746a"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  }
+                ]
+              },
+              "diagnostic_before_normalize": {
+                "level": 1,
+                "scale": "1.125899906842624000000000000000000000000e+15",
+                "scale_float64": 1125899906842624,
+                "scale_log2": 50,
+                "n": 8192,
+                "log_slots": 12,
+                "is_ntt": true,
+                "is_montgomery": false,
+                "q_moduli": [
+                  36028797018652673,
+                  549755731969
+                ],
+                "maintained_rows_q0_q1": [
+                  {
+                    "component": 0,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "1a2c8151354b625df88ac8786fa4860e534f9332ac21c89d98c6b8fd5a456388"
+                  },
+                  {
+                    "component": 0,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "50e4e203c4a0c9d8c939852a32ca725898e83b83cc9bab2b5ff857ba2aa1746a"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  }
+                ]
+              },
+              "diagnostic_after_normalize": {
+                "level": 1,
+                "scale": "1.125899906842624000000000000000000000000e+15",
+                "scale_float64": 1125899906842624,
+                "scale_log2": 50,
+                "n": 8192,
+                "log_slots": 12,
+                "is_ntt": true,
+                "is_montgomery": false,
+                "q_moduli": [
+                  36028797018652673,
+                  549755731969
+                ],
+                "maintained_rows_q0_q1": [
+                  {
+                    "component": 0,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "1a2c8151354b625df88ac8786fa4860e534f9332ac21c89d98c6b8fd5a456388"
+                  },
+                  {
+                    "component": 0,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "50e4e203c4a0c9d8c939852a32ca725898e83b83cc9bab2b5ff857ba2aa1746a"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  }
+                ]
+              },
+              "rows_copied_exactly": true,
+              "source_unchanged": true
+            }
+          },
+          {
+            "branch": "imag",
+            "present": true,
+            "standard_oracle_valid": true,
+            "full_vs_q01": {
+              "sample_count": 4096,
+              "max_abs_complex": 0,
+              "mean_abs_complex": 0,
+              "rmse_complex": 0,
+              "max_abs_real": 0,
+              "max_abs_imag": 0,
+              "max_component_abs": 0,
+              "max_abs_complex_indices": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7
+              ],
+              "max_component_indices": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7
+              ],
+              "pass_threshold": true,
+              "threshold": 0.01
+            },
+            "projection": {
+              "source": {
+                "level": 12,
+                "scale": "1.125899906842624000000000000000000000000e+15",
+                "scale_float64": 1125899906842624,
+                "scale_log2": 50,
+                "n": 8192,
+                "log_slots": 12,
+                "is_ntt": true,
+                "is_montgomery": false,
+                "q_moduli": [
+                  36028797018652673,
+                  549755731969
+                ],
+                "maintained_rows_q0_q1": [
+                  {
+                    "component": 0,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "b9734e90ffeea7db0e86d34e82a0e26259d6f683bf1891450e1231439c1de004"
+                  },
+                  {
+                    "component": 0,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "d5ff4affc47e648a7fbfae45596ef80c66fe88078cc461415ef49fbc55e029fd"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  }
+                ]
+              },
+              "source_after_projection": {
+                "level": 12,
+                "scale": "1.125899906842624000000000000000000000000e+15",
+                "scale_float64": 1125899906842624,
+                "scale_log2": 50,
+                "n": 8192,
+                "log_slots": 12,
+                "is_ntt": true,
+                "is_montgomery": false,
+                "q_moduli": [
+                  36028797018652673,
+                  549755731969
+                ],
+                "maintained_rows_q0_q1": [
+                  {
+                    "component": 0,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "b9734e90ffeea7db0e86d34e82a0e26259d6f683bf1891450e1231439c1de004"
+                  },
+                  {
+                    "component": 0,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "d5ff4affc47e648a7fbfae45596ef80c66fe88078cc461415ef49fbc55e029fd"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  }
+                ]
+              },
+              "diagnostic_before_normalize": {
+                "level": 1,
+                "scale": "1.125899906842624000000000000000000000000e+15",
+                "scale_float64": 1125899906842624,
+                "scale_log2": 50,
+                "n": 8192,
+                "log_slots": 12,
+                "is_ntt": true,
+                "is_montgomery": false,
+                "q_moduli": [
+                  36028797018652673,
+                  549755731969
+                ],
+                "maintained_rows_q0_q1": [
+                  {
+                    "component": 0,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "b9734e90ffeea7db0e86d34e82a0e26259d6f683bf1891450e1231439c1de004"
+                  },
+                  {
+                    "component": 0,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "d5ff4affc47e648a7fbfae45596ef80c66fe88078cc461415ef49fbc55e029fd"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  }
+                ]
+              },
+              "diagnostic_after_normalize": {
+                "level": 1,
+                "scale": "1.125899906842624000000000000000000000000e+15",
+                "scale_float64": 1125899906842624,
+                "scale_log2": 50,
+                "n": 8192,
+                "log_slots": 12,
+                "is_ntt": true,
+                "is_montgomery": false,
+                "q_moduli": [
+                  36028797018652673,
+                  549755731969
+                ],
+                "maintained_rows_q0_q1": [
+                  {
+                    "component": 0,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "b9734e90ffeea7db0e86d34e82a0e26259d6f683bf1891450e1231439c1de004"
+                  },
+                  {
+                    "component": 0,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "d5ff4affc47e648a7fbfae45596ef80c66fe88078cc461415ef49fbc55e029fd"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  }
+                ]
+              },
+              "rows_copied_exactly": true,
+              "source_unchanged": true
+            }
+          }
+        ]
+      },
+      {
+        "name": "Q3_eval_mod_real",
+        "order": 3,
+        "oracle_valid": true,
+        "branches": [
+          {
+            "branch": "real",
+            "present": true,
+            "standard_oracle_valid": true,
+            "full_vs_q01": {
+              "sample_count": 4096,
+              "max_abs_complex": 0,
+              "mean_abs_complex": 0,
+              "rmse_complex": 0,
+              "max_abs_real": 0,
+              "max_abs_imag": 0,
+              "max_component_abs": 0,
+              "max_abs_complex_indices": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7
+              ],
+              "max_component_indices": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7
+              ],
+              "pass_threshold": true,
+              "threshold": 0.01
+            },
+            "projection": {
+              "source": {
+                "level": 4,
+                "scale": "3.518437208883200000000000000000000000000e+13",
+                "scale_float64": 35184372088832,
+                "scale_log2": 45,
+                "n": 8192,
+                "log_slots": 12,
+                "is_ntt": true,
+                "is_montgomery": false,
+                "q_moduli": [
+                  36028797018652673,
+                  549755731969
+                ],
+                "maintained_rows_q0_q1": [
+                  {
+                    "component": 0,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "85a62fe9bdb302d8fd0f96f4280882fcfbb987c556f2e8bf39c4ebfcbf0b54f6"
+                  },
+                  {
+                    "component": 0,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "3e456cbba1ed52d98b650679448a7810402fe22d80cc40d0bf47b5ba0a2a5990"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  }
+                ]
+              },
+              "source_after_projection": {
+                "level": 4,
+                "scale": "3.518437208883200000000000000000000000000e+13",
+                "scale_float64": 35184372088832,
+                "scale_log2": 45,
+                "n": 8192,
+                "log_slots": 12,
+                "is_ntt": true,
+                "is_montgomery": false,
+                "q_moduli": [
+                  36028797018652673,
+                  549755731969
+                ],
+                "maintained_rows_q0_q1": [
+                  {
+                    "component": 0,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "85a62fe9bdb302d8fd0f96f4280882fcfbb987c556f2e8bf39c4ebfcbf0b54f6"
+                  },
+                  {
+                    "component": 0,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "3e456cbba1ed52d98b650679448a7810402fe22d80cc40d0bf47b5ba0a2a5990"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  }
+                ]
+              },
+              "diagnostic_before_normalize": {
+                "level": 1,
+                "scale": "3.518437208883200000000000000000000000000e+13",
+                "scale_float64": 35184372088832,
+                "scale_log2": 45,
+                "n": 8192,
+                "log_slots": 12,
+                "is_ntt": true,
+                "is_montgomery": false,
+                "q_moduli": [
+                  36028797018652673,
+                  549755731969
+                ],
+                "maintained_rows_q0_q1": [
+                  {
+                    "component": 0,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "85a62fe9bdb302d8fd0f96f4280882fcfbb987c556f2e8bf39c4ebfcbf0b54f6"
+                  },
+                  {
+                    "component": 0,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "3e456cbba1ed52d98b650679448a7810402fe22d80cc40d0bf47b5ba0a2a5990"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  }
+                ]
+              },
+              "diagnostic_after_normalize": {
+                "level": 1,
+                "scale": "3.518437208883200000000000000000000000000e+13",
+                "scale_float64": 35184372088832,
+                "scale_log2": 45,
+                "n": 8192,
+                "log_slots": 12,
+                "is_ntt": true,
+                "is_montgomery": false,
+                "q_moduli": [
+                  36028797018652673,
+                  549755731969
+                ],
+                "maintained_rows_q0_q1": [
+                  {
+                    "component": 0,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "85a62fe9bdb302d8fd0f96f4280882fcfbb987c556f2e8bf39c4ebfcbf0b54f6"
+                  },
+                  {
+                    "component": 0,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "3e456cbba1ed52d98b650679448a7810402fe22d80cc40d0bf47b5ba0a2a5990"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  }
+                ]
+              },
+              "rows_copied_exactly": true,
+              "source_unchanged": true
+            }
+          }
+        ]
+      },
+      {
+        "name": "Q4_eval_mod_imag",
+        "order": 4,
+        "oracle_valid": true,
+        "branches": [
+          {
+            "branch": "imag",
+            "present": true,
+            "standard_oracle_valid": true,
+            "full_vs_q01": {
+              "sample_count": 4096,
+              "max_abs_complex": 0,
+              "mean_abs_complex": 0,
+              "rmse_complex": 0,
+              "max_abs_real": 0,
+              "max_abs_imag": 0,
+              "max_component_abs": 0,
+              "max_abs_complex_indices": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7
+              ],
+              "max_component_indices": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7
+              ],
+              "pass_threshold": true,
+              "threshold": 0.01
+            },
+            "projection": {
+              "source": {
+                "level": 4,
+                "scale": "3.518437208883200000000000000000000000000e+13",
+                "scale_float64": 35184372088832,
+                "scale_log2": 45,
+                "n": 8192,
+                "log_slots": 12,
+                "is_ntt": true,
+                "is_montgomery": false,
+                "q_moduli": [
+                  36028797018652673,
+                  549755731969
+                ],
+                "maintained_rows_q0_q1": [
+                  {
+                    "component": 0,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "fdc4e04575f7dbea1cbbccb281cfab7497001467f280cf14292560b68db7cb04"
+                  },
+                  {
+                    "component": 0,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "43dd71e291d2cefdb5c26fdce1ce5bd45ae17336780fdaabe85ed6d9996ab49f"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  }
+                ]
+              },
+              "source_after_projection": {
+                "level": 4,
+                "scale": "3.518437208883200000000000000000000000000e+13",
+                "scale_float64": 35184372088832,
+                "scale_log2": 45,
+                "n": 8192,
+                "log_slots": 12,
+                "is_ntt": true,
+                "is_montgomery": false,
+                "q_moduli": [
+                  36028797018652673,
+                  549755731969
+                ],
+                "maintained_rows_q0_q1": [
+                  {
+                    "component": 0,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "fdc4e04575f7dbea1cbbccb281cfab7497001467f280cf14292560b68db7cb04"
+                  },
+                  {
+                    "component": 0,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "43dd71e291d2cefdb5c26fdce1ce5bd45ae17336780fdaabe85ed6d9996ab49f"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  }
+                ]
+              },
+              "diagnostic_before_normalize": {
+                "level": 1,
+                "scale": "3.518437208883200000000000000000000000000e+13",
+                "scale_float64": 35184372088832,
+                "scale_log2": 45,
+                "n": 8192,
+                "log_slots": 12,
+                "is_ntt": true,
+                "is_montgomery": false,
+                "q_moduli": [
+                  36028797018652673,
+                  549755731969
+                ],
+                "maintained_rows_q0_q1": [
+                  {
+                    "component": 0,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "fdc4e04575f7dbea1cbbccb281cfab7497001467f280cf14292560b68db7cb04"
+                  },
+                  {
+                    "component": 0,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "43dd71e291d2cefdb5c26fdce1ce5bd45ae17336780fdaabe85ed6d9996ab49f"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  }
+                ]
+              },
+              "diagnostic_after_normalize": {
+                "level": 1,
+                "scale": "3.518437208883200000000000000000000000000e+13",
+                "scale_float64": 35184372088832,
+                "scale_log2": 45,
+                "n": 8192,
+                "log_slots": 12,
+                "is_ntt": true,
+                "is_montgomery": false,
+                "q_moduli": [
+                  36028797018652673,
+                  549755731969
+                ],
+                "maintained_rows_q0_q1": [
+                  {
+                    "component": 0,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "fdc4e04575f7dbea1cbbccb281cfab7497001467f280cf14292560b68db7cb04"
+                  },
+                  {
+                    "component": 0,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "43dd71e291d2cefdb5c26fdce1ce5bd45ae17336780fdaabe85ed6d9996ab49f"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  }
+                ]
+              },
+              "rows_copied_exactly": true,
+              "source_unchanged": true
+            }
+          }
+        ]
+      },
+      {
+        "name": "Q5_slots_to_coeffs",
+        "order": 5,
+        "oracle_valid": true,
+        "branches": [
+          {
+            "branch": "combined",
+            "present": true,
+            "standard_oracle_valid": true,
+            "full_vs_q01": {
+              "sample_count": 4096,
+              "max_abs_complex": 0,
+              "mean_abs_complex": 0,
+              "rmse_complex": 0,
+              "max_abs_real": 0,
+              "max_abs_imag": 0,
+              "max_component_abs": 0,
+              "max_abs_complex_indices": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7
+              ],
+              "max_component_indices": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7
+              ],
+              "pass_threshold": true,
+              "threshold": 0.01
+            },
+            "projection": {
+              "source": {
+                "level": 1,
+                "scale": "3.518437208883200000000000000000000000000e+13",
+                "scale_float64": 35184372088832,
+                "scale_log2": 45,
+                "n": 8192,
+                "log_slots": 12,
+                "is_ntt": true,
+                "is_montgomery": false,
+                "q_moduli": [
+                  36028797018652673,
+                  549755731969
+                ],
+                "maintained_rows_q0_q1": [
+                  {
+                    "component": 0,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "a04907e0e35b3d8aa53d414bedd153e40eccfa9ecb982f864c1ee2e4748788c3"
+                  },
+                  {
+                    "component": 0,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "2242adfe5b7411dbb5612946a800d12d7a1791955eb41e5078fc229f4ee1f0a8"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  }
+                ]
+              },
+              "source_after_projection": {
+                "level": 1,
+                "scale": "3.518437208883200000000000000000000000000e+13",
+                "scale_float64": 35184372088832,
+                "scale_log2": 45,
+                "n": 8192,
+                "log_slots": 12,
+                "is_ntt": true,
+                "is_montgomery": false,
+                "q_moduli": [
+                  36028797018652673,
+                  549755731969
+                ],
+                "maintained_rows_q0_q1": [
+                  {
+                    "component": 0,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "a04907e0e35b3d8aa53d414bedd153e40eccfa9ecb982f864c1ee2e4748788c3"
+                  },
+                  {
+                    "component": 0,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "2242adfe5b7411dbb5612946a800d12d7a1791955eb41e5078fc229f4ee1f0a8"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  }
+                ]
+              },
+              "diagnostic_before_normalize": {
+                "level": 1,
+                "scale": "3.518437208883200000000000000000000000000e+13",
+                "scale_float64": 35184372088832,
+                "scale_log2": 45,
+                "n": 8192,
+                "log_slots": 12,
+                "is_ntt": true,
+                "is_montgomery": false,
+                "q_moduli": [
+                  36028797018652673,
+                  549755731969
+                ],
+                "maintained_rows_q0_q1": [
+                  {
+                    "component": 0,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "a04907e0e35b3d8aa53d414bedd153e40eccfa9ecb982f864c1ee2e4748788c3"
+                  },
+                  {
+                    "component": 0,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "2242adfe5b7411dbb5612946a800d12d7a1791955eb41e5078fc229f4ee1f0a8"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  }
+                ]
+              },
+              "diagnostic_after_normalize": {
+                "level": 1,
+                "scale": "3.518437208883200000000000000000000000000e+13",
+                "scale_float64": 35184372088832,
+                "scale_log2": 45,
+                "n": 8192,
+                "log_slots": 12,
+                "is_ntt": true,
+                "is_montgomery": false,
+                "q_moduli": [
+                  36028797018652673,
+                  549755731969
+                ],
+                "maintained_rows_q0_q1": [
+                  {
+                    "component": 0,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "a04907e0e35b3d8aa53d414bedd153e40eccfa9ecb982f864c1ee2e4748788c3"
+                  },
+                  {
+                    "component": 0,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "2242adfe5b7411dbb5612946a800d12d7a1791955eb41e5078fc229f4ee1f0a8"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 0,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  },
+                  {
+                    "component": 1,
+                    "limb": 1,
+                    "length": 8192,
+                    "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                  }
+                ]
+              },
+              "rows_copied_exactly": true,
+              "source_unchanged": true
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "standard_q01_vs_fast_q01": [
+    {
+      "name": "Q1_mod_up",
+      "order": 1,
+      "branches": [
+        {
+          "branch": "single",
+          "present": true,
+          "standard_oracle_valid": true,
+          "metrics": {
+            "sample_count": 4096,
+            "max_abs_complex": 0,
+            "mean_abs_complex": 0,
+            "rmse_complex": 0,
+            "max_abs_real": 0,
+            "max_abs_imag": 0,
+            "max_component_abs": 0,
+            "max_abs_complex_indices": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7
+            ],
+            "max_component_indices": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7
+            ],
+            "pass_threshold": true,
+            "threshold": 0.01
+          },
+          "fast_projection": {
+            "source": {
+              "level": 16,
+              "scale": "1.125899906842624000000000000000000000000e+15",
+              "scale_float64": 1125899906842624,
+              "scale_log2": 50,
+              "n": 8192,
+              "log_slots": 12,
+              "is_ntt": true,
+              "is_montgomery": true,
+              "q_moduli": [
+                36028797018652673,
+                549755731969
+              ],
+              "maintained_rows_q0_q1": [
+                {
+                  "component": 0,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "4969e6d51bfd276fcaf2a094cd3c16c85dc110fac739672453718ed5a412354e"
+                },
+                {
+                  "component": 0,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "8269c5b586cd7096becd56788a8a812c6822dd06f9ce4186fd77334f225ffa34"
+                },
+                {
+                  "component": 1,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                },
+                {
+                  "component": 1,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                }
+              ]
+            },
+            "source_after_projection": {
+              "level": 16,
+              "scale": "1.125899906842624000000000000000000000000e+15",
+              "scale_float64": 1125899906842624,
+              "scale_log2": 50,
+              "n": 8192,
+              "log_slots": 12,
+              "is_ntt": true,
+              "is_montgomery": true,
+              "q_moduli": [
+                36028797018652673,
+                549755731969
+              ],
+              "maintained_rows_q0_q1": [
+                {
+                  "component": 0,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "4969e6d51bfd276fcaf2a094cd3c16c85dc110fac739672453718ed5a412354e"
+                },
+                {
+                  "component": 0,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "8269c5b586cd7096becd56788a8a812c6822dd06f9ce4186fd77334f225ffa34"
+                },
+                {
+                  "component": 1,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                },
+                {
+                  "component": 1,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                }
+              ]
+            },
+            "diagnostic_before_normalize": {
+              "level": 1,
+              "scale": "1.125899906842624000000000000000000000000e+15",
+              "scale_float64": 1125899906842624,
+              "scale_log2": 50,
+              "n": 8192,
+              "log_slots": 12,
+              "is_ntt": true,
+              "is_montgomery": true,
+              "q_moduli": [
+                36028797018652673,
+                549755731969
+              ],
+              "maintained_rows_q0_q1": [
+                {
+                  "component": 0,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "4969e6d51bfd276fcaf2a094cd3c16c85dc110fac739672453718ed5a412354e"
+                },
+                {
+                  "component": 0,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "8269c5b586cd7096becd56788a8a812c6822dd06f9ce4186fd77334f225ffa34"
+                },
+                {
+                  "component": 1,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                },
+                {
+                  "component": 1,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                }
+              ]
+            },
+            "diagnostic_after_normalize": {
+              "level": 1,
+              "scale": "1.125899906842624000000000000000000000000e+15",
+              "scale_float64": 1125899906842624,
+              "scale_log2": 50,
+              "n": 8192,
+              "log_slots": 12,
+              "is_ntt": true,
+              "is_montgomery": false,
+              "q_moduli": [
+                36028797018652673,
+                549755731969
+              ],
+              "maintained_rows_q0_q1": [
+                {
+                  "component": 0,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "bc9f373b284a17904ed58968922031f67abc27c73d277e1f8afb7d887f52e068"
+                },
+                {
+                  "component": 0,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "e552fa8a8add2ae1e019c9495c8e01a16dba58feeacb1def888d80385c5361c5"
+                },
+                {
+                  "component": 1,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                },
+                {
+                  "component": 1,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                }
+              ]
+            },
+            "rows_copied_exactly": true,
+            "source_unchanged": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "Q2_coeffs_to_slots",
+      "order": 2,
+      "branches": [
+        {
+          "branch": "real",
+          "present": true,
+          "standard_oracle_valid": true,
+          "metrics": {
+            "sample_count": 4096,
+            "max_abs_complex": 0.0003098126393859551,
+            "mean_abs_complex": 0.00007806778730854084,
+            "rmse_complex": 0.00009619711971140932,
+            "max_abs_real": 0.0003098126393859551,
+            "max_abs_imag": 9.99242892000824E-20,
+            "max_component_abs": 0.0003098126393859551,
+            "max_abs_complex_indices": [
+              3768
+            ],
+            "max_component_indices": [
+              3768
+            ],
+            "pass_threshold": true,
+            "threshold": 0.01
+          },
+          "fast_projection": {
+            "source": {
+              "level": 12,
+              "scale": "1.125899906842624000000000000000000000000e+15",
+              "scale_float64": 1125899906842624,
+              "scale_log2": 50,
+              "n": 8192,
+              "log_slots": 12,
+              "is_ntt": true,
+              "is_montgomery": true,
+              "q_moduli": [
+                36028797018652673,
+                549755731969
+              ],
+              "maintained_rows_q0_q1": [
+                {
+                  "component": 0,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "49e62a3b492dee621b24803d16f3cfb645b01f3252e0a63f4e5d0d2f185dc6dc"
+                },
+                {
+                  "component": 0,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "9f3a50d0b34d5fa0deba60d4eea66c942a016a3eb6cd73527632ed0ca023c7cd"
+                },
+                {
+                  "component": 1,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                },
+                {
+                  "component": 1,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                }
+              ]
+            },
+            "source_after_projection": {
+              "level": 12,
+              "scale": "1.125899906842624000000000000000000000000e+15",
+              "scale_float64": 1125899906842624,
+              "scale_log2": 50,
+              "n": 8192,
+              "log_slots": 12,
+              "is_ntt": true,
+              "is_montgomery": true,
+              "q_moduli": [
+                36028797018652673,
+                549755731969
+              ],
+              "maintained_rows_q0_q1": [
+                {
+                  "component": 0,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "49e62a3b492dee621b24803d16f3cfb645b01f3252e0a63f4e5d0d2f185dc6dc"
+                },
+                {
+                  "component": 0,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "9f3a50d0b34d5fa0deba60d4eea66c942a016a3eb6cd73527632ed0ca023c7cd"
+                },
+                {
+                  "component": 1,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                },
+                {
+                  "component": 1,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                }
+              ]
+            },
+            "diagnostic_before_normalize": {
+              "level": 1,
+              "scale": "1.125899906842624000000000000000000000000e+15",
+              "scale_float64": 1125899906842624,
+              "scale_log2": 50,
+              "n": 8192,
+              "log_slots": 12,
+              "is_ntt": true,
+              "is_montgomery": true,
+              "q_moduli": [
+                36028797018652673,
+                549755731969
+              ],
+              "maintained_rows_q0_q1": [
+                {
+                  "component": 0,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "49e62a3b492dee621b24803d16f3cfb645b01f3252e0a63f4e5d0d2f185dc6dc"
+                },
+                {
+                  "component": 0,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "9f3a50d0b34d5fa0deba60d4eea66c942a016a3eb6cd73527632ed0ca023c7cd"
+                },
+                {
+                  "component": 1,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                },
+                {
+                  "component": 1,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                }
+              ]
+            },
+            "diagnostic_after_normalize": {
+              "level": 1,
+              "scale": "1.125899906842624000000000000000000000000e+15",
+              "scale_float64": 1125899906842624,
+              "scale_log2": 50,
+              "n": 8192,
+              "log_slots": 12,
+              "is_ntt": true,
+              "is_montgomery": false,
+              "q_moduli": [
+                36028797018652673,
+                549755731969
+              ],
+              "maintained_rows_q0_q1": [
+                {
+                  "component": 0,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "237d5cc2eb0d6bef09e7a4664412fdfb0eabcf688e89f91949a837ccf4130e5f"
+                },
+                {
+                  "component": 0,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "761e74ea305f9e416900cd7a7e0ec814471399c0284aeb3b87698c592721fe5e"
+                },
+                {
+                  "component": 1,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                },
+                {
+                  "component": 1,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                }
+              ]
+            },
+            "rows_copied_exactly": true,
+            "source_unchanged": true
+          }
+        },
+        {
+          "branch": "imag",
+          "present": true,
+          "standard_oracle_valid": true,
+          "metrics": {
+            "sample_count": 4096,
+            "max_abs_complex": 0.00026367655745716595,
+            "mean_abs_complex": 0.00007911830526409151,
+            "rmse_complex": 0.00009668204862683828,
+            "max_abs_real": 0.00026367655745716595,
+            "max_abs_imag": 9.487270132685345E-20,
+            "max_component_abs": 0.00026367655745716595,
+            "max_abs_complex_indices": [
+              3058
+            ],
+            "max_component_indices": [
+              3058
+            ],
+            "pass_threshold": true,
+            "threshold": 0.01
+          },
+          "fast_projection": {
+            "source": {
+              "level": 12,
+              "scale": "1.125899906842624000000000000000000000000e+15",
+              "scale_float64": 1125899906842624,
+              "scale_log2": 50,
+              "n": 8192,
+              "log_slots": 12,
+              "is_ntt": true,
+              "is_montgomery": true,
+              "q_moduli": [
+                36028797018652673,
+                549755731969
+              ],
+              "maintained_rows_q0_q1": [
+                {
+                  "component": 0,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "313fd3327f73d4a0b4f51aeb4313e64e3cc19a8188c0fdd9976cb31f4c5773d6"
+                },
+                {
+                  "component": 0,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "cc52cbdee13d877196ffa79828d709701b196ae9afef75d6411c0e8e46c94c68"
+                },
+                {
+                  "component": 1,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                },
+                {
+                  "component": 1,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                }
+              ]
+            },
+            "source_after_projection": {
+              "level": 12,
+              "scale": "1.125899906842624000000000000000000000000e+15",
+              "scale_float64": 1125899906842624,
+              "scale_log2": 50,
+              "n": 8192,
+              "log_slots": 12,
+              "is_ntt": true,
+              "is_montgomery": true,
+              "q_moduli": [
+                36028797018652673,
+                549755731969
+              ],
+              "maintained_rows_q0_q1": [
+                {
+                  "component": 0,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "313fd3327f73d4a0b4f51aeb4313e64e3cc19a8188c0fdd9976cb31f4c5773d6"
+                },
+                {
+                  "component": 0,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "cc52cbdee13d877196ffa79828d709701b196ae9afef75d6411c0e8e46c94c68"
+                },
+                {
+                  "component": 1,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                },
+                {
+                  "component": 1,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                }
+              ]
+            },
+            "diagnostic_before_normalize": {
+              "level": 1,
+              "scale": "1.125899906842624000000000000000000000000e+15",
+              "scale_float64": 1125899906842624,
+              "scale_log2": 50,
+              "n": 8192,
+              "log_slots": 12,
+              "is_ntt": true,
+              "is_montgomery": true,
+              "q_moduli": [
+                36028797018652673,
+                549755731969
+              ],
+              "maintained_rows_q0_q1": [
+                {
+                  "component": 0,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "313fd3327f73d4a0b4f51aeb4313e64e3cc19a8188c0fdd9976cb31f4c5773d6"
+                },
+                {
+                  "component": 0,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "cc52cbdee13d877196ffa79828d709701b196ae9afef75d6411c0e8e46c94c68"
+                },
+                {
+                  "component": 1,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                },
+                {
+                  "component": 1,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                }
+              ]
+            },
+            "diagnostic_after_normalize": {
+              "level": 1,
+              "scale": "1.125899906842624000000000000000000000000e+15",
+              "scale_float64": 1125899906842624,
+              "scale_log2": 50,
+              "n": 8192,
+              "log_slots": 12,
+              "is_ntt": true,
+              "is_montgomery": false,
+              "q_moduli": [
+                36028797018652673,
+                549755731969
+              ],
+              "maintained_rows_q0_q1": [
+                {
+                  "component": 0,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "0509ebf3eb6a32330be23b1819da706420210570a7593f5599cd4ad154737803"
+                },
+                {
+                  "component": 0,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "c5680026041aec10fd21d4a2d111d9c64eeaf8eae644f7f412eac09efd41d16d"
+                },
+                {
+                  "component": 1,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                },
+                {
+                  "component": 1,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                }
+              ]
+            },
+            "rows_copied_exactly": true,
+            "source_unchanged": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "Q3_eval_mod_real",
+      "order": 3,
+      "branches": [
+        {
+          "branch": "real",
+          "present": true,
+          "standard_oracle_valid": true,
+          "metrics": {
+            "sample_count": 4096,
+            "max_abs_complex": 0.12023816407863477,
+            "mean_abs_complex": 0.03826374847653159,
+            "rmse_complex": 0.04674274743184901,
+            "max_abs_real": 0.12023816407863477,
+            "max_abs_imag": 5.539127871500962E-17,
+            "max_component_abs": 0.12023816407863477,
+            "max_abs_complex_indices": [
+              2317
+            ],
+            "max_component_indices": [
+              2317
+            ],
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "fast_projection": {
+            "source": {
+              "level": 4,
+              "scale": "3.518437208883200000000000000000000000000e+13",
+              "scale_float64": 35184372088832,
+              "scale_log2": 45,
+              "n": 8192,
+              "log_slots": 12,
+              "is_ntt": true,
+              "is_montgomery": true,
+              "q_moduli": [
+                36028797018652673,
+                549755731969
+              ],
+              "maintained_rows_q0_q1": [
+                {
+                  "component": 0,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "44aade5f4a25a7010f0fa028aeec97319db5f26eb0071bd9177d8ef04c2fd1ae"
+                },
+                {
+                  "component": 0,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "e07dc4dbfd6e593b9c575c861bc254998da639c2b9318f366152f070f48ba896"
+                },
+                {
+                  "component": 1,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                },
+                {
+                  "component": 1,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                }
+              ]
+            },
+            "source_after_projection": {
+              "level": 4,
+              "scale": "3.518437208883200000000000000000000000000e+13",
+              "scale_float64": 35184372088832,
+              "scale_log2": 45,
+              "n": 8192,
+              "log_slots": 12,
+              "is_ntt": true,
+              "is_montgomery": true,
+              "q_moduli": [
+                36028797018652673,
+                549755731969
+              ],
+              "maintained_rows_q0_q1": [
+                {
+                  "component": 0,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "44aade5f4a25a7010f0fa028aeec97319db5f26eb0071bd9177d8ef04c2fd1ae"
+                },
+                {
+                  "component": 0,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "e07dc4dbfd6e593b9c575c861bc254998da639c2b9318f366152f070f48ba896"
+                },
+                {
+                  "component": 1,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                },
+                {
+                  "component": 1,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                }
+              ]
+            },
+            "diagnostic_before_normalize": {
+              "level": 1,
+              "scale": "3.518437208883200000000000000000000000000e+13",
+              "scale_float64": 35184372088832,
+              "scale_log2": 45,
+              "n": 8192,
+              "log_slots": 12,
+              "is_ntt": true,
+              "is_montgomery": true,
+              "q_moduli": [
+                36028797018652673,
+                549755731969
+              ],
+              "maintained_rows_q0_q1": [
+                {
+                  "component": 0,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "44aade5f4a25a7010f0fa028aeec97319db5f26eb0071bd9177d8ef04c2fd1ae"
+                },
+                {
+                  "component": 0,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "e07dc4dbfd6e593b9c575c861bc254998da639c2b9318f366152f070f48ba896"
+                },
+                {
+                  "component": 1,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                },
+                {
+                  "component": 1,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                }
+              ]
+            },
+            "diagnostic_after_normalize": {
+              "level": 1,
+              "scale": "3.518437208883200000000000000000000000000e+13",
+              "scale_float64": 35184372088832,
+              "scale_log2": 45,
+              "n": 8192,
+              "log_slots": 12,
+              "is_ntt": true,
+              "is_montgomery": false,
+              "q_moduli": [
+                36028797018652673,
+                549755731969
+              ],
+              "maintained_rows_q0_q1": [
+                {
+                  "component": 0,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "bce41973cde8b98afb078d9fa7156d621723fbd59ce375504638e7307ebaf0f7"
+                },
+                {
+                  "component": 0,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "068c2ecf54f416597f368d364368166b3a28c49a8d795cd53c6a70ab5e0c0dc4"
+                },
+                {
+                  "component": 1,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                },
+                {
+                  "component": 1,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                }
+              ]
+            },
+            "rows_copied_exactly": true,
+            "source_unchanged": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "Q4_eval_mod_imag",
+      "order": 4,
+      "branches": [
+        {
+          "branch": "imag",
+          "present": true,
+          "standard_oracle_valid": true,
+          "metrics": {
+            "sample_count": 4096,
+            "max_abs_complex": 0.1206767469114737,
+            "mean_abs_complex": 0.038637122608427645,
+            "rmse_complex": 0.047020659806212145,
+            "max_abs_real": 0.1206767469114737,
+            "max_abs_imag": 5.345301530948681E-17,
+            "max_component_abs": 0.1206767469114737,
+            "max_abs_complex_indices": [
+              3058
+            ],
+            "max_component_indices": [
+              3058
+            ],
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "fast_projection": {
+            "source": {
+              "level": 4,
+              "scale": "3.518437208883200000000000000000000000000e+13",
+              "scale_float64": 35184372088832,
+              "scale_log2": 45,
+              "n": 8192,
+              "log_slots": 12,
+              "is_ntt": true,
+              "is_montgomery": true,
+              "q_moduli": [
+                36028797018652673,
+                549755731969
+              ],
+              "maintained_rows_q0_q1": [
+                {
+                  "component": 0,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "44aade5f4a25a7010f0fa028aeec97319db5f26eb0071bd9177d8ef04c2fd1ae"
+                },
+                {
+                  "component": 0,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "e07dc4dbfd6e593b9c575c861bc254998da639c2b9318f366152f070f48ba896"
+                },
+                {
+                  "component": 1,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                },
+                {
+                  "component": 1,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                }
+              ]
+            },
+            "source_after_projection": {
+              "level": 4,
+              "scale": "3.518437208883200000000000000000000000000e+13",
+              "scale_float64": 35184372088832,
+              "scale_log2": 45,
+              "n": 8192,
+              "log_slots": 12,
+              "is_ntt": true,
+              "is_montgomery": true,
+              "q_moduli": [
+                36028797018652673,
+                549755731969
+              ],
+              "maintained_rows_q0_q1": [
+                {
+                  "component": 0,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "44aade5f4a25a7010f0fa028aeec97319db5f26eb0071bd9177d8ef04c2fd1ae"
+                },
+                {
+                  "component": 0,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "e07dc4dbfd6e593b9c575c861bc254998da639c2b9318f366152f070f48ba896"
+                },
+                {
+                  "component": 1,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                },
+                {
+                  "component": 1,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                }
+              ]
+            },
+            "diagnostic_before_normalize": {
+              "level": 1,
+              "scale": "3.518437208883200000000000000000000000000e+13",
+              "scale_float64": 35184372088832,
+              "scale_log2": 45,
+              "n": 8192,
+              "log_slots": 12,
+              "is_ntt": true,
+              "is_montgomery": true,
+              "q_moduli": [
+                36028797018652673,
+                549755731969
+              ],
+              "maintained_rows_q0_q1": [
+                {
+                  "component": 0,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "44aade5f4a25a7010f0fa028aeec97319db5f26eb0071bd9177d8ef04c2fd1ae"
+                },
+                {
+                  "component": 0,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "e07dc4dbfd6e593b9c575c861bc254998da639c2b9318f366152f070f48ba896"
+                },
+                {
+                  "component": 1,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                },
+                {
+                  "component": 1,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                }
+              ]
+            },
+            "diagnostic_after_normalize": {
+              "level": 1,
+              "scale": "3.518437208883200000000000000000000000000e+13",
+              "scale_float64": 35184372088832,
+              "scale_log2": 45,
+              "n": 8192,
+              "log_slots": 12,
+              "is_ntt": true,
+              "is_montgomery": false,
+              "q_moduli": [
+                36028797018652673,
+                549755731969
+              ],
+              "maintained_rows_q0_q1": [
+                {
+                  "component": 0,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "bce41973cde8b98afb078d9fa7156d621723fbd59ce375504638e7307ebaf0f7"
+                },
+                {
+                  "component": 0,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "068c2ecf54f416597f368d364368166b3a28c49a8d795cd53c6a70ab5e0c0dc4"
+                },
+                {
+                  "component": 1,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                },
+                {
+                  "component": 1,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                }
+              ]
+            },
+            "rows_copied_exactly": true,
+            "source_unchanged": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "Q5_slots_to_coeffs",
+      "order": 5,
+      "branches": [
+        {
+          "branch": "combined",
+          "present": true,
+          "standard_oracle_valid": true,
+          "metrics": {
+            "sample_count": 4096,
+            "max_abs_complex": 0.19768030822108423,
+            "mean_abs_complex": 0.11990124276347486,
+            "rmse_complex": 0.13260206463086074,
+            "max_abs_real": 0.1875003433897564,
+            "max_abs_imag": 0.06266212878278056,
+            "max_component_abs": 0.1875003433897564,
+            "max_abs_complex_indices": [
+              1700
+            ],
+            "max_component_indices": [
+              3457
+            ],
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "fast_projection": {
+            "source": {
+              "level": 1,
+              "scale": "3.518437208883200000000000000000000000000e+13",
+              "scale_float64": 35184372088832,
+              "scale_log2": 45,
+              "n": 8192,
+              "log_slots": 12,
+              "is_ntt": true,
+              "is_montgomery": true,
+              "q_moduli": [
+                36028797018652673,
+                549755731969
+              ],
+              "maintained_rows_q0_q1": [
+                {
+                  "component": 0,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "f1e0468d02d1a3782c02916915fd7100483d7a6d8a1637aae87bcb73380ce61b"
+                },
+                {
+                  "component": 0,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "1f47f3257b8b902b741afd7917ba2c070b4434c76c3761dd41a5c4a10121b486"
+                },
+                {
+                  "component": 1,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                },
+                {
+                  "component": 1,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                }
+              ]
+            },
+            "source_after_projection": {
+              "level": 1,
+              "scale": "3.518437208883200000000000000000000000000e+13",
+              "scale_float64": 35184372088832,
+              "scale_log2": 45,
+              "n": 8192,
+              "log_slots": 12,
+              "is_ntt": true,
+              "is_montgomery": true,
+              "q_moduli": [
+                36028797018652673,
+                549755731969
+              ],
+              "maintained_rows_q0_q1": [
+                {
+                  "component": 0,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "f1e0468d02d1a3782c02916915fd7100483d7a6d8a1637aae87bcb73380ce61b"
+                },
+                {
+                  "component": 0,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "1f47f3257b8b902b741afd7917ba2c070b4434c76c3761dd41a5c4a10121b486"
+                },
+                {
+                  "component": 1,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                },
+                {
+                  "component": 1,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                }
+              ]
+            },
+            "diagnostic_before_normalize": {
+              "level": 1,
+              "scale": "3.518437208883200000000000000000000000000e+13",
+              "scale_float64": 35184372088832,
+              "scale_log2": 45,
+              "n": 8192,
+              "log_slots": 12,
+              "is_ntt": true,
+              "is_montgomery": true,
+              "q_moduli": [
+                36028797018652673,
+                549755731969
+              ],
+              "maintained_rows_q0_q1": [
+                {
+                  "component": 0,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "f1e0468d02d1a3782c02916915fd7100483d7a6d8a1637aae87bcb73380ce61b"
+                },
+                {
+                  "component": 0,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "1f47f3257b8b902b741afd7917ba2c070b4434c76c3761dd41a5c4a10121b486"
+                },
+                {
+                  "component": 1,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                },
+                {
+                  "component": 1,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                }
+              ]
+            },
+            "diagnostic_after_normalize": {
+              "level": 1,
+              "scale": "3.518437208883200000000000000000000000000e+13",
+              "scale_float64": 35184372088832,
+              "scale_log2": 45,
+              "n": 8192,
+              "log_slots": 12,
+              "is_ntt": true,
+              "is_montgomery": false,
+              "q_moduli": [
+                36028797018652673,
+                549755731969
+              ],
+              "maintained_rows_q0_q1": [
+                {
+                  "component": 0,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "42dabda91cf1fff3af035ee5a09fdfa6e9d1e0d623f0fada9f6787a989a75049"
+                },
+                {
+                  "component": 0,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "3fe667975b79057855b870c7e45d0db15b631d47ef773c06ea1c76716843317c"
+                },
+                {
+                  "component": 1,
+                  "limb": 0,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                },
+                {
+                  "component": 1,
+                  "limb": 1,
+                  "length": 8192,
+                  "sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+                }
+              ]
+            },
+            "rows_copied_exactly": true,
+            "source_unchanged": true
+          }
+        }
+      ]
+    }
+  ],
+  "f2_consistency": {
+    "stage": "Q5_slots_to_coeffs",
+    "method": "Fast q01 projection is the IMForm-only F2 view; source remains untouched",
+    "fast_q01_matches_f2_view": true,
+    "fast_q01_vs_f2_view": {
+      "sample_count": 4096,
+      "max_abs_complex": 0,
+      "mean_abs_complex": 0,
+      "rmse_complex": 0,
+      "max_abs_real": 0,
+      "max_abs_imag": 0,
+      "max_component_abs": 0,
+      "max_abs_complex_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "max_component_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "pass_threshold": true,
+      "threshold": 0.01
+    },
+    "existing_f2_view_vs_input": {
+      "sample_count": 4096,
+      "max_abs_complex": 0.19768030920027857,
+      "mean_abs_complex": 0.11990124276786196,
+      "rmse_complex": 0.1326020646243982,
+      "max_abs_real": 0.18750034197742593,
+      "max_abs_imag": 0.06266213402955517,
+      "max_component_abs": 0.18750034197742593,
+      "max_abs_complex_indices": [
+        1700
+      ],
+      "max_component_indices": [
+        6,
+        13,
+        20,
+        27,
+        34,
+        41,
+        48,
+        55
+      ],
+      "pass_threshold": false,
+      "threshold": 0.01
+    },
+    "existing_f2_diverges": true
+  },
+  "first_supported_cause": "Q3_eval_mod_real/real",
+  "diagnostic_classification": "eval_mod",
+  "unresolved_reason": "Resolved: Q1 and both Q2 branches have valid Standard projection oracles and pass Standard-q01 vs Fast-q01; Q3 real is the first valid comparison above 1e-2."
+}
