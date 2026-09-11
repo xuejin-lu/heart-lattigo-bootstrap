@@ -299,6 +299,18 @@ func q01FastBranch(stage q01StageSnapshot, branch q01BranchSnapshot, params ckks
 	return result, nil
 }
 
+func q01DirectF2Decode(source *rlwe.Ciphertext, params ckks.Parameters, zeroBootstrapSecret *rlwe.SecretKey) ([]complex128, error) {
+	if source == nil || source.Level() != 1 || !source.IsMontgomery {
+		return nil, fmt.Errorf("existing F2 view requires a level-1 Montgomery Q5 source")
+	}
+	view := finalizationDiagnosticCopy(source)
+	if err := finalizationTransformMaintained(view, params, false); err != nil {
+		return nil, fmt.Errorf("F2 IMForm: %w", err)
+	}
+	view.IsMontgomery = false
+	return diagnosticDecode(params, view, zeroBootstrapSecret)
+}
+
 func q01ReferenceStage(reference Q01DiagnosticResult, name string) (Q01StageResult, error) {
 	for _, stage := range reference.Stages {
 		if stage.Name == name {
@@ -432,15 +444,30 @@ func RunQ01DiagnosticExperiment(cfg BootstrapConfig, primaryRoot, backendRoot, s
 		result.Stages = append(result.Stages, stageResult)
 	}
 	q5, err := q01ReferenceStage(result, "Q5_slots_to_coeffs")
-	if err == nil && len(q5.Branches) == 1 && len(q5.Branches[0].FastQ01Decoded) == len(input) {
-		q5Branch := q5.Branches[0]
-		inputMetrics, metricsErr := compareComplexVectors(input, finalizationValues(q5Branch.FastQ01Decoded), correctnessThreshold)
-		if metricsErr != nil {
-			return Q01DiagnosticResult{}, metricsErr
-		}
-		f2Consistency := &Q01F2Consistency{Stage: "Q5_slots_to_coeffs", Method: "Fast q01 projection is the IMForm-only F2 view; source remains untouched", FastQ01MatchesF2View: true, FastQ01VsF2View: &CorrectnessMetrics{PassThreshold: true, Threshold: correctnessThreshold}, ExistingF2ViewVsInput: &inputMetrics, ExistingF2Diverges: !inputMetrics.PassThreshold}
-		result.F2Consistency = f2Consistency
+	if err != nil || len(q5.Branches) != 1 || len(q5.Branches[0].FastQ01Decoded) != len(input) {
+		return Q01DiagnosticResult{}, fmt.Errorf("Q5 F2 consistency checkpoint is incomplete")
 	}
+	var q5Source *rlwe.Ciphertext
+	for _, snapshot := range snapshots {
+		if snapshot.Name == "Q5_slots_to_coeffs" && len(snapshot.Branches) == 1 {
+			q5Source = snapshot.Branches[0].CT
+		}
+	}
+	f2Decoded, err := q01DirectF2Decode(q5Source, btp.BootstrappingParameters, zeroBootstrapSecret)
+	if err != nil {
+		return Q01DiagnosticResult{}, err
+	}
+	q5Branch := q5.Branches[0]
+	fastQ01Decoded := finalizationValues(q5Branch.FastQ01Decoded)
+	f2Metrics, err := compareComplexVectors(fastQ01Decoded, f2Decoded, correctnessThreshold)
+	if err != nil {
+		return Q01DiagnosticResult{}, fmt.Errorf("Q5/F2 consistency: %w", err)
+	}
+	inputMetrics, err := compareComplexVectors(input, f2Decoded, correctnessThreshold)
+	if err != nil {
+		return Q01DiagnosticResult{}, err
+	}
+	result.F2Consistency = &Q01F2Consistency{Stage: "Q5_slots_to_coeffs", Method: "Fast q01 projection is the IMForm-only F2 view; source remains untouched", FastQ01MatchesF2View: f2Metrics.PassThreshold && f2Metrics.MaxAbsComplex == 0, FastQ01VsF2View: &f2Metrics, ExistingF2ViewVsInput: &inputMetrics, ExistingF2Diverges: !inputMetrics.PassThreshold}
 	result.FirstSupportedCause, result.Classification = q01Classify(result)
 	return result, nil
 }
