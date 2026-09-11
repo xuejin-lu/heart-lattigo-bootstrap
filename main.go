@@ -15,6 +15,8 @@ func main() {
 	stages := flag.Bool("stages", false, "measure bootstrap stages instead of only the full bootstrap")
 	correctness := flag.Bool("correctness", false, "decode one complete bootstrap and record numerical correctness")
 	diagnostic := flag.Bool("diagnostic", false, "trace public bootstrap stages for numerical diagnosis")
+	finalizationDiagnostic := flag.Bool("finalization-diagnostic", false, "diagnose the Fast public finalization boundary")
+	standardReference := flag.String("standard-reference", "", "EXP-002-C-DIAG-P Standard result JSON used as the logical reference")
 	flag.Parse()
 
 	cfg, err := LoadBootstrapConfig(*configPath)
@@ -46,10 +48,21 @@ func main() {
 	if *diagnostic {
 		selectedModes++
 	}
-	if selectedModes > 1 {
-		log.Fatal("-stages, -correctness, and -diagnostic cannot be used together")
+	if *finalizationDiagnostic {
+		selectedModes++
 	}
-	if *diagnostic {
+	if selectedModes > 1 {
+		log.Fatal("-stages, -correctness, -diagnostic, and -finalization-diagnostic cannot be used together")
+	}
+	if *finalizationDiagnostic {
+		result, err := RunFinalizationBoundaryExperiment(cfg, primaryRoot, backendRoot, *standardReference)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if err := WriteFinalizationDiagnosticResult(result, *outputPath); err != nil {
+			log.Fatal(err)
+		}
+	} else if *diagnostic {
 		result, err := RunDiagnosticExperiment(cfg, primaryRoot, backendRoot)
 		if err != nil {
 			log.Fatal(err)
