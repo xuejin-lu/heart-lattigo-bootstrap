@@ -1,4 +1,4 @@
 # Current Task
 
-Task: Implement `specs/FIX-001-DIAG-POLY-ORACLE-CORRECTION.md`
-Status: COMPLETE
+Task: Implement `specs/FIX-001-DIAG-T3-alignment.md`
+Status: READY
