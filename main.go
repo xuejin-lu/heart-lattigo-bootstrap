@@ -19,6 +19,7 @@ func main() {
 	standardReference := flag.String("standard-reference", "", "EXP-002-C-DIAG-P Standard result JSON used as the logical reference")
 	q01Diagnostic := flag.Bool("q01-diagnostic", false, "diagnose q0/q1 intermediate projections")
 	q01StandardReference := flag.String("q01-standard-reference", "", "EXP-002-C-DIAG-Q01 Standard result JSON used as the logical reference")
+	fix001DiagPoly := flag.Bool("fix001-diag-poly", false, "replay formal Chebyshev powers for FIX-001 diagnosis")
 	flag.Parse()
 
 	cfg, err := LoadBootstrapConfig(*configPath)
@@ -56,8 +57,11 @@ func main() {
 	if *q01Diagnostic {
 		selectedModes++
 	}
+	if *fix001DiagPoly {
+		selectedModes++
+	}
 	if selectedModes > 1 {
-		log.Fatal("-stages, -correctness, -diagnostic, -finalization-diagnostic, and -q01-diagnostic cannot be used together")
+		log.Fatal("bootstrap diagnostic modes cannot be used together")
 	}
 	if *q01Diagnostic {
 		result, err := RunQ01DiagnosticExperiment(cfg, primaryRoot, backendRoot, *q01StandardReference)
@@ -65,6 +69,10 @@ func main() {
 			log.Fatal(err)
 		}
 		if err := WriteQ01DiagnosticResult(result, *outputPath); err != nil {
+			log.Fatal(err)
+		}
+	} else if *fix001DiagPoly {
+		if err := runFIX001DiagPoly(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
 			log.Fatal(err)
 		}
 	} else if *finalizationDiagnostic {
