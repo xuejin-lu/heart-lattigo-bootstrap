@@ -1,4 +1,4 @@
 # Current Task
 
-Task: Implement `specs/EXP-002-C-DIAG-T2-primitive.md`
-Status: COMPLETE
+Task: Implement `specs/FIX-001-fast-chebyshev-capacity-safe.md`
+Status: READY
