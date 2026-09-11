@@ -109,13 +109,13 @@ type Fix001T2Comparison struct {
 }
 
 type Fix001PowerSummary struct {
-	N         int                 `json:"n"`
-	A         int                 `json:"a"`
-	B         int                 `json:"b"`
-	C         int                 `json:"c"`
+	N          int                            `json:"n"`
+	A          int                            `json:"a"`
+	B          int                            `json:"b"`
+	C          int                            `json:"c"`
 	Ciphertext FinalizationCiphertextEvidence `json:"ciphertext"`
-	Metrics   CorrectnessMetrics `json:"metrics"`
-	Pass      bool               `json:"pass"`
+	Metrics    CorrectnessMetrics             `json:"metrics"`
+	Pass       bool                           `json:"pass"`
 }
 
 type fix001HistoricalPoly struct {
@@ -131,33 +131,6 @@ type fix001HistoricalEvalMod struct {
 
 func fix001ScaleString(scale rlwe.Scale) string {
 	return scale.Value.Text('e', rlwe.ScalePrecisionLog10)
-}
-
-func fix001ExpectedPower(n int, x []complex128, memo map[int][]complex128) []complex128 {
-	if value, ok := memo[n]; ok {
-		return value
-	}
-	if n == 1 {
-		memo[n] = append([]complex128(nil), x...)
-		return memo[n]
-	}
-	a, b := commonpolynomial.SplitDegree(n)
-	va := fix001ExpectedPower(a, x, memo)
-	vb := fix001ExpectedPower(b, x, memo)
-	c := a - b
-	if c < 0 {
-		c = -c
-	}
-	vc := make([]complex128, len(x))
-	if c != 0 {
-		vc = fix001ExpectedPower(c, x, memo)
-	}
-	out := make([]complex128, len(x))
-	for i := range out {
-		out[i] = 2*va[i]*vb[i] - vc[i]
-	}
-	memo[n] = out
-	return out
 }
 
 func fix001TargetScale(ct *rlwe.Ciphertext, eval *bootstrapping.FastEvaluator) rlwe.Scale {
@@ -435,7 +408,7 @@ func RunFIX001DiagPoly(cfg BootstrapConfig, primaryRoot, backendRoot, historical
 	} else {
 		cause = "diagnostic_inconsistency"
 	}
-	result := Fix001DiagPolyResult{SchemaVersion: "fix-001-diag-poly.v1", Timestamp: time.Now().UTC(), Primary: gitMetadata(primaryRoot), Lattigo: gitMetadata(backendRoot), Environment: EnvironmentMetadata{GoVersion: runtime.Version(), OS: runtime.GOOS, Arch: runtime.GOARCH, CPU: cpuModel(), CPUs: runtime.NumCPU()}, Config: cfg, Parameters: parameterMetadata(residual, btp), Workload: CorrectnessWorkload{Identifier: "reproducibleInput.v1", Formula: "real=((i%7)-3)/16; imag=((i%5)-2)/32; value=real+imag*i", LogicalSlots: residual.MaxSlots()}, Backend: "Fast repaired formal LogN13", BackendFastGoFileBlob: gitOutput(backendRoot, "rev-parse", "HEAD:circuits/ckks/polynomial/fast.go"), RepairedCorrectionMarker: "powers captured after repaired post-Rescale Chebyshev correction ordering in fast.go", E2Decoded: correctnessValues(e2Decoded), E2VsHistorical: e2Metrics, E2InputMatch: true, GeneratedPowers: powerRecords, PowerOracleValidation: true, FailingPowers: failing, FirstFailingPowerN: firstSupported, FirstFailingPowerDeps: firstDeps, FirstFailingPowerMetadata: firstMeta, T2Comparison: Fix001T2Comparison{RepairedMetrics: t2Metrics, HistoricalMaxComponent: historicalT2, AbsoluteImprovement: historicalT2 - t2Metrics.MaxComponentAbs, Pass: t2Metrics.PassThreshold, Level: func() int {
+	result := Fix001DiagPolyResult{SchemaVersion: "fix-001-diag-poly-corrected.v1", Timestamp: time.Now().UTC(), Primary: gitMetadata(primaryRoot), Lattigo: gitMetadata(backendRoot), Environment: EnvironmentMetadata{GoVersion: runtime.Version(), OS: runtime.GOOS, Arch: runtime.GOARCH, CPU: cpuModel(), CPUs: runtime.NumCPU()}, Config: cfg, Parameters: parameterMetadata(residual, btp), Workload: CorrectnessWorkload{Identifier: "reproducibleInput.v1", Formula: "real=((i%7)-3)/16; imag=((i%5)-2)/32; value=real+imag*i", LogicalSlots: residual.MaxSlots()}, Backend: "Fast repaired formal LogN13", BackendFastGoFileBlob: gitOutput(backendRoot, "rev-parse", "HEAD:circuits/ckks/polynomial/fast.go"), RepairedCorrectionMarker: "powers captured after repaired post-Rescale Chebyshev correction ordering in fast.go", E2Decoded: correctnessValues(e2Decoded), E2VsHistorical: e2Metrics, E2InputMatch: true, GeneratedPowers: powerRecords, PowerOracleValidation: true, FailingPowers: failing, FirstFailingPowerN: firstSupported, FirstFailingPowerDeps: firstDeps, FirstFailingPowerMetadata: firstMeta, T2Comparison: Fix001T2Comparison{RepairedMetrics: t2Metrics, HistoricalMaxComponent: historicalT2, AbsoluteImprovement: historicalT2 - t2Metrics.MaxComponentAbs, Pass: t2Metrics.PassThreshold, Level: func() int {
 		for _, p := range powerRecords {
 			if p.N == 2 {
 				return p.Ciphertext.Level
@@ -449,7 +422,7 @@ func RunFIX001DiagPoly(cfg BootstrapConfig, primaryRoot, backendRoot, historical
 			}
 		}
 		return ""
-	}(), PostRescaleSemanticOracle: t2Metrics.PassThreshold}, WholePolynomial: Fix001WholePolynomial{Ciphertext: finalizationEvidence(whole), Decoded: correctnessValues(wholeDecoded), Expected: correctnessValues(wholeExpected), VsExactOracle: wholeExact, VsPriorE3Actual: wholePrior, ReproducedPriorFailure: !wholeExact.PassThreshold}, PublicQ3: Fix001PublicQ3{Ciphertext: finalizationEvidence(publicOut), Decoded: correctnessValues(publicDecoded), VsStandardQ01: publicMetrics, Pass: publicMetrics.PassThreshold}, Plan: fix001Plan(plan), FirstSupportedCause: cause, StandardReferencePath: standardQ01Path, HistoricalFastCommit: "ce79b861c9b4ecb45f7a42ca5de2e98dbbdb9ef2", RepairedFastCommit: "87be78ff3c591932699aba63d3be46ca306a6eea", SecondaryWorktreeClean: false, TemporarySourceRemoved: false, Threshold: correctnessThreshold}
+	}(), PostRescaleSemanticOracle: t2Metrics.PassThreshold}, WholePolynomial: Fix001WholePolynomial{Ciphertext: finalizationEvidence(whole), Decoded: correctnessValues(wholeDecoded), Expected: correctnessValues(wholeExpected), VsExactOracle: wholeExact, VsPriorE3Actual: wholePrior, ReproducedPriorFailure: !wholeExact.PassThreshold}, PublicQ3: Fix001PublicQ3{Ciphertext: finalizationEvidence(publicOut), Decoded: correctnessValues(publicDecoded), VsStandardQ01: publicMetrics, Pass: publicMetrics.PassThreshold}, Plan: fix001Plan(plan), FirstSupportedCause: cause, StandardReferencePath: standardQ01Path, HistoricalFastCommit: "ce79b861c9b4ecb45f7a42ca5de2e98dbbdb9ef2", RepairedFastCommit: "87be78ff3c591932699aba63d3be46ca306a6eea", SecondaryWorktreeClean: false, TemporarySourceRemoved: false, Threshold: correctnessThreshold, Notes: []string{"The previous FIX-001-DIAG-POLY replay is superseded because its plaintext Chebyshev oracle treated T0 as zero.", "This correction changed Primary diagnostic oracle code only; production Lattigo evidence was not changed.", "The independent EXP-002-C-DIAG-T2 capacity experiment remains separate evidence and was not retroactively rewritten."}}
 	_ = ctxtN1
 	_ = ctxtN2
 	return result, nil
@@ -473,31 +446,36 @@ func WriteFIX001DiagPolySummary(result Fix001DiagPolyResult, path string) error 
 		powers[i] = Fix001PowerSummary{N: power.N, A: power.A, B: power.B, C: power.C, Ciphertext: power.Ciphertext, Metrics: power.Metrics, Pass: power.Pass}
 	}
 	summary := struct {
-		SchemaVersion           string                    `json:"schema_version"`
-		Timestamp               time.Time                 `json:"timestamp"`
-		Backend                 string                    `json:"backend"`
-		Primary                 RepositoryMetadata        `json:"primary_repository"`
-		Lattigo                 RepositoryMetadata        `json:"lattigo_repository"`
-		RepairedFastCommit      string                    `json:"repaired_fast_commit"`
-		HistoricalFastCommit    string                    `json:"historical_fast_commit"`
-		E2InputMatch            bool                      `json:"e2_input_match"`
-		E2VsHistorical          CorrectnessMetrics        `json:"e2_vs_historical"`
-		GeneratedPowers         []Fix001PowerSummary      `json:"generated_powers"`
-		FailingPowers           []int                     `json:"failing_powers"`
-		T2Comparison            Fix001T2Comparison        `json:"t2_comparison"`
-		WholePolynomial         Fix001WholePolynomial    `json:"whole_polynomial"`
-		PublicQ3                Fix001PublicQ3           `json:"public_q3_real"`
-		Plan                    Fix001Plan               `json:"paterson_stockmeyer_plan"`
-		FirstSupportedCause     string                    `json:"first_supported_cause"`
-		Threshold               float64                   `json:"threshold"`
-		PowerOracleValidation   bool                      `json:"power_oracle_validation"`
-		SecondaryWorktreeClean  bool                      `json:"secondary_worktree_clean"`
-		TemporarySourceRemoved  bool                      `json:"temporary_secondary_source_removed"`
-	}{SchemaVersion: result.SchemaVersion, Timestamp: result.Timestamp, Backend: result.Backend, Primary: result.Primary, Lattigo: result.Lattigo, RepairedFastCommit: result.RepairedFastCommit, HistoricalFastCommit: result.HistoricalFastCommit, E2InputMatch: result.E2InputMatch, E2VsHistorical: result.E2VsHistorical, GeneratedPowers: powers, FailingPowers: result.FailingPowers, T2Comparison: result.T2Comparison, WholePolynomial: result.WholePolynomial, PublicQ3: result.PublicQ3, Plan: result.Plan, FirstSupportedCause: result.FirstSupportedCause, Threshold: result.Threshold, PowerOracleValidation: result.PowerOracleValidation, SecondaryWorktreeClean: result.SecondaryWorktreeClean, TemporarySourceRemoved: result.TemporarySourceRemoved}
+		SchemaVersion          string                `json:"schema_version"`
+		Timestamp              time.Time             `json:"timestamp"`
+		Backend                string                `json:"backend"`
+		Primary                RepositoryMetadata    `json:"primary_repository"`
+		Lattigo                RepositoryMetadata    `json:"lattigo_repository"`
+		RepairedFastCommit     string                `json:"repaired_fast_commit"`
+		HistoricalFastCommit   string                `json:"historical_fast_commit"`
+		E2InputMatch           bool                  `json:"e2_input_match"`
+		E2VsHistorical         CorrectnessMetrics    `json:"e2_vs_historical"`
+		GeneratedPowers        []Fix001PowerSummary  `json:"generated_powers"`
+		FailingPowers          []int                 `json:"failing_powers"`
+		T2Comparison           Fix001T2Comparison    `json:"t2_comparison"`
+		WholePolynomial        Fix001WholePolynomial `json:"whole_polynomial"`
+		PublicQ3               Fix001PublicQ3        `json:"public_q3_real"`
+		Plan                   Fix001Plan            `json:"paterson_stockmeyer_plan"`
+		FirstSupportedCause    string                `json:"first_supported_cause"`
+		Threshold              float64               `json:"threshold"`
+		PowerOracleValidation  bool                  `json:"power_oracle_validation"`
+		SecondaryWorktreeClean bool                  `json:"secondary_worktree_clean"`
+		TemporarySourceRemoved bool                  `json:"temporary_secondary_source_removed"`
+		Notes                  []string              `json:"notes"`
+	}{SchemaVersion: result.SchemaVersion, Timestamp: result.Timestamp, Backend: result.Backend, Primary: result.Primary, Lattigo: result.Lattigo, RepairedFastCommit: result.RepairedFastCommit, HistoricalFastCommit: result.HistoricalFastCommit, E2InputMatch: result.E2InputMatch, E2VsHistorical: result.E2VsHistorical, GeneratedPowers: powers, FailingPowers: result.FailingPowers, T2Comparison: result.T2Comparison, WholePolynomial: result.WholePolynomial, PublicQ3: result.PublicQ3, Plan: result.Plan, FirstSupportedCause: result.FirstSupportedCause, Threshold: result.Threshold, PowerOracleValidation: result.PowerOracleValidation, SecondaryWorktreeClean: result.SecondaryWorktreeClean, TemporarySourceRemoved: result.TemporarySourceRemoved, Notes: result.Notes}
 	data, err := json.MarshalIndent(summary, "", "  ")
-	if err != nil { return err }
+	if err != nil {
+		return err
+	}
 	data = append(data, '\n')
-	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil { return err }
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		return err
+	}
 	return os.WriteFile(path, data, 0o644)
 }
 
@@ -506,6 +484,9 @@ func runFIX001DiagPoly(cfg BootstrapConfig, primaryRoot, backendRoot, outPath st
 	if err != nil {
 		return err
 	}
-	if err := WriteFIX001DiagPolyResult(result, outPath); err != nil { return err }
-	return WriteFIX001DiagPolySummary(result, filepath.Join(filepath.Dir(outPath), "FIX-001-DIAG-POLY-logN13-summary.json"))
+	if err := WriteFIX001DiagPolyResult(result, outPath); err != nil {
+		return err
+	}
+	summaryPath := filepath.Join(filepath.Dir(outPath), "FIX-001-DIAG-POLY-CORRECTED-logN13-summary.json")
+	return WriteFIX001DiagPolySummary(result, summaryPath)
 }
