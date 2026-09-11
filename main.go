@@ -21,6 +21,7 @@ func main() {
 	q01StandardReference := flag.String("q01-standard-reference", "", "EXP-002-C-DIAG-Q01 Standard result JSON used as the logical reference")
 	fix001DiagPoly := flag.Bool("fix001-diag-poly", false, "replay formal Chebyshev powers for FIX-001 diagnosis")
 	fix001DiagT3 := flag.Bool("fix001-diag-t3", false, "replay formal T3 correction alignment for FIX-001 diagnosis")
+	fix001DiagT3Capacity := flag.Bool("fix001-diag-t3-capacity", false, "diagnose FIX-001 T3 q0/q1 capacity")
 	flag.Parse()
 
 	cfg, err := LoadBootstrapConfig(*configPath)
@@ -64,6 +65,9 @@ func main() {
 	if *fix001DiagT3 {
 		selectedModes++
 	}
+	if *fix001DiagT3Capacity {
+		selectedModes++
+	}
 	if selectedModes > 1 {
 		log.Fatal("bootstrap diagnostic modes cannot be used together")
 	}
@@ -81,6 +85,10 @@ func main() {
 		}
 	} else if *fix001DiagT3 {
 		if err := runFIX001T3(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
+			log.Fatal(err)
+		}
+	} else if *fix001DiagT3Capacity {
+		if err := runFIX001T3Capacity(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
 			log.Fatal(err)
 		}
 	} else if *finalizationDiagnostic {
