@@ -142,10 +142,7 @@ func runBootstrap(eval bootstrapping.Bootstrapper, params ckks.Parameters, btpPa
 }
 
 func reproducibleInput(params ckks.Parameters, btpParams bootstrapping.Parameters) *rlwe.Ciphertext {
-	values := make([]complex128, params.MaxSlots())
-	for i := range values {
-		values[i] = complex(float64((i%7)-3)/16, float64((i%5)-2)/32)
-	}
+	values := reproducibleValues(params.MaxSlots())
 	encoder := ckks.NewEncoder(params)
 	pt := ckks.NewPlaintext(params, 0)
 	pt.IsNTT = true
@@ -161,6 +158,14 @@ func reproducibleInput(params ckks.Parameters, btpParams bootstrapping.Parameter
 	ct.IsNTT = pt.IsNTT
 	ct.IsMontgomery = pt.IsMontgomery
 	return ct
+}
+
+func reproducibleValues(slotCount int) []complex128 {
+	values := make([]complex128, slotCount)
+	for i := range values {
+		values[i] = complex(float64((i%7)-3)/16, float64((i%5)-2)/32)
+	}
+	return values
 }
 
 func parameterMetadata(params ckks.Parameters, btp bootstrapping.Parameters) ExperimentParameters {

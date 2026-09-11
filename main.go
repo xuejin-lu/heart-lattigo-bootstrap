@@ -13,6 +13,7 @@ func main() {
 	repetitions := flag.Int("repetitions", 0, "override config repetition count")
 	warmup := flag.Int("warmup", -1, "override config warm-up count")
 	stages := flag.Bool("stages", false, "measure bootstrap stages instead of only the full bootstrap")
+	correctness := flag.Bool("correctness", false, "decode one complete bootstrap and record numerical correctness")
 	flag.Parse()
 
 	cfg, err := LoadBootstrapConfig(*configPath)
@@ -34,7 +35,18 @@ func main() {
 	if backendRoot == "" {
 		backendRoot = primaryRoot + "/../lattigo"
 	}
-	if *stages {
+	if *stages && *correctness {
+		log.Fatal("-stages and -correctness cannot be used together")
+	}
+	if *correctness {
+		result, err := RunCorrectnessExperiment(cfg, primaryRoot, backendRoot)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if err := WriteCorrectnessResult(result, *outputPath); err != nil {
+			log.Fatal(err)
+		}
+	} else if *stages {
 		result, err := RunStageExperiment(cfg, primaryRoot, backendRoot)
 		if err != nil {
 			log.Fatal(err)
