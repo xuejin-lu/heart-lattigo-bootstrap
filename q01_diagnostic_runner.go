@@ -64,8 +64,22 @@ type Q01F2Consistency struct {
 	Method                string              `json:"method"`
 	FastQ01MatchesF2View  bool                `json:"fast_q01_matches_f2_view"`
 	FastQ01VsF2View       *CorrectnessMetrics `json:"fast_q01_vs_f2_view,omitempty"`
+	FastQ01VsStagedFinal  *CorrectnessMetrics `json:"fast_q01_vs_staged_final,omitempty"`
+	StagedFinalVsInput    *CorrectnessMetrics `json:"staged_final_vs_input,omitempty"`
+	StagedFinalDecoded    []CorrectnessValue  `json:"staged_final_decoded,omitempty"`
 	ExistingF2ViewVsInput *CorrectnessMetrics `json:"existing_f2_view_vs_input,omitempty"`
 	ExistingF2Diverges    bool                `json:"existing_f2_diverges"`
+}
+
+type Q01OfficialOutput struct {
+	Present                bool                           `json:"present"`
+	Ciphertext             FinalizationCiphertextEvidence `json:"ciphertext"`
+	GeneratedSecretDecoded []CorrectnessValue             `json:"generated_secret_decoded,omitempty"`
+	ZeroSecretDecoded      []CorrectnessValue             `json:"zero_secret_decoded,omitempty"`
+	GeneratedVsInput       *CorrectnessMetrics            `json:"generated_vs_input,omitempty"`
+	ZeroVsInput            *CorrectnessMetrics            `json:"zero_vs_input,omitempty"`
+	ZeroVsStandard         *CorrectnessMetrics            `json:"zero_vs_standard,omitempty"`
+	DecodeErrors           []string                       `json:"decode_errors,omitempty"`
 }
 
 type Q01DiagnosticResult struct {
@@ -82,6 +96,7 @@ type Q01DiagnosticResult struct {
 	Q01Moduli             []uint64             `json:"q01_moduli"`
 	StandardReferencePath string               `json:"standard_reference_path,omitempty"`
 	Stages                []Q01StageResult     `json:"stages"`
+	OfficialOutput        *Q01OfficialOutput   `json:"official_output,omitempty"`
 	F2Consistency         *Q01F2Consistency    `json:"f2_consistency,omitempty"`
 	FirstSupportedCause   string               `json:"first_supported_cause"`
 	Classification        string               `json:"diagnostic_classification"`
@@ -203,26 +218,26 @@ func q01Projection(params ckks.Parameters, source *rlwe.Ciphertext, normalizeMon
 	return projection, evidence, nil
 }
 
-func q01RunStageSnapshots(eval *bootstrapping.Evaluator, residual ckks.Parameters, btp bootstrapping.Parameters) ([]q01StageSnapshot, []complex128, error) {
+func q01RunStageSnapshots(eval *bootstrapping.Evaluator, residual ckks.Parameters, btp bootstrapping.Parameters) ([]q01StageSnapshot, []complex128, *rlwe.Ciphertext, error) {
 	input := reproducibleInput(residual, btp)
 	packed, ctxtN1, ctxtN2, err := eval.PackAndSwitchN1ToN2([]rlwe.Ciphertext{*input})
 	if err != nil {
-		return nil, nil, fmt.Errorf("PackAndSwitchN1ToN2: %w", err)
+		return nil, nil, nil, fmt.Errorf("PackAndSwitchN1ToN2: %w", err)
 	}
 	scaled, _, err := eval.ScaleDown(&packed[0])
 	if err != nil {
-		return nil, nil, fmt.Errorf("ScaleDown: %w", err)
+		return nil, nil, nil, fmt.Errorf("ScaleDown: %w", err)
 	}
 	packed[0] = *scaled
 	modUp, err := eval.ModUp(&packed[0])
 	if err != nil {
-		return nil, nil, fmt.Errorf("ModUp: %w", err)
+		return nil, nil, nil, fmt.Errorf("ModUp: %w", err)
 	}
 	packed[0] = *modUp
 	snapshots := []q01StageSnapshot{{Name: "Q1_mod_up", Order: 1, Branches: []q01BranchSnapshot{{Name: "single", CT: finalizationDiagnosticCopy(modUp)}}}}
 	ctReal, ctImag, err := eval.CoeffsToSlots(&packed[0])
 	if err != nil {
-		return nil, nil, fmt.Errorf("CoeffsToSlots: %w", err)
+		return nil, nil, nil, fmt.Errorf("CoeffsToSlots: %w", err)
 	}
 	branches := []q01BranchSnapshot{{Name: "real", CT: finalizationDiagnosticCopy(ctReal)}}
 	if ctImag != nil {
@@ -231,25 +246,29 @@ func q01RunStageSnapshots(eval *bootstrapping.Evaluator, residual ckks.Parameter
 	snapshots = append(snapshots, q01StageSnapshot{Name: "Q2_coeffs_to_slots", Order: 2, Branches: branches})
 	ctReal, err = eval.EvalMod(ctReal)
 	if err != nil {
-		return nil, nil, fmt.Errorf("EvalMod real: %w", err)
+		return nil, nil, nil, fmt.Errorf("EvalMod real: %w", err)
 	}
 	snapshots = append(snapshots, q01StageSnapshot{Name: "Q3_eval_mod_real", Order: 3, Branches: []q01BranchSnapshot{{Name: "real", CT: finalizationDiagnosticCopy(ctReal)}}})
 	if ctImag != nil {
 		ctImag, err = eval.EvalMod(ctImag)
 		if err != nil {
-			return nil, nil, fmt.Errorf("EvalMod imag: %w", err)
+			return nil, nil, nil, fmt.Errorf("EvalMod imag: %w", err)
 		}
 		snapshots = append(snapshots, q01StageSnapshot{Name: "Q4_eval_mod_imag", Order: 4, Branches: []q01BranchSnapshot{{Name: "imag", CT: finalizationDiagnosticCopy(ctImag)}}})
 	}
 	ctOut, err := eval.SlotsToCoeffs(ctReal, ctImag)
 	if err != nil {
-		return nil, nil, fmt.Errorf("SlotsToCoeffs: %w", err)
+		return nil, nil, nil, fmt.Errorf("SlotsToCoeffs: %w", err)
 	}
 	snapshots = append(snapshots, q01StageSnapshot{Name: "Q5_slots_to_coeffs", Order: 5, Branches: []q01BranchSnapshot{{Name: "combined", CT: finalizationDiagnosticCopy(ctOut)}}})
-	if _, err := eval.UnpackAndSwitchN2ToN1([]rlwe.Ciphertext{*finalizationDiagnosticCopy(ctOut)}, ctxtN1, ctxtN2); err != nil {
-		return nil, nil, fmt.Errorf("UnpackAndSwitchN2ToN1: %w", err)
+	unpacked, err := eval.UnpackAndSwitchN2ToN1([]rlwe.Ciphertext{*finalizationDiagnosticCopy(ctOut)}, ctxtN1, ctxtN2)
+	if err != nil {
+		return nil, nil, nil, fmt.Errorf("UnpackAndSwitchN2ToN1: %w", err)
 	}
-	return snapshots, reproducibleValues(residual.MaxSlots()), nil
+	if len(unpacked) != 1 {
+		return nil, nil, nil, fmt.Errorf("UnpackAndSwitchN2ToN1 returned %d ciphertexts, want 1", len(unpacked))
+	}
+	return snapshots, reproducibleValues(residual.MaxSlots()), &unpacked[0], nil
 }
 
 func q01StandardBranch(stage q01StageSnapshot, branch q01BranchSnapshot, params ckks.Parameters, bootstrapSecret *rlwe.SecretKey) (Q01StageBranchResult, error) {
@@ -296,6 +315,48 @@ func q01FastBranch(stage q01StageSnapshot, branch q01BranchSnapshot, params ckks
 	result.FastSource = &evidence
 	result.FastQ01Decoded = correctnessValues(projected)
 	result.StandardQ01VsFastQ01 = &metrics
+	return result, nil
+}
+
+func q01OfficialOutput(eval *bootstrapping.Evaluator, residual ckks.Parameters, btp bootstrapping.Parameters, input []complex128, generatedSecret, zeroBootstrapSecret *rlwe.SecretKey, standardReference []complex128, requireGenerated bool) (*Q01OfficialOutput, error) {
+	output, err := eval.Bootstrap(reproducibleInput(residual, btp))
+	if err != nil {
+		return nil, fmt.Errorf("official Bootstrap: %w", err)
+	}
+	result := &Q01OfficialOutput{Present: true, Ciphertext: finalizationEvidence(output)}
+
+	generatedDecoded, generatedErr := decodeWithSecret(residual, output, generatedSecret)
+	if generatedErr != nil {
+		result.DecodeErrors = append(result.DecodeErrors, fmt.Sprintf("generated-secret: %v", generatedErr))
+		if requireGenerated {
+			return nil, fmt.Errorf("official generated-secret decode: %w", generatedErr)
+		}
+	} else {
+		result.GeneratedSecretDecoded = correctnessValues(generatedDecoded)
+		metrics, metricsErr := compareComplexVectors(input, generatedDecoded, correctnessThreshold)
+		if metricsErr != nil {
+			return nil, fmt.Errorf("official generated-secret metrics: %w", metricsErr)
+		}
+		result.GeneratedVsInput = &metrics
+	}
+
+	zeroDecoded, zeroErr := decodeWithSecret(residual, output, zeroBootstrapSecret)
+	if zeroErr != nil {
+		return nil, fmt.Errorf("official zero-secret decode: %w", zeroErr)
+	}
+	result.ZeroSecretDecoded = correctnessValues(zeroDecoded)
+	zeroVsInput, err := compareComplexVectors(input, zeroDecoded, correctnessThreshold)
+	if err != nil {
+		return nil, fmt.Errorf("official zero-secret metrics: %w", err)
+	}
+	result.ZeroVsInput = &zeroVsInput
+	if len(standardReference) != 0 {
+		zeroVsStandard, err := compareComplexVectors(standardReference, zeroDecoded, correctnessThreshold)
+		if err != nil {
+			return nil, fmt.Errorf("official zero-secret vs Standard metrics: %w", err)
+		}
+		result.ZeroVsStandard = &zeroVsStandard
+	}
 	return result, nil
 }
 
@@ -387,7 +448,7 @@ func RunQ01DiagnosticExperiment(cfg BootstrapConfig, primaryRoot, backendRoot, s
 	if err != nil {
 		return Q01DiagnosticResult{}, fmt.Errorf("construct bootstrap evaluator: %w", err)
 	}
-	snapshots, input, err := q01RunStageSnapshots(eval, residual, btp)
+	snapshots, input, stagedFinal, err := q01RunStageSnapshots(eval, residual, btp)
 	if err != nil {
 		return Q01DiagnosticResult{}, err
 	}
@@ -405,6 +466,11 @@ func RunQ01DiagnosticExperiment(cfg BootstrapConfig, primaryRoot, backendRoot, s
 			}
 			result.Stages = append(result.Stages, stageResult)
 		}
+		official, err := q01OfficialOutput(eval, residual, btp, input, generatedSecret, zeroSecret(residual), nil, true)
+		if err != nil {
+			return Q01DiagnosticResult{}, err
+		}
+		result.OfficialOutput = official
 		result.FirstSupportedCause = "not_applicable_for_this_backend"
 		result.Classification = "STANDARD_ORACLE_ONLY"
 		return result, nil
@@ -424,6 +490,12 @@ func RunQ01DiagnosticExperiment(cfg BootstrapConfig, primaryRoot, backendRoot, s
 	result.BackendRole = "fast"
 	result.StandardReferencePath = standardReferencePath
 	zeroBootstrapSecret := zeroSecret(btp.BootstrappingParameters)
+	standardFinal := []complex128(nil)
+	if reference.OfficialOutput != nil && len(reference.OfficialOutput.GeneratedSecretDecoded) != 0 {
+		standardFinal = finalizationValues(reference.OfficialOutput.GeneratedSecretDecoded)
+	} else {
+		return Q01DiagnosticResult{}, fmt.Errorf("Standard Q01 reference has no official generated-secret output")
+	}
 	for _, snapshot := range snapshots {
 		standardStage, err := q01ReferenceStage(reference, snapshot.Name)
 		if err != nil {
@@ -467,7 +539,24 @@ func RunQ01DiagnosticExperiment(cfg BootstrapConfig, primaryRoot, backendRoot, s
 	if err != nil {
 		return Q01DiagnosticResult{}, err
 	}
-	result.F2Consistency = &Q01F2Consistency{Stage: "Q5_slots_to_coeffs", Method: "Fast q01 projection is the IMForm-only F2 view; source remains untouched", FastQ01MatchesF2View: f2Metrics.PassThreshold && f2Metrics.MaxAbsComplex == 0, FastQ01VsF2View: &f2Metrics, ExistingF2ViewVsInput: &inputMetrics, ExistingF2Diverges: !inputMetrics.PassThreshold}
+	stagedFinalDecoded, err := decodeWithSecret(residual, stagedFinal, zeroSecret(residual))
+	if err != nil {
+		return Q01DiagnosticResult{}, fmt.Errorf("staged final zero-secret decode: %w", err)
+	}
+	stagedFinalVsQ01, err := compareComplexVectors(fastQ01Decoded, stagedFinalDecoded, correctnessThreshold)
+	if err != nil {
+		return Q01DiagnosticResult{}, fmt.Errorf("Q5/staged-final consistency: %w", err)
+	}
+	stagedFinalVsInput, err := compareComplexVectors(input, stagedFinalDecoded, correctnessThreshold)
+	if err != nil {
+		return Q01DiagnosticResult{}, fmt.Errorf("staged-final/input consistency: %w", err)
+	}
+	result.F2Consistency = &Q01F2Consistency{Stage: "Q5_slots_to_coeffs", Method: "Fast q01 projection is the IMForm-only F2 view; source remains untouched", FastQ01MatchesF2View: f2Metrics.PassThreshold && f2Metrics.MaxAbsComplex == 0, FastQ01VsF2View: &f2Metrics, FastQ01VsStagedFinal: &stagedFinalVsQ01, StagedFinalVsInput: &stagedFinalVsInput, StagedFinalDecoded: correctnessValues(stagedFinalDecoded), ExistingF2ViewVsInput: &inputMetrics, ExistingF2Diverges: !inputMetrics.PassThreshold}
+	official, err := q01OfficialOutput(eval, residual, btp, input, generatedSecret, zeroSecret(residual), standardFinal, false)
+	if err != nil {
+		return Q01DiagnosticResult{}, err
+	}
+	result.OfficialOutput = official
 	result.FirstSupportedCause, result.Classification = q01Classify(result)
 	return result, nil
 }
