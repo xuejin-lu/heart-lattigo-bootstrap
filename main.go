@@ -14,6 +14,7 @@ func main() {
 	warmup := flag.Int("warmup", -1, "override config warm-up count")
 	stages := flag.Bool("stages", false, "measure bootstrap stages instead of only the full bootstrap")
 	correctness := flag.Bool("correctness", false, "decode one complete bootstrap and record numerical correctness")
+	diagnostic := flag.Bool("diagnostic", false, "trace public bootstrap stages for numerical diagnosis")
 	flag.Parse()
 
 	cfg, err := LoadBootstrapConfig(*configPath)
@@ -35,10 +36,28 @@ func main() {
 	if backendRoot == "" {
 		backendRoot = primaryRoot + "/../lattigo"
 	}
-	if *stages && *correctness {
-		log.Fatal("-stages and -correctness cannot be used together")
+	selectedModes := 0
+	if *stages {
+		selectedModes++
 	}
 	if *correctness {
+		selectedModes++
+	}
+	if *diagnostic {
+		selectedModes++
+	}
+	if selectedModes > 1 {
+		log.Fatal("-stages, -correctness, and -diagnostic cannot be used together")
+	}
+	if *diagnostic {
+		result, err := RunDiagnosticExperiment(cfg, primaryRoot, backendRoot)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if err := WriteDiagnosticResult(result, *outputPath); err != nil {
+			log.Fatal(err)
+		}
+	} else if *correctness {
 		result, err := RunCorrectnessExperiment(cfg, primaryRoot, backendRoot)
 		if err != nil {
 			log.Fatal(err)
