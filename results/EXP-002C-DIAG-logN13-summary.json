@@ -1,0 +1,465 @@
+{
+  "schema_version": "exp-002c-diag-summary.v1",
+  "primary_repository": {
+    "commit": "f30a86a1bf1ab08b0045c0b93adfb9355821ed0e",
+    "ref": "main",
+    "dirty": false
+  },
+  "standard_lattigo": {
+    "commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+    "ref": "",
+    "dirty": false
+  },
+  "fast_lattigo": {
+    "commit": "ce79b861c9b4ecb45f7a42ca5de2e98dbbdb9ef2",
+    "ref": "fast-ckks",
+    "dirty": false
+  },
+  "effective_profile": {
+    "coeffs_to_slots_dft_levels": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "log_default_scale": 45,
+    "log_message_ratio": 10,
+    "log_n": 13,
+    "log_slots": -1,
+    "mod1_degree": 30,
+    "mod1_double_angle": 3,
+    "mod1_inv_degree": 0,
+    "mod1_k": 16,
+    "mod1_log_scale": 60,
+    "p": [
+      61,
+      61,
+      61,
+      61,
+      61
+    ],
+    "q0": [
+      55
+    ],
+    "q_coeffs_to_slots": [
+      56,
+      56,
+      56,
+      56
+    ],
+    "q_slots_to_coeffs": [
+      39,
+      39,
+      39
+    ],
+    "repetitions": 3,
+    "secret_hamming": 192,
+    "slots_to_coeffs_dft_levels": [
+      1,
+      1,
+      1
+    ],
+    "warmup": 1
+  },
+  "trace_context": {
+    "bootstrap_log_n": 13,
+    "bootstrap_log_slots": 12,
+    "packing_log_pack_cts": 0,
+    "packing_work": "TRIVIAL: full slots and one ciphertext imply logPackCTs=0",
+    "residual_log_n": 13,
+    "ring_degree_switch": "TRIVIAL: residual N equals bootstrap N",
+    "trace_automorphism_iterations": 0,
+    "trace_gap": 1,
+    "trace_work": "TRIVIAL: Trace gap=1 and automorphism iteration count=0"
+  },
+  "threshold": 0.01,
+  "comparisons": [
+    {
+      "stage": "input_sanity",
+      "quantity": "deterministic full-slot input",
+      "standard_method": "ordinary_decrypt_and_ckks_decode",
+      "fast_method": "ordinary_decrypt_and_ckks_decode",
+      "directly_comparable": true,
+      "classification": "MATCH",
+      "standard_metadata": [
+        {
+          "branches": 1,
+          "is_montgomery": false,
+          "is_ntt": true,
+          "level": 0,
+          "scale_log2": 45
+        }
+      ],
+      "fast_metadata": [
+        {
+          "branches": 1,
+          "is_montgomery": false,
+          "is_ntt": true,
+          "level": 0,
+          "scale_log2": 45
+        }
+      ],
+      "standard_generated_vs_fast_zero": [
+        {
+          "max_abs_real": 0,
+          "max_abs_imag": 0,
+          "max_component_abs": 0,
+          "rmse_complex": 0,
+          "samples": 4096,
+          "classification": "MATCH"
+        }
+      ],
+      "standard_generated_vs_input": [
+        {
+          "max_abs_real": 1.826067075327842e-12,
+          "max_abs_imag": 1.9461550426758123e-12,
+          "max_component_abs": 1.9461550426758123e-12,
+          "rmse_complex": 7.399553515512704e-13,
+          "samples": 4096,
+          "classification": "MATCH"
+        }
+      ],
+      "fast_zero_vs_input": [
+        {
+          "max_abs_real": 1.826067075327842e-12,
+          "max_abs_imag": 1.9461550426758123e-12,
+          "max_component_abs": 1.9461550426758123e-12,
+          "rmse_complex": 7.399553515512704e-13,
+          "samples": 4096,
+          "classification": "MATCH"
+        }
+      ]
+    },
+    {
+      "stage": "pack_and_switch_n1_to_n2",
+      "quantity": "ciphertext boundary",
+      "standard_method": "ordinary_decrypt_and_ckks_decode",
+      "fast_method": "ordinary_decrypt_and_ckks_decode",
+      "directly_comparable": true,
+      "classification": "TRIVIAL_BOUNDARY",
+      "standard_metadata": [
+        {
+          "branches": 1,
+          "is_montgomery": false,
+          "is_ntt": true,
+          "level": 0,
+          "scale_log2": 45
+        }
+      ],
+      "fast_metadata": [
+        {
+          "branches": 1,
+          "is_montgomery": false,
+          "is_ntt": true,
+          "level": 0,
+          "scale_log2": 45
+        }
+      ],
+      "standard_generated_vs_fast_zero": [
+        {
+          "max_abs_real": 0,
+          "max_abs_imag": 0,
+          "max_component_abs": 0,
+          "rmse_complex": 0,
+          "samples": 4096,
+          "classification": "MATCH"
+        }
+      ],
+      "standard_generated_vs_input": [
+        {
+          "max_abs_real": 1.826067075327842e-12,
+          "max_abs_imag": 1.9461550426758123e-12,
+          "max_component_abs": 1.9461550426758123e-12,
+          "rmse_complex": 7.399553515512704e-13,
+          "samples": 4096,
+          "classification": "MATCH"
+        }
+      ],
+      "fast_zero_vs_input": [
+        {
+          "max_abs_real": 1.826067075327842e-12,
+          "max_abs_imag": 1.9461550426758123e-12,
+          "max_component_abs": 1.9461550426758123e-12,
+          "rmse_complex": 7.399553515512704e-13,
+          "samples": 4096,
+          "classification": "MATCH"
+        }
+      ],
+      "note": "Full-slot LogN13 has N1=N2 and one ciphertext, so packing/ring switch/Trace work is logically trivial; decoded values are an exact match."
+    },
+    {
+      "stage": "scale_down",
+      "quantity": "ciphertext boundary",
+      "standard_method": "ordinary_decrypt_and_ckks_decode",
+      "fast_method": "ordinary_decrypt_and_ckks_decode",
+      "directly_comparable": true,
+      "classification": "MATCH",
+      "standard_metadata": [
+        {
+          "branches": 1,
+          "is_montgomery": false,
+          "is_ntt": true,
+          "level": 0,
+          "scale_log2": 45
+        }
+      ],
+      "fast_metadata": [
+        {
+          "branches": 1,
+          "is_montgomery": false,
+          "is_ntt": true,
+          "level": 0,
+          "scale_log2": 45
+        }
+      ],
+      "standard_err_scale_log2": 1.2465133168867161e-11,
+      "fast_err_scale_log2": 1.2465133168867161e-11,
+      "standard_generated_vs_fast_zero": [
+        {
+          "max_abs_real": 0,
+          "max_abs_imag": 0,
+          "max_component_abs": 0,
+          "rmse_complex": 0,
+          "samples": 4096,
+          "classification": "MATCH"
+        }
+      ],
+      "standard_generated_vs_input": [
+        {
+          "max_abs_real": 1.826067075327842e-12,
+          "max_abs_imag": 1.9461550426758123e-12,
+          "max_component_abs": 1.9461550426758123e-12,
+          "rmse_complex": 7.399553515512704e-13,
+          "samples": 4096,
+          "classification": "MATCH"
+        }
+      ],
+      "fast_zero_vs_input": [
+        {
+          "max_abs_real": 1.826067075327842e-12,
+          "max_abs_imag": 1.9461550426758123e-12,
+          "max_component_abs": 1.9461550426758123e-12,
+          "rmse_complex": 7.399553515512704e-13,
+          "samples": 4096,
+          "classification": "MATCH"
+        }
+      ]
+    },
+    {
+      "stage": "mod_up",
+      "quantity": "ciphertext boundary including Trace",
+      "standard_method": "ordinary_decrypt_and_ckks_decode",
+      "fast_method": "not_directly_comparable",
+      "directly_comparable": false,
+      "classification": "NOT_DIRECTLY_COMPARABLE",
+      "standard_metadata": [
+        {
+          "branches": 1,
+          "is_montgomery": false,
+          "is_ntt": true,
+          "level": 16,
+          "scale_log2": 50
+        }
+      ],
+      "fast_metadata": [
+        {
+          "branches": 1,
+          "is_montgomery": true,
+          "is_ntt": true,
+          "level": 16,
+          "scale_log2": 50
+        }
+      ],
+      "note": "This boundary is not assigned slot-error metrics: the Fast output is not directly CKKS-decodable, or the pre-unpack N2 representation is not semantically the final logical slot vector. A backend-neutral polynomial/RNS comparison was not added because it would require Fast-specific semantics."
+    },
+    {
+      "stage": "coeffs_to_slots",
+      "quantity": "real and imaginary DFT branches",
+      "standard_method": "ordinary_decrypt_and_ckks_decode",
+      "fast_method": "not_directly_comparable",
+      "directly_comparable": false,
+      "classification": "NOT_DIRECTLY_COMPARABLE",
+      "standard_metadata": [
+        {
+          "branches": 2,
+          "is_montgomery": false,
+          "is_ntt": true,
+          "level": 12,
+          "scale_log2": 50
+        },
+        {
+          "branches": 2,
+          "is_montgomery": false,
+          "is_ntt": true,
+          "level": 12,
+          "scale_log2": 50
+        }
+      ],
+      "fast_metadata": [
+        {
+          "branches": 2,
+          "is_montgomery": true,
+          "is_ntt": true,
+          "level": 12,
+          "scale_log2": 50
+        },
+        {
+          "branches": 2,
+          "is_montgomery": true,
+          "is_ntt": true,
+          "level": 12,
+          "scale_log2": 50
+        }
+      ],
+      "note": "This boundary is not assigned slot-error metrics: the Fast output is not directly CKKS-decodable, or the pre-unpack N2 representation is not semantically the final logical slot vector. A backend-neutral polynomial/RNS comparison was not added because it would require Fast-specific semantics."
+    },
+    {
+      "stage": "eval_mod_real",
+      "quantity": "real DFT branch",
+      "standard_method": "ordinary_decrypt_and_ckks_decode",
+      "fast_method": "not_directly_comparable",
+      "directly_comparable": false,
+      "classification": "NOT_DIRECTLY_COMPARABLE",
+      "standard_metadata": [
+        {
+          "branches": 1,
+          "is_montgomery": false,
+          "is_ntt": true,
+          "level": 4,
+          "scale_log2": 45
+        }
+      ],
+      "fast_metadata": [
+        {
+          "branches": 1,
+          "is_montgomery": true,
+          "is_ntt": true,
+          "level": 4,
+          "scale_log2": 45
+        }
+      ],
+      "note": "This boundary is not assigned slot-error metrics: the Fast output is not directly CKKS-decodable, or the pre-unpack N2 representation is not semantically the final logical slot vector. A backend-neutral polynomial/RNS comparison was not added because it would require Fast-specific semantics."
+    },
+    {
+      "stage": "eval_mod_imag",
+      "quantity": "imaginary DFT branch",
+      "standard_method": "ordinary_decrypt_and_ckks_decode",
+      "fast_method": "not_directly_comparable",
+      "directly_comparable": false,
+      "classification": "NOT_DIRECTLY_COMPARABLE",
+      "standard_metadata": [
+        {
+          "branches": 1,
+          "is_montgomery": false,
+          "is_ntt": true,
+          "level": 4,
+          "scale_log2": 45
+        }
+      ],
+      "fast_metadata": [
+        {
+          "branches": 1,
+          "is_montgomery": true,
+          "is_ntt": true,
+          "level": 4,
+          "scale_log2": 45
+        }
+      ],
+      "note": "This boundary is not assigned slot-error metrics: the Fast output is not directly CKKS-decodable, or the pre-unpack N2 representation is not semantically the final logical slot vector. A backend-neutral polynomial/RNS comparison was not added because it would require Fast-specific semantics."
+    },
+    {
+      "stage": "slots_to_coeffs",
+      "quantity": "ciphertext boundary before public unpack",
+      "standard_method": "ordinary_decrypt_and_ckks_decode",
+      "fast_method": "ordinary_decrypt_and_ckks_decode",
+      "directly_comparable": false,
+      "classification": "NOT_DIRECTLY_COMPARABLE",
+      "standard_metadata": [
+        {
+          "branches": 1,
+          "is_montgomery": false,
+          "is_ntt": true,
+          "level": 1,
+          "scale_log2": 45
+        }
+      ],
+      "fast_metadata": [
+        {
+          "branches": 1,
+          "is_montgomery": true,
+          "is_ntt": true,
+          "level": 1,
+          "scale_log2": 45
+        }
+      ],
+      "note": "This boundary is not assigned slot-error metrics: the Fast output is not directly CKKS-decodable, or the pre-unpack N2 representation is not semantically the final logical slot vector. A backend-neutral polynomial/RNS comparison was not added because it would require Fast-specific semantics."
+    },
+    {
+      "stage": "unpack_and_switch_n2_to_n1",
+      "quantity": "final public stage output",
+      "standard_method": "ordinary_decrypt_and_ckks_decode",
+      "fast_method": "ordinary_decrypt_and_ckks_decode",
+      "directly_comparable": true,
+      "classification": "DIVERGED",
+      "standard_metadata": [
+        {
+          "branches": 1,
+          "is_montgomery": false,
+          "is_ntt": true,
+          "level": 1,
+          "scale_log2": 45
+        }
+      ],
+      "fast_metadata": [
+        {
+          "branches": 1,
+          "is_montgomery": false,
+          "is_ntt": true,
+          "level": 1,
+          "scale_log2": 45
+        }
+      ],
+      "standard_generated_vs_fast_zero": [
+        {
+          "max_abs_real": 0.1875003433897564,
+          "max_abs_imag": 0.06266212878278056,
+          "max_component_abs": 0.1875003433897564,
+          "rmse_complex": 0.13260206463086074,
+          "samples": 4096,
+          "classification": "DIVERGED"
+        }
+      ],
+      "standard_generated_vs_input": [
+        {
+          "max_abs_real": 1.738921145966188e-9,
+          "max_abs_imag": 5.754406148805735e-8,
+          "max_component_abs": 5.754406148805735e-8,
+          "rmse_complex": 1.1841383607453172e-9,
+          "samples": 4096,
+          "classification": "SMALL_NUMERICAL_DRIFT"
+        }
+      ],
+      "fast_zero_vs_input": [
+        {
+          "max_abs_real": 0.18750034197742593,
+          "max_abs_imag": 0.06266213402955517,
+          "max_component_abs": 0.18750034197742593,
+          "rmse_complex": 0.1326020646243982,
+          "samples": 4096,
+          "classification": "DIVERGED"
+        }
+      ]
+    }
+  ],
+  "first_divergence_stage": "unpack_and_switch_n2_to_n1",
+  "unresolved_stages": [
+    "mod_up",
+    "coeffs_to_slots",
+    "eval_mod_real",
+    "eval_mod_imag",
+    "slots_to_coeffs"
+  ],
+  "no_logn16_run": true,
+  "no_lattigo_code_modified": true,
+  "conclusion": "First supported directly comparable divergence above 1e-2: unpack_and_switch_n2_to_n1; earlier N2 intermediate boundaries remain NOT_DIRECTLY_COMPARABLE, and the diagnostic stops at LogN13 per EXP-002-C-DIAG."
+}
