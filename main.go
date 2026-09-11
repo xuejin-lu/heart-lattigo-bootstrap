@@ -17,6 +17,8 @@ func main() {
 	diagnostic := flag.Bool("diagnostic", false, "trace public bootstrap stages for numerical diagnosis")
 	finalizationDiagnostic := flag.Bool("finalization-diagnostic", false, "diagnose the Fast public finalization boundary")
 	standardReference := flag.String("standard-reference", "", "EXP-002-C-DIAG-P Standard result JSON used as the logical reference")
+	q01Diagnostic := flag.Bool("q01-diagnostic", false, "diagnose q0/q1 intermediate projections")
+	q01StandardReference := flag.String("q01-standard-reference", "", "EXP-002-C-DIAG-Q01 Standard result JSON used as the logical reference")
 	flag.Parse()
 
 	cfg, err := LoadBootstrapConfig(*configPath)
@@ -51,10 +53,21 @@ func main() {
 	if *finalizationDiagnostic {
 		selectedModes++
 	}
-	if selectedModes > 1 {
-		log.Fatal("-stages, -correctness, -diagnostic, and -finalization-diagnostic cannot be used together")
+	if *q01Diagnostic {
+		selectedModes++
 	}
-	if *finalizationDiagnostic {
+	if selectedModes > 1 {
+		log.Fatal("-stages, -correctness, -diagnostic, -finalization-diagnostic, and -q01-diagnostic cannot be used together")
+	}
+	if *q01Diagnostic {
+		result, err := RunQ01DiagnosticExperiment(cfg, primaryRoot, backendRoot, *q01StandardReference)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if err := WriteQ01DiagnosticResult(result, *outputPath); err != nil {
+			log.Fatal(err)
+		}
+	} else if *finalizationDiagnostic {
 		result, err := RunFinalizationBoundaryExperiment(cfg, primaryRoot, backendRoot, *standardReference)
 		if err != nil {
 			log.Fatal(err)
