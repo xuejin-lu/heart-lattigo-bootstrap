@@ -35,6 +35,7 @@ type CorrectnessOutputMetadata struct {
 }
 
 type CorrectnessMetrics struct {
+	SampleCount          int      `json:"sample_count"`
 	MaxAbsComplex        float64  `json:"max_abs_complex"`
 	MeanAbsComplex       float64  `json:"mean_abs_complex"`
 	RMSEComplex          float64  `json:"rmse_complex"`
@@ -118,7 +119,7 @@ func compareComplexVectors(reference, actual []complex128, threshold float64) (C
 		return CorrectnessMetrics{}, fmt.Errorf("cannot compare empty vectors")
 	}
 
-	metrics := CorrectnessMetrics{Threshold: threshold}
+	metrics := CorrectnessMetrics{SampleCount: len(reference), Threshold: threshold}
 	var squaredSum float64
 	for i := range reference {
 		delta := actual[i] - reference[i]
