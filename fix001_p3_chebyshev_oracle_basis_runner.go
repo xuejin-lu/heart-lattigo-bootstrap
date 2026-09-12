@@ -95,6 +95,7 @@ type chebyshevOracleState struct {
 	Params          bootstrapping.Parameters
 	Eval            *bootstrapping.FastEvaluator
 	Mod1Input       *rlwe.Ciphertext
+	Mod1ImagInput   *rlwe.Ciphertext
 	Poly            bignum.Polynomial
 	Target          rlwe.Scale
 	Z               []complex128
@@ -252,7 +253,7 @@ func chebyshevCanonicalState(cfg BootstrapConfig) (chebyshevOracleState, error) 
 		return chebyshevOracleState{}, err
 	}
 	packed[0] = *modUp
-	ctReal, _, err := eval.CoeffsToSlots(&packed[0])
+	ctReal, ctImag, err := eval.CoeffsToSlots(&packed[0])
 	if err != nil {
 		return chebyshevOracleState{}, err
 	}
@@ -306,7 +307,7 @@ func chebyshevCanonicalState(cfg BootstrapConfig) (chebyshevOracleState, error) 
 	}) {
 		return chebyshevOracleState{}, fmt.Errorf("CHEBYSHEV_ORACLE_PRECONDITION_MISMATCH: authoritative root hashes differ")
 	}
-	return chebyshevOracleState{Params: btp, Eval: eval, Mod1Input: ctReal, Poly: poly, Target: target, Z: z, PreOffset: preOffset, InputScale: inputScale, InputScaleValue: ctReal.Scale, E2Scale: chebyshevScaleString(e2.Scale), Root: root, PowerChecks: powerChecks, PowerExpected: powerExpected, PowerDecoded: powerDecoded}, nil
+	return chebyshevOracleState{Params: btp, Eval: eval, Mod1Input: ctReal, Mod1ImagInput: ctImag, Poly: poly, Target: target, Z: z, PreOffset: preOffset, InputScale: inputScale, InputScaleValue: ctReal.Scale, E2Scale: chebyshevScaleString(e2.Scale), Root: root, PowerChecks: powerChecks, PowerExpected: powerExpected, PowerDecoded: powerDecoded}, nil
 }
 
 func (cp PSGlobalCheckpoint) RowsMatch(expected []string) bool {

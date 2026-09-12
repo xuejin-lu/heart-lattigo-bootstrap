@@ -30,6 +30,7 @@ func main() {
 	fix001P3DoubleAngleMulAlias := flag.Bool("fix001-p3-double-angle-mul-alias", false, "isolate FIX-001 DoubleAngle square alias")
 	fix001P3DesignNormalized := flag.Bool("fix001-p3-design-normalized-double-angle", false, "validate normalized FIX-001 DoubleAngle recurrence")
 	fix001P3IntegrateLogN13Mod1 := flag.Bool("fix001-p3-integrate-logn13-mod1", false, "verify production normalized LogN13 Fast Mod1")
+	fix001P3DiagPostMod1S2C := flag.Bool("fix001-p3-diag-logn13-post-mod1-s2c", false, "validate production LogN13 post-Mod1 SlotsToCoeffs core output")
 	flag.Parse()
 
 	cfg, err := LoadBootstrapConfig(*configPath)
@@ -100,6 +101,9 @@ func main() {
 	if *fix001P3IntegrateLogN13Mod1 {
 		selectedModes++
 	}
+	if *fix001P3DiagPostMod1S2C {
+		selectedModes++
+	}
 	if selectedModes > 1 {
 		log.Fatal("bootstrap diagnostic modes cannot be used together")
 	}
@@ -153,6 +157,10 @@ func main() {
 		}
 	} else if *fix001P3IntegrateLogN13Mod1 {
 		if err := runFIX001P3IntegrateLogN13Mod1(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
+			log.Fatal(err)
+		}
+	} else if *fix001P3DiagPostMod1S2C {
+		if err := runFIX001P3DiagLogN13PostMod1S2C(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
 			log.Fatal(err)
 		}
 	} else if *finalizationDiagnostic {
