@@ -33,6 +33,7 @@ func main() {
 	fix001P3DiagPostMod1S2C := flag.Bool("fix001-p3-diag-logn13-post-mod1-s2c", false, "validate production LogN13 post-Mod1 SlotsToCoeffs core output")
 	fix001P3ValidateLogN13E2E := flag.Bool("fix001-p3-validate-logn13-e2e", false, "validate the production LogN13 Fast Bootstrap public boundary")
 	fix001P3DiagLogN13SemanticBisect := flag.Bool("fix001-p3-diag-logn13-semantic-bisect", false, "bisect LogN13 Fast semantic divergence against a genuine Standard control")
+	fix001P3DiagLogN13EvalModCausal := flag.Bool("fix001-p3-diag-logn13-evalmod-causal", false, "localize LogN13 EvalMod divergence with matched semantic inputs")
 	flag.Parse()
 
 	cfg, err := LoadBootstrapConfig(*configPath)
@@ -112,6 +113,9 @@ func main() {
 	if *fix001P3DiagLogN13SemanticBisect {
 		selectedModes++
 	}
+	if *fix001P3DiagLogN13EvalModCausal {
+		selectedModes++
+	}
 	if selectedModes > 1 {
 		log.Fatal("bootstrap diagnostic modes cannot be used together")
 	}
@@ -177,6 +181,10 @@ func main() {
 		}
 	} else if *fix001P3DiagLogN13SemanticBisect {
 		if err := runFIX001P3DiagLogN13SemanticBisect(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
+			log.Fatal(err)
+		}
+	} else if *fix001P3DiagLogN13EvalModCausal {
+		if err := runFIX001P3DiagLogN13EvalModCausal(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
 			log.Fatal(err)
 		}
 	} else if *finalizationDiagnostic {
