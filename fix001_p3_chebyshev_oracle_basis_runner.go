@@ -92,19 +92,20 @@ type ChebyshevOracleBasisResult struct {
 }
 
 type chebyshevOracleState struct {
-	Params        bootstrapping.Parameters
-	Eval          *bootstrapping.FastEvaluator
-	Poly          bignum.Polynomial
-	Target        rlwe.Scale
-	Z             []complex128
-	PreOffset     []complex128
-	InputScale    string
-	E2Scale       string
-	Offset        float64
-	Root          PSGlobalCheckpoint
-	PowerChecks   []ChebyshevPowerDomainCheck
-	PowerExpected map[int][]complex128
-	PowerDecoded  map[int][]complex128
+	Params          bootstrapping.Parameters
+	Eval            *bootstrapping.FastEvaluator
+	Poly            bignum.Polynomial
+	Target          rlwe.Scale
+	Z               []complex128
+	PreOffset       []complex128
+	InputScale      string
+	InputScaleValue rlwe.Scale
+	E2Scale         string
+	Offset          float64
+	Root            PSGlobalCheckpoint
+	PowerChecks     []ChebyshevPowerDomainCheck
+	PowerExpected   map[int][]complex128
+	PowerDecoded    map[int][]complex128
 }
 
 func chebyshevOracleMetric(expected, actual []complex128) *PSGlobalMetric {
@@ -304,7 +305,7 @@ func chebyshevCanonicalState(cfg BootstrapConfig) (chebyshevOracleState, error) 
 	}) {
 		return chebyshevOracleState{}, fmt.Errorf("CHEBYSHEV_ORACLE_PRECONDITION_MISMATCH: authoritative root hashes differ")
 	}
-	return chebyshevOracleState{Params: btp, Eval: eval, Poly: poly, Target: target, Z: z, PreOffset: preOffset, InputScale: inputScale, E2Scale: chebyshevScaleString(e2.Scale), Root: root, PowerChecks: powerChecks, PowerExpected: powerExpected, PowerDecoded: powerDecoded}, nil
+	return chebyshevOracleState{Params: btp, Eval: eval, Poly: poly, Target: target, Z: z, PreOffset: preOffset, InputScale: inputScale, InputScaleValue: ctReal.Scale, E2Scale: chebyshevScaleString(e2.Scale), Root: root, PowerChecks: powerChecks, PowerExpected: powerExpected, PowerDecoded: powerDecoded}, nil
 }
 
 func (cp PSGlobalCheckpoint) RowsMatch(expected []string) bool {
