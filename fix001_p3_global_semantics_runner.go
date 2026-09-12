@@ -52,6 +52,8 @@ type PSGlobalCheckpoint struct {
 	ErrorDelta           float64                      `json:"source_error_delta,omitempty"`
 	RatioToPrevious      float64                      `json:"source_error_ratio_to_previous,omitempty"`
 	actual               []complex128                 `json:"-"`
+	expected             []complex128                 `json:"-"`
+	ciphertext           *rlwe.Ciphertext             `json:"-"`
 }
 
 type PSGiantStepRecord struct {
@@ -544,7 +546,7 @@ func hashSourceVector(label string) string {
 }
 func psGlobalCheckpointWithLocal(id, op string, ct *rlwe.Ciphertext, source, actual, localExpected []complex128, identity, description string, previous *PSGlobalMetric) PSGlobalCheckpoint {
 	metric := psGlobalMetric(source, actual)
-	cp := PSGlobalCheckpoint{ID: id, Operation: op, Level: ct.Level(), Degree: ct.Degree(), Scale: finalizationScaleString(ct.Scale), SourceBacked: metric, ExpectedSubtree: description, ExpectedSubtreeHash: identity, Rows: finalizationEvidence(ct).Rows, actual: actual}
+	cp := PSGlobalCheckpoint{ID: id, Operation: op, Level: ct.Level(), Degree: ct.Degree(), Scale: finalizationScaleString(ct.Scale), SourceBacked: metric, ExpectedSubtree: description, ExpectedSubtreeHash: identity, Rows: finalizationEvidence(ct).Rows, actual: actual, expected: source, ciphertext: ct}
 	if localExpected != nil {
 		cp.LocalConsistency = psGlobalMetric(localExpected, actual)
 	}

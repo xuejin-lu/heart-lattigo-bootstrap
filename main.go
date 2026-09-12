@@ -23,6 +23,7 @@ func main() {
 	fix001DiagT3 := flag.Bool("fix001-diag-t3", false, "replay formal T3 correction alignment for FIX-001 diagnosis")
 	fix001DiagT3Capacity := flag.Bool("fix001-diag-t3-capacity", false, "diagnose FIX-001 T3 q0/q1 capacity")
 	fix001P3GlobalSemantics := flag.Bool("fix001-p3-global-semantics", false, "diagnose source-backed global PS semantics")
+	fix001P3ChebyshevOracleBasis := flag.Bool("fix001-p3-chebyshev-oracle-basis", false, "resolve Chebyshev plaintext oracle basis semantics")
 	flag.Parse()
 
 	cfg, err := LoadBootstrapConfig(*configPath)
@@ -72,6 +73,9 @@ func main() {
 	if *fix001P3GlobalSemantics {
 		selectedModes++
 	}
+	if *fix001P3ChebyshevOracleBasis {
+		selectedModes++
+	}
 	if selectedModes > 1 {
 		log.Fatal("bootstrap diagnostic modes cannot be used together")
 	}
@@ -97,6 +101,10 @@ func main() {
 		}
 	} else if *fix001P3GlobalSemantics {
 		if err := runFIX001P3GlobalSemantics(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
+			log.Fatal(err)
+		}
+	} else if *fix001P3ChebyshevOracleBasis {
+		if err := runFIX001P3ChebyshevOracleBasis(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
 			log.Fatal(err)
 		}
 	} else if *finalizationDiagnostic {
