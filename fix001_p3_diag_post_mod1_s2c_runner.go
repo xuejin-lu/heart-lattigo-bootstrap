@@ -245,12 +245,13 @@ func postMod1S2CFastNormalizedCopy(params ckks.Parameters, source *rlwe.Cipherte
 
 func postMod1S2CRowsEqual(params ckks.Parameters, fast, reference *rlwe.Ciphertext) bool {
 	fastNormal := postMod1S2CFastNormalizedCopy(params, fast)
-	if fastNormal.Level() != reference.Level() || fastNormal.Degree() != reference.Degree() {
+	referenceNormal := postMod1S2CFastNormalizedCopy(params, reference)
+	if fastNormal.Level() != referenceNormal.Level() || fastNormal.Degree() != referenceNormal.Degree() {
 		return false
 	}
 	for component := 0; component <= fastNormal.Degree(); component++ {
 		for limb := 0; limb < 2; limb++ {
-			if !finalizationRowComparison(component, limb, fastNormal.Value[component].Coeffs[limb], reference.Value[component].Coeffs[limb]).Equal {
+			if !finalizationRowComparison(component, limb, fastNormal.Value[component].Coeffs[limb], referenceNormal.Value[component].Coeffs[limb]).Equal {
 				return false
 			}
 		}
