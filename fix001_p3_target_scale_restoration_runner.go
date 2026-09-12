@@ -111,6 +111,27 @@ func targetScaleIntText(value *big.Int) string {
 	return value.Text(10)
 }
 
+func targetScaleCenteredFromResidues(q0, q1, r0, r1 uint64) *big.Int {
+	q0Big := new(big.Int).SetUint64(q0)
+	q1Big := new(big.Int).SetUint64(q1)
+	q01 := new(big.Int).Mul(new(big.Int).Set(q0Big), q1Big)
+	q01Half := new(big.Int).Quo(new(big.Int).Set(q01), big.NewInt(2))
+	q0Inverse := new(big.Int).ModInverse(q0Big, q1Big)
+	if q0Inverse == nil {
+		return nil
+	}
+	t := new(big.Int).Sub(new(big.Int).SetUint64(r1), new(big.Int).SetUint64(r0))
+	t.Mod(t, q1Big)
+	t.Mul(t, q0Inverse)
+	t.Mod(t, q1Big)
+	value := new(big.Int).Mul(q0Big, t)
+	value.Add(value, new(big.Int).SetUint64(r0))
+	if value.Cmp(q01Half) >= 0 {
+		value.Sub(value, q01)
+	}
+	return value
+}
+
 func targetScaleCenteredRows(params ckks.Parameters, ct *rlwe.Ciphertext) (targetScaleCenteredData, error) {
 	if ct == nil || ct.Level() < 1 || ct.Degree() < 1 || len(ct.Value) < 2 {
 		return targetScaleCenteredData{}, fmt.Errorf("target-scale capacity requires a degree-one q0/q1 ciphertext")
@@ -122,10 +143,6 @@ func targetScaleCenteredRows(params ckks.Parameters, ct *rlwe.Ciphertext) (targe
 	q1 := new(big.Int).SetUint64(params.RingQ().SubRings[1].Modulus)
 	q01 := new(big.Int).Mul(q0, q1)
 	q01Half := new(big.Int).Quo(new(big.Int).Set(q01), big.NewInt(2))
-	q0Inverse := new(big.Int).ModInverse(q0, q1)
-	if q0Inverse == nil {
-		return targetScaleCenteredData{}, fmt.Errorf("q0 has no inverse modulo q1")
-	}
 	values := make([][]*big.Int, 0, ct.Degree()+1)
 	for component := 0; component <= ct.Degree(); component++ {
 		if len(ct.Value[component].Coeffs) < 2 || len(ct.Value[component].Coeffs[0]) != len(ct.Value[component].Coeffs[1]) {
@@ -133,16 +150,9 @@ func targetScaleCenteredRows(params ckks.Parameters, ct *rlwe.Ciphertext) (targe
 		}
 		componentValues := make([]*big.Int, len(ct.Value[component].Coeffs[0]))
 		for index := range componentValues {
-			r0 := new(big.Int).SetUint64(ct.Value[component].Coeffs[0][index])
-			r1 := new(big.Int).SetUint64(ct.Value[component].Coeffs[1][index])
-			t := new(big.Int).Sub(r1, r0)
-			t.Mod(t, q1)
-			t.Mul(t, q0Inverse)
-			t.Mod(t, q1)
-			value := new(big.Int).Mul(q0, t)
-			value.Add(value, r0)
-			if value.Cmp(q01Half) >= 0 {
-				value.Sub(value, q01)
+			value := targetScaleCenteredFromResidues(q0.Uint64(), q1.Uint64(), ct.Value[component].Coeffs[0][index], ct.Value[component].Coeffs[1][index])
+			if value == nil {
+				return targetScaleCenteredData{}, fmt.Errorf("q0 has no inverse modulo q1")
 			}
 			componentValues[index] = value
 		}

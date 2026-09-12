@@ -25,6 +25,7 @@ func main() {
 	fix001P3GlobalSemantics := flag.Bool("fix001-p3-global-semantics", false, "diagnose source-backed global PS semantics")
 	fix001P3ChebyshevOracleBasis := flag.Bool("fix001-p3-chebyshev-oracle-basis", false, "resolve Chebyshev plaintext oracle basis semantics")
 	fix001P3TargetScaleRestoration := flag.Bool("fix001-p3-target-scale-restoration", false, "validate canonical 2^91 public target-scale restoration")
+	fix001P3TargetScaleCapacityDomain := flag.Bool("fix001-p3-target-scale-capacity-domain", false, "correct q0/q1 capacity oracle domain for canonical 2^91 restoration")
 	flag.Parse()
 
 	cfg, err := LoadBootstrapConfig(*configPath)
@@ -80,6 +81,9 @@ func main() {
 	if *fix001P3TargetScaleRestoration {
 		selectedModes++
 	}
+	if *fix001P3TargetScaleCapacityDomain {
+		selectedModes++
+	}
 	if selectedModes > 1 {
 		log.Fatal("bootstrap diagnostic modes cannot be used together")
 	}
@@ -113,6 +117,10 @@ func main() {
 		}
 	} else if *fix001P3TargetScaleRestoration {
 		if err := runFIX001P3TargetScaleRestoration(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
+			log.Fatal(err)
+		}
+	} else if *fix001P3TargetScaleCapacityDomain {
+		if err := runFIX001P3TargetScaleCapacityDomain(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
 			log.Fatal(err)
 		}
 	} else if *finalizationDiagnostic {
