@@ -78,4 +78,16 @@ Keep cryptographic backend implementation in `lattigo`: evaluator behavior, key 
 
 The previous hardware golden-model implementation is historical work, not the active mainline architecture. Preserve it through the dedicated legacy branch/tag specified by the active task before removing hardware-model code from `main`.
 
+## Result artifact read discipline
+
+Large diagnostic result artifacts can exhaust tool time or conversation context even when their filename contains `summary`.
+
+- Never full-fetch `results/*.json` unless its size is already known to be small and human-reviewable.
+- A filename containing `summary` does **not** imply the artifact is compact.
+- For unknown or large result artifacts, first inspect metadata/size when available, then use targeted search for specific keys/values or bounded excerpts.
+- Do not load full per-slot vectors, repeated index arrays, operation traces, coefficient dumps, or large hash collections into an orchestrator chat merely to review a result.
+- Prefer compact evidence: provenance, classification, checkpoint status, aggregate metrics, mismatch count, first mismatch, and worst error.
+- If an artifact turns out to be unexpectedly huge, stop reading it in full and report that the artifact format needs refinement.
+- New `summary.json` artifacts must remain compact and human-reviewable; detailed evidence belongs in the raw artifact, and even raw artifacts should avoid redundant multi-thousand-entry arrays when hashes/counts/first-worst evidence are sufficient.
+
 `CURRENT_TASK.md` is only the active work pointer. Task-specific requirements belong in `specs/`. Durable project rules belong here.
