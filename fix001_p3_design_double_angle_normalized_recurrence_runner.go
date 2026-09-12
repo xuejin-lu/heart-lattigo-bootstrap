@@ -53,6 +53,16 @@ type NormalizedExactCapacity struct {
 	Pass         bool    `json:"pass_exact_q01_capacity"`
 }
 
+type NormalizedFinalRestoreCapacity struct {
+	B            string  `json:"max_abs_c0_coefficient"`
+	K3           string  `json:"k3"`
+	RestoreBound string  `json:"k3_times_b"`
+	Q01Half      string  `json:"q01_half"`
+	Ratio        float64 `json:"k3_times_b_over_q01_half"`
+	OutsideCount int     `json:"outside_count"`
+	Pass         bool    `json:"pass_final_restore_capacity"`
+}
+
 type NormalizedStageComparison struct {
 	Match               bool   `json:"match"`
 	FastLevel           int    `json:"fast_level"`
@@ -102,22 +112,40 @@ type NormalizedRoundCheckpoint struct {
 }
 
 type NormalizedFinalEvidence struct {
-	K3                            string                       `json:"k3"`
-	BeforeResetScale              string                       `json:"before_reset_scale"`
-	FastRestoredRowsMatch         bool                         `json:"fast_restored_rows_match_r_coherent"`
-	FastRestoredComparison        NormalizedStageComparison    `json:"fast_restored_comparison"`
-	FastRestoredRows              []FinalizationRowFingerprint `json:"fast_restored_rows"`
-	RCoherentRows                 []FinalizationRowFingerprint `json:"r_coherent_rows"`
-	FastVsRCoherentSemantic       *PSGlobalMetric              `json:"fast_vs_r_coherent_semantic"`
-	RCoherentVsExactTarget        *PSGlobalMetric              `json:"r_coherent_vs_r_exact_target_semantic"`
-	FastVsExactTargetSemantic     *PSGlobalMetric              `json:"fast_vs_r_exact_target_semantic"`
-	FastFinalRowsAfterReset       []FinalizationRowFingerprint `json:"fast_final_rows_after_reset"`
-	RCoherentFinalRows            []FinalizationRowFingerprint `json:"r_coherent_final_rows_after_reset"`
-	RowsMatchAfterReset           bool                         `json:"rows_match_after_reset"`
-	FastRowsUnchangedOnReset      bool                         `json:"fast_rows_unchanged_on_metadata_reset"`
-	RCoherentRowsUnchangedOnReset bool                         `json:"r_coherent_rows_unchanged_on_metadata_reset"`
-	FinalSemanticPass             bool                         `json:"final_semantic_pass"`
-	ExactTargetCompatibility      bool                         `json:"exact_target_compatibility_pass"`
+	K3                                      string                         `json:"k3"`
+	BeforeResetScale                        string                         `json:"before_reset_scale"`
+	RestoreCapacity                         NormalizedFinalRestoreCapacity `json:"final_restore_capacity"`
+	FastBeforeRestoreRows                   []FinalizationRowFingerprint   `json:"fast_before_restore_rows"`
+	RNormBeforeRestoreRows                  []FinalizationRowFingerprint   `json:"r_norm_before_restore_rows"`
+	FastRestoredRows                        []FinalizationRowFingerprint   `json:"fast_restored_rows"`
+	RNormRestoredRows                       []FinalizationRowFingerprint   `json:"r_norm_restored_rows"`
+	NormalizedRestoredRowsMatch             bool                           `json:"normalized_restored_rows_match"`
+	NormalizedRestoredComparison            NormalizedStageComparison      `json:"normalized_restored_comparison"`
+	FastRestoreMetadataPass                 bool                           `json:"fast_restore_metadata_pass"`
+	RNormRestoreMetadataPass                bool                           `json:"r_norm_restore_metadata_pass"`
+	FastRestoreC1Zero                       bool                           `json:"fast_restore_c1_zero"`
+	RNormRestoreC1Zero                      bool                           `json:"r_norm_restore_c1_zero"`
+	FastVsNormalizedRestoredSemantic        *PSGlobalMetric                `json:"fast_vs_normalized_restored_semantic"`
+	NormalizedRestoredVsRCoherentSemantic   *PSGlobalMetric                `json:"normalized_restored_vs_r_coherent_semantic"`
+	NormalizedRestoredVsExactTargetSemantic *PSGlobalMetric                `json:"normalized_restored_vs_exact_target_semantic"`
+	FastVsRCoherentSemantic                 *PSGlobalMetric                `json:"fast_vs_r_coherent_semantic"`
+	RCoherentVsExactTarget                  *PSGlobalMetric                `json:"r_coherent_vs_r_exact_target_semantic"`
+	FastVsExactTargetSemantic               *PSGlobalMetric                `json:"fast_vs_r_exact_target_semantic"`
+	FastFinalRowsAfterReset                 []FinalizationRowFingerprint   `json:"fast_final_rows_after_reset"`
+	NormalizedReferenceFinalRowsAfterReset  []FinalizationRowFingerprint   `json:"normalized_reference_final_rows_after_reset"`
+	RowsMatchAfterReset                     bool                           `json:"rows_match_after_reset"`
+	FastRowsUnchangedOnReset                bool                           `json:"fast_rows_unchanged_on_metadata_reset"`
+	NormalizedReferenceRowsUnchangedOnReset bool                           `json:"normalized_reference_rows_unchanged_on_metadata_reset"`
+	FastFinalLevelDegreeUnchanged           bool                           `json:"fast_final_level_degree_unchanged"`
+	NormalizedFinalLevelDegreeUnchanged     bool                           `json:"normalized_final_level_degree_unchanged"`
+	FinalScaleResetSemantic                 *PSGlobalMetric                `json:"final_scale_reset_semantic"`
+	NormalizedFinalScaleResetSemantic       *PSGlobalMetric                `json:"normalized_final_scale_reset_semantic"`
+	FinalScaleResetPass                     bool                           `json:"final_scale_reset_pass"`
+	FinalSemanticPass                       bool                           `json:"final_semantic_pass"`
+	ExactTargetCompatibility                bool                           `json:"exact_target_compatibility_pass"`
+	RCoherentRows                           []FinalizationRowFingerprint   `json:"r_coherent_rows_semantic_only"`
+	RCoherentFinalRows                      []FinalizationRowFingerprint   `json:"r_coherent_final_rows_semantic_only"`
+	OldRCoherentRowEqualityDisposition      string                         `json:"old_r_coherent_row_equality_disposition"`
 }
 
 type NormalizedResult struct {
@@ -285,6 +313,17 @@ func normalizedExactCapacity(params ckks.Parameters, ct *rlwe.Ciphertext) (Norma
 	}
 	ratio, _ := new(big.Float).Quo(new(big.Float).SetInt(max), new(big.Float).SetInt(q01Half)).Float64()
 	return NormalizedExactCapacity{MaxAbs: max.String(), Q01Half: q01Half.String(), Ratio: ratio, OutsideCount: outside, Pass: outside == 0}, nil
+}
+
+func normalizedFinalRestoreCapacity(data targetScaleCenteredData, k3 *big.Int) NormalizedFinalRestoreCapacity {
+	b := mulAliasMaxAbs(data.Values[0])
+	bound := new(big.Int).Mul(new(big.Int).Set(b), k3)
+	ratio, _ := new(big.Float).Quo(new(big.Float).SetInt(bound), new(big.Float).SetInt(data.Q01Half)).Float64()
+	outside := 0
+	if bound.Cmp(data.Q01Half) >= 0 {
+		outside = 1
+	}
+	return NormalizedFinalRestoreCapacity{B: b.String(), K3: k3.String(), RestoreBound: bound.String(), Q01Half: data.Q01Half.String(), Ratio: ratio, OutsideCount: outside, Pass: outside == 0}
 }
 
 func normalizedFullFromLow(params ckks.Parameters, low *rlwe.Ciphertext, data targetScaleCenteredData) (*rlwe.Ciphertext, error) {
@@ -521,7 +560,7 @@ func normalizedWriteResult(result NormalizedResult, outPath string) error {
 		return err
 	}
 	summaryData = append(summaryData, '\n')
-	return os.WriteFile(filepath.Join(filepath.Dir(outPath), "FIX-001-P3-DESIGN-DOUBLE-ANGLE-NORMALIZED-REFERENCE-FIX-logN13-summary.json"), summaryData, 0o644)
+	return os.WriteFile(filepath.Join(filepath.Dir(outPath), "FIX-001-P3-DESIGN-DOUBLE-ANGLE-FINAL-RESTORE-REFERENCE-FIX-logN13-summary.json"), summaryData, 0o644)
 }
 
 func runFIX001P3DesignNormalizedRecurrence(cfg BootstrapConfig, primaryRoot, backendRoot, outPath string) error {
@@ -553,7 +592,7 @@ func runFIX001P3DesignNormalizedRecurrence(cfg BootstrapConfig, primaryRoot, bac
 	}
 	lowEvidence := NormalizedStateEvidence{Level: low.Level(), Degree: low.Degree(), Scale: finalizationScaleString(low.Scale), Semantic: psGlobalMetric(y0, lowDecoded), Rows: finalizationEvidence(low).Rows, C1Zero: lowC1.CoefficientDomainExactlyZero && lowC1.NTTMontgomeryExactlyZero, C0MaxAbs: mulAliasMaxAbs(lowData.Values[0]).String()}
 	if low.Level() != 7 || low.Degree() != 1 || !lowEvidence.Semantic.Pass || !lowEvidence.C1Zero {
-		result := NormalizedResult{SchemaVersion: "fix-001-p3-design-double-angle-normalized-reference-fix.v1", Timestamp: time.Now().UTC(), Primary: gitMetadata(primaryRoot), Lattigo: gitMetadata(backendRoot), AuthoritativeOracle: "raw_chebyshev_on_preprocessed_z", Threshold: correctnessThreshold, CanonicalLow: lowEvidence, PreviousClassificationDisposition: "superseded_by_reference_harness_error", FirstFailingRound: "canonical", FirstFailingCheckpoint: "canonical_low", FirstSupportedCause: "normalized_double_angle_reference_fix_precondition_mismatch", Validation: map[string]interface{}{"secondary_commit": gitOutput(backendRoot, "rev-parse", "HEAD"), "secondary_clean": gitOutput(backendRoot, "status", "--porcelain") == ""}}
+		result := NormalizedResult{SchemaVersion: "fix-001-p3-design-double-angle-final-restore-reference-fix.v1", Timestamp: time.Now().UTC(), Primary: gitMetadata(primaryRoot), Lattigo: gitMetadata(backendRoot), AuthoritativeOracle: "raw_chebyshev_on_preprocessed_z", Threshold: correctnessThreshold, CanonicalLow: lowEvidence, PreviousClassificationDisposition: "superseded_by_wrong_final_restore_reference", FirstFailingRound: "canonical", FirstFailingCheckpoint: "canonical_low", FirstSupportedCause: "normalized_double_angle_final_reference_precondition_mismatch", Validation: map[string]interface{}{"secondary_commit": gitOutput(backendRoot, "rev-parse", "HEAD"), "secondary_clean": gitOutput(backendRoot, "status", "--porcelain") == ""}}
 		return normalizedWriteResult(result, outPath)
 	}
 
@@ -570,7 +609,7 @@ func runFIX001P3DesignNormalizedRecurrence(cfg BootstrapConfig, primaryRoot, bac
 		return err
 	}
 	if psGlobalMetric(canonicalNormalized, fastNormalizedDecoded).MaxComponent > correctnessThreshold {
-		result := NormalizedResult{SchemaVersion: "fix-001-p3-design-double-angle-normalized-reference-fix.v1", Timestamp: time.Now().UTC(), Primary: gitMetadata(primaryRoot), Lattigo: gitMetadata(backendRoot), AuthoritativeOracle: "raw_chebyshev_on_preprocessed_z", Threshold: correctnessThreshold, CanonicalLow: lowEvidence, CanonicalNormalizedInput: psGlobalMetric(canonicalNormalized, fastNormalizedDecoded), PreviousClassificationDisposition: "superseded_by_reference_harness_error", FirstFailingRound: "canonical", FirstFailingCheckpoint: "canonical_normalized_input", FirstSupportedCause: "normalized_double_angle_reference_fix_precondition_mismatch", Validation: map[string]interface{}{"secondary_commit": gitOutput(backendRoot, "rev-parse", "HEAD"), "secondary_clean": gitOutput(backendRoot, "status", "--porcelain") == ""}}
+		result := NormalizedResult{SchemaVersion: "fix-001-p3-design-double-angle-final-restore-reference-fix.v1", Timestamp: time.Now().UTC(), Primary: gitMetadata(primaryRoot), Lattigo: gitMetadata(backendRoot), AuthoritativeOracle: "raw_chebyshev_on_preprocessed_z", Threshold: correctnessThreshold, CanonicalLow: lowEvidence, CanonicalNormalizedInput: psGlobalMetric(canonicalNormalized, fastNormalizedDecoded), PreviousClassificationDisposition: "superseded_by_wrong_final_restore_reference", FirstFailingRound: "canonical", FirstFailingCheckpoint: "canonical_normalized_input", FirstSupportedCause: "normalized_double_angle_final_reference_precondition_mismatch", Validation: map[string]interface{}{"secondary_commit": gitOutput(backendRoot, "rev-parse", "HEAD"), "secondary_clean": gitOutput(backendRoot, "status", "--porcelain") == ""}}
 		return normalizedWriteResult(result, outPath)
 	}
 
@@ -592,11 +631,11 @@ func runFIX001P3DesignNormalizedRecurrence(cfg BootstrapConfig, primaryRoot, bac
 	rNorm.Scale = coherentInitialScale
 
 	result := NormalizedResult{
-		SchemaVersion: "fix-001-p3-design-double-angle-normalized-reference-fix.v1", Timestamp: time.Now().UTC(), Primary: gitMetadata(primaryRoot), Lattigo: gitMetadata(backendRoot),
+		SchemaVersion: "fix-001-p3-design-double-angle-final-restore-reference-fix.v1", Timestamp: time.Now().UTC(), Primary: gitMetadata(primaryRoot), Lattigo: gitMetadata(backendRoot),
 		Environment: EnvironmentMetadata{GoVersion: runtime.Version(), OS: runtime.GOOS, Arch: runtime.GOARCH, CPU: cpuModel(), CPUs: runtime.NumCPU()}, Config: cfg,
 		Parameters: parameterMetadata(params, state.Params), Workload: CorrectnessWorkload{Identifier: "reproducibleInput.v1 + real-branch degree-30 Chebyshev", Formula: "real=((i%7)-3)/16; imag=((i%5)-2)/32; corrected T0=1", LogicalSlots: 4096},
-		AuthoritativeOracle: "raw_chebyshev_on_preprocessed_z", Threshold: correctnessThreshold, WorkingScaleW: finalizationScaleString(low.Scale), CoherentInitialScale: finalizationScaleString(coherentInitialScale), ExactTargetScale: finalizationScaleString(exactTarget), InitialScaleLog2Delta: normalizedLog2Deviation(coherentInitialScale, exactTarget), PromotionMultiplier: multiplier.String(), CanonicalLow: lowEvidence, CanonicalNormalizedInput: psGlobalMetric(canonicalNormalized, fastNormalizedDecoded), DesignMechanism: "metadata_normalized_double_angle_with_power_of_two_value_factors", PreviousClassificationDisposition: "superseded_by_reference_harness_error",
-		Validation: map[string]interface{}{"secondary_commit": gitOutput(backendRoot, "rev-parse", "HEAD"), "secondary_clean": gitOutput(backendRoot, "status", "--porcelain") == "", "canonical_root_hash_match": state.Root.RowsMatch([]string{"d0db2b184bc895ff004769f6f02aadfc956a9d69ddfa60e86fdf9963f7382faf", "d0f3f6d6ed56e82bc97be47c535361895a75a2d583cac4c09fdbc5343d5f6f7f"}), "previous_h0_stale_checkpoint_object": true, "previous_h0_missing_squared_scale": true, "corrected_reference_product_scale": true, "immutable_fast_stage_snapshots": true, "no_logn16": true, "no_benchmark": true, "no_gate_4_or_5": true, "no_exp003": true, "no_coeffs_to_slots_or_later_bootstrap": true},
+		AuthoritativeOracle: "raw_chebyshev_on_preprocessed_z", Threshold: correctnessThreshold, WorkingScaleW: finalizationScaleString(low.Scale), CoherentInitialScale: finalizationScaleString(coherentInitialScale), ExactTargetScale: finalizationScaleString(exactTarget), InitialScaleLog2Delta: normalizedLog2Deviation(coherentInitialScale, exactTarget), PromotionMultiplier: multiplier.String(), CanonicalLow: lowEvidence, CanonicalNormalizedInput: psGlobalMetric(canonicalNormalized, fastNormalizedDecoded), DesignMechanism: "metadata_normalized_double_angle_with_power_of_two_value_factors", PreviousClassificationDisposition: "superseded_by_wrong_final_restore_reference",
+		Validation: map[string]interface{}{"secondary_commit": gitOutput(backendRoot, "rev-parse", "HEAD"), "secondary_clean": gitOutput(backendRoot, "status", "--porcelain") == "", "canonical_root_hash_match": state.Root.RowsMatch([]string{"d0db2b184bc895ff004769f6f02aadfc956a9d69ddfa60e86fdf9963f7382faf", "d0f3f6d6ed56e82bc97be47c535361895a75a2d583cac4c09fdbc5343d5f6f7f"}), "previous_h0_stale_checkpoint_object": true, "previous_h0_missing_squared_scale": true, "corrected_reference_product_scale": true, "immutable_fast_stage_snapshots": true, "final_exact_row_oracle": "rNormRestored", "r_coherent_row_equality_required": false, "previous_classification_disposition": "superseded_by_wrong_final_restore_reference", "old_r_coherent_row_equality_disposition": "invalid_due_to_independent_rescale_rounding_histories", "no_logn16": true, "no_benchmark": true, "no_gate_4_or_5": true, "no_exp003": true, "no_coeffs_to_slots_or_later_bootstrap": true},
 	}
 	result.FirstFailingRound = "none"
 	result.FirstFailingCheckpoint = "none"
@@ -631,7 +670,7 @@ func runFIX001P3DesignNormalizedRecurrence(cfg BootstrapConfig, primaryRoot, bac
 		checkpoint := NormalizedRoundCheckpoint{Round: round, Schedule: schedule, InputSemantic: psGlobalMetric(zBefore, inputDecoded), InputSquareBound: normalizedSquareBound(inputData, params.N())}
 		if !checkpoint.InputSquareBound.Pass {
 			result.Rounds = append(result.Rounds, checkpoint)
-			normalizedSetFailure(&result, fmt.Sprintf("%d", round), "pre_square_capacity", "normalized_double_angle_square_capacity_failure")
+			normalizedSetFailure(&result, fmt.Sprintf("%d", round), "pre_square_capacity", "normalized_double_angle_final_reference_precondition_mismatch")
 			return normalizedWriteResult(result, outPath)
 		}
 
@@ -667,12 +706,12 @@ func runFIX001P3DesignNormalizedRecurrence(cfg BootstrapConfig, primaryRoot, bac
 		checkpoint.SquareSemantic = psGlobalMetric(zSquare, squareDecoded)
 		if !checkpoint.SquareComparison.Match {
 			result.Rounds = append(result.Rounds, checkpoint)
-			normalizedSetFailure(&result, fmt.Sprintf("%d", round), "square", "normalized_double_angle_square_arithmetic_mismatch")
+			normalizedSetFailure(&result, fmt.Sprintf("%d", round), "square", "normalized_double_angle_final_reference_precondition_mismatch")
 			return normalizedWriteResult(result, outPath)
 		}
 		if !checkpoint.SquareSemantic.Pass {
 			result.Rounds = append(result.Rounds, checkpoint)
-			normalizedSetFailure(&result, fmt.Sprintf("%d", round), "square_semantic", "normalized_double_angle_semantic_failure")
+			normalizedSetFailure(&result, fmt.Sprintf("%d", round), "square_semantic", "normalized_double_angle_final_reference_precondition_mismatch")
 			return normalizedWriteResult(result, outPath)
 		}
 
@@ -693,12 +732,12 @@ func runFIX001P3DesignNormalizedRecurrence(cfg BootstrapConfig, primaryRoot, bac
 		checkpoint.AfterMultiplierSemantic = psGlobalMetric(zAfterA, aDecoded)
 		if !checkpoint.AfterMultiplierComparison.Match {
 			result.Rounds = append(result.Rounds, checkpoint)
-			normalizedSetFailure(&result, fmt.Sprintf("%d", round), "after_multiplier", "normalized_double_angle_multiplier_arithmetic_mismatch")
+			normalizedSetFailure(&result, fmt.Sprintf("%d", round), "after_multiplier", "normalized_double_angle_final_reference_precondition_mismatch")
 			return normalizedWriteResult(result, outPath)
 		}
 		if !checkpoint.AfterMultiplierSemantic.Pass {
 			result.Rounds = append(result.Rounds, checkpoint)
-			normalizedSetFailure(&result, fmt.Sprintf("%d", round), "after_multiplier_semantic", "normalized_double_angle_semantic_failure")
+			normalizedSetFailure(&result, fmt.Sprintf("%d", round), "after_multiplier_semantic", "normalized_double_angle_final_reference_precondition_mismatch")
 			return normalizedWriteResult(result, outPath)
 		}
 
@@ -730,17 +769,17 @@ func runFIX001P3DesignNormalizedRecurrence(cfg BootstrapConfig, primaryRoot, bac
 		checkpoint.PreRescaleRowsMatch = checkpoint.AfterConstantComparison.Match
 		if !checkpoint.PreRescaleCapacity.Pass {
 			result.Rounds = append(result.Rounds, checkpoint)
-			normalizedSetFailure(&result, fmt.Sprintf("%d", round), "pre_rescale_capacity", "normalized_double_angle_pre_rescale_capacity_failure")
+			normalizedSetFailure(&result, fmt.Sprintf("%d", round), "pre_rescale_capacity", "normalized_double_angle_final_reference_precondition_mismatch")
 			return normalizedWriteResult(result, outPath)
 		}
 		if !checkpoint.AfterConstantComparison.Match {
 			result.Rounds = append(result.Rounds, checkpoint)
-			normalizedSetFailure(&result, fmt.Sprintf("%d", round), "after_constant", "normalized_double_angle_constant_arithmetic_mismatch")
+			normalizedSetFailure(&result, fmt.Sprintf("%d", round), "after_constant", "normalized_double_angle_final_reference_precondition_mismatch")
 			return normalizedWriteResult(result, outPath)
 		}
 		if !checkpoint.AfterConstantSemantic.Pass {
 			result.Rounds = append(result.Rounds, checkpoint)
-			normalizedSetFailure(&result, fmt.Sprintf("%d", round), "after_constant_semantic", "normalized_double_angle_semantic_failure")
+			normalizedSetFailure(&result, fmt.Sprintf("%d", round), "after_constant_semantic", "normalized_double_angle_final_reference_precondition_mismatch")
 			return normalizedWriteResult(result, outPath)
 		}
 
@@ -766,11 +805,11 @@ func runFIX001P3DesignNormalizedRecurrence(cfg BootstrapConfig, primaryRoot, bac
 		checkpoint.PostRescaleReferenceRows = finalizationEvidence(refPostRescale).Rows
 		result.Rounds = append(result.Rounds, checkpoint)
 		if !checkpoint.PostRescaleComparison.Match || !checkpoint.PostRescaleScaleMatch {
-			normalizedSetFailure(&result, fmt.Sprintf("%d", round), "post_rescale", "normalized_double_angle_rescale_arithmetic_mismatch")
+			normalizedSetFailure(&result, fmt.Sprintf("%d", round), "post_rescale", "normalized_double_angle_final_reference_precondition_mismatch")
 			return normalizedWriteResult(result, outPath)
 		}
 		if !checkpoint.InputSemantic.Pass || !checkpoint.PostRescaleSemantic.Pass {
-			normalizedSetFailure(&result, fmt.Sprintf("%d", round), "post_rescale_semantic", "normalized_double_angle_semantic_failure")
+			normalizedSetFailure(&result, fmt.Sprintf("%d", round), "post_rescale_semantic", "normalized_double_angle_final_reference_precondition_mismatch")
 			return normalizedWriteResult(result, outPath)
 		}
 
@@ -799,45 +838,131 @@ func runFIX001P3DesignNormalizedRecurrence(cfg BootstrapConfig, primaryRoot, bac
 	}
 
 	fastBeforeRestore := fastNormalized.CopyNew()
+	rNormBeforeRestore := rNorm.CopyNew()
 	k3 := new(big.Int).Lsh(big.NewInt(1), uint(kIn))
-	if err := state.Eval.FastCKKS.MulIntegerMaintained(fastNormalized, k3, fastNormalized); err != nil {
+	restoreView, err := targetScaleCoefficientView(params, fastBeforeRestore)
+	if err != nil {
 		return err
 	}
-	fastRestored := fastNormalized.CopyNew()
-	rCoherentBeforeReset := rCoherent.CopyNew()
-	fastRestoredRows := finalizationEvidence(fastNormalized).Rows
-	coherentRows := finalizationEvidence(rCoherent).Rows
-	fastRestoredComparison := normalizedStageComparison(fastRestored, rCoherentBeforeReset)
-	fastRestoredRowsMatch := fastRestoredComparison.Match
+	restoreData, err := targetScaleCenteredRows(params, restoreView)
+	if err != nil {
+		return err
+	}
+	final := NormalizedFinalEvidence{
+		K3: k3.String(), BeforeResetScale: finalizationScaleString(fastBeforeRestore.Scale),
+		RestoreCapacity:                    normalizedFinalRestoreCapacity(restoreData, k3),
+		FastBeforeRestoreRows:              finalizationEvidence(fastBeforeRestore).Rows,
+		RNormBeforeRestoreRows:             finalizationEvidence(rNormBeforeRestore).Rows,
+		RCoherentRows:                      finalizationEvidence(rCoherent).Rows,
+		OldRCoherentRowEqualityDisposition: "invalid_due_to_independent_rescale_rounding_histories",
+	}
+	if !final.RestoreCapacity.Pass {
+		result.Final = final
+		normalizedSetFailure(&result, "final", "restore_capacity", "normalized_double_angle_final_restore_capacity_failure")
+		return normalizedWriteResult(result, outPath)
+	}
+
+	fastRestored := fastBeforeRestore.CopyNew()
+	if err := state.Eval.FastCKKS.MulIntegerMaintained(fastBeforeRestore, k3, fastRestored); err != nil {
+		return err
+	}
+	rNormRestored := normalizedFullIntegerMultiply(params, rNormBeforeRestore, k3)
+	final.FastRestoredRows = finalizationEvidence(fastRestored).Rows
+	final.RNormRestoredRows = finalizationEvidence(rNormRestored).Rows
+	final.NormalizedRestoredComparison = normalizedStageComparison(fastRestored, rNormRestored)
+	final.NormalizedRestoredRowsMatch = final.NormalizedRestoredComparison.Match
+	final.FastRestoreMetadataPass = fastRestored.Level() == fastBeforeRestore.Level() && fastRestored.Degree() == fastBeforeRestore.Degree() && fastRestored.IsNTT == fastBeforeRestore.IsNTT && fastRestored.IsMontgomery == fastBeforeRestore.IsMontgomery && fastRestored.Scale.Equal(fastBeforeRestore.Scale)
+	final.RNormRestoreMetadataPass = rNormRestored.Level() == rNormBeforeRestore.Level() && rNormRestored.Degree() == rNormBeforeRestore.Degree() && rNormRestored.IsNTT == rNormBeforeRestore.IsNTT && rNormRestored.IsMontgomery == rNormBeforeRestore.IsMontgomery && rNormRestored.Scale.Equal(rNormBeforeRestore.Scale)
+	fastRestoreC1, err := mulAliasZeroCheck(params, fastRestored, 1)
+	if err != nil {
+		return err
+	}
+	rNormRestoreC1, err := mulAliasZeroCheck(params, rNormRestored, 1)
+	if err != nil {
+		return err
+	}
+	final.FastRestoreC1Zero = fastRestoreC1.CoefficientDomainExactlyZero && fastRestoreC1.NTTMontgomeryExactlyZero
+	final.RNormRestoreC1Zero = rNormRestoreC1.CoefficientDomainExactlyZero && rNormRestoreC1.NTTMontgomeryExactlyZero
+	if !final.NormalizedRestoredRowsMatch || !final.FastRestoreMetadataPass || !final.RNormRestoreMetadataPass || !final.FastRestoreC1Zero || !final.RNormRestoreC1Zero {
+		result.Final = final
+		normalizedSetFailure(&result, "final", "k3_restore", "normalized_double_angle_final_restore_primitive_mismatch")
+		return normalizedWriteResult(result, outPath)
+	}
+
 	inputScale := state.InputScaleValue
-	fastNormalized.Scale = inputScale
+	fastRestoredBeforeResetRows := finalizationEvidence(fastRestored).Rows
+	rNormRestoredBeforeResetRows := finalizationEvidence(rNormRestored).Rows
+	fastRestoredDecoded, err := psGlobalDecode(params, fastRestored)
+	if err != nil {
+		return err
+	}
+	rNormRestoredDecoded, err := psGlobalDecode(params, rNormRestored)
+	if err != nil {
+		return err
+	}
+	rCoherentBeforeReset := rCoherent.CopyNew()
+	rExactTargetBeforeReset := rExactTarget.CopyNew()
+	coherentBeforeReset, err := psGlobalDecode(params, rCoherentBeforeReset)
+	if err != nil {
+		return err
+	}
+	exactBeforeReset, err := psGlobalDecode(params, rExactTargetBeforeReset)
+	if err != nil {
+		return err
+	}
+	final.FastVsNormalizedRestoredSemantic = psGlobalMetric(rNormRestoredDecoded, fastRestoredDecoded)
+	final.NormalizedRestoredVsRCoherentSemantic = psGlobalMetric(coherentBeforeReset, rNormRestoredDecoded)
+	final.NormalizedRestoredVsExactTargetSemantic = psGlobalMetric(exactBeforeReset, rNormRestoredDecoded)
+	final.FastVsRCoherentSemantic = psGlobalMetric(coherentBeforeReset, fastRestoredDecoded)
+	final.RCoherentVsExactTarget = psGlobalMetric(coherentBeforeReset, exactBeforeReset)
+	final.FastVsExactTargetSemantic = psGlobalMetric(exactBeforeReset, fastRestoredDecoded)
+	final.ExactTargetCompatibility = final.RCoherentVsExactTarget.Pass
+	if !final.FastVsNormalizedRestoredSemantic.Pass || !final.NormalizedRestoredVsRCoherentSemantic.Pass || !final.NormalizedRestoredVsExactTargetSemantic.Pass || !final.FastVsRCoherentSemantic.Pass || !final.RCoherentVsExactTarget.Pass || !final.FastVsExactTargetSemantic.Pass {
+		result.Final = final
+		normalizedSetFailure(&result, "final", "final_semantic", "normalized_double_angle_final_restore_semantic_failure")
+		return normalizedWriteResult(result, outPath)
+	}
+
+	resetRatio, _ := new(big.Float).Quo(new(big.Float).Set(&fastRestored.Scale.Value), new(big.Float).Set(&inputScale.Value)).Float64()
+	expectedReset := make([]complex128, len(fastRestoredDecoded))
+	for index, value := range fastRestoredDecoded {
+		expectedReset[index] = value * complex(resetRatio, 0)
+	}
+	expectedNormalizedReset := make([]complex128, len(rNormRestoredDecoded))
+	for index, value := range rNormRestoredDecoded {
+		expectedNormalizedReset[index] = value * complex(resetRatio, 0)
+	}
+	fastRestored.Scale = inputScale
+	rNormRestored.Scale = inputScale
 	rCoherent.Scale = inputScale
 	rExactTarget.Scale = inputScale
-	fastFinal, err := psGlobalDecode(params, fastNormalized)
+	fastFinal, err := psGlobalDecode(params, fastRestored)
 	if err != nil {
 		return err
 	}
-	coherentFinal, err := psGlobalDecode(params, rCoherent)
+	normalizedFinal, err := psGlobalDecode(params, rNormRestored)
 	if err != nil {
 		return err
 	}
-	exactFinal, err := psGlobalDecode(params, rExactTarget)
-	if err != nil {
-		return err
-	}
-	final := NormalizedFinalEvidence{K3: k3.String(), BeforeResetScale: finalizationScaleString(fastBeforeRestore.Scale), FastRestoredRowsMatch: fastRestoredRowsMatch, FastRestoredComparison: fastRestoredComparison, FastRestoredRows: fastRestoredRows, RCoherentRows: coherentRows, FastVsRCoherentSemantic: psGlobalMetric(coherentFinal, fastFinal), RCoherentVsExactTarget: psGlobalMetric(coherentFinal, exactFinal), FastVsExactTargetSemantic: psGlobalMetric(exactFinal, fastFinal), FastFinalRowsAfterReset: finalizationEvidence(fastNormalized).Rows, RCoherentFinalRows: finalizationEvidence(rCoherent).Rows}
-	final.RowsMatchAfterReset = doubleAngleRowsMatch(final.FastFinalRowsAfterReset, final.RCoherentFinalRows)
-	final.FastRowsUnchangedOnReset = doubleAngleRowsMatch(final.FastFinalRowsAfterReset, finalizationEvidence(fastRestored).Rows)
-	final.RCoherentRowsUnchangedOnReset = doubleAngleRowsMatch(final.RCoherentFinalRows, finalizationEvidence(rCoherentBeforeReset).Rows)
-	final.FinalSemanticPass = final.FastVsRCoherentSemantic.Pass
-	final.ExactTargetCompatibility = final.RCoherentVsExactTarget.Pass
+	final.FastFinalRowsAfterReset = finalizationEvidence(fastRestored).Rows
+	final.NormalizedReferenceFinalRowsAfterReset = finalizationEvidence(rNormRestored).Rows
+	final.RowsMatchAfterReset = doubleAngleRowsMatch(final.FastFinalRowsAfterReset, final.NormalizedReferenceFinalRowsAfterReset)
+	final.FastRowsUnchangedOnReset = doubleAngleRowsMatch(final.FastFinalRowsAfterReset, fastRestoredBeforeResetRows)
+	final.NormalizedReferenceRowsUnchangedOnReset = doubleAngleRowsMatch(final.NormalizedReferenceFinalRowsAfterReset, rNormRestoredBeforeResetRows)
+	final.FastFinalLevelDegreeUnchanged = fastRestored.Level() == fastBeforeRestore.Level() && fastRestored.Degree() == fastBeforeRestore.Degree()
+	final.NormalizedFinalLevelDegreeUnchanged = rNormRestored.Level() == rNormBeforeRestore.Level() && rNormRestored.Degree() == rNormBeforeRestore.Degree()
+	final.FinalScaleResetSemantic = psGlobalMetric(expectedReset, fastFinal)
+	final.NormalizedFinalScaleResetSemantic = psGlobalMetric(expectedNormalizedReset, normalizedFinal)
+	final.FinalScaleResetPass = final.RowsMatchAfterReset && final.FastRowsUnchangedOnReset && final.NormalizedReferenceRowsUnchangedOnReset && final.FastFinalLevelDegreeUnchanged && final.NormalizedFinalLevelDegreeUnchanged && fastRestored.Scale.Equal(inputScale) && rNormRestored.Scale.Equal(inputScale) && final.FinalScaleResetSemantic.Pass && final.NormalizedFinalScaleResetSemantic.Pass
+	final.RCoherentFinalRows = finalizationEvidence(rCoherent).Rows
+	final.FinalSemanticPass = final.FastVsNormalizedRestoredSemantic.Pass && final.NormalizedRestoredVsRCoherentSemantic.Pass && final.NormalizedRestoredVsExactTargetSemantic.Pass && final.FastVsRCoherentSemantic.Pass && final.RCoherentVsExactTarget.Pass && final.FastVsExactTargetSemantic.Pass
 	result.Final = final
-	if !fastRestoredRowsMatch || !final.RowsMatchAfterReset || !final.FastRowsUnchangedOnReset || !final.RCoherentRowsUnchangedOnReset {
-		normalizedSetFailure(&result, "final", "k3_restore", "normalized_double_angle_final_restoration_failure")
-	} else if !final.FinalSemanticPass || !final.ExactTargetCompatibility {
-		normalizedSetFailure(&result, "final", "final_semantic", "normalized_double_angle_semantic_failure")
+	if !final.FinalScaleResetPass {
+		normalizedSetFailure(&result, "final", "scale_reset", "normalized_double_angle_final_scale_reset_failure")
+	} else if !final.FinalSemanticPass {
+		normalizedSetFailure(&result, "final", "final_semantic", "normalized_double_angle_final_restore_semantic_failure")
 	} else {
-		normalizedSetFailure(&result, "none", "none", "normalized_double_angle_recurrence_validated_after_reference_fix")
+		normalizedSetFailure(&result, "none", "none", "normalized_double_angle_recurrence_validated_after_final_reference_fix")
 	}
 	return normalizedWriteResult(result, outPath)
 }

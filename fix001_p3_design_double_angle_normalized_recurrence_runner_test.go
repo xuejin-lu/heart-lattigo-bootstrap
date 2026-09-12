@@ -90,3 +90,43 @@ func TestFIX001P3NormalizedFastSnapshotIsImmutable(t *testing.T) {
 		t.Fatalf("snapshot changed after live ciphertext mutation: got %d, want %d", snapshot.Value[0].Coeffs[0][0], want)
 	}
 }
+
+func TestFIX001P3FinalRestoreCapacityBound(t *testing.T) {
+	data := targetScaleCenteredData{Q01Half: big.NewInt(1000), Values: [][]*big.Int{{big.NewInt(3), big.NewInt(-4)}}}
+	evidence := normalizedFinalRestoreCapacity(data, big.NewInt(2))
+	if !evidence.Pass || evidence.B != "4" || evidence.RestoreBound != "8" || evidence.Ratio != 0.008 {
+		t.Fatalf("unexpected final restore capacity evidence: %+v", evidence)
+	}
+	failing := normalizedFinalRestoreCapacity(data, big.NewInt(300))
+	if failing.Pass || failing.OutsideCount != 1 || failing.RestoreBound != "1200" {
+		t.Fatalf("expected final restore capacity failure: %+v", failing)
+	}
+}
+
+func TestFIX001P3FinalRestoreNormalizedReferenceRows(t *testing.T) {
+	params := newQ01TestParameters(t, []int{50, 50})
+	input := fillQ01TestCiphertext(t, params, 1, true)
+	factor := big.NewInt(8)
+	fast := input.CopyNew()
+	reference := normalizedFullIntegerMultiply(params, input, factor)
+	for component := range fast.Value {
+		for limb := range fast.Value[component].Coeffs {
+			for index := range fast.Value[component].Coeffs[limb] {
+				fast.Value[component].Coeffs[limb][index] = reference.Value[component].Coeffs[limb][index]
+			}
+		}
+	}
+	if !normalizedStageComparison(fast, reference).Match {
+		t.Fatal("normalized reference rows should match the exact integer restore")
+	}
+}
+
+func TestFIX001P3FinalRestoreMetadataResetPreservesRows(t *testing.T) {
+	params := newQ01TestParameters(t, []int{50, 50})
+	ct := fillQ01TestCiphertext(t, params, 1, true)
+	before := finalizationEvidence(ct).Rows
+	ct.Scale = rlwe.NewScale(new(big.Int).Lsh(big.NewInt(1), 30))
+	if !doubleAngleRowsMatch(before, finalizationEvidence(ct).Rows) {
+		t.Fatal("metadata-only scale reset changed q0/q1 rows")
+	}
+}
