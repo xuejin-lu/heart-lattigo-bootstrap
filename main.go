@@ -44,6 +44,7 @@ func main() {
 	fix001P3IntegrateLogN13C2SCompression := flag.Bool("fix001-p3-integrate-logn13-c2s-compression", false, "integrate and validate production LogN13 Fast C2S compression")
 	fix001P3DiagLogN13EvalModS2CAmplification := flag.Bool("fix001-p3-diag-logn13-evalmod-s2c-amplification", false, "diagnose LogN13 EvalMod semantic amplification through S2C")
 	fix001P3DesignLogN13EvalModPrecisionScaleSweep := flag.Bool("fix001-p3-design-logn13-evalmod-precision-scale-sweep", false, "sweep diagnostic Fast EvalMod common plan scales")
+	fix001P3DesignLogN13GuardedPowerPrecision := flag.Bool("fix001-p3-design-logn13-guarded-power-precision", false, "sweep diagnostic guarded Chebyshev power precision")
 	flag.Parse()
 
 	cfg, err := LoadBootstrapConfig(*configPath)
@@ -156,6 +157,9 @@ func main() {
 	if *fix001P3DesignLogN13EvalModPrecisionScaleSweep {
 		selectedModes++
 	}
+	if *fix001P3DesignLogN13GuardedPowerPrecision {
+		selectedModes++
+	}
 	if selectedModes > 1 {
 		log.Fatal("bootstrap diagnostic modes cannot be used together")
 	}
@@ -265,6 +269,10 @@ func main() {
 		}
 	} else if *fix001P3DesignLogN13EvalModPrecisionScaleSweep {
 		if err := runFIX001P3DesignLogN13EvalModPrecisionScaleSweep(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
+			log.Fatal(err)
+		}
+	} else if *fix001P3DesignLogN13GuardedPowerPrecision {
+		if err := runFIX001P3DesignLogN13GuardedPowerPrecision(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
 			log.Fatal(err)
 		}
 	} else if *finalizationDiagnostic {

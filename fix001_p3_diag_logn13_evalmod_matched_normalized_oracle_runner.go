@@ -425,6 +425,10 @@ func evalModMatchedRunPath(fastInput, standardInput *rlwe.Ciphertext, fastEval *
 }
 
 func evalModMatchedRunPathWithPlanScale(fastInput, standardInput *rlwe.Ciphertext, fastEval *bootstrapping.FastEvaluator, standardEval *bootstrapping.Evaluator, params ckks.Parameters, fastSK, standardSK *rlwe.SecretKey, planScale rlwe.Scale) (evalModMatchedPath, error) {
+	return evalModMatchedRunPathWithPlanScaleAndFastPolynomial(fastInput, standardInput, fastEval, standardEval, params, fastSK, standardSK, planScale, nil)
+}
+
+func evalModMatchedRunPathWithPlanScaleAndFastPolynomial(fastInput, standardInput *rlwe.Ciphertext, fastEval *bootstrapping.FastEvaluator, standardEval *bootstrapping.Evaluator, params ckks.Parameters, fastSK, standardSK *rlwe.SecretKey, planScale rlwe.Scale, fastPolyOverride *rlwe.Ciphertext) (evalModMatchedPath, error) {
 	path := evalModMatchedPath{Polynomial: map[string]*PSGlobalMetric{}, PolyMeta: map[string]string{}, FirstFailure: "none"}
 	coefficientView, err := targetScaleCoefficientView(params, fastInput)
 	if err != nil {
@@ -491,9 +495,14 @@ func evalModMatchedRunPathWithPlanScale(fastInput, standardInput *rlwe.Ciphertex
 	if err != nil {
 		return path, err
 	}
-	fastPoly, err := fastEval.PolynomialEvaluator.EvaluateWithPlanScale(fastCurrent.CopyNew(), fastEval.Mod1Parameters.Mod1Poly, targetScale, planScale)
-	if err != nil {
-		return path, err
+	var fastPoly *rlwe.Ciphertext
+	if fastPolyOverride != nil {
+		fastPoly = fastPolyOverride.CopyNew()
+	} else {
+		fastPoly, err = fastEval.PolynomialEvaluator.EvaluateWithPlanScale(fastCurrent.CopyNew(), fastEval.Mod1Parameters.Mod1Poly, targetScale, planScale)
+		if err != nil {
+			return path, err
+		}
 	}
 	polyView, err := targetScaleCoefficientView(params, fastPoly)
 	if err != nil {
