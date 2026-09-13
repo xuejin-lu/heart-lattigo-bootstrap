@@ -58,6 +58,7 @@ func main() {
 	fix001P3DesignLogN13DAAllRoundsLocalQ2 := flag.Bool("fix001-p3-design-logn13-da-all-rounds-local-q2", false, "test LogN13 all-rounds DA local q2 feasibility")
 	fix001P3DesignLogN13G0LocalQ2GuardSweep := flag.Bool("fix001-p3-design-logn13-g0-local-q2-guard-sweep", false, "sweep LogN13 G0 local q2 guard bits")
 	fix001P3DiagLogN13S2CErrorDecomposition := flag.Bool("fix001-p3-diag-logn13-s2c-error-decomposition", false, "decompose LogN13 S2C error for the accepted G0=2 candidate")
+	fix001P3DiagLogN13EvalModResidualDecomposition := flag.Bool("fix001-p3-diag-logn13-evalmod-residual-error-decomposition", false, "decompose LogN13 EvalMod residual error")
 	flag.Parse()
 
 	cfg, err := LoadBootstrapConfig(*configPath)
@@ -210,6 +211,9 @@ func main() {
 		selectedModes++
 	}
 	if *fix001P3DiagLogN13S2CErrorDecomposition {
+		selectedModes++
+	}
+	if *fix001P3DiagLogN13EvalModResidualDecomposition {
 		selectedModes++
 	}
 	if selectedModes > 1 {
@@ -377,6 +381,10 @@ func main() {
 		}
 	} else if *fix001P3DiagLogN13S2CErrorDecomposition {
 		if err := runFIX001P3DiagLogN13S2CErrorDecomposition(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
+			log.Fatal(err)
+		}
+	} else if *fix001P3DiagLogN13EvalModResidualDecomposition {
+		if err := runFIX001P3DiagLogN13EvalModResidualDecomposition(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
 			log.Fatal(err)
 		}
 	} else if *finalizationDiagnostic {

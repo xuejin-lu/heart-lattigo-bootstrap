@@ -42,6 +42,11 @@ type fix001P3DAAllRoundsRoundOutcome struct {
 	Blocker        string
 }
 
+// fix001P3DAAllRoundsTrace captures stage-aligned Fast/full-RNS views for a
+// diagnostic replay. It is deliberately optional so the accepted replay path
+// remains unchanged for existing callers.
+type fix001P3DAAllRoundsTrace func(round int, checkpoint string, fast, normalized *rlwe.Ciphertext)
+
 func fix001P3DAAllRoundsWrite(result fix001P3DAAllRoundsResult, outPath string) error {
 	data, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {
@@ -97,11 +102,18 @@ func fix001P3DAAllRoundsExpansion(params ckks.Parameters, source, intended *rlwe
 }
 
 func fix001P3DAAllRoundsRound(state *fix001P3DAR0LocalQ2State, round int, fastEval *bootstrapping.FastEvaluator, standardEval *bootstrapping.Evaluator, params ckks.Parameters, fastSK, standardSK *rlwe.SecretKey) (fix001P3DAAllRoundsRoundOutcome, error) {
+	return fix001P3DAAllRoundsRoundWithTrace(state, round, fastEval, standardEval, params, fastSK, standardSK, nil)
+}
+
+func fix001P3DAAllRoundsRoundWithTrace(state *fix001P3DAR0LocalQ2State, round int, fastEval *bootstrapping.FastEvaluator, standardEval *bootstrapping.Evaluator, params ckks.Parameters, fastSK, standardSK *rlwe.SecretKey, trace fix001P3DAAllRoundsTrace) (fix001P3DAAllRoundsRoundOutcome, error) {
 	outcome := fix001P3DAAllRoundsRoundOutcome{Evidence: map[string]interface{}{"round": round}}
 	sqrt2pi := state.Sqrt2Pi * state.Sqrt2Pi
 	schedule, err := normalizedScaleSchedule(round, state.CurrentLevel, state.CurrentScale, state.WorkingScale, state.KIn, sqrt2pi, params)
 	if err != nil {
 		return outcome, err
+	}
+	if trace != nil {
+		trace(round, "input", state.FastNormalized, state.NormalizedCurrent)
 	}
 	inputCheckpoint, err := evalModMatchedCheckpointFor("da_input", round, state.FastNormalized, state.NormalizedCurrent, state.CoherentCurrent, params, fastSK, zeroSecret(params), zeroSecret(params))
 	if err != nil {
@@ -161,6 +173,9 @@ func fix001P3DAAllRoundsRound(state *fix001P3DAR0LocalQ2State, round int, fastEv
 		outcome.Evidence["expansion"] = expansion
 		return outcome, nil
 	}
+	if trace != nil {
+		trace(round, "square", state.FastNormalized, refSquare)
+	}
 	factor := new(big.Int).Lsh(big.NewInt(1), uint(schedule.AExponent))
 	refAfterMultiplier := normalizedFullIntegerMultiply(params, refSquare, factor)
 	q01AfterMultiplier, err := fix001P3DAR0ContractQ01(params, refAfterMultiplier)
@@ -180,6 +195,10 @@ func fix001P3DAAllRoundsRound(state *fix001P3DAR0LocalQ2State, round int, fastEv
 	constantCheckpoint, err := evalModMatchedCheckpointFor("da_after_constant", round, q01AfterConstant, refAfterConstant, state.CoherentCurrent, params, fastSK, zeroSecret(params), zeroSecret(params))
 	if err != nil {
 		return outcome, err
+	}
+	if trace != nil {
+		trace(round, "after_multiplier", q01AfterMultiplier, refAfterMultiplier)
+		trace(round, "after_constant", q01AfterConstant, refAfterConstant)
 	}
 	refAfterRescale, err := normalizedFullRescale(params, refAfterConstant)
 	if err != nil {
@@ -267,6 +286,9 @@ func fix001P3DAAllRoundsRound(state *fix001P3DAR0LocalQ2State, round int, fastEv
 		return outcome, err
 	}
 	state.Path.Rounds[len(state.Path.Rounds)-1].PostRescale = postCheckpoint
+	if trace != nil {
+		trace(round, "post_rescale", q01AfterRescale, refAfterRescale)
+	}
 	if !postCheckpoint.RowsMatch || !postCheckpoint.NormalizedSafe {
 		outcome.Classification = "logn13_da_all_rounds_local_q2_q012_capacity_failure"
 		outcome.Blocker = fmt.Sprintf("round%d.post_rescale", round)
