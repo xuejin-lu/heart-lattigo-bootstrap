@@ -421,6 +421,10 @@ func evalModMatchedAddFullConstant(params ckks.Parameters, input *rlwe.Ciphertex
 }
 
 func evalModMatchedRunPath(fastInput, standardInput *rlwe.Ciphertext, fastEval *bootstrapping.FastEvaluator, standardEval *bootstrapping.Evaluator, params ckks.Parameters, fastSK, standardSK *rlwe.SecretKey) (evalModMatchedPath, error) {
+	return evalModMatchedRunPathWithPlanScale(fastInput, standardInput, fastEval, standardEval, params, fastSK, standardSK, rlwe.NewScale(new(big.Int).Lsh(big.NewInt(1), 91)))
+}
+
+func evalModMatchedRunPathWithPlanScale(fastInput, standardInput *rlwe.Ciphertext, fastEval *bootstrapping.FastEvaluator, standardEval *bootstrapping.Evaluator, params ckks.Parameters, fastSK, standardSK *rlwe.SecretKey, planScale rlwe.Scale) (evalModMatchedPath, error) {
 	path := evalModMatchedPath{Polynomial: map[string]*PSGlobalMetric{}, PolyMeta: map[string]string{}, FirstFailure: "none"}
 	coefficientView, err := targetScaleCoefficientView(params, fastInput)
 	if err != nil {
@@ -483,7 +487,6 @@ func evalModMatchedRunPath(fastInput, standardInput *rlwe.Ciphertext, fastEval *
 	if err != nil {
 		return path, err
 	}
-	planScale := rlwe.NewScale(new(big.Int).Lsh(big.NewInt(1), 91))
 	standardPoly, err := standardEval.Mod1Evaluator.PolynomialEvaluator.Evaluate(standardCurrent.CopyNew(), standardEval.Mod1Evaluator.Parameters.Mod1Poly.Clone(), targetScale)
 	if err != nil {
 		return path, err
@@ -580,6 +583,7 @@ func evalModMatchedRunPath(fastInput, standardInput *rlwe.Ciphertext, fastEval *
 		}
 		if !inputCheckpoint.NormalizedSafe && path.FirstFailure == "none" {
 			path.FirstFailure = fmt.Sprintf("round%d.input_capacity", round)
+			path.Rounds = append(path.Rounds, evalModMatchedRound{Round: round, KInExponent: kIn, KOutExponent: schedule.KOutExponent, MultiplierExponent: schedule.AExponent, Input: inputCheckpoint})
 			return path, nil
 		}
 		if !inputCheckpoint.FastVsNormalized.Pass && path.FirstFailure == "none" {
@@ -602,6 +606,7 @@ func evalModMatchedRunPath(fastInput, standardInput *rlwe.Ciphertext, fastEval *
 		}
 		if !squareCheckpoint.NormalizedSafe && path.FirstFailure == "none" {
 			path.FirstFailure = fmt.Sprintf("round%d.square_capacity", round)
+			path.Rounds = append(path.Rounds, evalModMatchedRound{Round: round, KInExponent: kIn, KOutExponent: schedule.KOutExponent, MultiplierExponent: schedule.AExponent, Input: inputCheckpoint, Square: squareCheckpoint})
 			return path, nil
 		}
 		if !squareCheckpoint.FastVsNormalized.Pass && path.FirstFailure == "none" {
@@ -621,6 +626,7 @@ func evalModMatchedRunPath(fastInput, standardInput *rlwe.Ciphertext, fastEval *
 		}
 		if !aCheckpoint.NormalizedSafe && path.FirstFailure == "none" {
 			path.FirstFailure = fmt.Sprintf("round%d.after_multiplier_capacity", round)
+			path.Rounds = append(path.Rounds, evalModMatchedRound{Round: round, KInExponent: kIn, KOutExponent: schedule.KOutExponent, MultiplierExponent: schedule.AExponent, Input: inputCheckpoint, Square: squareCheckpoint, AfterMultiplier: aCheckpoint})
 			return path, nil
 		}
 		constantValue, _ := new(big.Float).SetPrec(doubleAnglePrecision).Quo(new(big.Float).SetFloat64(sqrt2pi), new(big.Float).SetInt(new(big.Int).Lsh(big.NewInt(1), uint(schedule.KOutExponent)))).Float64()
@@ -634,6 +640,7 @@ func evalModMatchedRunPath(fastInput, standardInput *rlwe.Ciphertext, fastEval *
 		}
 		if !constantCheckpoint.NormalizedSafe && path.FirstFailure == "none" {
 			path.FirstFailure = fmt.Sprintf("round%d.constant_capacity", round)
+			path.Rounds = append(path.Rounds, evalModMatchedRound{Round: round, KInExponent: kIn, KOutExponent: schedule.KOutExponent, MultiplierExponent: schedule.AExponent, Input: inputCheckpoint, Square: squareCheckpoint, AfterMultiplier: aCheckpoint, AfterConstant: constantCheckpoint})
 			return path, nil
 		}
 		if !constantCheckpoint.RowsMatch && path.FirstFailure == "none" {
@@ -679,6 +686,7 @@ func evalModMatchedRunPath(fastInput, standardInput *rlwe.Ciphertext, fastEval *
 		}
 		if !postCheckpoint.NormalizedSafe && path.FirstFailure == "none" {
 			path.FirstFailure = fmt.Sprintf("round%d.post_rescale_capacity", round)
+			path.Rounds = append(path.Rounds, evalModMatchedRound{Round: round, KInExponent: kIn, KOutExponent: schedule.KOutExponent, MultiplierExponent: schedule.AExponent, Input: inputCheckpoint, Square: squareCheckpoint, AfterMultiplier: aCheckpoint, AfterConstant: constantCheckpoint, PostRescale: postCheckpoint})
 			return path, nil
 		}
 		_, nValues, err := semanticBisectView(normalizedCurrent, params, zeroSecret(params))

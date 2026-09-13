@@ -1,0 +1,757 @@
+{
+  "schema_version": "fix-001-p3-design-logn13-evalmod-precision-scale-sweep.v1",
+  "timestamp": "2026-09-13T09:27:49.375808Z",
+  "primary_repository": {
+    "path": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap",
+    "commit": "19615b8e9a6a4fbf09f538a789bd39101f1b1576",
+    "ref": "main",
+    "dirty": true
+  },
+  "lattigo_repository": {
+    "path": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/../lattigo",
+    "commit": "25e70430b10cd4af37ad4cf94cd994912e970e3f",
+    "ref": "fast-ckks",
+    "dirty": false
+  },
+  "environment": {
+    "go_version": "go1.26.4",
+    "os": "darwin",
+    "architecture": "arm64",
+    "logical_cpus": 10
+  },
+  "config": {
+    "log_n": 13,
+    "log_default_scale": 45,
+    "secret_hamming": 192,
+    "q0": [
+      55
+    ],
+    "q_slots_to_coeffs": [
+      39,
+      39,
+      39
+    ],
+    "q_coeffs_to_slots": [
+      56,
+      56,
+      56,
+      56
+    ],
+    "p": [
+      61,
+      61,
+      61,
+      61,
+      61
+    ],
+    "slots_to_coeffs_dft_levels": [
+      1,
+      1,
+      1
+    ],
+    "coeffs_to_slots_dft_levels": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "log_slots": -1,
+    "mod1_log_scale": 60,
+    "mod1_degree": 30,
+    "mod1_double_angle": 3,
+    "mod1_k": 16,
+    "log_message_ratio": 10,
+    "mod1_inv_degree": 0,
+    "repetitions": 3,
+    "warmup": 1
+  },
+  "effective_parameters": {
+    "residual_log_n": 13,
+    "residual_max_level": 1,
+    "bootstrap_log_n": 13,
+    "bootstrap_max_level": 16,
+    "bootstrap_log_slots": 12,
+    "bootstrap_log_q": [
+      55,
+      39,
+      40,
+      39,
+      40,
+      60,
+      60,
+      61,
+      60,
+      60,
+      60,
+      61,
+      61,
+      56,
+      57,
+      56,
+      56
+    ],
+    "bootstrap_log_p": [
+      61,
+      61,
+      62,
+      61,
+      62
+    ],
+    "circuit_order": "ModUpThenEncode"
+  },
+  "workload": {
+    "identifier": "reproducibleInput.v1",
+    "formula": "real=((i%7)-3)/16; imag=((i%5)-2)/32; value=real+imag*i",
+    "logical_slots": 4096
+  },
+  "public_threshold": 0.01,
+  "measured_current_s2c_amplification": 53.934491154584336,
+  "derived_no_margin_local_evalmod_budget": 0.0001854101111538904,
+  "fixed_evalmod_local_design_target": 0.0001,
+  "fixed_polynomial_design_target": 2e-8,
+  "current_c2s_real": {
+    "max_component_abs": 9.209497856162152e-14,
+    "max_abs_complex": 9.209497856162575e-14,
+    "mean_abs_complex": 2.0166000532085243e-14,
+    "worst_index": 675,
+    "worst_component": "real",
+    "pass_threshold": true,
+    "threshold": 0.000019531249403614602
+  },
+  "current_c2s_imag": {
+    "max_component_abs": 9.444563729178734e-14,
+    "max_abs_complex": 9.444563729178757e-14,
+    "mean_abs_complex": 1.986202702494107e-14,
+    "worst_index": 2143,
+    "worst_component": "real",
+    "pass_threshold": true,
+    "threshold": 0.000019531249403614602
+  },
+  "current_evalmod_real": {
+    "max_component_abs": 0.004566288964195857,
+    "max_abs_complex": 0.004566288964195857,
+    "mean_abs_complex": 0.0014156858505153923,
+    "worst_index": 2504,
+    "worst_component": "real",
+    "pass_threshold": true,
+    "threshold": 0.01
+  },
+  "current_evalmod_imag": {
+    "max_component_abs": 0.004434999466167917,
+    "max_abs_complex": 0.004434999466167917,
+    "mean_abs_complex": 0.0014273417171756261,
+    "worst_index": 3058,
+    "worst_component": "real",
+    "pass_threshold": true,
+    "threshold": 0.01
+  },
+  "current_polynomial_vs_standard": {
+    "max_component_abs": 5.457409324449713e-7,
+    "max_abs_complex": 5.457409324449713e-7,
+    "mean_abs_complex": 1.690537816144205e-7,
+    "worst_index": 2504,
+    "worst_component": "real",
+    "pass_threshold": true,
+    "threshold": 0.01
+  },
+  "current_coherent_real_vs_standard": {
+    "max_component_abs": 0.004589186471801822,
+    "max_abs_complex": 0.004589186471801822,
+    "mean_abs_complex": 0.0014215811514802145,
+    "worst_index": 2504,
+    "worst_component": "real",
+    "pass_threshold": true,
+    "threshold": 0.01
+  },
+  "current_coherent_imag_vs_standard": {
+    "max_component_abs": 0.004452797489830642,
+    "max_abs_complex": 0.004452797489830642,
+    "mean_abs_complex": 0.001433234718372046,
+    "worst_index": 3058,
+    "worst_component": "real",
+    "pass_threshold": true,
+    "threshold": 0.01
+  },
+  "current_polynomial_to_evalmod_amplification": 8367.136662698998,
+  "derived_polynomial_delta_budget_for_local_target": 1.1951519860528115e-8,
+  "genuine_standard_public": {
+    "max_component_abs": 5.754406148805735e-8,
+    "max_abs_complex": 5.7544940345432415e-8,
+    "mean_abs_complex": 6.047820833839128e-10,
+    "worst_index": 0,
+    "worst_component": "imag",
+    "pass_threshold": true,
+    "threshold": 0.01
+  },
+  "current_fast_public": {
+    "max_component_abs": 0.24628047174869752,
+    "max_abs_complex": 0.25756139617648827,
+    "mean_abs_complex": 0.14188115875223026,
+    "worst_index": 321,
+    "worst_component": "real",
+    "pass_threshold": false,
+    "threshold": 0.01
+  },
+  "current_fast_public_metadata_correct": true,
+  "candidates": [
+    {
+      "plan_scale_exponent": 91,
+      "plan_scale": "2.475880078570760549798248448000000000000e+27",
+      "polynomial_output_scale": "2.147483648000305173918604894136600474194e+09",
+      "polynomial_capacity_ratio": 1.6902143695599765e-19,
+      "polynomial_capacity_pass": true,
+      "compressed_polynomial_vs_standard": {
+        "max_component_abs": 5.457409324449713e-7,
+        "max_abs_complex": 5.457409324449713e-7,
+        "mean_abs_complex": 1.690537816144205e-7,
+        "worst_index": 2504,
+        "worst_component": "real",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "polynomial_design_target_pass": false,
+      "capacity": {
+        "minimum_capacity_ratio": 1.6155873746449314e-27,
+        "worst_capacity_checkpoint": "round2.post_rescale.fast_q01",
+        "outside_count": 0,
+        "all_centered_unique": true,
+        "all_fast_vs_full_rns_rows_match": true
+      },
+      "derived_k_schedule": [
+        {
+          "round": 0,
+          "k_in_exponent": 29,
+          "k_out_exponent": 29,
+          "multiplier_exponent": 30
+        },
+        {
+          "round": 1,
+          "k_in_exponent": 29,
+          "k_out_exponent": 29,
+          "multiplier_exponent": 30
+        },
+        {
+          "round": 2,
+          "k_in_exponent": 29,
+          "k_out_exponent": 29,
+          "multiplier_exponent": 30
+        }
+      ],
+      "final_restore_k_exponent": "536870912",
+      "real_evalmod_vs_standard": {
+        "max_component_abs": 0.004566288964195857,
+        "max_abs_complex": 0.004566288964195857,
+        "mean_abs_complex": 0.0014156858505153923,
+        "worst_index": 2504,
+        "worst_component": "real",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "imag_evalmod_vs_standard": {
+        "max_component_abs": 0.004434999466167917,
+        "max_abs_complex": 0.004434999466167917,
+        "mean_abs_complex": 0.0014273417171756261,
+        "worst_index": 3058,
+        "worst_component": "real",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "real_fast_vs_normalized": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "imag_fast_vs_normalized": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "real_coherent_vs_standard": {
+        "max_component_abs": 0.004589186471801822,
+        "max_abs_complex": 0.004589186471801822,
+        "mean_abs_complex": 0.0014215811514802145,
+        "worst_index": 2504,
+        "worst_component": "real",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "imag_coherent_vs_standard": {
+        "max_component_abs": 0.004452797489830642,
+        "max_abs_complex": 0.004452797489830642,
+        "mean_abs_complex": 0.001433234718372046,
+        "worst_index": 3058,
+        "worst_component": "real",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "post_s2c_vs_standard": {
+        "max_component_abs": 0.007696264723323441,
+        "max_abs_complex": 0.008048793607747459,
+        "mean_abs_complex": 0.004433786210928141,
+        "worst_index": 321,
+        "worst_component": "real",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "public_like_vs_message": {
+        "max_component_abs": 0.24628047174869752,
+        "max_abs_complex": 0.25756139617648827,
+        "mean_abs_complex": 0.14188115875223026,
+        "worst_index": 321,
+        "worst_component": "real",
+        "pass_threshold": false,
+        "threshold": 0.01
+      },
+      "standard_public_like_vs_message": {
+        "max_component_abs": 0.1816406250484608,
+        "max_abs_complex": 0.1914660302527769,
+        "mean_abs_complex": 0.11615440568668865,
+        "worst_index": 615,
+        "worst_component": "real",
+        "pass_threshold": false,
+        "threshold": 0.01
+      },
+      "public_like_metadata_correct": true,
+      "public_like_input_unchanged": true,
+      "precision_qualified": false,
+      "public_like_accepted": false,
+      "first_failing_checkpoint": "none",
+      "classification": "normalized_candidate_pass"
+    },
+    {
+      "plan_scale_exponent": 92,
+      "plan_scale": "4.951760157141521099596496896000000000000e+27",
+      "polynomial_output_scale": "4.294967296000610347837209788273200948387e+09",
+      "polynomial_capacity_ratio": 3.3804287421491793e-19,
+      "polynomial_capacity_pass": true,
+      "compressed_polynomial_vs_standard": {
+        "max_component_abs": 4.954566135140226e-7,
+        "max_abs_complex": 4.954566135140226e-7,
+        "mean_abs_complex": 1.5988044046360075e-7,
+        "worst_index": 2317,
+        "worst_component": "real",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "polynomial_design_target_pass": false,
+      "capacity": {
+        "minimum_capacity_ratio": 3.231174749289863e-27,
+        "worst_capacity_checkpoint": "round2.post_rescale.fast_q01",
+        "outside_count": 0,
+        "all_centered_unique": true,
+        "all_fast_vs_full_rns_rows_match": true
+      },
+      "derived_k_schedule": [
+        {
+          "round": 0,
+          "k_in_exponent": 28,
+          "k_out_exponent": 28,
+          "multiplier_exponent": 29
+        },
+        {
+          "round": 1,
+          "k_in_exponent": 28,
+          "k_out_exponent": 28,
+          "multiplier_exponent": 29
+        },
+        {
+          "round": 2,
+          "k_in_exponent": 28,
+          "k_out_exponent": 28,
+          "multiplier_exponent": 29
+        }
+      ],
+      "final_restore_k_exponent": "268435456",
+      "real_evalmod_vs_standard": {
+        "max_component_abs": 0.004155279056523906,
+        "max_abs_complex": 0.004155279056523906,
+        "mean_abs_complex": 0.0013406041918427843,
+        "worst_index": 2317,
+        "worst_component": "real",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "imag_evalmod_vs_standard": {
+        "max_component_abs": 0.00423294287067992,
+        "max_abs_complex": 0.00423294287067992,
+        "mean_abs_complex": 0.0013522545721336222,
+        "worst_index": 3058,
+        "worst_component": "real",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "real_fast_vs_normalized": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "imag_fast_vs_normalized": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "real_coherent_vs_standard": {
+        "max_component_abs": 0.004166345351846921,
+        "max_abs_complex": 0.004166345351846921,
+        "mean_abs_complex": 0.0013444420863133447,
+        "worst_index": 2317,
+        "worst_component": "real",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "imag_coherent_vs_standard": {
+        "max_component_abs": 0.004245142182497346,
+        "max_abs_complex": 0.004245142182497346,
+        "mean_abs_complex": 0.0013561090374292967,
+        "worst_index": 3058,
+        "worst_component": "real",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "public_like_metadata_correct": false,
+      "public_like_input_unchanged": false,
+      "precision_qualified": false,
+      "public_like_accepted": false,
+      "first_failing_checkpoint": "none",
+      "classification": "normalized_candidate_pass"
+    },
+    {
+      "plan_scale_exponent": 93,
+      "plan_scale": "9.903520314283042199192993792000000000000e+27",
+      "polynomial_output_scale": "8.589934592001220695674419576546401896775e+09",
+      "polynomial_capacity_ratio": 6.896217379287592e-19,
+      "polynomial_capacity_pass": true,
+      "compressed_polynomial_vs_standard": {
+        "max_component_abs": 0.015606422502954076,
+        "max_abs_complex": 0.015606422502954076,
+        "mean_abs_complex": 0.015605938520454447,
+        "worst_index": 3768,
+        "worst_component": "real",
+        "pass_threshold": false,
+        "threshold": 0.01
+      },
+      "polynomial_design_target_pass": false,
+      "capacity": {
+        "minimum_capacity_ratio": 4.1294185669760776e-19,
+        "worst_capacity_checkpoint": "evalmod_input.fast_q01",
+        "outside_count": 2,
+        "all_centered_unique": false,
+        "all_fast_vs_full_rns_rows_match": false
+      },
+      "derived_k_schedule": [
+        {
+          "round": 0,
+          "k_in_exponent": 27,
+          "k_out_exponent": 27,
+          "multiplier_exponent": 28
+        }
+      ],
+      "public_like_metadata_correct": false,
+      "public_like_input_unchanged": false,
+      "precision_qualified": false,
+      "public_like_accepted": false,
+      "first_failing_checkpoint": "round0.after_multiplier_capacity",
+      "classification": "polynomial_plan_capacity_failure"
+    },
+    {
+      "plan_scale_exponent": 94,
+      "plan_scale": "1.980704062856608439838598758400000000000e+28",
+      "polynomial_output_scale": "1.717986918400244139134883915309280379355e+10",
+      "polynomial_capacity_ratio": 3.5547999992917315e-19,
+      "polynomial_capacity_pass": true,
+      "compressed_polynomial_vs_standard": {
+        "max_component_abs": 0.9843944158332618,
+        "max_abs_complex": 0.9843944158332618,
+        "mean_abs_complex": 0.9843939123513751,
+        "worst_index": 2504,
+        "worst_component": "real",
+        "pass_threshold": false,
+        "threshold": 0.01
+      },
+      "polynomial_design_target_pass": false,
+      "capacity": {
+        "minimum_capacity_ratio": 3.5547999992917315e-19,
+        "worst_capacity_checkpoint": "round0.input.fast_q01",
+        "outside_count": 2,
+        "all_centered_unique": false,
+        "all_fast_vs_full_rns_rows_match": false
+      },
+      "derived_k_schedule": [
+        {
+          "round": 0,
+          "k_in_exponent": 26,
+          "k_out_exponent": 26,
+          "multiplier_exponent": 27
+        }
+      ],
+      "public_like_metadata_correct": false,
+      "public_like_input_unchanged": false,
+      "precision_qualified": false,
+      "public_like_accepted": false,
+      "first_failing_checkpoint": "round0.constant_capacity",
+      "classification": "polynomial_plan_capacity_failure"
+    },
+    {
+      "plan_scale_exponent": 95,
+      "plan_scale": "3.961408125713216879677197516800000000000e+28",
+      "polynomial_output_scale": "3.435973836800488278269767830618560758710e+10",
+      "polynomial_capacity_ratio": 7.109599999593205e-19,
+      "polynomial_capacity_pass": true,
+      "compressed_polynomial_vs_standard": {
+        "max_component_abs": 0.9843944119688524,
+        "max_abs_complex": 0.9843944119688524,
+        "mean_abs_complex": 0.9843939123804812,
+        "worst_index": 2317,
+        "worst_component": "real",
+        "pass_threshold": false,
+        "threshold": 0.01
+      },
+      "polynomial_design_target_pass": false,
+      "capacity": {
+        "minimum_capacity_ratio": 4.1294185669760776e-19,
+        "worst_capacity_checkpoint": "evalmod_input.fast_q01",
+        "outside_count": 2,
+        "all_centered_unique": false,
+        "all_fast_vs_full_rns_rows_match": false
+      },
+      "derived_k_schedule": [
+        {
+          "round": 0,
+          "k_in_exponent": 25,
+          "k_out_exponent": 25,
+          "multiplier_exponent": 26
+        }
+      ],
+      "public_like_metadata_correct": false,
+      "public_like_input_unchanged": false,
+      "precision_qualified": false,
+      "public_like_accepted": false,
+      "first_failing_checkpoint": "round0.constant_capacity",
+      "classification": "polynomial_plan_capacity_failure"
+    },
+    {
+      "plan_scale_exponent": 96,
+      "plan_scale": "7.922816251426433759354395033600000000000e+28",
+      "polynomial_output_scale": "6.871947673600976556539535661237121517420e+10",
+      "polynomial_capacity_ratio": 2.9926748636912725e-19,
+      "polynomial_capacity_pass": true,
+      "compressed_polynomial_vs_standard": {
+        "max_component_abs": 0.7363451918731235,
+        "max_abs_complex": 0.7363451918731235,
+        "mean_abs_complex": 0.736344691044255,
+        "worst_index": 2317,
+        "worst_component": "real",
+        "pass_threshold": false,
+        "threshold": 0.01
+      },
+      "polynomial_design_target_pass": false,
+      "capacity": {
+        "minimum_capacity_ratio": 2.992674787960614e-19,
+        "worst_capacity_checkpoint": "round0.input.fast_q01",
+        "outside_count": 2,
+        "all_centered_unique": false,
+        "all_fast_vs_full_rns_rows_match": false
+      },
+      "derived_k_schedule": [
+        {
+          "round": 0,
+          "k_in_exponent": 24,
+          "k_out_exponent": 24,
+          "multiplier_exponent": 25
+        }
+      ],
+      "public_like_metadata_correct": false,
+      "public_like_input_unchanged": false,
+      "precision_qualified": false,
+      "public_like_accepted": false,
+      "first_failing_checkpoint": "round0.constant_capacity",
+      "classification": "polynomial_plan_capacity_failure"
+    },
+    {
+      "plan_scale_exponent": 97,
+      "plan_scale": "1.584563250285286751870879006720000000000e+29",
+      "polynomial_output_scale": "1.374389534720195311307907132247424303484e+11",
+      "polynomial_capacity_ratio": 5.985349727382545e-19,
+      "polynomial_capacity_pass": true,
+      "compressed_polynomial_vs_standard": {
+        "max_component_abs": 0.736345192321235,
+        "max_abs_complex": 0.736345192321235,
+        "mean_abs_complex": 0.7363446910442536,
+        "worst_index": 2317,
+        "worst_component": "real",
+        "pass_threshold": false,
+        "threshold": 0.01
+      },
+      "polynomial_design_target_pass": false,
+      "capacity": {
+        "minimum_capacity_ratio": 4.1294185669760776e-19,
+        "worst_capacity_checkpoint": "evalmod_input.fast_q01",
+        "outside_count": 2,
+        "all_centered_unique": false,
+        "all_fast_vs_full_rns_rows_match": false
+      },
+      "derived_k_schedule": [
+        {
+          "round": 0,
+          "k_in_exponent": 23,
+          "k_out_exponent": 23,
+          "multiplier_exponent": 24
+        }
+      ],
+      "public_like_metadata_correct": false,
+      "public_like_input_unchanged": false,
+      "precision_qualified": false,
+      "public_like_accepted": false,
+      "first_failing_checkpoint": "round0.constant_capacity",
+      "classification": "polynomial_plan_capacity_failure"
+    },
+    {
+      "plan_scale_exponent": 98,
+      "plan_scale": "3.169126500570573503741758013440000000000e+29",
+      "polynomial_output_scale": "2.748779069440390622615814264494848606968e+11",
+      "polynomial_capacity_ratio": 4.701848219755171e-19,
+      "polynomial_capacity_pass": true,
+      "compressed_polynomial_vs_standard": {
+        "max_component_abs": 0.7964143665294389,
+        "max_abs_complex": 0.7964143665294389,
+        "mean_abs_complex": 0.7964138656882607,
+        "worst_index": 2317,
+        "worst_component": "real",
+        "pass_threshold": false,
+        "threshold": 0.01
+      },
+      "polynomial_design_target_pass": false,
+      "capacity": {
+        "minimum_capacity_ratio": 4.1294185669760776e-19,
+        "worst_capacity_checkpoint": "evalmod_input.fast_q01",
+        "outside_count": 2,
+        "all_centered_unique": false,
+        "all_fast_vs_full_rns_rows_match": false
+      },
+      "derived_k_schedule": [
+        {
+          "round": 0,
+          "k_in_exponent": 22,
+          "k_out_exponent": 22,
+          "multiplier_exponent": 23
+        }
+      ],
+      "public_like_metadata_correct": false,
+      "public_like_input_unchanged": false,
+      "precision_qualified": false,
+      "public_like_accepted": false,
+      "first_failing_checkpoint": "round0.constant_capacity",
+      "classification": "polynomial_plan_capacity_failure"
+    },
+    {
+      "plan_scale_exponent": 99,
+      "plan_scale": "6.338253001141147007483516026880000000000e+29",
+      "polynomial_output_scale": "5.497558138880781245231628528989697213936e+11",
+      "polynomial_capacity_ratio": 7.808178416299146e-19,
+      "polynomial_capacity_pass": true,
+      "compressed_polynomial_vs_standard": {
+        "max_component_abs": 0.7654082140053221,
+        "max_abs_complex": 0.7654082140053221,
+        "mean_abs_complex": 0.7654077130339644,
+        "worst_index": 2317,
+        "worst_component": "real",
+        "pass_threshold": false,
+        "threshold": 0.01
+      },
+      "polynomial_design_target_pass": false,
+      "capacity": {
+        "minimum_capacity_ratio": 4.1294185669760776e-19,
+        "worst_capacity_checkpoint": "evalmod_input.fast_q01",
+        "outside_count": 2,
+        "all_centered_unique": false,
+        "all_fast_vs_full_rns_rows_match": false
+      },
+      "derived_k_schedule": [
+        {
+          "round": 0,
+          "k_in_exponent": 21,
+          "k_out_exponent": 21,
+          "multiplier_exponent": 22
+        }
+      ],
+      "public_like_metadata_correct": false,
+      "public_like_input_unchanged": false,
+      "precision_qualified": false,
+      "public_like_accepted": false,
+      "first_failing_checkpoint": "round0.constant_capacity",
+      "classification": "polynomial_plan_capacity_failure"
+    },
+    {
+      "plan_scale_exponent": 100,
+      "plan_scale": "1.267650600228229401496703205376000000000e+30",
+      "polynomial_output_scale": "1.099511627776156249046325705797939442787e+12",
+      "polynomial_capacity_ratio": 2.1348452075296485e-19,
+      "polynomial_capacity_pass": true,
+      "compressed_polynomial_vs_standard": {
+        "max_component_abs": 0.7813970729707927,
+        "max_abs_complex": 0.7813970729707927,
+        "mean_abs_complex": 0.7813965720299891,
+        "worst_index": 2317,
+        "worst_component": "real",
+        "pass_threshold": false,
+        "threshold": 0.01
+      },
+      "polynomial_design_target_pass": false,
+      "capacity": {
+        "minimum_capacity_ratio": 2.1348452075296485e-19,
+        "worst_capacity_checkpoint": "round0.input.fast_q01",
+        "outside_count": 2,
+        "all_centered_unique": false,
+        "all_fast_vs_full_rns_rows_match": false
+      },
+      "derived_k_schedule": [
+        {
+          "round": 0,
+          "k_in_exponent": 20,
+          "k_out_exponent": 20,
+          "multiplier_exponent": 21
+        }
+      ],
+      "public_like_metadata_correct": false,
+      "public_like_input_unchanged": false,
+      "precision_qualified": false,
+      "public_like_accepted": false,
+      "first_failing_checkpoint": "round0.constant_capacity",
+      "classification": "polynomial_plan_capacity_failure"
+    }
+  ],
+  "classification": "logn13_evalmod_common_scale_insufficient_precision",
+  "first_limiting_checkpoint": "round0.after_multiplier_capacity",
+  "validation": {
+    "no_benchmark": true,
+    "no_c2s_change": true,
+    "no_exp003": true,
+    "no_gate_4_or_5": true,
+    "no_logn16": true,
+    "no_parameter_retuning": true,
+    "no_production_fix": true,
+    "no_raw_standard_double_angle_q01_oracle": true,
+    "no_s2c_change": true,
+    "no_secondary_production_changes": true,
+    "primary_required_base": "72cc6a44d4ce25b11f1e77cbd77d018f21e4aa68",
+    "secondary_clean": true,
+    "secondary_commit": "25e70430b10cd4af37ad4cf94cd994912e970e3f",
+    "secondary_exact_required_commit": true
+  }
+}
