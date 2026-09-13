@@ -58,6 +58,28 @@ After the mandatory startup preflight has completed:
 5. Implement only the requested scope, run the required tests/benchmarks, review the diff, commit, and push.
 6. Report commits, tests, benchmark evidence, and any unresolved compatibility gap.
 
+## Standing safe-push authorization
+
+The user has provided standing authorization for the ordinary task-completion push described by this repository workflow. **Do not stop solely to ask for a separate push confirmation** when all conditions below are true.
+
+For the primary repository, `git push origin main` is pre-authorized after task completion only when:
+
+- startup preflight previously succeeded for the current task;
+- the task implementation and required validation have completed successfully;
+- the local branch is `main`;
+- the worktree is clean after committing the task result;
+- `origin/main` is an ancestor of local `HEAD`, so the push is a normal fast-forward;
+- the commits being pushed contain only the current authorized task/workflow changes;
+- no force push, ref rewrite, rebase, amend, reset, history rewrite, branch deletion, or unrelated remote mutation is required.
+
+Immediately stop and report instead of pushing if any of those conditions fail, if `git push` would be non-fast-forward, if remote history changed unexpectedly, if unknown/unrelated commits are present, or if the exact destination ref is ambiguous.
+
+This standing authorization is intentionally narrow. It does not authorize force push, destructive Git operations, publishing secrets, pushing unrelated work, changing repository visibility/settings, creating releases, merging pull requests, or any other external side effect beyond the normal fast-forward task-completion push.
+
+If the execution environment itself enforces an interactive approval that cannot be satisfied by repository instructions, report that as an environment-level restriction; do not misrepresent it as a project requirement.
+
+For a secondary-repository task, the same principle may be used only when the active Primary specification explicitly requires a secondary commit/push and all secondary repository safety rules are satisfied. Otherwise do not modify or push Secondary.
+
 ## Permanent architecture rules
 
 - The primary repository must not know whether the active backend is Standard or Fast.
