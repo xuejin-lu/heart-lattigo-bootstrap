@@ -1,4 +1,4 @@
 # Current Task
 
-Task: Implement `specs/FIX-001-P3-DIAG-LOGN13-C2S-FINAL-SPLIT-PROBE-FIX.md`
+Task: Implement `specs/FIX-001-P3-DIAG-LOGN13-EVALMOD-MATCHED-NORMALIZED-ORACLE.md`
 Status: READY
