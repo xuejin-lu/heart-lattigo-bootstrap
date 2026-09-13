@@ -1,4 +1,4 @@
 # Current Task
 
-Task: Implement `specs/FIX-001-P3-DESIGN-LOGN13-DA-R0-LOCAL-Q2-FEASIBILITY.md`
+Task: Implement `specs/FIX-001-P3-DESIGN-LOGN13-DA-ALL-ROUNDS-LOCAL-Q2.md`
 Status: READY
