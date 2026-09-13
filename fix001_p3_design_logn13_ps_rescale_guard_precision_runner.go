@@ -188,6 +188,8 @@ type psRescaleGuardBranch struct {
 	Standard []complex128
 }
 
+type psRescaleGuardFinalOverride func(params ckks.Parameters, eval *fastckks.Evaluator, ct *rlwe.Ciphertext, boundary *psRescaleGuardBoundary) (bool, error)
+
 func psRescaleGuardScheduleKey(bits []int) string {
 	parts := make([]string, len(bits))
 	for i, value := range bits {
@@ -218,6 +220,10 @@ func psRescaleGuardBoundaryIndex(boundaries []psRescaleGuardBoundary) map[string
 }
 
 func psRescaleGuardRunBranch(params ckks.Parameters, eval *bootstrapping.FastEvaluator, branch psRescaleGuardBranch, schedule []int, boundaries []psRescaleGuardBoundary) (psRescaleGuardBranchRun, error) {
+	return psRescaleGuardRunBranchWithOverride(params, eval, branch, schedule, boundaries, nil)
+}
+
+func psRescaleGuardRunBranchWithOverride(params ckks.Parameters, eval *bootstrapping.FastEvaluator, branch psRescaleGuardBranch, schedule []int, boundaries []psRescaleGuardBoundary, override psRescaleGuardFinalOverride) (psRescaleGuardBranchRun, error) {
 	run := psRescaleGuardBranchRun{Name: branch.Name, CapacitySafe: true, AlignmentSafe: true, ValuePreserving: true, LevelSafe: true, RowsMatch: true, FirstFailure: "none"}
 	guardMap := make(map[string]int, len(boundaries))
 	for i, boundary := range boundaries {
@@ -226,7 +232,7 @@ func psRescaleGuardRunBranch(params ckks.Parameters, eval *bootstrapping.FastEva
 		}
 	}
 	plan := psOracleScalePlan(branch.Base.Plan, precisionSweepScale(92))
-	replay, err := psRescaleGuardReplayPS(params, eval.FastCKKS, plan, branch.Base.OraclePowerMap, branch.Base.PowerExpected, branch.Base.OraclePowerValues, branch.Base.InputValues, precisionSweepScale(92), guardMap)
+	replay, err := psRescaleGuardReplayPS(params, eval.FastCKKS, plan, branch.Base.OraclePowerMap, branch.Base.PowerExpected, branch.Base.OraclePowerValues, branch.Base.InputValues, precisionSweepScale(92), guardMap, override)
 	if err != nil {
 		return run, err
 	}
@@ -331,11 +337,15 @@ func psRescaleGuardWorstMetric(a, b *PSGlobalMetric) *PSGlobalMetric {
 }
 
 func psRescaleGuardMakeCandidate(params ckks.Parameters, eval *bootstrapping.FastEvaluator, realBranch, imagBranch psRescaleGuardBranch, realStandard, imagStandard []complex128, schedule []int, name string, baselineReal, baselineImag *psRescaleGuardBranchRun, boundaries []psRescaleGuardBoundary) (psRescaleGuardCandidate, psRescaleGuardBranchRun, psRescaleGuardBranchRun, error) {
-	realRun, err := psRescaleGuardRunBranch(params, eval, realBranch, schedule, boundaries)
+	return psRescaleGuardMakeCandidateWithOverrides(params, eval, realBranch, imagBranch, realStandard, imagStandard, schedule, name, baselineReal, baselineImag, boundaries, nil, nil)
+}
+
+func psRescaleGuardMakeCandidateWithOverrides(params ckks.Parameters, eval *bootstrapping.FastEvaluator, realBranch, imagBranch psRescaleGuardBranch, realStandard, imagStandard []complex128, schedule []int, name string, baselineReal, baselineImag *psRescaleGuardBranchRun, boundaries []psRescaleGuardBoundary, realOverride, imagOverride psRescaleGuardFinalOverride) (psRescaleGuardCandidate, psRescaleGuardBranchRun, psRescaleGuardBranchRun, error) {
+	realRun, err := psRescaleGuardRunBranchWithOverride(params, eval, realBranch, schedule, boundaries, realOverride)
 	if err != nil {
 		return psRescaleGuardCandidate{}, realRun, psRescaleGuardBranchRun{}, err
 	}
-	imagRun, err := psRescaleGuardRunBranch(params, eval, imagBranch, schedule, boundaries)
+	imagRun, err := psRescaleGuardRunBranchWithOverride(params, eval, imagBranch, schedule, boundaries, imagOverride)
 	if err != nil {
 		return psRescaleGuardCandidate{}, realRun, imagRun, err
 	}
@@ -502,7 +512,7 @@ func psRescaleGuardAddAligned(params ckks.Parameters, eval *fastckks.Evaluator, 
 	return nil
 }
 
-func psRescaleGuardReplayPS(params ckks.Parameters, eval *fastckks.Evaluator, plan commonpolynomial.PatersonStockmeyerPolynomial, powers map[int]*rlwe.Ciphertext, powerExpected, powerDecoded map[int][]complex128, input []complex128, candidate rlwe.Scale, guards map[string]int) (psRescaleGuardReplay, error) {
+func psRescaleGuardReplayPS(params ckks.Parameters, eval *fastckks.Evaluator, plan commonpolynomial.PatersonStockmeyerPolynomial, powers map[int]*rlwe.Ciphertext, powerExpected, powerDecoded map[int][]complex128, input []complex128, candidate rlwe.Scale, guards map[string]int, override psRescaleGuardFinalOverride) (psRescaleGuardReplay, error) {
 	out := psRescaleGuardReplay{}
 	type node struct {
 		degree   int
@@ -714,26 +724,38 @@ func psRescaleGuardReplayPS(params ckks.Parameters, eval *fastckks.Evaluator, pl
 	if err != nil {
 		return out, err
 	}
-	finalBoundary.GuardValuePreservation, err = psRescaleGuardApply(eval, params, root.value, guards[finalID])
-	if err != nil {
-		return out, err
+	handled := false
+	if override != nil {
+		handled, err = override(params, eval, root.value, &finalBoundary)
+		if err != nil {
+			return out, err
+		}
 	}
-	finalBoundary.GuardedPreCapacityRatio, finalBoundary.CenteredUnique, finalBoundary.RowsMatch, err = psRescaleGuardCapacity(params, root.value)
-	if err != nil {
-		return out, err
-	}
-	guardedFinalBefore, err := psGlobalDecode(params, root.value)
-	if err != nil {
-		return out, err
-	}
-	if err := eval.Rescale(root.value, root.value); err != nil {
-		return out, err
+	var guardedFinalBefore []complex128
+	if !handled {
+		finalBoundary.GuardValuePreservation, err = psRescaleGuardApply(eval, params, root.value, guards[finalID])
+		if err != nil {
+			return out, err
+		}
+		finalBoundary.GuardedPreCapacityRatio, finalBoundary.CenteredUnique, finalBoundary.RowsMatch, err = psRescaleGuardCapacity(params, root.value)
+		if err != nil {
+			return out, err
+		}
+		guardedFinalBefore, err = psGlobalDecode(params, root.value)
+		if err != nil {
+			return out, err
+		}
+		if err := eval.Rescale(root.value, root.value); err != nil {
+			return out, err
+		}
 	}
 	finalAfter, err := psGlobalDecode(params, root.value)
 	if err != nil {
 		return out, err
 	}
-	finalBoundary.LocalRescaleError = psRescaleGuardMetric(guardedFinalBefore, finalAfter)
+	if !handled {
+		finalBoundary.LocalRescaleError = psRescaleGuardMetric(guardedFinalBefore, finalAfter)
+	}
 	finalBoundary.PostCumulativeError = psGlobalMetric(root.source, finalAfter)
 	finalBoundary.OutputLevel = root.value.Level()
 	finalBoundary.OutputScale = psRescaleGuardScaleString(root.value.Scale)
