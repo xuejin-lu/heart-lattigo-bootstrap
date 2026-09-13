@@ -1,4 +1,4 @@
 # Current Task
 
-Task: Implement `specs/FIX-001-P3-INTEGRATE-LOGN13-C2S-COMPRESSION.md`
+Task: Implement `specs/FIX-001-P3-DIAG-LOGN13-EVALMOD-S2C-AMPLIFICATION.md`
 Status: READY
