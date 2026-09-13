@@ -36,6 +36,7 @@ func main() {
 	fix001P3DiagLogN13EvalModCausal := flag.Bool("fix001-p3-diag-logn13-evalmod-causal", false, "localize LogN13 EvalMod divergence with matched semantic inputs")
 	fix001P3DiagLogN13C2SPrecision := flag.Bool("fix001-p3-diag-logn13-c2s-precision", false, "localize LogN13 C2S precision loss against a downstream budget")
 	fix001P3DiagLogN13C2SGroup0LinearAlias := flag.Bool("fix001-p3-diag-logn13-c2s-group0-linear-alias", false, "localize LogN13 group 0 LinearTransform q0/q1 alias")
+	fix001P3DesignLogN13C2SGroup0CompressedLinear := flag.Bool("fix001-p3-design-logn13-c2s-group0-compressed-linear", false, "validate diagnostic compressed LogN13 group 0 LinearTransform")
 	flag.Parse()
 
 	cfg, err := LoadBootstrapConfig(*configPath)
@@ -124,6 +125,9 @@ func main() {
 	if *fix001P3DiagLogN13C2SGroup0LinearAlias {
 		selectedModes++
 	}
+	if *fix001P3DesignLogN13C2SGroup0CompressedLinear {
+		selectedModes++
+	}
 	if selectedModes > 1 {
 		log.Fatal("bootstrap diagnostic modes cannot be used together")
 	}
@@ -201,6 +205,10 @@ func main() {
 		}
 	} else if *fix001P3DiagLogN13C2SGroup0LinearAlias {
 		if err := runFIX001P3DiagLogN13C2SGroup0LinearAlias(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
+			log.Fatal(err)
+		}
+	} else if *fix001P3DesignLogN13C2SGroup0CompressedLinear {
+		if err := runFIX001P3DesignLogN13C2SGroup0CompressedLinear(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
 			log.Fatal(err)
 		}
 	} else if *finalizationDiagnostic {
