@@ -50,6 +50,7 @@ func main() {
 	fix001P3DesignLogN13PSMixedScalePrecision := flag.Bool("fix001-p3-design-logn13-ps-mixed-scale-precision", false, "design LogN13 Fast PS mixed per-block oracle scales")
 	fix001P3DesignLogN13PSRescaleGuardPrecision := flag.Bool("fix001-p3-design-logn13-ps-rescale-guard-precision", false, "design LogN13 Fast PS pre-rescale guard factors")
 	fix001P3DesignLogN13Q056RescaleGuardFeasibility := flag.Bool("fix001-p3-design-logn13-q0-56-rescale-guard-feasibility", false, "test LogN13 q0=56 rescale-guard feasibility")
+	fix001P3DesignLogN13Q056F0TwoBitGuard := flag.Bool("fix001-p3-design-logn13-q0-56-f0-two-bit-guard", false, "test LogN13 q0=56 F0 two-bit guard")
 	flag.Parse()
 
 	cfg, err := LoadBootstrapConfig(*configPath)
@@ -178,6 +179,9 @@ func main() {
 		selectedModes++
 	}
 	if *fix001P3DesignLogN13Q056RescaleGuardFeasibility {
+		selectedModes++
+	}
+	if *fix001P3DesignLogN13Q056F0TwoBitGuard {
 		selectedModes++
 	}
 	if selectedModes > 1 {
@@ -313,6 +317,10 @@ func main() {
 		}
 	} else if *fix001P3DesignLogN13Q056RescaleGuardFeasibility {
 		if err := runFIX001P3DesignLogN13Q056RescaleGuardFeasibility(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
+			log.Fatal(err)
+		}
+	} else if *fix001P3DesignLogN13Q056F0TwoBitGuard {
+		if err := runFIX001P3DesignLogN13Q056F0TwoBitGuard(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
 			log.Fatal(err)
 		}
 	} else if *finalizationDiagnostic {
