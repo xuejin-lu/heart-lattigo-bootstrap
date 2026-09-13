@@ -38,6 +38,7 @@ func main() {
 	fix001P3DiagLogN13C2SGroup0LinearAlias := flag.Bool("fix001-p3-diag-logn13-c2s-group0-linear-alias", false, "localize LogN13 group 0 LinearTransform q0/q1 alias")
 	fix001P3DesignLogN13C2SGroup0CompressedLinear := flag.Bool("fix001-p3-design-logn13-c2s-group0-compressed-linear", false, "validate diagnostic compressed LogN13 group 0 LinearTransform")
 	fix001P3DiagLogN13C2SGroup1LinearAlias := flag.Bool("fix001-p3-diag-logn13-c2s-group1-linear-alias", false, "localize LogN13 group 1 LinearTransform q0/q1 alias")
+	fix001P3DesignLogN13C2SGroup1CompressedLinear := flag.Bool("fix001-p3-design-logn13-c2s-group1-compressed-linear", false, "validate diagnostic compressed LogN13 group 1 LinearTransform")
 	flag.Parse()
 
 	cfg, err := LoadBootstrapConfig(*configPath)
@@ -132,6 +133,9 @@ func main() {
 	if *fix001P3DiagLogN13C2SGroup1LinearAlias {
 		selectedModes++
 	}
+	if *fix001P3DesignLogN13C2SGroup1CompressedLinear {
+		selectedModes++
+	}
 	if selectedModes > 1 {
 		log.Fatal("bootstrap diagnostic modes cannot be used together")
 	}
@@ -217,6 +221,10 @@ func main() {
 		}
 	} else if *fix001P3DiagLogN13C2SGroup1LinearAlias {
 		if err := runFIX001P3DiagLogN13C2SGroup1LinearAlias(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
+			log.Fatal(err)
+		}
+	} else if *fix001P3DesignLogN13C2SGroup1CompressedLinear {
+		if err := runFIX001P3DesignLogN13C2SGroup1CompressedLinear(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
 			log.Fatal(err)
 		}
 	} else if *finalizationDiagnostic {
