@@ -1,4 +1,4 @@
 # Current Task
 
-Task: Implement `specs/FIX-001-P3-DIAG-LOGN13-EVALMOD-S2C-AMPLIFICATION.md`
+Task: Implement `specs/FIX-001-P3-DESIGN-LOGN13-EVALMOD-PRECISION-SCALE-SWEEP.md`
 Status: READY
