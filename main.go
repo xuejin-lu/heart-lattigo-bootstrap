@@ -49,6 +49,7 @@ func main() {
 	fix001P3DesignLogN13PSOracleScalePrecision := flag.Bool("fix001-p3-design-logn13-ps-oracle-scale-precision", false, "sweep LogN13 Fast PS oracle common plan scales")
 	fix001P3DesignLogN13PSMixedScalePrecision := flag.Bool("fix001-p3-design-logn13-ps-mixed-scale-precision", false, "design LogN13 Fast PS mixed per-block oracle scales")
 	fix001P3DesignLogN13PSRescaleGuardPrecision := flag.Bool("fix001-p3-design-logn13-ps-rescale-guard-precision", false, "design LogN13 Fast PS pre-rescale guard factors")
+	fix001P3DesignLogN13Q056RescaleGuardFeasibility := flag.Bool("fix001-p3-design-logn13-q0-56-rescale-guard-feasibility", false, "test LogN13 q0=56 rescale-guard feasibility")
 	flag.Parse()
 
 	cfg, err := LoadBootstrapConfig(*configPath)
@@ -174,6 +175,9 @@ func main() {
 		selectedModes++
 	}
 	if *fix001P3DesignLogN13PSRescaleGuardPrecision {
+		selectedModes++
+	}
+	if *fix001P3DesignLogN13Q056RescaleGuardFeasibility {
 		selectedModes++
 	}
 	if selectedModes > 1 {
@@ -305,6 +309,10 @@ func main() {
 		}
 	} else if *fix001P3DesignLogN13PSRescaleGuardPrecision {
 		if err := runFIX001P3DesignLogN13PSRescaleGuardPrecision(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
+			log.Fatal(err)
+		}
+	} else if *fix001P3DesignLogN13Q056RescaleGuardFeasibility {
+		if err := runFIX001P3DesignLogN13Q056RescaleGuardFeasibility(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
 			log.Fatal(err)
 		}
 	} else if *finalizationDiagnostic {

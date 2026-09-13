@@ -1,0 +1,443 @@
+{
+  "schema_version": "fix-001-p3-design-logn13-q0-56-rescale-guard-feasibility.v1",
+  "timestamp": "2026-09-13T18:24:38.092644Z",
+  "primary_repository": {
+    "path": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap",
+    "commit": "4342f62019ad46ad4f3d27335e9561d43908cd03",
+    "ref": "main",
+    "dirty": true
+  },
+  "lattigo_repository": {
+    "path": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/../lattigo",
+    "commit": "25e70430b10cd4af37ad4cf94cd994912e970e3f",
+    "ref": "fast-ckks",
+    "dirty": false
+  },
+  "environment": {
+    "go_version": "go1.26.4",
+    "os": "darwin",
+    "architecture": "arm64",
+    "logical_cpus": 10
+  },
+  "config": {
+    "log_n": 13,
+    "log_default_scale": 45,
+    "secret_hamming": 192,
+    "q0": [
+      55
+    ],
+    "q_slots_to_coeffs": [
+      39,
+      39,
+      39
+    ],
+    "q_coeffs_to_slots": [
+      56,
+      56,
+      56,
+      56
+    ],
+    "p": [
+      61,
+      61,
+      61,
+      61,
+      61
+    ],
+    "slots_to_coeffs_dft_levels": [
+      1,
+      1,
+      1
+    ],
+    "coeffs_to_slots_dft_levels": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "log_slots": -1,
+    "mod1_log_scale": 60,
+    "mod1_degree": 30,
+    "mod1_double_angle": 3,
+    "mod1_k": 16,
+    "log_message_ratio": 10,
+    "mod1_inv_degree": 0,
+    "repetitions": 3,
+    "warmup": 1
+  },
+  "effective_parameters": {
+    "residual_log_n": 13,
+    "residual_max_level": 1,
+    "bootstrap_log_n": 13,
+    "bootstrap_max_level": 16,
+    "bootstrap_log_slots": 12,
+    "bootstrap_log_q": [
+      56,
+      39,
+      40,
+      39,
+      40,
+      60,
+      60,
+      61,
+      60,
+      60,
+      60,
+      61,
+      61,
+      57,
+      56,
+      56,
+      56
+    ],
+    "bootstrap_log_p": [
+      61,
+      61,
+      62,
+      61,
+      62
+    ],
+    "circuit_order": "ModUpThenEncode"
+  },
+  "workload": {
+    "identifier": "reproducibleInput.v1",
+    "formula": "real=((i%7)-3)/16; imag=((i%5)-2)/32; value=real+imag*i",
+    "logical_slots": 4096
+  },
+  "polynomial_budget": 1.2e-8,
+  "public_like_threshold": 0.01,
+  "q0_55_39_control": {
+    "no_guard_max_error": 3.3025028600697226e-8,
+    "g0_unguarded_capacity_ratio": 0.8972907076912564,
+    "g0_one_bit_guard": {
+      "name": "Q0-control-G0-one-bit",
+      "boundary_guard_bits": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "guarded_boundaries": [
+        "G0-rescale"
+      ],
+      "total_guard_bits": 1,
+      "guarded_boundary_count": 1,
+      "final_real_error": 0.015606374857244698,
+      "final_imag_error": 0.015606398214962014,
+      "final_max_error": 0.015606398214962014,
+      "final_real_vs_standard": 0.015606374857244809,
+      "final_imag_vs_standard": 0.015606398214961126,
+      "capacity_safe": true,
+      "scale_alignment_safe": false,
+      "guard_value_preserving": false,
+      "no_extra_level_consumption": true,
+      "fast_vs_full_rns_rows_match": true,
+      "valid": false,
+      "precision_qualified": false,
+      "first_failure": "G0-rescale.guard_value",
+      "first_limiting_boundary": "G0-rescale"
+    },
+    "f0_one_bit_guard": {
+      "name": "Q0-control-F0-one-bit",
+      "boundary_guard_bits": [
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "guarded_boundaries": [
+        "F0-final-rescale"
+      ],
+      "total_guard_bits": 1,
+      "guarded_boundary_count": 1,
+      "final_real_error": 2.5509180656690944e-8,
+      "final_imag_error": 2.410898292115604e-8,
+      "final_max_error": 2.5509180656690944e-8,
+      "final_real_vs_standard": 2.550918176691397e-8,
+      "final_imag_vs_standard": 2.410898192195532e-8,
+      "capacity_safe": true,
+      "scale_alignment_safe": true,
+      "guard_value_preserving": true,
+      "no_extra_level_consumption": true,
+      "fast_vs_full_rns_rows_match": true,
+      "valid": true,
+      "precision_qualified": false,
+      "first_failure": "none",
+      "first_limiting_boundary": ""
+    },
+    "no_guard_expected_range": [
+      2.5e-8,
+      4.2e-8
+    ],
+    "f0_expected_max_error": 2.5509e-8,
+    "precondition_pass": true
+  },
+  "q0_56_39_profile": {
+    "requested_q0_bits": 56,
+    "q0_prime": "72057594037616641",
+    "q1_prime": "549755731969",
+    "q0_actual_bit_length": 56,
+    "q1_actual_bit_length": 39,
+    "q01_product": "39614075354074986593170096129",
+    "q01_product_bit_length": 95,
+    "q01_within_existing_domain": true,
+    "fast_rescale_domain_accepted": true,
+    "standard_public_result": {
+      "max_component_abs": 5.830057349387463e-8,
+      "max_abs_complex": 5.8301329087484385e-8,
+      "mean_abs_complex": 6.059716380251585e-10,
+      "worst_index": 0,
+      "worst_component": "imag",
+      "pass_threshold": true,
+      "threshold": 0.01
+    },
+    "five_boundary_table": [
+      {
+        "id": "G0-rescale",
+        "order": 0,
+        "unguarded_pre_rescale_capacity_ratio": 0.44864535384367576,
+        "one_bit_guard_projected_capacity_ratio": 0.8972907076873515,
+        "one_bit_guard_actual_capacity_ratio": 0.8972907076873515,
+        "one_bit_guard_value_preservation_error": 0,
+        "local_rescale_error_before": 2.3489051148573026e-8,
+        "local_rescale_error_after": 1.2272975524751928e-8,
+        "centered_unique": true,
+        "fast_vs_full_rns_rows_match": true,
+        "level_unchanged": true,
+        "one_bit_guard_valid": true,
+        "first_failure": "none"
+      },
+      {
+        "id": "G1-rescale",
+        "order": 1,
+        "unguarded_pre_rescale_capacity_ratio": 2.73533851598282e-8,
+        "one_bit_guard_projected_capacity_ratio": 5.47067703196564e-8,
+        "one_bit_guard_actual_capacity_ratio": 5.47067703196564e-8,
+        "one_bit_guard_value_preservation_error": 0,
+        "local_rescale_error_before": 1.6878459107355707e-11,
+        "local_rescale_error_after": 1.6878459107355707e-11,
+        "centered_unique": true,
+        "fast_vs_full_rns_rows_match": true,
+        "level_unchanged": true,
+        "one_bit_guard_valid": true,
+        "first_failure": "none"
+      },
+      {
+        "id": "G2-rescale",
+        "order": 2,
+        "unguarded_pre_rescale_capacity_ratio": 0.000004094929100918979,
+        "one_bit_guard_projected_capacity_ratio": 0.000008189858201837957,
+        "one_bit_guard_actual_capacity_ratio": 0.000008189858201837957,
+        "one_bit_guard_value_preservation_error": 0,
+        "local_rescale_error_before": 7.821767982385455e-11,
+        "local_rescale_error_after": 3.8270086599924034e-11,
+        "centered_unique": true,
+        "fast_vs_full_rns_rows_match": true,
+        "level_unchanged": true,
+        "one_bit_guard_valid": true,
+        "first_failure": "none"
+      },
+      {
+        "id": "G3-rescale",
+        "order": 3,
+        "unguarded_pre_rescale_capacity_ratio": 0.012820581839784594,
+        "one_bit_guard_projected_capacity_ratio": 0.025641163679569187,
+        "one_bit_guard_actual_capacity_ratio": 0.025641163679569187,
+        "one_bit_guard_value_preservation_error": 0,
+        "local_rescale_error_before": 3.138453663620311e-10,
+        "local_rescale_error_after": 3.138453663620311e-10,
+        "centered_unique": true,
+        "fast_vs_full_rns_rows_match": true,
+        "level_unchanged": true,
+        "one_bit_guard_valid": true,
+        "first_failure": "none"
+      },
+      {
+        "id": "F0-final-rescale",
+        "order": 4,
+        "unguarded_pre_rescale_capacity_ratio": 0.19486845023733138,
+        "one_bit_guard_projected_capacity_ratio": 0.38973690047466275,
+        "one_bit_guard_actual_capacity_ratio": 0.38973690047466275,
+        "one_bit_guard_value_preservation_error": 0,
+        "local_rescale_error_before": 2.3268836413237182e-8,
+        "local_rescale_error_after": 1.2840058460916737e-8,
+        "centered_unique": true,
+        "fast_vs_full_rns_rows_match": true,
+        "level_unchanged": true,
+        "one_bit_guard_valid": true,
+        "first_failure": "none"
+      }
+    ],
+    "candidates": [
+      {
+        "name": "W0-no-guards",
+        "boundary_guard_bits": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "guarded_boundaries": null,
+        "total_guard_bits": 0,
+        "guarded_boundary_count": 0,
+        "final_real_error": 2.912511887220859e-8,
+        "final_imag_error": 3.302544948624586e-8,
+        "final_max_error": 3.302544948624586e-8,
+        "final_real_vs_standard": 2.912511898323089e-8,
+        "final_imag_vs_standard": 3.302545037442428e-8,
+        "capacity_safe": true,
+        "scale_alignment_safe": true,
+        "guard_value_preserving": true,
+        "no_extra_level_consumption": true,
+        "fast_vs_full_rns_rows_match": true,
+        "valid": true,
+        "precision_qualified": false,
+        "first_failure": "none",
+        "first_limiting_boundary": ""
+      },
+      {
+        "name": "W1-G0-one-bit",
+        "boundary_guard_bits": [
+          1,
+          0,
+          0,
+          0,
+          0
+        ],
+        "guarded_boundaries": [
+          "G0-rescale"
+        ],
+        "total_guard_bits": 1,
+        "guarded_boundary_count": 1,
+        "final_real_error": 1.8804111046044625e-8,
+        "final_imag_error": 1.6453032936070144e-8,
+        "final_max_error": 1.8804111046044625e-8,
+        "final_real_vs_standard": 1.8804110046843903e-8,
+        "final_imag_vs_standard": 1.6453031603802515e-8,
+        "capacity_safe": true,
+        "scale_alignment_safe": true,
+        "guard_value_preserving": true,
+        "no_extra_level_consumption": true,
+        "fast_vs_full_rns_rows_match": true,
+        "valid": true,
+        "precision_qualified": false,
+        "first_failure": "none",
+        "first_limiting_boundary": ""
+      },
+      {
+        "name": "W2-F0-one-bit",
+        "boundary_guard_bits": [
+          0,
+          0,
+          0,
+          0,
+          1
+        ],
+        "guarded_boundaries": [
+          "F0-final-rescale"
+        ],
+        "total_guard_bits": 1,
+        "guarded_boundary_count": 1,
+        "final_real_error": 2.550875977114231e-8,
+        "final_imag_error": 2.410940391772698e-8,
+        "final_max_error": 2.550875977114231e-8,
+        "final_real_vs_standard": 2.5508760548298426e-8,
+        "final_imag_vs_standard": 2.4109402696481652e-8,
+        "capacity_safe": true,
+        "scale_alignment_safe": true,
+        "guard_value_preserving": true,
+        "no_extra_level_consumption": true,
+        "fast_vs_full_rns_rows_match": true,
+        "valid": true,
+        "precision_qualified": false,
+        "first_failure": "none",
+        "first_limiting_boundary": ""
+      },
+      {
+        "name": "W3-G0-F0-one-bit",
+        "boundary_guard_bits": [
+          1,
+          0,
+          0,
+          0,
+          1
+        ],
+        "guarded_boundaries": [
+          "G0-rescale",
+          "F0-final-rescale"
+        ],
+        "total_guard_bits": 2,
+        "guarded_boundary_count": 2,
+        "final_real_error": 1.1857085091548925e-8,
+        "final_imag_error": 1.2418863493124377e-8,
+        "final_max_error": 1.2418863493124377e-8,
+        "final_real_vs_standard": 1.1857084758482017e-8,
+        "final_imag_vs_standard": 1.2418865047436611e-8,
+        "capacity_safe": true,
+        "scale_alignment_safe": true,
+        "guard_value_preserving": true,
+        "no_extra_level_consumption": true,
+        "fast_vs_full_rns_rows_match": true,
+        "valid": true,
+        "precision_qualified": false,
+        "first_failure": "none",
+        "first_limiting_boundary": ""
+      }
+    ],
+    "best_valid_candidate": {
+      "name": "W0-no-guards",
+      "boundary_guard_bits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "guarded_boundaries": null,
+      "total_guard_bits": 0,
+      "guarded_boundary_count": 0,
+      "final_real_error": 2.912511887220859e-8,
+      "final_imag_error": 3.302544948624586e-8,
+      "final_max_error": 3.302544948624586e-8,
+      "final_real_vs_standard": 2.912511898323089e-8,
+      "final_imag_vs_standard": 3.302545037442428e-8,
+      "capacity_safe": true,
+      "scale_alignment_safe": true,
+      "guard_value_preserving": true,
+      "no_extra_level_consumption": true,
+      "fast_vs_full_rns_rows_match": true,
+      "valid": true,
+      "precision_qualified": false,
+      "first_failure": "none",
+      "first_limiting_boundary": ""
+    },
+    "first_remaining_blocker": "G0-rescale"
+  },
+  "classification": "logn13_q0_56_rescale_guard_insufficient_precision",
+  "first_remaining_blocker": "G0-rescale",
+  "validation": {
+    "logn13_only": true,
+    "no_benchmark": true,
+    "no_c2s_change": true,
+    "no_exp003": true,
+    "no_gate_4_or_5": true,
+    "no_generated_power_redesign": true,
+    "no_logn16": true,
+    "no_mod1_change": true,
+    "no_production_integration": true,
+    "no_q0_beyond_56": true,
+    "no_q1_widening": true,
+    "no_q2_plus_arithmetic": true,
+    "no_s2c_change": true,
+    "no_secondary_production_changes": true,
+    "primary_required_base": "d9d540a306f09298dbcb1a4960bd2900bd7a3a53",
+    "same_level_topology": true,
+    "same_plan_scale_2^92": true,
+    "secondary_clean": true,
+    "secondary_commit": "25e70430b10cd4af37ad4cf94cd994912e970e3f",
+    "secondary_exact_required_commit": true
+  }
+}
