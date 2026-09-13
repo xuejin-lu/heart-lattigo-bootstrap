@@ -35,6 +35,7 @@ func main() {
 	fix001P3DiagLogN13SemanticBisect := flag.Bool("fix001-p3-diag-logn13-semantic-bisect", false, "bisect LogN13 Fast semantic divergence against a genuine Standard control")
 	fix001P3DiagLogN13EvalModCausal := flag.Bool("fix001-p3-diag-logn13-evalmod-causal", false, "localize LogN13 EvalMod divergence with matched semantic inputs")
 	fix001P3DiagLogN13C2SPrecision := flag.Bool("fix001-p3-diag-logn13-c2s-precision", false, "localize LogN13 C2S precision loss against a downstream budget")
+	fix001P3DiagLogN13C2SGroup0LinearAlias := flag.Bool("fix001-p3-diag-logn13-c2s-group0-linear-alias", false, "localize LogN13 group 0 LinearTransform q0/q1 alias")
 	flag.Parse()
 
 	cfg, err := LoadBootstrapConfig(*configPath)
@@ -120,6 +121,9 @@ func main() {
 	if *fix001P3DiagLogN13C2SPrecision {
 		selectedModes++
 	}
+	if *fix001P3DiagLogN13C2SGroup0LinearAlias {
+		selectedModes++
+	}
 	if selectedModes > 1 {
 		log.Fatal("bootstrap diagnostic modes cannot be used together")
 	}
@@ -193,6 +197,10 @@ func main() {
 		}
 	} else if *fix001P3DiagLogN13C2SPrecision {
 		if err := runFIX001P3DiagLogN13C2SPrecision(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
+			log.Fatal(err)
+		}
+	} else if *fix001P3DiagLogN13C2SGroup0LinearAlias {
+		if err := runFIX001P3DiagLogN13C2SGroup0LinearAlias(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
 			log.Fatal(err)
 		}
 	} else if *finalizationDiagnostic {
