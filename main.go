@@ -46,6 +46,7 @@ func main() {
 	fix001P3DesignLogN13EvalModPrecisionScaleSweep := flag.Bool("fix001-p3-design-logn13-evalmod-precision-scale-sweep", false, "sweep diagnostic Fast EvalMod common plan scales")
 	fix001P3DesignLogN13GuardedPowerPrecision := flag.Bool("fix001-p3-design-logn13-guarded-power-precision", false, "sweep diagnostic guarded Chebyshev power precision")
 	fix001P3DiagLogN13PolynomialPrecisionDecomposition := flag.Bool("fix001-p3-diag-logn13-polynomial-precision-decomposition", false, "decompose LogN13 polynomial precision into power semantics and Fast PS arithmetic")
+	fix001P3DesignLogN13PSOracleScalePrecision := flag.Bool("fix001-p3-design-logn13-ps-oracle-scale-precision", false, "sweep LogN13 Fast PS oracle common plan scales")
 	flag.Parse()
 
 	cfg, err := LoadBootstrapConfig(*configPath)
@@ -162,6 +163,9 @@ func main() {
 		selectedModes++
 	}
 	if *fix001P3DiagLogN13PolynomialPrecisionDecomposition {
+		selectedModes++
+	}
+	if *fix001P3DesignLogN13PSOracleScalePrecision {
 		selectedModes++
 	}
 	if selectedModes > 1 {
@@ -281,6 +285,10 @@ func main() {
 		}
 	} else if *fix001P3DiagLogN13PolynomialPrecisionDecomposition {
 		if err := runFIX001P3DiagLogN13PolynomialPrecisionDecomposition(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
+			log.Fatal(err)
+		}
+	} else if *fix001P3DesignLogN13PSOracleScalePrecision {
+		if err := runFIX001P3DesignLogN13PSOracleScalePrecision(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
 			log.Fatal(err)
 		}
 	} else if *finalizationDiagnostic {
