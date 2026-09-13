@@ -54,6 +54,7 @@ func main() {
 	fix001P3DesignLogN13F0LocalQ2RescaleFeasibility := flag.Bool("fix001-p3-design-logn13-f0-local-q2-rescale-feasibility", false, "test LogN13 F0 local q2 rescale feasibility")
 	fix001P3DesignLogN13F0LocalQ2GuardSweep := flag.Bool("fix001-p3-design-logn13-f0-local-q2-guard-sweep", false, "sweep LogN13 F0 local q2 guard bits")
 	fix001P3DiagLogN13K3DownstreamSufficiency := flag.Bool("fix001-p3-diag-logn13-k3-downstream-sufficiency", false, "diagnose LogN13 k3 downstream sufficiency")
+	fix001P3DesignLogN13DAR0LocalQ2Feasibility := flag.Bool("fix001-p3-design-logn13-da-r0-local-q2-feasibility", false, "test LogN13 DA round0 local q2 feasibility")
 	flag.Parse()
 
 	cfg, err := LoadBootstrapConfig(*configPath)
@@ -194,6 +195,9 @@ func main() {
 		selectedModes++
 	}
 	if *fix001P3DiagLogN13K3DownstreamSufficiency {
+		selectedModes++
+	}
+	if *fix001P3DesignLogN13DAR0LocalQ2Feasibility {
 		selectedModes++
 	}
 	if selectedModes > 1 {
@@ -345,6 +349,10 @@ func main() {
 		}
 	} else if *fix001P3DiagLogN13K3DownstreamSufficiency {
 		if err := runFIX001P3DiagLogN13K3DownstreamSufficiency(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
+			log.Fatal(err)
+		}
+	} else if *fix001P3DesignLogN13DAR0LocalQ2Feasibility {
+		if err := runFIX001P3DesignLogN13DAR0LocalQ2Feasibility(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
 			log.Fatal(err)
 		}
 	} else if *finalizationDiagnostic {
