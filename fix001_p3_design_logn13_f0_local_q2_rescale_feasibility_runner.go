@@ -69,6 +69,7 @@ type fix001P3LocalQ2Contraction struct {
 }
 
 type fix001P3LocalQ2BranchEvidence struct {
+	GuardBits   int                        `json:"guard_bits"`
 	Name        string                     `json:"branch"`
 	Expansion   fix001P3LocalQ2Expansion   `json:"expansion"`
 	Guard       fix001P3LocalQ2Guard       `json:"two_bit_guard"`
@@ -211,6 +212,10 @@ func fix001P3LocalQ2RowEqual(a, b []uint64) bool {
 }
 
 func fix001P3LocalQ2Override(params ckks.Parameters, branch string, evidence *fix001P3LocalQ2BranchEvidence) psRescaleGuardFinalOverride {
+	return fix001P3LocalQ2OverrideWithBits(params, branch, evidence, 2)
+}
+
+func fix001P3LocalQ2OverrideWithBits(params ckks.Parameters, branch string, evidence *fix001P3LocalQ2BranchEvidence, guardBits int) psRescaleGuardFinalOverride {
 	return func(params ckks.Parameters, eval *fastckks.Evaluator, ct *rlwe.Ciphertext, boundary *psRescaleGuardBoundary) (bool, error) {
 		q0, q1, _, q012, err := fix001P3LocalQ2Moduli(params)
 		if err != nil {
@@ -225,6 +230,7 @@ func fix001P3LocalQ2Override(params ckks.Parameters, branch string, evidence *fi
 		}
 		input := recovered
 		q01 := new(big.Int).Mul(q0, q1)
+		evidence.GuardBits = guardBits
 		evidence.Name = branch
 		evidence.Expansion.Q01 = q01.String()
 		evidence.Expansion.Q012 = q012.String()
@@ -281,7 +287,7 @@ func fix001P3LocalQ2Override(params ckks.Parameters, branch string, evidence *fi
 			return false, nil
 		}
 
-		factor := big.NewInt(4)
+		factor := new(big.Int).Lsh(big.NewInt(1), uint(guardBits))
 		guarded := make([][]*big.Int, len(input))
 		for component, values := range input {
 			guarded[component] = make([]*big.Int, len(values))
@@ -309,7 +315,26 @@ func fix001P3LocalQ2Override(params ckks.Parameters, branch string, evidence *fi
 		guardMetric := psRescaleGuardMetric(before, guardedDecoded)
 		evidence.Guard.Q01Before, evidence.Guard.Q012Before = inputCapacity, inputCapacity012
 		evidence.Guard.Q01After, evidence.Guard.Q012After = guardedCapacity01, guardedCapacity012
-		evidence.Guard.Value, evidence.Guard.RowsMatch = guardMetric, q2Rows
+		guardedReference, err := fix001P3LocalQ2Build(params, ct, guarded, 2, guardedScale, false)
+		if err != nil {
+			return true, err
+		}
+		guardedMaterialized, err := fix001P3LocalQ2Build(params, ct, guarded, 2, guardedScale, true)
+		if err != nil {
+			return true, err
+		}
+		guardedRows := true
+		for component := range guarded {
+			for limb := 0; limb <= 2; limb++ {
+				row := append([]uint64(nil), guardedMaterialized.Value[component].Coeffs[limb]...)
+				params.RingQ().SubRings[limb].IMForm(row, row)
+				guardedRows = guardedRows && fix001P3LocalQ2RowEqual(row, guardedReference.Value[component].Coeffs[limb])
+			}
+		}
+		evidence.Guard.Value, evidence.Guard.RowsMatch = guardMetric, guardedRows
+		if !guardedCapacity012.Unique || !guardedRows {
+			return false, nil
+		}
 
 		divisor := new(big.Int).SetUint64(params.RingQ().SubRings[ct.Level()].Modulus)
 		outputLevel := ct.Level() - 1
@@ -326,10 +351,18 @@ func fix001P3LocalQ2Override(params ckks.Parameters, branch string, evidence *fi
 			return true, err
 		}
 		localError := psRescaleGuardMetric(guardedDecoded, outputDecoded)
-		outputCapacity012 := fix001P3LocalQ2CapacityOf(output[0], q012)
-		outputCapacity01 := fix001P3LocalQ2CapacityOf(output[0], q01)
+		outputCapacity012 := fix001P3LocalQ2Capacity{}
+		outputCapacity01 := fix001P3LocalQ2Capacity{}
 		outputUnique := true
 		for _, values := range output {
+			output012 := fix001P3LocalQ2CapacityOf(values, q012)
+			output01 := fix001P3LocalQ2CapacityOf(values, q01)
+			if output012.Ratio > outputCapacity012.Ratio {
+				outputCapacity012 = output012
+			}
+			if output01.Ratio > outputCapacity01.Ratio {
+				outputCapacity01 = output01
+			}
 			outputUnique = outputUnique && fix001P3LocalQ2CapacityOf(values, q01).Unique
 		}
 		contract, err := fix001P3LocalQ2CopyQ01(params, ct, output, outputLevel, outputScale)
@@ -342,8 +375,16 @@ func fix001P3LocalQ2Override(params ckks.Parameters, branch string, evidence *fi
 		}
 		contractMetric := psRescaleGuardMetric(outputDecoded, contractDecoded)
 		q01ContractRows := true
+		outputReference, err := fix001P3LocalQ2Build(params, ct, output, 2, outputScale, false)
+		if err != nil {
+			return true, err
+		}
 		for component := range output {
-			q01ContractRows = q01ContractRows && fix001P3LocalQ2RowEqual(contract.Value[component].Coeffs[0], contract.Value[component].Coeffs[0])
+			for limb := 0; limb < 2; limb++ {
+				row := append([]uint64(nil), contract.Value[component].Coeffs[limb]...)
+				params.RingQ().SubRings[limb].IMForm(row, row)
+				q01ContractRows = q01ContractRows && fix001P3LocalQ2RowEqual(row, outputReference.Value[component].Coeffs[limb])
+			}
 		}
 		metadataMatch := contract.Level() == outputLevel && contract.Scale.Equal(outputScale) && contract.IsNTT && contract.IsMontgomery
 		evidence.Rescale = fix001P3LocalQ2Rescale{Divisor: divisor.String(), InputLevel: ct.Level(), OutputLevel: outputLevel, InputScale: psRescaleGuardScaleString(ct.Scale), OutputScale: psRescaleGuardScaleString(outputScale), LocalError: localError, Q012Output: outputCapacity012, Q01Output: outputCapacity01, RowsMatch: true, RoundedDivisionMatch: true}
