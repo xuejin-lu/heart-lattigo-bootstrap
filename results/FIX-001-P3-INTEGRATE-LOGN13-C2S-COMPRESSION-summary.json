@@ -1,0 +1,367 @@
+{
+  "schema_version": "fix-001-p3-integrate-logn13-c2s-compression.v1",
+  "timestamp": "2026-09-13T08:06:49.545146Z",
+  "primary_repository": {
+    "path": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap",
+    "commit": "fbd05f1dc71b0e440500d5d3a441f7184779d4f0",
+    "ref": "main",
+    "dirty": true
+  },
+  "lattigo_repository": {
+    "path": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/../lattigo",
+    "commit": "25e70430b10cd4af37ad4cf94cd994912e970e3f",
+    "ref": "fast-ckks",
+    "dirty": false
+  },
+  "environment": {
+    "go_version": "go1.26.4",
+    "os": "darwin",
+    "architecture": "arm64",
+    "cpu": "Apple M4",
+    "logical_cpus": 10
+  },
+  "config": {
+    "log_n": 13,
+    "log_default_scale": 45,
+    "secret_hamming": 192,
+    "q0": [
+      55
+    ],
+    "q_slots_to_coeffs": [
+      39,
+      39,
+      39
+    ],
+    "q_coeffs_to_slots": [
+      56,
+      56,
+      56,
+      56
+    ],
+    "p": [
+      61,
+      61,
+      61,
+      61,
+      61
+    ],
+    "slots_to_coeffs_dft_levels": [
+      1,
+      1,
+      1
+    ],
+    "coeffs_to_slots_dft_levels": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "log_slots": -1,
+    "mod1_log_scale": 60,
+    "mod1_degree": 30,
+    "mod1_double_angle": 3,
+    "mod1_k": 16,
+    "log_message_ratio": 10,
+    "mod1_inv_degree": 0,
+    "repetitions": 3,
+    "warmup": 1
+  },
+  "effective_parameters": {
+    "residual_log_n": 13,
+    "residual_max_level": 1,
+    "bootstrap_log_n": 13,
+    "bootstrap_max_level": 16,
+    "bootstrap_log_slots": 12,
+    "bootstrap_log_q": [
+      55,
+      39,
+      40,
+      39,
+      40,
+      60,
+      60,
+      61,
+      60,
+      60,
+      60,
+      61,
+      61,
+      56,
+      57,
+      56,
+      56
+    ],
+    "bootstrap_log_p": [
+      61,
+      61,
+      62,
+      61,
+      62
+    ],
+    "circuit_order": "ModUpThenEncode"
+  },
+  "workload": {
+    "identifier": "reproducibleInput.v1",
+    "formula": "real=((i%7)-3)/16; imag=((i%5)-2)/32; value=real+imag*i",
+    "logical_slots": 4096
+  },
+  "secondary_changed_files": [
+    "circuits/ckks/dft/fast.go",
+    "circuits/ckks/bootstrapping/fast_c2s_compression.go",
+    "circuits/ckks/bootstrapping/fast_bootstrap.go",
+    "circuits/ckks/bootstrapping/fast_evalmod.go",
+    "docs/FAST_CKKS_SPEC.md"
+  ],
+  "production_guard_disposition": "exact LogN13 full-slot C2S profile only",
+  "matrix_compression_restore_plan": [
+    4,
+    2,
+    0,
+    0
+  ],
+  "matrix_compression_active": true,
+  "c2s_groups": [
+    {
+      "group": 0,
+      "restore_exponent": 4,
+      "fast_scale": "4.503599627333632062500000000000000000000e+15",
+      "standard_scale": "7.205759403733811300000000000000000000000e+16",
+      "scale_ratio_log2": 4,
+      "level_q": 16,
+      "level_p": 4,
+      "n1": 1024,
+      "diagonal_set_unchanged": true,
+      "structural_metadata_same": true
+    },
+    {
+      "group": 1,
+      "restore_exponent": 2,
+      "fast_scale": "1.801439850934272025000000000000000000000e+16",
+      "standard_scale": "7.205759403737088100000000000000000000000e+16",
+      "scale_ratio_log2": 2,
+      "level_q": 16,
+      "level_p": 4,
+      "n1": 256,
+      "diagonal_set_unchanged": true,
+      "structural_metadata_same": true
+    },
+    {
+      "group": 2,
+      "restore_exponent": 0,
+      "fast_scale": "7.205759403832115300000000000000000000000e+16",
+      "standard_scale": "7.205759403832115300000000000000000000000e+16",
+      "scale_ratio_log2": 0,
+      "level_q": 16,
+      "level_p": 4,
+      "n1": 32,
+      "diagonal_set_unchanged": true,
+      "structural_metadata_same": true
+    },
+    {
+      "group": 3,
+      "restore_exponent": 0,
+      "fast_scale": "7.205759403761664100000000000000000000000e+16",
+      "standard_scale": "7.205759403761664100000000000000000000000e+16",
+      "scale_ratio_log2": 0,
+      "level_q": 16,
+      "level_p": 4,
+      "n1": 4,
+      "diagonal_set_unchanged": true,
+      "structural_metadata_same": true
+    }
+  ],
+  "modup_fast": {
+    "level": 16,
+    "scale": "1.125899906842624000000000000000000000000e+15",
+    "scale_log2": 50,
+    "degree": 1,
+    "n": 8192,
+    "log_dimensions": {
+      "Rows": 0,
+      "Cols": 12
+    },
+    "is_ntt": true,
+    "is_montgomery": true
+  },
+  "modup_standard": {
+    "level": 16,
+    "scale": "1.125899906842624000000000000000000000000e+15",
+    "scale_log2": 50,
+    "degree": 1,
+    "n": 8192,
+    "log_dimensions": {
+      "Rows": 0,
+      "Cols": 12
+    },
+    "is_ntt": true,
+    "is_montgomery": false
+  },
+  "modup_metadata_match": true,
+  "c2s_real_fast": {
+    "level": 12,
+    "scale": "1.125899906842624000000000000000000000000e+15",
+    "scale_log2": 50,
+    "degree": 1,
+    "n": 8192,
+    "log_dimensions": {
+      "Rows": 0,
+      "Cols": 12
+    },
+    "is_ntt": true,
+    "is_montgomery": true
+  },
+  "c2s_real_standard": {
+    "level": 12,
+    "scale": "1.125899906842624000000000000000000000000e+15",
+    "scale_log2": 50,
+    "degree": 1,
+    "n": 8192,
+    "log_dimensions": {
+      "Rows": 0,
+      "Cols": 12
+    },
+    "is_ntt": true,
+    "is_montgomery": false
+  },
+  "c2s_imag_fast": {
+    "level": 12,
+    "scale": "1.125899906842624000000000000000000000000e+15",
+    "scale_log2": 50,
+    "degree": 1,
+    "n": 8192,
+    "log_dimensions": {
+      "Rows": 0,
+      "Cols": 12
+    },
+    "is_ntt": true,
+    "is_montgomery": true
+  },
+  "c2s_imag_standard": {
+    "level": 12,
+    "scale": "1.125899906842624000000000000000000000000e+15",
+    "scale_log2": 50,
+    "degree": 1,
+    "n": 8192,
+    "log_dimensions": {
+      "Rows": 0,
+      "Cols": 12
+    },
+    "is_ntt": true,
+    "is_montgomery": false
+  },
+  "c2s_metadata_match": true,
+  "c2s_real_fast_vs_genuine_standard": {
+    "max_component_abs": 9.209497856162152e-14,
+    "max_abs_complex": 9.209497856162575e-14,
+    "mean_abs_complex": 2.0166000532085243e-14,
+    "worst_index": 675,
+    "worst_component": "real",
+    "threshold": 0.000019531249403614602,
+    "pass": true
+  },
+  "c2s_imag_fast_vs_genuine_standard": {
+    "max_component_abs": 9.444563729178734e-14,
+    "max_abs_complex": 9.444563729178757e-14,
+    "mean_abs_complex": 1.986202702494107e-14,
+    "worst_index": 2143,
+    "worst_component": "real",
+    "threshold": 0.000019531249403614602,
+    "pass": true
+  },
+  "public_fast_metadata": {
+    "level": 1,
+    "scale": "3.518437208883200000000000000000000000000e+13",
+    "scale_log2": 45,
+    "degree": 1,
+    "n": 8192,
+    "log_dimensions": {
+      "Rows": 0,
+      "Cols": 12
+    },
+    "is_ntt": true,
+    "is_montgomery": false
+  },
+  "public_standard_metadata": {
+    "level": 1,
+    "scale": "3.518437208883200000000000000000000000000e+13",
+    "scale_log2": 45,
+    "degree": 1,
+    "n": 8192,
+    "log_dimensions": {
+      "Rows": 0,
+      "Cols": 12
+    },
+    "is_ntt": true,
+    "is_montgomery": false
+  },
+  "public_fast_semantic": {
+    "sample_count": 4096,
+    "max_abs_complex": 0.25756139617648827,
+    "mean_abs_complex": 0.14188115875223026,
+    "rmse_complex": 0.15679339187500232,
+    "max_abs_real": 0.24628047174869752,
+    "max_abs_imag": 0.09924333802737419,
+    "max_component_abs": 0.24628047174869752,
+    "max_abs_complex_indices": [
+      3954
+    ],
+    "max_component_indices": [
+      321
+    ],
+    "max_abs_real_indices": [
+      321
+    ],
+    "max_abs_imag_indices": [
+      2435
+    ],
+    "precision_bits": 1.9570117192852279,
+    "pass_threshold": false,
+    "threshold": 0.01
+  },
+  "public_standard_semantic": {
+    "sample_count": 4096,
+    "max_abs_complex": 5.7544940345432415e-8,
+    "mean_abs_complex": 6.047820833839128e-10,
+    "rmse_complex": 1.1841383607453172e-9,
+    "max_abs_real": 1.738921145966188e-9,
+    "max_abs_imag": 5.754406148805735e-8,
+    "max_component_abs": 5.754406148805735e-8,
+    "max_abs_complex_indices": [
+      0
+    ],
+    "max_component_indices": [
+      0
+    ],
+    "max_abs_real_indices": [
+      1109
+    ],
+    "max_abs_imag_indices": [
+      0
+    ],
+    "precision_bits": 24.05073567451986,
+    "pass_threshold": true,
+    "threshold": 0.01
+  },
+  "bootstrap_many_output_count": 1,
+  "bootstrap_many_pass": true,
+  "public_input_unchanged": true,
+  "genuine_standard_control_pass": true,
+  "classification": "logn13_public_e2e_semantic_failure_after_c2s_integration",
+  "first_failing_checkpoint": "public_bootstrap_semantics",
+  "tests": {
+    "secondary_all": "pass",
+    "secondary_focused": "pass"
+  },
+  "validation": {
+    "evalmod_unchanged": true,
+    "no_benchmark": true,
+    "no_exp003": true,
+    "no_gate_4_or_5": true,
+    "no_logn16": true,
+    "secondary_branch": "fast-ckks",
+    "secondary_clean": true,
+    "secondary_commit": "25e70430b10cd4af37ad4cf94cd994912e970e3f",
+    "slots_to_coeffs_unchanged": true,
+    "standard_dft_unchanged": true
+  }
+}
