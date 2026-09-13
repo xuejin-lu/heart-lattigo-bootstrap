@@ -1,0 +1,349 @@
+{
+  "schema_version": "fix-001-p3-diag-logn13-s2c-error-decomposition.v1",
+  "timestamp": "2026-09-13T22:08:25.003307Z",
+  "primary_repository": {
+    "path": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap",
+    "commit": "9cabb93d3860f0174ad29ed47fa92d1e0781828e",
+    "ref": "main",
+    "dirty": true
+  },
+  "lattigo_repository": {
+    "path": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/../lattigo",
+    "commit": "25e70430b10cd4af37ad4cf94cd994912e970e3f",
+    "ref": "fast-ckks",
+    "dirty": false
+  },
+  "environment": {
+    "go_version": "go1.26.4",
+    "os": "darwin",
+    "architecture": "arm64",
+    "cpu": "Apple M4",
+    "logical_cpus": 10
+  },
+  "config": {
+    "log_n": 13,
+    "log_default_scale": 45,
+    "secret_hamming": 192,
+    "q0": [
+      55
+    ],
+    "q_slots_to_coeffs": [
+      39,
+      39,
+      39
+    ],
+    "q_coeffs_to_slots": [
+      56,
+      56,
+      56,
+      56
+    ],
+    "p": [
+      61,
+      61,
+      61,
+      61,
+      61
+    ],
+    "slots_to_coeffs_dft_levels": [
+      1,
+      1,
+      1
+    ],
+    "coeffs_to_slots_dft_levels": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "log_slots": -1,
+    "mod1_log_scale": 60,
+    "mod1_degree": 30,
+    "mod1_double_angle": 3,
+    "mod1_k": 16,
+    "log_message_ratio": 10,
+    "mod1_inv_degree": 0,
+    "repetitions": 3,
+    "warmup": 1
+  },
+  "effective_parameters": {
+    "residual_log_n": 13,
+    "residual_max_level": 1,
+    "bootstrap_log_n": 13,
+    "bootstrap_max_level": 16,
+    "bootstrap_log_slots": 12,
+    "bootstrap_log_q": [
+      56,
+      39,
+      40,
+      39,
+      40,
+      60,
+      60,
+      61,
+      60,
+      60,
+      60,
+      61,
+      61,
+      57,
+      56,
+      56,
+      56
+    ],
+    "bootstrap_log_p": [
+      61,
+      61,
+      62,
+      61,
+      62
+    ],
+    "circuit_order": "ModUpThenEncode"
+  },
+  "d0_control": {
+    "evalmod_imag_vs_standard": {
+      "max_component_abs": 0.00004647793870173522,
+      "max_abs_complex": 0.00004647793870173522,
+      "mean_abs_complex": 0.000010301514045024188,
+      "worst_index": 2323,
+      "worst_component": "real",
+      "pass_threshold": true,
+      "threshold": 0.01
+    },
+    "evalmod_real_vs_standard": {
+      "max_component_abs": 0.00006261306805777143,
+      "max_abs_complex": 0.00006261306805777143,
+      "mean_abs_complex": 0.000010352582797743931,
+      "worst_index": 2935,
+      "worst_component": "real",
+      "pass_threshold": true,
+      "threshold": 0.01
+    },
+    "final_metadata_valid": true,
+    "no_da_capacity_failure": true,
+    "post_s2c_fast_vs_standard": {
+      "max_component_abs": 0.00033385298628089955,
+      "max_abs_complex": 0.0003352466156606677,
+      "mean_abs_complex": 0.00003212708167479504,
+      "worst_index": 0,
+      "worst_component": "imag",
+      "pass_threshold": true,
+      "threshold": 0.01
+    },
+    "public_like_error": {
+      "max_component_abs": 0.010683237260415292,
+      "max_abs_complex": 0.010727833615889559,
+      "mean_abs_complex": 0.0010280665817240212,
+      "worst_index": 0,
+      "worst_component": "imag",
+      "pass_threshold": false,
+      "threshold": 0.01
+    }
+  },
+  "full_rns_mirror": {
+    "fidelity_metric_n_s_vs_genuine_standard_s2c": {
+      "max_component_abs": 0,
+      "max_abs_complex": 0,
+      "mean_abs_complex": 0,
+      "worst_index": -1,
+      "worst_component": "",
+      "pass_threshold": true,
+      "threshold": 1e-10
+    },
+    "final_q01_rows_match": false,
+    "target": 1e-10
+  },
+  "causal_decomposition": {
+    "closure_relative_to_observed": 0,
+    "closure_residual": {
+      "max_component_abs": 0,
+      "max_abs_complex": 0,
+      "mean_abs_complex": 0,
+      "worst_index": -1,
+      "worst_component": "",
+      "pass_threshold": true,
+      "threshold": 1e-10
+    },
+    "fast_s2c_implementation_effect_s_f_minus_n_f": {
+      "max_component_abs": 0,
+      "max_abs_complex": 0,
+      "mean_abs_complex": 0,
+      "worst_index": -1,
+      "worst_component": "",
+      "pass_threshold": true,
+      "threshold": 0.01
+    },
+    "full_rns_mirror_fidelity_n_s_minus_s_s": {
+      "max_component_abs": 0,
+      "max_abs_complex": 0,
+      "mean_abs_complex": 0,
+      "worst_index": -1,
+      "worst_component": "",
+      "pass_threshold": true,
+      "threshold": 1e-10
+    },
+    "observed_total_s_f_minus_s_s": {
+      "max_component_abs": 0.00033385298628089955,
+      "max_abs_complex": 0.0003352466156606677,
+      "mean_abs_complex": 0.00003212708167479504,
+      "worst_index": 0,
+      "worst_component": "imag",
+      "pass_threshold": true,
+      "threshold": 0.01
+    },
+    "propagated_evalmod_input_effect_n_f_minus_n_s": {
+      "max_component_abs": 0.00033385298628089955,
+      "max_abs_complex": 0.0003352466156606677,
+      "mean_abs_complex": 0.00003212708167479504,
+      "worst_index": 0,
+      "worst_component": "imag",
+      "pass_threshold": true,
+      "threshold": 0.01
+    }
+  },
+  "propagated_input_group_amplification": [
+    {
+      "stage": "group0_post_rescale",
+      "group": 0,
+      "propagated_input_error": {
+        "max_component_abs": 0.00006447337767037653,
+        "max_abs_complex": 0.00006471212429954653,
+        "mean_abs_complex": 0.000020512202641152816,
+        "worst_index": 3057,
+        "worst_component": "real",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "empirical_amplification": 1.0297112035923373,
+      "fast_s2c_effect_at_stage": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "intended_full_rns_q01_capacity_ratio": 0.000003998283560509954,
+      "fast_pre_rows_match_mirror": true,
+      "fast_post_rows_match_mirror": true
+    },
+    {
+      "stage": "group1_post_rescale",
+      "group": 1,
+      "propagated_input_error": {
+        "max_component_abs": 0.00010122875343531162,
+        "max_abs_complex": 0.00010571465193733123,
+        "mean_abs_complex": 0.00002567583919411575,
+        "worst_index": 1280,
+        "worst_component": "imag",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "empirical_amplification": 1.5700860896857125,
+      "fast_s2c_effect_at_stage": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "intended_full_rns_q01_capacity_ratio": 0.000005002817953068453,
+      "fast_pre_rows_match_mirror": true,
+      "fast_post_rows_match_mirror": true
+    },
+    {
+      "stage": "group2_post_rescale",
+      "group": 2,
+      "propagated_input_error": {
+        "max_component_abs": 0.00033385298628089955,
+        "max_abs_complex": 0.0003352466156606677,
+        "mean_abs_complex": 0.00003212708167479504,
+        "worst_index": 0,
+        "worst_component": "imag",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "empirical_amplification": 3.2980055068468483,
+      "fast_s2c_effect_at_stage": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "intended_full_rns_q01_capacity_ratio": 0.0000036834866750124484,
+      "fast_pre_rows_match_mirror": true,
+      "fast_post_rows_match_mirror": true
+    }
+  ],
+  "linear_delta_confirmation": {
+    "agreement_tolerance": 1e-10,
+    "agreement_with_n_f_minus_n_s": {
+      "max_component_abs": 2.3903310429097824e-13,
+      "max_abs_complex": 2.5163055374374895e-13,
+      "mean_abs_complex": 7.949054220635777e-14,
+      "worst_index": 532,
+      "worst_component": "imag",
+      "pass_threshold": true,
+      "threshold": 1e-10
+    },
+    "input_delta": {
+      "max_component_abs": 0.00006261306805777122,
+      "max_abs_complex": 0.00006267733116697635,
+      "mean_abs_complex": 0.000016268487822699666,
+      "worst_index": 2935,
+      "worst_component": "real",
+      "pass_threshold": true,
+      "threshold": 0.01
+    },
+    "input_to_output_amplification": 5.332001716029347,
+    "output_delta": {
+      "max_component_abs": 0.0003338529863298984,
+      "max_abs_complex": 0.00033524661571528175,
+      "mean_abs_complex": 0.00003212708167487584,
+      "worst_index": 0,
+      "worst_component": "imag",
+      "pass_threshold": true,
+      "threshold": 0.01
+    },
+    "worst_output_component": "imag",
+    "worst_output_index": 0
+  },
+  "required_post_s2c_threshold": 0.0003125,
+  "current_gap_to_required_post_s2c": 0.000021352986280899543,
+  "classification": "logn13_s2c_error_dominated_by_evalmod_input_propagation",
+  "first_remaining_blocker": "first S2C group with largest propagated-input amplification",
+  "validation": {
+    "accepted_f0_guard_bits": 3,
+    "accepted_g0_guard_bits": 2,
+    "all_rounds_da_fixed": true,
+    "closure_pass": true,
+    "d0_expected_evalmod_imag_near": true,
+    "d0_expected_evalmod_real_near": true,
+    "d0_expected_post_s2c_near": true,
+    "d0_expected_public_like_near": true,
+    "linear_delta_pass": true,
+    "logn13_only": true,
+    "mirror_fidelity_pass": true,
+    "no_benchmark": true,
+    "no_candidate_retuning": true,
+    "no_exp003": true,
+    "no_gate_4_or_5": true,
+    "no_generated_power_redesign": true,
+    "no_logn16": true,
+    "no_production_integration": true,
+    "no_q_parameter_changes": true,
+    "no_s2c_production_changes": true,
+    "no_secondary_production_changes": true,
+    "primary_required_base": "30e2e602576cf2c8a3c91bbb4d8d724c78bc027d",
+    "primary_required_base_ancestor": true,
+    "secondary_clean": true,
+    "secondary_commit": "25e70430b10cd4af37ad4cf94cd994912e970e3f",
+    "secondary_exact_required_commit": true
+  }
+}
