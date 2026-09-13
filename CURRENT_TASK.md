@@ -1,4 +1,4 @@
 # Current Task
 
-Task: Implement `specs/FIX-001-P3-DIAG-LOGN13-C2S-PRECISION-BUDGET.md`
+Task: Implement `specs/FIX-001-P3-DIAG-LOGN13-C2S-GROUP0-LINEAR-ALIAS.md`
 Status: READY
