@@ -40,6 +40,7 @@ func main() {
 	fix001P3DiagLogN13C2SGroup1LinearAlias := flag.Bool("fix001-p3-diag-logn13-c2s-group1-linear-alias", false, "localize LogN13 group 1 LinearTransform q0/q1 alias")
 	fix001P3DesignLogN13C2SGroup1CompressedLinear := flag.Bool("fix001-p3-design-logn13-c2s-group1-compressed-linear", false, "validate diagnostic compressed LogN13 group 1 LinearTransform")
 	fix001P3DiagLogN13C2SFinalSplitProbeFix := flag.Bool("fix001-p3-diag-logn13-c2s-final-split-probe-fix", false, "replay LogN13 C2S final split without reapplying DFT factors")
+	fix001P3DiagLogN13EvalModMatchedNormalizedOracle := flag.Bool("fix001-p3-diag-logn13-evalmod-matched-normalized-oracle", false, "diagnose LogN13 EvalMod with matched normalized full-RNS oracle")
 	flag.Parse()
 
 	cfg, err := LoadBootstrapConfig(*configPath)
@@ -140,6 +141,9 @@ func main() {
 	if *fix001P3DiagLogN13C2SFinalSplitProbeFix {
 		selectedModes++
 	}
+	if *fix001P3DiagLogN13EvalModMatchedNormalizedOracle {
+		selectedModes++
+	}
 	if selectedModes > 1 {
 		log.Fatal("bootstrap diagnostic modes cannot be used together")
 	}
@@ -233,6 +237,10 @@ func main() {
 		}
 	} else if *fix001P3DiagLogN13C2SFinalSplitProbeFix {
 		if err := runFIX001P3DiagLogN13C2SFinalSplitProbeFix(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
+			log.Fatal(err)
+		}
+	} else if *fix001P3DiagLogN13EvalModMatchedNormalizedOracle {
+		if err := runFIX001P3DiagLogN13EvalModMatchedNormalizedOracle(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
 			log.Fatal(err)
 		}
 	} else if *finalizationDiagnostic {
