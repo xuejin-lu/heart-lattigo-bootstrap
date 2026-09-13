@@ -1,0 +1,593 @@
+{
+  "schema_version": "fix-001-p3-diag-logn13-high-precision-oracle-recovery.v1",
+  "timestamp": "2026-09-13T23:26:55.023347Z",
+  "primary_repository": {
+    "path": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap",
+    "commit": "0468dd7d216d6001e22869533193f89b021118bf",
+    "ref": "main",
+    "dirty": true
+  },
+  "lattigo_repository": {
+    "path": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/../lattigo",
+    "commit": "25e70430b10cd4af37ad4cf94cd994912e970e3f",
+    "ref": "fast-ckks",
+    "dirty": false
+  },
+  "environment": {
+    "go_version": "go1.26.4",
+    "os": "darwin",
+    "architecture": "arm64",
+    "cpu": "Apple M4",
+    "logical_cpus": 10
+  },
+  "config": {
+    "log_n": 13,
+    "log_default_scale": 45,
+    "secret_hamming": 192,
+    "q0": [
+      55
+    ],
+    "q_slots_to_coeffs": [
+      39,
+      39,
+      39
+    ],
+    "q_coeffs_to_slots": [
+      56,
+      56,
+      56,
+      56
+    ],
+    "p": [
+      61,
+      61,
+      61,
+      61,
+      61
+    ],
+    "slots_to_coeffs_dft_levels": [
+      1,
+      1,
+      1
+    ],
+    "coeffs_to_slots_dft_levels": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "log_slots": -1,
+    "mod1_log_scale": 60,
+    "mod1_degree": 30,
+    "mod1_double_angle": 3,
+    "mod1_k": 16,
+    "log_message_ratio": 10,
+    "mod1_inv_degree": 0,
+    "repetitions": 3,
+    "warmup": 1
+  },
+  "effective_parameters": {
+    "residual_log_n": 13,
+    "residual_max_level": 1,
+    "bootstrap_log_n": 13,
+    "bootstrap_max_level": 16,
+    "bootstrap_log_slots": 12,
+    "bootstrap_log_q": [
+      56,
+      39,
+      40,
+      39,
+      40,
+      60,
+      60,
+      61,
+      60,
+      60,
+      60,
+      61,
+      61,
+      57,
+      56,
+      56,
+      56
+    ],
+    "bootstrap_log_p": [
+      61,
+      61,
+      62,
+      61,
+      62
+    ],
+    "circuit_order": "ModUpThenEncode"
+  },
+  "provenance": {
+    "primary_required_base": "591c8fa5dabada8ac3e2577f5fc512a2fab85e3c",
+    "primary_required_base_ancestor": true,
+    "secondary_branch": "fast-ckks",
+    "secondary_clean": true,
+    "secondary_commit": "25e70430b10cd4af37ad4cf94cd994912e970e3f",
+    "secondary_required_commit": "25e70430b10cd4af37ad4cf94cd994912e970e3f"
+  },
+  "h0_control": {
+    "evalmod_imag_vs_standard": {
+      "max_component_abs": 0.00004647793870173522,
+      "max_abs_complex": 0.00004647793870173522,
+      "mean_abs_complex": 0.000010301514045024188,
+      "worst_index": 2323,
+      "worst_component": "real",
+      "pass_threshold": true,
+      "threshold": 0.01
+    },
+    "evalmod_real_vs_standard": {
+      "max_component_abs": 0.00006261306805777143,
+      "max_abs_complex": 0.00006261306805777143,
+      "mean_abs_complex": 0.000010352582797743931,
+      "worst_index": 2935,
+      "worst_component": "real",
+      "pass_threshold": true,
+      "threshold": 0.01
+    },
+    "exact_capacity_row_and_restore_contracts": true,
+    "executed_candidate": {
+      "all_da_rounds_local_q2": true,
+      "f0_guard_bits": 3,
+      "g0_guard_bits": 2,
+      "g0_row_valid_local_q2": true,
+      "imag_first_failure": "none",
+      "name": "G0-local-q2-2-F0-local-q2-3",
+      "real_first_failure": "none"
+    },
+    "final_metadata": {
+      "degree": 1,
+      "expected_degree": 1,
+      "expected_is_montgomery": false,
+      "expected_is_ntt": true,
+      "expected_level": 1,
+      "expected_n": 8192,
+      "expected_scale": "3.518437208883200000000000000000000000000e+13",
+      "is_montgomery": false,
+      "is_ntt": true,
+      "level": 1,
+      "log_dimensions": {
+        "Rows": 0,
+        "Cols": 12
+      },
+      "n": 8192,
+      "pass": true,
+      "present": true,
+      "scale": "3.518437208883200000000000000000000000000e+13",
+      "slots": 4096
+    },
+    "input_unchanged": true,
+    "post_s2c_vs_standard": {
+      "max_component_abs": 0.00033385298628089955,
+      "max_abs_complex": 0.0003352466156606677,
+      "mean_abs_complex": 0.00003212708167479504,
+      "worst_index": 0,
+      "worst_component": "imag",
+      "pass_threshold": true,
+      "threshold": 0.01
+    },
+    "public_like_vs_standard": {
+      "max_component_abs": 0.010683237260415292,
+      "max_abs_complex": 0.010727833615889559,
+      "mean_abs_complex": 0.0010280665817240212,
+      "worst_index": 0,
+      "worst_component": "imag",
+      "pass_threshold": false,
+      "threshold": 0.01
+    }
+  },
+  "h2_precision_sweep": [
+    {
+      "imag": {
+        "decoded_reporting_values": 4096,
+        "deterministic_materialization": true,
+        "encoder_precision_bits": 80,
+        "metadata_match": {
+          "degree": true,
+          "is_ntt": true,
+          "level": true,
+          "log_dimensions": true,
+          "logical_metadata_match_pass": true,
+          "montgomery_domain_normalized": true,
+          "n": true,
+          "oracle_is_montgomery": false,
+          "scale": true,
+          "source_is_montgomery": true
+        },
+        "metadata_match_pass": true,
+        "oracle_injection": {
+          "max_component_abs": 7.071983831567165e-10,
+          "max_abs_complex": 7.071983831567165e-10,
+          "mean_abs_complex": 1.519430360198349e-10,
+          "worst_index": 2276,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        },
+        "p_f_minus_p_o": {
+          "max_component_abs": 5.5101831986092975e-9,
+          "max_abs_complex": 5.5101831986092975e-9,
+          "mean_abs_complex": 1.2236459935317367e-9,
+          "worst_index": 2323,
+          "worst_component": "real",
+          "pass_threshold": true,
+          "threshold": 0.000001
+        },
+        "qualified_h2": false,
+        "reporting_conversion_floor": {
+          "max_component_abs": 5.5493152608309286e-17,
+          "max_abs_complex": 5.5493152608309286e-17,
+          "mean_abs_complex": 2.738278965075585e-17,
+          "worst_index": 1393,
+          "worst_component": "real",
+          "pass_threshold": true,
+          "threshold": 1e-12
+        },
+        "source_precision_bits": 80
+      },
+      "precision_bits": 80,
+      "qualified_h2_both_branches": false,
+      "real": {
+        "decoded_reporting_values": 4096,
+        "deterministic_materialization": true,
+        "encoder_precision_bits": 80,
+        "metadata_match": {
+          "degree": true,
+          "is_ntt": true,
+          "level": true,
+          "log_dimensions": true,
+          "logical_metadata_match_pass": true,
+          "montgomery_domain_normalized": true,
+          "n": true,
+          "oracle_is_montgomery": false,
+          "scale": true,
+          "source_is_montgomery": true
+        },
+        "metadata_match_pass": true,
+        "oracle_injection": {
+          "max_component_abs": 6.291604265959288e-10,
+          "max_abs_complex": 6.291604265959288e-10,
+          "mean_abs_complex": 1.5267717521605145e-10,
+          "worst_index": 3749,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        },
+        "p_f_minus_p_o": {
+          "max_component_abs": 7.45649086919542e-9,
+          "max_abs_complex": 7.45649086919542e-9,
+          "mean_abs_complex": 1.2313803121968576e-9,
+          "worst_index": 2935,
+          "worst_component": "real",
+          "pass_threshold": true,
+          "threshold": 0.000001
+        },
+        "qualified_h2": false,
+        "reporting_conversion_floor": {
+          "max_component_abs": 5.5491049088011563e-17,
+          "max_abs_complex": 5.5491049088011563e-17,
+          "mean_abs_complex": 2.786101000288352e-17,
+          "worst_index": 3647,
+          "worst_component": "real",
+          "pass_threshold": true,
+          "threshold": 1e-12
+        },
+        "source_precision_bits": 80
+      }
+    },
+    {
+      "imag": {
+        "decoded_reporting_values": 4096,
+        "deterministic_materialization": true,
+        "encoder_precision_bits": 96,
+        "metadata_match": {
+          "degree": true,
+          "is_ntt": true,
+          "level": true,
+          "log_dimensions": true,
+          "logical_metadata_match_pass": true,
+          "montgomery_domain_normalized": true,
+          "n": true,
+          "oracle_is_montgomery": false,
+          "scale": true,
+          "source_is_montgomery": true
+        },
+        "metadata_match_pass": true,
+        "oracle_injection": {
+          "max_component_abs": 7.071983831567165e-10,
+          "max_abs_complex": 7.071983831567165e-10,
+          "mean_abs_complex": 1.5194303601983506e-10,
+          "worst_index": 2276,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        },
+        "p_f_minus_p_o": {
+          "max_component_abs": 5.5101831986092975e-9,
+          "max_abs_complex": 5.5101831986092975e-9,
+          "mean_abs_complex": 1.2236459935317367e-9,
+          "worst_index": 2323,
+          "worst_component": "real",
+          "pass_threshold": true,
+          "threshold": 0.000001
+        },
+        "qualified_h2": false,
+        "reporting_conversion_floor": {
+          "max_component_abs": 5.5493153007914666e-17,
+          "max_abs_complex": 5.5493153007914666e-17,
+          "mean_abs_complex": 2.73827896491726e-17,
+          "worst_index": 1393,
+          "worst_component": "real",
+          "pass_threshold": true,
+          "threshold": 1e-12
+        },
+        "source_precision_bits": 96
+      },
+      "precision_bits": 96,
+      "qualified_h2_both_branches": false,
+      "real": {
+        "decoded_reporting_values": 4096,
+        "deterministic_materialization": true,
+        "encoder_precision_bits": 96,
+        "metadata_match": {
+          "degree": true,
+          "is_ntt": true,
+          "level": true,
+          "log_dimensions": true,
+          "logical_metadata_match_pass": true,
+          "montgomery_domain_normalized": true,
+          "n": true,
+          "oracle_is_montgomery": false,
+          "scale": true,
+          "source_is_montgomery": true
+        },
+        "metadata_match_pass": true,
+        "oracle_injection": {
+          "max_component_abs": 6.291604265959278e-10,
+          "max_abs_complex": 6.291604265959278e-10,
+          "mean_abs_complex": 1.526771752160517e-10,
+          "worst_index": 3749,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        },
+        "p_f_minus_p_o": {
+          "max_component_abs": 7.45649086919542e-9,
+          "max_abs_complex": 7.45649086919542e-9,
+          "mean_abs_complex": 1.2313803121968576e-9,
+          "worst_index": 2935,
+          "worst_component": "real",
+          "pass_threshold": true,
+          "threshold": 0.000001
+        },
+        "qualified_h2": false,
+        "reporting_conversion_floor": {
+          "max_component_abs": 5.549104870778061e-17,
+          "max_abs_complex": 5.549104870778061e-17,
+          "mean_abs_complex": 2.786100999549577e-17,
+          "worst_index": 3647,
+          "worst_component": "real",
+          "pass_threshold": true,
+          "threshold": 1e-12
+        },
+        "source_precision_bits": 96
+      }
+    },
+    {
+      "imag": {
+        "decoded_reporting_values": 4096,
+        "deterministic_materialization": true,
+        "encoder_precision_bits": 128,
+        "metadata_match": {
+          "degree": true,
+          "is_ntt": true,
+          "level": true,
+          "log_dimensions": true,
+          "logical_metadata_match_pass": true,
+          "montgomery_domain_normalized": true,
+          "n": true,
+          "oracle_is_montgomery": false,
+          "scale": true,
+          "source_is_montgomery": true
+        },
+        "metadata_match_pass": true,
+        "oracle_injection": {
+          "max_component_abs": 7.071983831567165e-10,
+          "max_abs_complex": 7.071983831567165e-10,
+          "mean_abs_complex": 1.5194303601983506e-10,
+          "worst_index": 2276,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        },
+        "p_f_minus_p_o": {
+          "max_component_abs": 5.5101831986092975e-9,
+          "max_abs_complex": 5.5101831986092975e-9,
+          "mean_abs_complex": 1.2236459935317367e-9,
+          "worst_index": 2323,
+          "worst_component": "real",
+          "pass_threshold": true,
+          "threshold": 0.000001
+        },
+        "qualified_h2": false,
+        "reporting_conversion_floor": {
+          "max_component_abs": 5.5493153007935047e-17,
+          "max_abs_complex": 5.5493153007935047e-17,
+          "mean_abs_complex": 2.73827896491728e-17,
+          "worst_index": 1393,
+          "worst_component": "real",
+          "pass_threshold": true,
+          "threshold": 1e-12
+        },
+        "source_precision_bits": 128
+      },
+      "precision_bits": 128,
+      "qualified_h2_both_branches": false,
+      "real": {
+        "decoded_reporting_values": 4096,
+        "deterministic_materialization": true,
+        "encoder_precision_bits": 128,
+        "metadata_match": {
+          "degree": true,
+          "is_ntt": true,
+          "level": true,
+          "log_dimensions": true,
+          "logical_metadata_match_pass": true,
+          "montgomery_domain_normalized": true,
+          "n": true,
+          "oracle_is_montgomery": false,
+          "scale": true,
+          "source_is_montgomery": true
+        },
+        "metadata_match_pass": true,
+        "oracle_injection": {
+          "max_component_abs": 6.291604265959278e-10,
+          "max_abs_complex": 6.291604265959278e-10,
+          "mean_abs_complex": 1.526771752160517e-10,
+          "worst_index": 3749,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        },
+        "p_f_minus_p_o": {
+          "max_component_abs": 7.45649086919542e-9,
+          "max_abs_complex": 7.45649086919542e-9,
+          "mean_abs_complex": 1.2313803121968576e-9,
+          "worst_index": 2935,
+          "worst_component": "real",
+          "pass_threshold": true,
+          "threshold": 0.000001
+        },
+        "qualified_h2": false,
+        "reporting_conversion_floor": {
+          "max_component_abs": 5.5491048707781476e-17,
+          "max_abs_complex": 5.5491048707781476e-17,
+          "mean_abs_complex": 2.7861009995496135e-17,
+          "worst_index": 3647,
+          "worst_component": "real",
+          "pass_threshold": true,
+          "threshold": 1e-12
+        },
+        "source_precision_bits": 128
+      }
+    },
+    {
+      "imag": {
+        "decoded_reporting_values": 4096,
+        "deterministic_materialization": true,
+        "encoder_precision_bits": 160,
+        "metadata_match": {
+          "degree": true,
+          "is_ntt": true,
+          "level": true,
+          "log_dimensions": true,
+          "logical_metadata_match_pass": true,
+          "montgomery_domain_normalized": true,
+          "n": true,
+          "oracle_is_montgomery": false,
+          "scale": true,
+          "source_is_montgomery": true
+        },
+        "metadata_match_pass": true,
+        "oracle_injection": {
+          "max_component_abs": 7.071983831567165e-10,
+          "max_abs_complex": 7.071983831567165e-10,
+          "mean_abs_complex": 1.5194303601983506e-10,
+          "worst_index": 2276,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        },
+        "p_f_minus_p_o": {
+          "max_component_abs": 5.5101831986092975e-9,
+          "max_abs_complex": 5.5101831986092975e-9,
+          "mean_abs_complex": 1.2236459935317367e-9,
+          "worst_index": 2323,
+          "worst_component": "real",
+          "pass_threshold": true,
+          "threshold": 0.000001
+        },
+        "qualified_h2": false,
+        "reporting_conversion_floor": {
+          "max_component_abs": 5.5493153007935047e-17,
+          "max_abs_complex": 5.5493153007935047e-17,
+          "mean_abs_complex": 2.73827896491728e-17,
+          "worst_index": 1393,
+          "worst_component": "real",
+          "pass_threshold": true,
+          "threshold": 1e-12
+        },
+        "source_precision_bits": 160
+      },
+      "precision_bits": 160,
+      "qualified_h2_both_branches": false,
+      "real": {
+        "decoded_reporting_values": 4096,
+        "deterministic_materialization": true,
+        "encoder_precision_bits": 160,
+        "metadata_match": {
+          "degree": true,
+          "is_ntt": true,
+          "level": true,
+          "log_dimensions": true,
+          "logical_metadata_match_pass": true,
+          "montgomery_domain_normalized": true,
+          "n": true,
+          "oracle_is_montgomery": false,
+          "scale": true,
+          "source_is_montgomery": true
+        },
+        "metadata_match_pass": true,
+        "oracle_injection": {
+          "max_component_abs": 6.291604265959278e-10,
+          "max_abs_complex": 6.291604265959278e-10,
+          "mean_abs_complex": 1.526771752160517e-10,
+          "worst_index": 3749,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        },
+        "p_f_minus_p_o": {
+          "max_component_abs": 7.45649086919542e-9,
+          "max_abs_complex": 7.45649086919542e-9,
+          "mean_abs_complex": 1.2313803121968576e-9,
+          "worst_index": 2935,
+          "worst_component": "real",
+          "pass_threshold": true,
+          "threshold": 0.000001
+        },
+        "qualified_h2": false,
+        "reporting_conversion_floor": {
+          "max_component_abs": 5.5491048707781476e-17,
+          "max_abs_complex": 5.5491048707781476e-17,
+          "mean_abs_complex": 2.7861009995496135e-17,
+          "worst_index": 3647,
+          "worst_component": "real",
+          "pass_threshold": true,
+          "threshold": 1e-12
+        },
+        "source_precision_bits": 160
+      }
+    }
+  ],
+  "classification": "logn13_high_precision_oracle_materialization_still_insufficient",
+  "first_remaining_blocker": "no tested precision (80/96/128/160 bits) satisfies both-branch injection, margin, metadata, and determinism gates",
+  "validation": {
+    "h0_executed_schedule_verified": true,
+    "h2_qualified": false,
+    "logn13_only": true,
+    "no_benchmark": true,
+    "no_candidate_retuning": true,
+    "no_exp003": true,
+    "no_g0_f0_da_behavior_changes": true,
+    "no_gate_4_or_5": true,
+    "no_generated_power_redesign": true,
+    "no_logn16": true,
+    "no_production_integration": true,
+    "no_q_parameter_changes": true,
+    "no_s2c_changes": true,
+    "no_secondary_production_changes": true
+  }
+}
