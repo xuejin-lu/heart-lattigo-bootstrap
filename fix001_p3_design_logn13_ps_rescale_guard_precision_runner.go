@@ -525,8 +525,21 @@ func psRescaleGuardReplayPS(params ckks.Parameters, eval *fastckks.Evaluator, pl
 	return psRescaleGuardReplayPSWithBoundaryOverride(params, eval, plan, powers, powerExpected, powerDecoded, input, candidate, guards, override, nil)
 }
 
-func psRescaleGuardReplayPSWithBoundaryOverride(params ckks.Parameters, eval *fastckks.Evaluator, plan commonpolynomial.PatersonStockmeyerPolynomial, powers map[int]*rlwe.Ciphertext, powerExpected, powerDecoded map[int][]complex128, input []complex128, candidate rlwe.Scale, guards map[string]int, override psRescaleGuardFinalOverride, boundaryOverride psRescaleGuardBoundaryOverride) (psRescaleGuardReplay, error) {
+func psRescaleGuardReplayPSWithBoundaryOverride(params ckks.Parameters, eval *fastckks.Evaluator, plan commonpolynomial.PatersonStockmeyerPolynomial, powers map[int]*rlwe.Ciphertext, powerExpected, powerDecoded map[int][]complex128, input []complex128, candidate rlwe.Scale, guards map[string]int, override psRescaleGuardFinalOverride, boundaryOverride psRescaleGuardBoundaryOverride, resets ...psGlobalReplayReset) (psRescaleGuardReplay, error) {
 	out := psRescaleGuardReplay{}
+	var resetID string
+	var resetCiphertext *rlwe.Ciphertext
+	if len(resets) > 0 {
+		resetID = resets[0].ID
+		if resets[0].Ciphertext != nil {
+			resetCiphertext = resets[0].Ciphertext.CopyNew()
+		}
+	}
+	applyReset := func(id string, current **rlwe.Ciphertext) {
+		if id == resetID && resetCiphertext != nil {
+			*current = resetCiphertext.CopyNew()
+		}
+	}
 	type node struct {
 		degree   int
 		value    *rlwe.Ciphertext
@@ -556,6 +569,7 @@ func psRescaleGuardReplayPSWithBoundaryOverride(params ckks.Parameters, eval *fa
 				return out, err
 			}
 			out.Checks = append(out.Checks, psGlobalCheckpointWithLocal(fmt.Sprintf("B%d-constant", i), "baby_constant_add", value, source, decoded, source, identity, fmt.Sprintf("Chebyshev block %d degree=%d", i, p.Degree()), nil))
+			applyReset(out.Checks[len(out.Checks)-1].ID, &value)
 		}
 		for key := p.Degree(); key > 0; key-- {
 			if (p.IsEven || p.IsOdd) && ((key&1 == 0 && !p.IsEven) || (key&1 == 1 && !p.IsOdd)) {
@@ -591,6 +605,7 @@ func psRescaleGuardReplayPSWithBoundaryOverride(params ckks.Parameters, eval *fa
 			local := append([]complex128(nil), before...)
 			psGlobalAddScaled(local, powerDecoded[key], psGlobalCoeff(p.Coeffs[key]))
 			out.Checks = append(out.Checks, psGlobalCheckpointWithLocal(fmt.Sprintf("B%d-term-%d", i, key), "baby_mul_then_add", value, source, decoded, local, identity, fmt.Sprintf("Chebyshev block %d degree=%d", i, p.Degree()), nil))
+			applyReset(out.Checks[len(out.Checks)-1].ID, &value)
 		}
 		baby[len(plan.Value)-i-1] = &node{degree: p.Degree(), value: value, source: source, identity: identity}
 	}
@@ -633,6 +648,7 @@ func psRescaleGuardReplayPSWithBoundaryOverride(params ckks.Parameters, eval *fa
 					return out, err
 				}
 				out.Checks = append(out.Checks, psGlobalCheckpointWithLocal(fmt.Sprintf("G%d-relinearize", order), "giant_relinearize", b.value, b.source, after, beforeB, b.identity, "same subtree after Fast relinearize", nil))
+				applyReset(out.Checks[len(out.Checks)-1].ID, &b.value)
 			}
 			beforeRescale, err := psGlobalDecode(params, b.value)
 			if err != nil {
@@ -683,6 +699,7 @@ func psRescaleGuardReplayPSWithBoundaryOverride(params ckks.Parameters, eval *fa
 			boundary.LevelUnchanged = boundary.OutputLevel == boundary.InputLevel-1
 			out.Boundaries = append(out.Boundaries, boundary)
 			out.Checks = append(out.Checks, psGlobalCheckpointWithLocal(id, "giant_rescale", b.value, b.source, afterRescale, beforeRescale, b.identity, "same subtree after Fast Rescale", nil))
+			applyReset(out.Checks[len(out.Checks)-1].ID, &b.value)
 			if err := eval.Mul(b.value, powers[deg], b.value); err != nil {
 				return out, err
 			}
@@ -701,6 +718,7 @@ func psRescaleGuardReplayPSWithBoundaryOverride(params ckks.Parameters, eval *fa
 			}
 			productID := hashSourceVector(fmt.Sprintf("%s*T%d", b.identity, deg))
 			out.Checks = append(out.Checks, psGlobalCheckpointWithLocal(fmt.Sprintf("G%d-multiply", order), "giant_multiply", b.value, productSource, productDecoded, localProduct, productID, fmt.Sprintf("(%s) * T%d", b.identity, deg), nil))
+			applyReset(out.Checks[len(out.Checks)-1].ID, &b.value)
 			productForAdd := productDecoded
 			parentSource := append([]complex128(nil), a.source...)
 			psGlobalAddScaled(parentSource, productSource, 1)
@@ -715,6 +733,7 @@ func psRescaleGuardReplayPSWithBoundaryOverride(params ckks.Parameters, eval *fa
 			localParent := append([]complex128(nil), aDecoded...)
 			psGlobalAddScaled(localParent, productForAdd, 1)
 			out.Checks = append(out.Checks, psGlobalCheckpointWithLocal(fmt.Sprintf("G%d-add", order), "giant_add_aligned", b.value, parentSource, parentDecoded, localParent, parentID, fmt.Sprintf("%s + (%s)", a.identity, productID), nil))
+			applyReset(out.Checks[len(out.Checks)-1].ID, &b.value)
 			b.degree = 2*deg - 1
 			b.source, b.identity = parentSource, parentID
 			baby[i] = nil
@@ -741,6 +760,12 @@ func psRescaleGuardReplayPSWithBoundaryOverride(params ckks.Parameters, eval *fa
 	}
 	rootBeforeFinal := root.value.CopyNew()
 	out.Root = psGlobalCheckpointWithDecode("F0-root", "pre_final_rescale_root", rootBeforeFinal, root.source, decoded, root.identity, "PS root before final Rescale", nil)
+	applyReset(out.Root.ID, &root.value)
+	out.Root.ciphertext = root.value.CopyNew()
+	out.Root.Level = root.value.Level()
+	out.Root.Degree = root.value.Degree()
+	out.Root.Scale = finalizationScaleString(root.value.Scale)
+	out.Root.Rows = finalizationEvidence(root.value).Rows
 	finalBefore := decoded
 	finalID := "F0-final-rescale"
 	finalBoundary := psRescaleGuardBoundary{ID: finalID, Order: len(out.Boundaries), InputLevel: root.value.Level(), InputScale: psRescaleGuardScaleString(root.value.Scale), GuardBits: guards[finalID], FirstDownstreamCheckpoint: "final_output"}
@@ -787,6 +812,7 @@ func psRescaleGuardReplayPSWithBoundaryOverride(params ckks.Parameters, eval *fa
 	finalBoundary.LevelUnchanged = finalBoundary.OutputLevel == finalBoundary.InputLevel-1
 	out.Boundaries = append(out.Boundaries, finalBoundary)
 	out.Checks = append(out.Checks, psGlobalCheckpointWithLocal(finalID, "final_rescale", root.value, root.source, finalAfter, finalBefore, root.identity, "PS final output after Rescale", nil))
+	applyReset(out.Checks[len(out.Checks)-1].ID, &root.value)
 	out.Final = root.value.CopyNew()
 	for i := range out.Boundaries {
 		boundary := &out.Boundaries[i]

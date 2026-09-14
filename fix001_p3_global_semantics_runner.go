@@ -350,10 +350,31 @@ func absInt(value int) int {
 	return value
 }
 
+// psGlobalReplayReset requests a diagnostic-only checkpoint replacement. The
+// production schedule is unchanged; the replacement is applied immediately
+// after the named checkpoint and the remaining schedule is replayed normally.
+type psGlobalReplayReset struct {
+	ID         string
+	Ciphertext *rlwe.Ciphertext
+}
+
 // psGlobalReplay executes the exact normalized PS schedule and uses source
 // polynomial values for every expected node. The decode callback is set by the
 // caller because the checkpoint constructor keeps artifacts compact.
-func psGlobalReplay(params ckks.Parameters, eval *fastckks.Evaluator, plan commonpolynomial.PatersonStockmeyerPolynomial, powers map[int]*rlwe.Ciphertext, powerExpected, powerDecoded map[int][]complex128, input []complex128, candidate rlwe.Scale) ([]PSGlobalCheckpoint, []PSGiantStepRecord, PSGlobalCheckpoint, []complex128, error) {
+func psGlobalReplay(params ckks.Parameters, eval *fastckks.Evaluator, plan commonpolynomial.PatersonStockmeyerPolynomial, powers map[int]*rlwe.Ciphertext, powerExpected, powerDecoded map[int][]complex128, input []complex128, candidate rlwe.Scale, resets ...psGlobalReplayReset) ([]PSGlobalCheckpoint, []PSGiantStepRecord, PSGlobalCheckpoint, []complex128, error) {
+	var resetID string
+	var resetCiphertext *rlwe.Ciphertext
+	if len(resets) > 0 {
+		resetID = resets[0].ID
+		if resets[0].Ciphertext != nil {
+			resetCiphertext = resets[0].Ciphertext.CopyNew()
+		}
+	}
+	applyReset := func(id string, current **rlwe.Ciphertext) {
+		if id == resetID && resetCiphertext != nil {
+			*current = resetCiphertext.CopyNew()
+		}
+	}
 	checks := []PSGlobalCheckpoint{}
 	baby := make([]*struct {
 		degree   int
@@ -384,6 +405,7 @@ func psGlobalReplay(params ckks.Parameters, eval *fastckks.Evaluator, plan commo
 				return checks, nil, PSGlobalCheckpoint{}, nil, err
 			}
 			checks = append(checks, psGlobalCheckpointWithLocal(fmt.Sprintf("B%d-constant", i), "baby_constant_add", out, source, localDecoded, source, identity, description, nil))
+			applyReset(checks[len(checks)-1].ID, &out)
 		}
 		for key := p.Degree(); key > 0; key-- {
 			if (p.IsEven || p.IsOdd) && ((key&1 == 0 && !p.IsEven) || (key&1 == 1 && !p.IsOdd)) {
@@ -407,6 +429,7 @@ func psGlobalReplay(params ckks.Parameters, eval *fastckks.Evaluator, plan commo
 			localExpected := append([]complex128(nil), before...)
 			psGlobalAddScaled(localExpected, powerDecoded[key], psGlobalCoeff(p.Coeffs[key]))
 			checks = append(checks, psGlobalCheckpointWithLocal(fmt.Sprintf("B%d-term-%d", i, key), "baby_mul_then_add", out, source, after, localExpected, identity, description, nil))
+			applyReset(checks[len(checks)-1].ID, &out)
 		}
 		baby[len(plan.Value)-i-1] = &struct {
 			degree   int
@@ -448,12 +471,14 @@ func psGlobalReplay(params ckks.Parameters, eval *fastckks.Evaluator, plan commo
 				return checks, giants, PSGlobalCheckpoint{}, nil, err
 			}
 			record.Checkpoints = append(record.Checkpoints, psGlobalCheckpointWithDecode(fmt.Sprintf("G%d-input-b", record.Round), "giant_input_b", b.value, b.source, beforeB, b.identity, "PS child branch b", nil))
+			applyReset(record.Checkpoints[len(record.Checkpoints)-1].ID, &b.value)
 			if b.value.Degree() == 2 {
 				if err := eval.Relinearize(b.value, b.value); err != nil {
 					return checks, giants, PSGlobalCheckpoint{}, nil, err
 				}
 				after, _ := psGlobalDecode(params, b.value)
 				record.Checkpoints = append(record.Checkpoints, psGlobalCheckpointWithLocal(fmt.Sprintf("G%d-relinearize", record.Round), "giant_relinearize", b.value, b.source, after, beforeB, b.identity, "same subtree after Fast relinearize", nil))
+				applyReset(record.Checkpoints[len(record.Checkpoints)-1].ID, &b.value)
 			}
 			beforeRescale, _ := psGlobalDecode(params, b.value)
 			if err := eval.Rescale(b.value, b.value); err != nil {
@@ -461,6 +486,7 @@ func psGlobalReplay(params ckks.Parameters, eval *fastckks.Evaluator, plan commo
 			}
 			afterRescale, _ := psGlobalDecode(params, b.value)
 			record.Checkpoints = append(record.Checkpoints, psGlobalCheckpointWithLocal(fmt.Sprintf("G%d-rescale", record.Round), "giant_rescale", b.value, b.source, afterRescale, beforeRescale, b.identity, "same subtree after Fast Rescale", nil))
+			applyReset(record.Checkpoints[len(record.Checkpoints)-1].ID, &b.value)
 			if err := eval.Mul(b.value, powers[deg], b.value); err != nil {
 				return checks, giants, PSGlobalCheckpoint{}, nil, err
 			}
@@ -476,6 +502,7 @@ func psGlobalReplay(params ckks.Parameters, eval *fastckks.Evaluator, plan commo
 				localProduct[k] = afterRescale[k] * powerDecoded[deg][k]
 			}
 			record.Checkpoints = append(record.Checkpoints, psGlobalCheckpointWithLocal(fmt.Sprintf("G%d-multiply", record.Round), "giant_multiply", b.value, productSource, productDecoded, localProduct, productID, fmt.Sprintf("(%s) * T%d", b.identity, deg), nil))
+			applyReset(record.Checkpoints[len(record.Checkpoints)-1].ID, &b.value)
 			productForAdd := productDecoded
 			if !a.value.Scale.InDelta(b.value.Scale, float64(rlwe.ScalePrecision-12)) {
 				logDelta := psGlobalLog2Delta(a.value.Scale, b.value.Scale)
@@ -490,6 +517,7 @@ func psGlobalReplay(params ckks.Parameters, eval *fastckks.Evaluator, plan commo
 				cp.BeforeNormalization = beforeMetric
 				cp.AfterNormalization = cp.SourceBacked
 				record.Checkpoints = append(record.Checkpoints, cp)
+				applyReset(cp.ID, &b.value)
 				productForAdd = normalizedDecoded
 			}
 			parentSource := make([]complex128, len(input))
@@ -505,6 +533,7 @@ func psGlobalReplay(params ckks.Parameters, eval *fastckks.Evaluator, plan commo
 			parent := psGlobalCheckpointWithLocal(fmt.Sprintf("G%d-add", record.Round), "giant_add_aligned", b.value, parentSource, parentDecoded, localParent, parentID, fmt.Sprintf("%s + (%s)", a.identity, productID), nil)
 			record.Final = parent
 			record.Checkpoints = append(record.Checkpoints, parent)
+			applyReset(parent.ID, &b.value)
 			giants = append(giants, record)
 			b.degree = 2*deg - 1
 			b.source, b.identity = parentSource, parentID
@@ -530,6 +559,12 @@ func psGlobalReplay(params ckks.Parameters, eval *fastckks.Evaluator, plan commo
 		return checks, giants, PSGlobalCheckpoint{}, nil, err
 	}
 	rootCP := psGlobalCheckpointWithDecode("F0-root", "pre_final_rescale_root", root.value, root.source, decoded, root.identity, "PS root before final Rescale", nil)
+	applyReset(rootCP.ID, &root.value)
+	rootCP.ciphertext = root.value.CopyNew()
+	rootCP.Level = root.value.Level()
+	rootCP.Degree = root.value.Degree()
+	rootCP.Scale = finalizationScaleString(root.value.Scale)
+	rootCP.Rows = finalizationEvidence(root.value).Rows
 	return checks, giants, rootCP, root.source, nil
 }
 
@@ -546,7 +581,8 @@ func hashSourceVector(label string) string {
 }
 func psGlobalCheckpointWithLocal(id, op string, ct *rlwe.Ciphertext, source, actual, localExpected []complex128, identity, description string, previous *PSGlobalMetric) PSGlobalCheckpoint {
 	metric := psGlobalMetric(source, actual)
-	cp := PSGlobalCheckpoint{ID: id, Operation: op, Level: ct.Level(), Degree: ct.Degree(), Scale: finalizationScaleString(ct.Scale), SourceBacked: metric, ExpectedSubtree: description, ExpectedSubtreeHash: identity, Rows: finalizationEvidence(ct).Rows, actual: actual, expected: source, ciphertext: ct}
+	snapshot := ct.CopyNew()
+	cp := PSGlobalCheckpoint{ID: id, Operation: op, Level: snapshot.Level(), Degree: snapshot.Degree(), Scale: finalizationScaleString(snapshot.Scale), SourceBacked: metric, ExpectedSubtree: description, ExpectedSubtreeHash: identity, Rows: finalizationEvidence(snapshot).Rows, actual: actual, expected: source, ciphertext: snapshot}
 	if localExpected != nil {
 		cp.LocalConsistency = psGlobalMetric(localExpected, actual)
 	}
