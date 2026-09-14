@@ -69,6 +69,21 @@ type psRescaleGuardReplay struct {
 	Boundaries []psRescaleGuardBoundary
 	Alignments []psRescaleGuardAlignment
 	FirstError string
+	G0Merge    *psRescaleGuardG0MergeSnapshot
+}
+
+type psRescaleGuardG0MergeSnapshot struct {
+	A               *rlwe.Ciphertext
+	BRaw            *rlwe.Ciphertext
+	Product         *rlwe.Ciphertext
+	Output          *rlwe.Ciphertext
+	AExpected       []complex128
+	ProductExpected []complex128
+}
+
+type psRescaleGuardG0MergeOverride struct {
+	A       *rlwe.Ciphertext
+	Product *rlwe.Ciphertext
 }
 
 type psRescaleGuardBranchRun struct {
@@ -525,14 +540,26 @@ func psRescaleGuardReplayPS(params ckks.Parameters, eval *fastckks.Evaluator, pl
 	return psRescaleGuardReplayPSWithBoundaryOverride(params, eval, plan, powers, powerExpected, powerDecoded, input, candidate, guards, override, nil)
 }
 
-func psRescaleGuardReplayPSWithBoundaryOverride(params ckks.Parameters, eval *fastckks.Evaluator, plan commonpolynomial.PatersonStockmeyerPolynomial, powers map[int]*rlwe.Ciphertext, powerExpected, powerDecoded map[int][]complex128, input []complex128, candidate rlwe.Scale, guards map[string]int, override psRescaleGuardFinalOverride, boundaryOverride psRescaleGuardBoundaryOverride, resets ...psGlobalReplayReset) (psRescaleGuardReplay, error) {
+func psRescaleGuardReplayPSWithBoundaryOverride(params ckks.Parameters, eval *fastckks.Evaluator, plan commonpolynomial.PatersonStockmeyerPolynomial, powers map[int]*rlwe.Ciphertext, powerExpected, powerDecoded map[int][]complex128, input []complex128, candidate rlwe.Scale, guards map[string]int, override psRescaleGuardFinalOverride, boundaryOverride psRescaleGuardBoundaryOverride, extras ...interface{}) (psRescaleGuardReplay, error) {
 	out := psRescaleGuardReplay{}
+	var mergeOverride *psRescaleGuardG0MergeOverride
+	var reset psGlobalReplayReset
+	for _, extra := range extras {
+		switch value := extra.(type) {
+		case psGlobalReplayReset:
+			reset = value
+		case psRescaleGuardG0MergeOverride:
+			mergeOverride = &value
+		case *psRescaleGuardG0MergeOverride:
+			mergeOverride = value
+		}
+	}
 	var resetID string
 	var resetCiphertext *rlwe.Ciphertext
-	if len(resets) > 0 {
-		resetID = resets[0].ID
-		if resets[0].Ciphertext != nil {
-			resetCiphertext = resets[0].Ciphertext.CopyNew()
+	if reset.ID != "" {
+		resetID = reset.ID
+		if reset.Ciphertext != nil {
+			resetCiphertext = reset.Ciphertext.CopyNew()
 		}
 	}
 	applyReset := func(id string, current **rlwe.Ciphertext) {
@@ -629,6 +656,9 @@ func psRescaleGuardReplayPSWithBoundaryOverride(params ckks.Parameters, eval *fa
 				continue
 			}
 			a, b := baby[i], baby[i+1]
+			if order == 0 && out.G0Merge == nil {
+				out.G0Merge = &psRescaleGuardG0MergeSnapshot{A: a.value.CopyNew(), AExpected: append([]complex128(nil), a.source...)}
+			}
 			deg := 1 << bitLen(uint64(a.degree))
 			aDecoded, err := psGlobalDecode(params, a.value)
 			if err != nil {
@@ -686,6 +716,9 @@ func psRescaleGuardReplayPSWithBoundaryOverride(params ckks.Parameters, eval *fa
 					return out, err
 				}
 			}
+			if order == 0 && out.G0Merge != nil {
+				out.G0Merge.BRaw = b.value.CopyNew()
+			}
 			afterRescale, err := psGlobalDecode(params, b.value)
 			if err != nil {
 				return out, err
@@ -717,14 +750,29 @@ func psRescaleGuardReplayPSWithBoundaryOverride(params ckks.Parameters, eval *fa
 				localProduct[k] = afterRescale[k] * powerValues[k]
 			}
 			productID := hashSourceVector(fmt.Sprintf("%s*T%d", b.identity, deg))
+			if order == 0 && out.G0Merge != nil {
+				out.G0Merge.Product = b.value.CopyNew()
+				out.G0Merge.ProductExpected = append([]complex128(nil), productSource...)
+			}
 			out.Checks = append(out.Checks, psGlobalCheckpointWithLocal(fmt.Sprintf("G%d-multiply", order), "giant_multiply", b.value, productSource, productDecoded, localProduct, productID, fmt.Sprintf("(%s) * T%d", b.identity, deg), nil))
 			applyReset(out.Checks[len(out.Checks)-1].ID, &b.value)
 			productForAdd := productDecoded
 			parentSource := append([]complex128(nil), a.source...)
 			psGlobalAddScaled(parentSource, productSource, 1)
 			parentID := hashSourceVector(fmt.Sprintf("%s+%s", a.identity, productID))
+			if order == 0 && mergeOverride != nil {
+				if mergeOverride.A != nil {
+					a.value = mergeOverride.A.CopyNew()
+				}
+				if mergeOverride.Product != nil {
+					b.value = mergeOverride.Product.CopyNew()
+				}
+			}
 			if err := psRescaleGuardAddAligned(params, eval, a.value, b.value, fmt.Sprintf("G%d-add", order), &out.Alignments); err != nil {
 				return out, err
+			}
+			if order == 0 && out.G0Merge != nil {
+				out.G0Merge.Output = b.value.CopyNew()
 			}
 			parentDecoded, err := psGlobalDecode(params, b.value)
 			if err != nil {

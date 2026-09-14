@@ -62,6 +62,7 @@ func main() {
 	fix001P3DiagLogN13HighPrecisionOracleRecovery := flag.Bool("fix001-p3-diag-logn13-high-precision-oracle-recovery", false, "recover LogN13 high-precision EvalMod oracle")
 	fix001P3DiagLogN13QuantizationAwareEvalModDecomposition := flag.Bool("fix001-p3-diag-logn13-quantization-aware-evalmod-decomposition", false, "decompose LogN13 EvalMod with canonical CKKS quantization")
 	fix001P3DiagLogN13PSResidualLocalization := flag.Bool("fix001-p3-diag-logn13-ps-residual-localization", false, "localize LogN13 PS residual with checkpoint resets")
+	fix001P3DiagLogN13G0MergeAttribution := flag.Bool("fix001-p3-diag-logn13-g0-merge-attribution", false, "attribute LogN13 G0 merge residual")
 	flag.Parse()
 
 	cfg, err := LoadBootstrapConfig(*configPath)
@@ -226,6 +227,9 @@ func main() {
 		selectedModes++
 	}
 	if *fix001P3DiagLogN13PSResidualLocalization {
+		selectedModes++
+	}
+	if *fix001P3DiagLogN13G0MergeAttribution {
 		selectedModes++
 	}
 	if selectedModes > 1 {
@@ -409,6 +413,10 @@ func main() {
 		}
 	} else if *fix001P3DiagLogN13PSResidualLocalization {
 		if err := runFIX001P3DiagLogN13PSResidualLocalization(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
+			log.Fatal(err)
+		}
+	} else if *fix001P3DiagLogN13G0MergeAttribution {
+		if err := runFIX001P3DiagLogN13G0MergeAttribution(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
 			log.Fatal(err)
 		}
 	} else if *finalizationDiagnostic {
