@@ -1,0 +1,213 @@
+{
+  "schema_version": "fix-001-p3-integrate-logn13-b4-t2-one-bit-scalar-guard.v1",
+  "timestamp": "2026-09-14T08:44:13.124427Z",
+  "primary_repository": {
+    "path": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap",
+    "commit": "8d45696441b33264af337e3db592d3584efeea97",
+    "ref": "main",
+    "dirty": true
+  },
+  "lattigo_repository": {
+    "path": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/../lattigo",
+    "commit": "d074ce8b1703a73b06e1f2ee2fe9912056f54f02",
+    "ref": "fast-ckks",
+    "dirty": false
+  },
+  "environment": {
+    "go_version": "go1.26.4",
+    "os": "darwin",
+    "architecture": "arm64",
+    "cpu": "Apple M4",
+    "logical_cpus": 10
+  },
+  "config": {
+    "log_n": 13,
+    "log_default_scale": 45,
+    "secret_hamming": 192,
+    "q0": [
+      55
+    ],
+    "q_slots_to_coeffs": [
+      39,
+      39,
+      39
+    ],
+    "q_coeffs_to_slots": [
+      56,
+      56,
+      56,
+      56
+    ],
+    "p": [
+      61,
+      61,
+      61,
+      61,
+      61
+    ],
+    "slots_to_coeffs_dft_levels": [
+      1,
+      1,
+      1
+    ],
+    "coeffs_to_slots_dft_levels": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "log_slots": -1,
+    "mod1_log_scale": 60,
+    "mod1_degree": 30,
+    "mod1_double_angle": 3,
+    "mod1_k": 16,
+    "log_message_ratio": 10,
+    "mod1_inv_degree": 0,
+    "repetitions": 3,
+    "warmup": 1
+  },
+  "effective_parameters": {
+    "residual_log_n": 13,
+    "residual_max_level": 1,
+    "bootstrap_log_n": 13,
+    "bootstrap_max_level": 16,
+    "bootstrap_log_slots": 12,
+    "bootstrap_log_q": [
+      55,
+      39,
+      40,
+      39,
+      40,
+      60,
+      60,
+      61,
+      60,
+      60,
+      60,
+      61,
+      61,
+      56,
+      57,
+      56,
+      56
+    ],
+    "bootstrap_log_p": [
+      61,
+      61,
+      62,
+      61,
+      62
+    ],
+    "circuit_order": "ModUpThenEncode"
+  },
+  "workload": {
+    "identifier": "reproducibleInput.v1",
+    "formula": "real=((i%7)-3)/16; imag=((i%5)-2)/32; value=real+imag*i",
+    "logical_slots": 4096
+  },
+  "classification": "logn13_b4_t2_guard_production_numeric_mismatch",
+  "first_failing_checkpoint": "evalmod_or_post_s2c_or_feasibility",
+  "production_final_metadata": {
+    "contraction_completed": true,
+    "final_degree": 1,
+    "final_is_montgomery": false,
+    "final_is_ntt": true,
+    "final_level": 1,
+    "final_scale": "3.518437208883200000000000000000000000000e+13",
+    "pass": true
+  },
+  "evalmod_real_vs_standard": {
+    "max_component_abs": 0.14599917654176742,
+    "max_abs_complex": 0.14599917654176742,
+    "mean_abs_complex": 0.045305209589183146,
+    "worst_index": 2504,
+    "worst_component": "real",
+    "pass_threshold": false,
+    "threshold": 0.01
+  },
+  "evalmod_imag_vs_standard": {
+    "max_component_abs": 0.14191998291737334,
+    "max_abs_complex": 0.14191998291737334,
+    "mean_abs_complex": 0.045674934949620036,
+    "worst_index": 3058,
+    "worst_component": "real",
+    "pass_threshold": false,
+    "threshold": 0.01
+  },
+  "post_s2c_vs_standard": {
+    "max_component_abs": 0.246273249184149,
+    "max_abs_complex": 0.2575591999302311,
+    "mean_abs_complex": 0.14188544549626494,
+    "worst_index": 321,
+    "worst_component": "real",
+    "pass_threshold": false,
+    "threshold": 0.01
+  },
+  "public_like": {
+    "max_component_abs": 0.24627324978649642,
+    "max_abs_complex": 0.25755920065880034,
+    "mean_abs_complex": 0.14188544549833113,
+    "worst_index": 321,
+    "worst_component": "real",
+    "pass_threshold": false,
+    "threshold": 0.01
+  },
+  "standard_like": {
+    "max_component_abs": 5.754406148805735e-8,
+    "max_abs_complex": 5.7544940345432415e-8,
+    "mean_abs_complex": 6.047820833839128e-10,
+    "worst_index": 0,
+    "worst_component": "imag",
+    "pass_threshold": true,
+    "threshold": 0.01
+  },
+  "final_vs_standard": {
+    "max_component_abs": 0.246273249184149,
+    "max_abs_complex": 0.2575591999302311,
+    "mean_abs_complex": 0.14188544549626494,
+    "worst_index": 321,
+    "worst_component": "real",
+    "pass_threshold": false,
+    "threshold": 0.01
+  },
+  "public_like_threshold": 0.01,
+  "public_like_margin": -0.23627324978649641,
+  "feasibility_guarded_public_like_reference": 0.005554220603853743,
+  "production_vs_feasibility_difference": 0.24071902918264268,
+  "guard_structural_selection": {
+    "final_parent_selected": true,
+    "pass": true,
+    "plan_count": 5,
+    "plan_index": 4,
+    "plan_scale_override": true,
+    "scalar_degree": 2,
+    "selected_operations": 1
+  },
+  "guard_contraction_metadata": {
+    "contraction_completed": true,
+    "final_degree": 1,
+    "final_is_montgomery": false,
+    "final_is_ntt": true,
+    "final_level": 1,
+    "final_scale": "3.518437208883200000000000000000000000000e+13",
+    "pass": true
+  },
+  "validation": {
+    "classification_pass": false,
+    "compact_artifact": true,
+    "fast_input_unchanged": true,
+    "input_unchanged": true,
+    "logn13_only": true,
+    "no_benchmark": true,
+    "no_diagnostic_injection": true,
+    "no_exp003": true,
+    "no_gate_4_or_5": true,
+    "no_later_bootstrap_stage": true,
+    "no_logn16": true,
+    "no_nan_or_inf": true,
+    "ordinary_fast_bootstrap_path": true,
+    "ordinary_fast_public_bootstrap_metadata": true,
+    "secondary_clean": true,
+    "secondary_commit": "d074ce8b1703a73b06e1f2ee2fe9912056f54f02"
+  }
+}
