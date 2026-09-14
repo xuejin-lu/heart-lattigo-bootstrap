@@ -74,6 +74,7 @@ func main() {
 	fix001P3DesignLogN13Q055Plan92T2LocalQ2Guard := flag.Bool("fix001-p3-design-logn13-q055-plan92-t2-local-q2-guard-feasibility", false, "evaluate q0=55 plan92 final-parent T2 temporary-q2 guard feasibility")
 	fix001P3DiagLogN13Q055Plan92PSFirstDivergence := flag.Bool("fix001-p3-diag-logn13-q055-plan92-ps-first-divergence", false, "localize the first LogN13 q0=55 plan92 PS divergence")
 	fix001P3DiagLogN13Q055Plan92PSDependencyWindowClosure := flag.Bool("fix001-p3-diag-logn13-q055-plan92-ps-dependency-window-closure", false, "close the LogN13 q0=55 plan92 PS dependency q012 window")
+	fix001P3DiagLogN13Q012G0F0SourceFaithfulClosure := flag.Bool("fix001-p3-diag-logn13-q012-g0-f0-source-faithful-closure", false, "close LogN13 q012 G0-F0 source-faithful dependency path")
 	flag.Parse()
 
 	cfg, err := LoadBootstrapConfig(*configPath)
@@ -505,6 +506,10 @@ func main() {
 		}
 	} else if *fix001P3DiagLogN13Q055Plan92PSDependencyWindowClosure {
 		if err := runFIX001P3DiagLogN13Q055Plan92PSDependencyWindowClosure(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
+			log.Fatal(err)
+		}
+	} else if *fix001P3DiagLogN13Q012G0F0SourceFaithfulClosure {
+		if err := runFIX001P3DiagLogN13Q012G0F0SourceFaithfulClosure(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
 			log.Fatal(err)
 		}
 	} else if *finalizationDiagnostic {
