@@ -1,4 +1,4 @@
 # Current Task
 
-Task: Implement `specs/FIX-001-P3-DIAG-LOGN13-B4-BABY-STEP-ATTRIBUTION.md`
+Task: Implement `specs/FIX-001-P3-DESIGN-LOGN13-B4-T2-LOCAL-SCALAR-GUARD-FEASIBILITY.md`
 Status: READY
