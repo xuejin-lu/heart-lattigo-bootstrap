@@ -1,0 +1,2387 @@
+{
+  "schema_version": "fix-001-p3-diag-logn13-b4-baby-step-attribution.v1",
+  "timestamp": "2026-09-14T04:07:38.131294Z",
+  "primary_repository": {
+    "path": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap",
+    "commit": "688652f507d47c838494d37424cc2eb1f0d538a8",
+    "ref": "main",
+    "dirty": true
+  },
+  "lattigo_repository": {
+    "path": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/../lattigo",
+    "commit": "25e70430b10cd4af37ad4cf94cd994912e970e3f",
+    "ref": "fast-ckks",
+    "dirty": false
+  },
+  "environment": {
+    "go_version": "go1.26.4",
+    "os": "darwin",
+    "architecture": "arm64",
+    "cpu": "Apple M4",
+    "logical_cpus": 10
+  },
+  "config": {
+    "log_n": 13,
+    "log_default_scale": 45,
+    "secret_hamming": 192,
+    "q0": [
+      55
+    ],
+    "q_slots_to_coeffs": [
+      39,
+      39,
+      39
+    ],
+    "q_coeffs_to_slots": [
+      56,
+      56,
+      56,
+      56
+    ],
+    "p": [
+      61,
+      61,
+      61,
+      61,
+      61
+    ],
+    "slots_to_coeffs_dft_levels": [
+      1,
+      1,
+      1
+    ],
+    "coeffs_to_slots_dft_levels": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "log_slots": -1,
+    "mod1_log_scale": 60,
+    "mod1_degree": 30,
+    "mod1_double_angle": 3,
+    "mod1_k": 16,
+    "log_message_ratio": 10,
+    "mod1_inv_degree": 0,
+    "repetitions": 3,
+    "warmup": 1
+  },
+  "effective_parameters": {
+    "residual_log_n": 13,
+    "residual_max_level": 1,
+    "bootstrap_log_n": 13,
+    "bootstrap_max_level": 16,
+    "bootstrap_log_slots": 12,
+    "bootstrap_log_q": [
+      56,
+      39,
+      40,
+      39,
+      40,
+      60,
+      60,
+      61,
+      60,
+      60,
+      60,
+      61,
+      61,
+      57,
+      56,
+      56,
+      56
+    ],
+    "bootstrap_log_p": [
+      61,
+      61,
+      62,
+      61,
+      62
+    ],
+    "circuit_order": "ModUpThenEncode"
+  },
+  "provenance": {
+    "primary_base_ancestor": true,
+    "primary_required_base": "33ff9bd8392685e31433a4956ea36309de4fd9de",
+    "secondary_branch": "fast-ckks",
+    "secondary_clean": true,
+    "secondary_commit": "25e70430b10cd4af37ad4cf94cd994912e970e3f",
+    "secondary_required_commit": "25e70430b10cd4af37ad4cf94cd994912e970e3f"
+  },
+  "m0_controls": {
+    "accepted_candidate": {
+      "capacity_safe": true,
+      "final_imag_vs_standard": 5.5101834206539024e-9,
+      "final_max_error": 7.45649086919542e-9,
+      "final_real_vs_standard": 7.45648909283858e-9,
+      "first_failure": "G0-add",
+      "name": "G0-local-q2-2-F0-local-q2-3",
+      "rows_match": true
+    },
+    "actual_public_like": {
+      "max_component_abs": 0.010683237260415292,
+      "max_abs_complex": 0.010727833615889559,
+      "mean_abs_complex": 0.0010280665817240212,
+      "worst_index": 0,
+      "worst_component": "imag",
+      "pass_threshold": false,
+      "threshold": 0.01
+    },
+    "g0_branch_cases": {
+      "C00": {
+        "pass": false,
+        "post_s2c": {
+          "max_component_abs": 0.00033385298628089955,
+          "max_abs_complex": 0.0003352466156606677,
+          "mean_abs_complex": 0.00003212708167479504,
+          "worst_index": 0,
+          "worst_component": "imag",
+          "pass_threshold": true,
+          "threshold": 0.01
+        },
+        "public_like": {
+          "max_component_abs": 0.010683237260415292,
+          "max_abs_complex": 0.010727833615889559,
+          "mean_abs_complex": 0.0010280665817240212,
+          "worst_index": 0,
+          "worst_component": "imag",
+          "pass_threshold": false,
+          "threshold": 0.01
+        }
+      },
+      "CA": {
+        "pass": true,
+        "post_s2c": {
+          "max_component_abs": 0.00010109744993419827,
+          "max_abs_complex": 0.00010329257080301273,
+          "mean_abs_complex": 0.00003198952177319024,
+          "worst_index": 2534,
+          "worst_component": "imag",
+          "pass_threshold": true,
+          "threshold": 0.01
+        },
+        "public_like": {
+          "max_component_abs": 0.0032351181652570046,
+          "max_abs_complex": 0.0033053618670669293,
+          "mean_abs_complex": 0.0010236646715444774,
+          "worst_index": 2534,
+          "worst_component": "imag",
+          "pass_threshold": true,
+          "threshold": 0.01
+        }
+      },
+      "CAP": {
+        "pass": true,
+        "post_s2c": {
+          "max_component_abs": 0.00016432073289428923,
+          "max_abs_complex": 0.00016433213083931868,
+          "mean_abs_complex": 0.000005014025784402059,
+          "worst_index": 0,
+          "worst_component": "imag",
+          "pass_threshold": true,
+          "threshold": 0.01
+        },
+        "public_like": {
+          "max_component_abs": 0.005258205152043761,
+          "max_abs_complex": 0.00525856988683252,
+          "mean_abs_complex": 0.0001604487993441504,
+          "worst_index": 0,
+          "worst_component": "imag",
+          "pass_threshold": true,
+          "threshold": 0.01
+        }
+      },
+      "CP": {
+        "pass": false,
+        "post_s2c": {
+          "max_component_abs": 0.00041445766821384105,
+          "max_abs_complex": 0.0004144583819209669,
+          "mean_abs_complex": 0.000005189705772377435,
+          "worst_index": 0,
+          "worst_component": "imag",
+          "pass_threshold": true,
+          "threshold": 0.01
+        },
+        "public_like": {
+          "max_component_abs": 0.01326258708226942,
+          "max_abs_complex": 0.013262609920446993,
+          "mean_abs_complex": 0.00016607055099197225,
+          "worst_index": 0,
+          "worst_component": "imag",
+          "pass_threshold": false,
+          "threshold": 0.01
+        }
+      }
+    },
+    "g0_parent_residual_max": 1.800410931451779e-10,
+    "required_g0_parent_residual": 1.800410931451779e-10,
+    "smallest_passing_parent_alpha": 0.07421875
+  },
+  "b4_parent_identity": {
+    "imag": {
+      "actual_b4_to_a_f_exact": true,
+      "canonical_b4_to_a_q_exact": true,
+      "actual_b4_state": {
+        "q0_q1_state_hash": "3d133433b5962f95a614f8813e71f5bdb3d1807c4786283f567b71ecd99896c2",
+        "level": 8,
+        "scale": "4.9517601571415210995964968960000000000000e+27",
+        "degree": 1,
+        "is_ntt": true,
+        "is_montgomery": true,
+        "decoded_max_abs": 1.0507924550936778,
+        "q01_capacity": {
+          "max_abs_exact_coefficient": "5203271725897595445569204608",
+          "q01_half": "19807037677037493296585048064",
+          "max_abs_over_q01_half": 0.2626981283490869,
+          "outside_count": 0,
+          "pass_unique_centered_reconstruction": true
+        }
+      },
+      "a_f_state": {
+        "q0_q1_state_hash": "3d133433b5962f95a614f8813e71f5bdb3d1807c4786283f567b71ecd99896c2",
+        "level": 8,
+        "scale": "4.9517601571415210995964968960000000000000e+27",
+        "degree": 1,
+        "is_ntt": true,
+        "is_montgomery": true,
+        "decoded_max_abs": 1.0507924550936778,
+        "q01_capacity": {
+          "max_abs_exact_coefficient": "5203271725897595445569204608",
+          "q01_half": "19807037677037493296585048064",
+          "max_abs_over_q01_half": 0.2626981283490869,
+          "outside_count": 0,
+          "pass_unique_centered_reconstruction": true
+        }
+      },
+      "canonical_b4_state": {
+        "q0_q1_state_hash": "1476613783583314af775a96a45dff38b54337bab39ac4d002a0248ef909cd41",
+        "level": 8,
+        "scale": "4.9517601571415210995964968960000000000000e+27",
+        "degree": 1,
+        "is_ntt": true,
+        "is_montgomery": true,
+        "decoded_max_abs": 1.0507924552737178,
+        "q01_capacity": {
+          "max_abs_exact_coefficient": "5203271726789111611507343360",
+          "q01_half": "19807037677037493296585048064",
+          "max_abs_over_q01_half": 0.26269812839409695,
+          "outside_count": 0,
+          "pass_unique_centered_reconstruction": true
+        }
+      },
+      "a_q_state": {
+        "q0_q1_state_hash": "1476613783583314af775a96a45dff38b54337bab39ac4d002a0248ef909cd41",
+        "level": 8,
+        "scale": "4.9517601571415210995964968960000000000000e+27",
+        "degree": 1,
+        "is_ntt": true,
+        "is_montgomery": true,
+        "decoded_max_abs": 1.0507924552737178,
+        "q01_capacity": {
+          "max_abs_exact_coefficient": "5203271726789111611507343360",
+          "q01_half": "19807037677037493296585048064",
+          "max_abs_over_q01_half": 0.26269812839409695,
+          "outside_count": 0,
+          "pass_unique_centered_reconstruction": true
+        }
+      },
+      "actual_g0_parent_vs_canonical": {
+        "max_component_abs": 1.800410931451779e-10,
+        "max_abs_complex": 1.800410931451779e-10,
+        "mean_abs_complex": 1.8004029430501722e-10,
+        "worst_index": 723,
+        "worst_component": "real",
+        "pass_threshold": false,
+        "threshold": 1e-10
+      },
+      "identity_valid": true
+    },
+    "real": {
+      "actual_b4_to_a_f_exact": true,
+      "canonical_b4_to_a_q_exact": true,
+      "actual_b4_state": {
+        "q0_q1_state_hash": "180ac2c2552a089e09f896356d09cc0c1da375cb57507dcf5cece9db3522e26c",
+        "level": 8,
+        "scale": "4.9517601571415210995964968960000000000000e+27",
+        "degree": 1,
+        "is_ntt": true,
+        "is_montgomery": true,
+        "decoded_max_abs": 1.0507924577416123,
+        "q01_capacity": {
+          "max_abs_exact_coefficient": "5203271714656320640840744576",
+          "q01_half": "19807037677037493296585048064",
+          "max_abs_over_q01_half": 0.2626981277815475,
+          "outside_count": 0,
+          "pass_unique_centered_reconstruction": true
+        }
+      },
+      "a_f_state": {
+        "q0_q1_state_hash": "180ac2c2552a089e09f896356d09cc0c1da375cb57507dcf5cece9db3522e26c",
+        "level": 8,
+        "scale": "4.9517601571415210995964968960000000000000e+27",
+        "degree": 1,
+        "is_ntt": true,
+        "is_montgomery": true,
+        "decoded_max_abs": 1.0507924577416123,
+        "q01_capacity": {
+          "max_abs_exact_coefficient": "5203271714656320640840744576",
+          "q01_half": "19807037677037493296585048064",
+          "max_abs_over_q01_half": 0.2626981277815475,
+          "outside_count": 0,
+          "pass_unique_centered_reconstruction": true
+        }
+      },
+      "canonical_b4_state": {
+        "q0_q1_state_hash": "d97533a21ac9f6b238bf5404327b90a27e796dce1e7a0234a795746c8c243f56",
+        "level": 8,
+        "scale": "4.9517601571415210995964968960000000000000e+27",
+        "degree": 1,
+        "is_ntt": true,
+        "is_montgomery": true,
+        "decoded_max_abs": 1.0507924579216532,
+        "q01_capacity": {
+          "max_abs_exact_coefficient": "5203271715547837188064411648",
+          "q01_half": "19807037677037493296585048064",
+          "max_abs_over_q01_half": 0.26269812782655755,
+          "outside_count": 0,
+          "pass_unique_centered_reconstruction": true
+        }
+      },
+      "a_q_state": {
+        "q0_q1_state_hash": "d97533a21ac9f6b238bf5404327b90a27e796dce1e7a0234a795746c8c243f56",
+        "level": 8,
+        "scale": "4.9517601571415210995964968960000000000000e+27",
+        "degree": 1,
+        "is_ntt": true,
+        "is_montgomery": true,
+        "decoded_max_abs": 1.0507924579216532,
+        "q01_capacity": {
+          "max_abs_exact_coefficient": "5203271715547837188064411648",
+          "q01_half": "19807037677037493296585048064",
+          "max_abs_over_q01_half": 0.26269812782655755,
+          "outside_count": 0,
+          "pass_unique_centered_reconstruction": true
+        }
+      },
+      "actual_g0_parent_vs_canonical": {
+        "max_component_abs": 1.800410931451779e-10,
+        "max_abs_complex": 1.800410931451779e-10,
+        "mean_abs_complex": 1.8004039882210665e-10,
+        "worst_index": 13,
+        "worst_component": "real",
+        "pass_threshold": false,
+        "threshold": 1e-10
+      },
+      "identity_valid": true
+    }
+  },
+  "b4_operation_schedule": {
+    "imag": [
+      {
+        "id": "B4-constant",
+        "kind": "constant_add",
+        "coefficient_degree": 0,
+        "coefficient_real": "1.2517128878960144620558358087321440690178e-01",
+        "coefficient_imag": "0.0000000000000000000000000000000000000000e+00",
+        "coefficient_is_integer": false,
+        "input_power_level": 12,
+        "input_power_scale": "1.1529215046068469760000000000000000000000e+18",
+        "accumulator_scale_before": "4.9517601571415210995964968960000000000000e+27",
+        "accumulator_scale_after": "4.9517601571415210995964968960000000000000e+27",
+        "scalar_encoding_scale": "4.9517601571415210995964968960000000000000e+27",
+        "rounded_integer_real": "619818200646403575657802668",
+        "rounded_integer_imag": "0",
+        "effective_coefficient_real": "1.2517128878960144620558358079815204829404e-01",
+        "effective_coefficient_imag": "0.0000000000000000000000000000000000000000e+00",
+        "quantization_error_real": "-7.5062358607740357652124478363354409928959e-29",
+        "quantization_error_imag": "0.0000000000000000000000000000000000000000e+00",
+        "quantization_error_sign": "real_negative",
+        "accumulator_promotion": false,
+        "promotion_factor_exact": true,
+        "scalar_q01_capacity_ratio": 0.0312928268604732,
+        "scalar_centered_unique": true,
+        "source_function": "fastPolynomialWorkspace.evaluateBabyStep",
+        "source_scalar_path": "schemes/ckks/fast/evaluator_ntt.go:MulThenAdd -\u003e scalarNTT",
+        "source_scale_path": "schemes/ckks/fast/evaluator_ntt.go:coefficientScale / scale promotion"
+      },
+      {
+        "id": "B4-term-6",
+        "kind": "scalar_mul_then_add",
+        "coefficient_degree": 6,
+        "coefficient_real": "7.3690796162134775661873233021223526130411e-01",
+        "coefficient_imag": "0.0000000000000000000000000000000000000000e+00",
+        "coefficient_is_integer": false,
+        "input_power_level": 9,
+        "input_power_scale": "1.1529215046071091190000000596041900289207e+18",
+        "accumulator_scale_before": "4.9517601571415210995964968960000000000000e+27",
+        "accumulator_scale_after": "4.9517601571415210995964968960000000000000e+27",
+        "scalar_encoding_scale": "4.2949672959990234412252902984619140625000e+09",
+        "rounded_integer_real": "3164995595",
+        "rounded_integer_imag": "0",
+        "effective_coefficient_real": "7.3690796154567963302508016879697341563144e-01",
+        "effective_coefficient_imag": "0.0000000000000000000000000000000000000000e+00",
+        "quantization_error_real": "-7.5668123593652161415261845672665651538839e-11",
+        "quantization_error_imag": "0.0000000000000000000000000000000000000000e+00",
+        "quantization_error_sign": "real_negative",
+        "accumulator_promotion": false,
+        "promotion_factor_exact": true,
+        "scalar_q01_capacity_ratio": 1.597914663770854e-19,
+        "scalar_centered_unique": true,
+        "source_function": "fastPolynomialWorkspace.evaluateBabyStep",
+        "source_scalar_path": "schemes/ckks/fast/evaluator_ntt.go:MulThenAdd -\u003e scalarNTT",
+        "source_scale_path": "schemes/ckks/fast/evaluator_ntt.go:coefficientScale / scale promotion"
+      },
+      {
+        "id": "B4-term-4",
+        "kind": "scalar_mul_then_add",
+        "coefficient_degree": 4,
+        "coefficient_real": "-1.1266534911439013357972524857738583229577e-02",
+        "coefficient_imag": "0.0000000000000000000000000000000000000000e+00",
+        "coefficient_is_integer": false,
+        "input_power_level": 10,
+        "input_power_scale": "1.1529215046057492450000006970987556135842e+18",
+        "accumulator_scale_before": "4.9517601571415210995964968960000000000000e+27",
+        "accumulator_scale_after": "4.9517601571415210995964968960000000000000e+27",
+        "scalar_encoding_scale": "4.2949672960040893666446221920986343909163e+09",
+        "rounded_integer_real": "-48389399",
+        "rounded_integer_imag": "0",
+        "effective_coefficient_real": "-1.1266534915183188162724808452691548051518e-02",
+        "effective_coefficient_imag": "0.0000000000000000000000000000000000000000e+00",
+        "quantization_error_real": "-3.7441748047522835949529648219412779073080e-12",
+        "quantization_error_imag": "0.0000000000000000000000000000000000000000e+00",
+        "quantization_error_sign": "real_negative",
+        "accumulator_promotion": false,
+        "promotion_factor_exact": true,
+        "scalar_q01_capacity_ratio": 2.443040690334948e-21,
+        "scalar_centered_unique": true,
+        "source_function": "fastPolynomialWorkspace.evaluateBabyStep",
+        "source_scalar_path": "schemes/ckks/fast/evaluator_ntt.go:MulThenAdd -\u003e scalarNTT",
+        "source_scale_path": "schemes/ckks/fast/evaluator_ntt.go:coefficientScale / scale promotion"
+      },
+      {
+        "id": "B4-term-2",
+        "kind": "scalar_mul_then_add",
+        "coefficient_degree": 2,
+        "coefficient_real": "4.3125798028553236964268325201266479780445e-01",
+        "coefficient_imag": "0.0000000000000000000000000000000000000000e+00",
+        "coefficient_is_integer": false,
+        "input_power_level": 11,
+        "input_power_scale": "1.1529215046064701430000001231680641930406e+18",
+        "accumulator_scale_before": "4.9517601571415210995964968960000000000000e+27",
+        "accumulator_scale_after": "4.9517601571415210995964968960000000000000e+27",
+        "scalar_encoding_scale": "4.2949672960014038123190402984619140625000e+09",
+        "rounded_integer_real": "1852238921",
+        "rounded_integer_imag": "0",
+        "effective_coefficient_real": "4.3125798017703802202240168982894724684902e-01",
+        "effective_coefficient_imag": "0.0000000000000000000000000000000000000000e+00",
+        "quantization_error_real": "-1.0849434762028156218371755095542912663319e-10",
+        "quantization_error_imag": "0.0000000000000000000000000000000000000000e+00",
+        "quantization_error_sign": "real_negative",
+        "accumulator_promotion": false,
+        "promotion_factor_exact": true,
+        "scalar_q01_capacity_ratio": 9.351418173689446e-20,
+        "scalar_centered_unique": true,
+        "source_function": "fastPolynomialWorkspace.evaluateBabyStep",
+        "source_scalar_path": "schemes/ckks/fast/evaluator_ntt.go:MulThenAdd -\u003e scalarNTT",
+        "source_scale_path": "schemes/ckks/fast/evaluator_ntt.go:coefficientScale / scale promotion"
+      }
+    ],
+    "real": [
+      {
+        "id": "B4-constant",
+        "kind": "constant_add",
+        "coefficient_degree": 0,
+        "coefficient_real": "1.2517128878960144620558358087321440690178e-01",
+        "coefficient_imag": "0.0000000000000000000000000000000000000000e+00",
+        "coefficient_is_integer": false,
+        "input_power_level": 12,
+        "input_power_scale": "1.1529215046068469760000000000000000000000e+18",
+        "accumulator_scale_before": "4.9517601571415210995964968960000000000000e+27",
+        "accumulator_scale_after": "4.9517601571415210995964968960000000000000e+27",
+        "scalar_encoding_scale": "4.9517601571415210995964968960000000000000e+27",
+        "rounded_integer_real": "619818200646403575657802668",
+        "rounded_integer_imag": "0",
+        "effective_coefficient_real": "1.2517128878960144620558358079815204829404e-01",
+        "effective_coefficient_imag": "0.0000000000000000000000000000000000000000e+00",
+        "quantization_error_real": "-7.5062358607740357652124478363354409928959e-29",
+        "quantization_error_imag": "0.0000000000000000000000000000000000000000e+00",
+        "quantization_error_sign": "real_negative",
+        "accumulator_promotion": false,
+        "promotion_factor_exact": true,
+        "scalar_q01_capacity_ratio": 0.0312928268604732,
+        "scalar_centered_unique": true,
+        "source_function": "fastPolynomialWorkspace.evaluateBabyStep",
+        "source_scalar_path": "schemes/ckks/fast/evaluator_ntt.go:MulThenAdd -\u003e scalarNTT",
+        "source_scale_path": "schemes/ckks/fast/evaluator_ntt.go:coefficientScale / scale promotion"
+      },
+      {
+        "id": "B4-term-6",
+        "kind": "scalar_mul_then_add",
+        "coefficient_degree": 6,
+        "coefficient_real": "7.3690796162134775661873233021223526130411e-01",
+        "coefficient_imag": "0.0000000000000000000000000000000000000000e+00",
+        "coefficient_is_integer": false,
+        "input_power_level": 9,
+        "input_power_scale": "1.1529215046071091190000000596041900289207e+18",
+        "accumulator_scale_before": "4.9517601571415210995964968960000000000000e+27",
+        "accumulator_scale_after": "4.9517601571415210995964968960000000000000e+27",
+        "scalar_encoding_scale": "4.2949672959990234412252902984619140625000e+09",
+        "rounded_integer_real": "3164995595",
+        "rounded_integer_imag": "0",
+        "effective_coefficient_real": "7.3690796154567963302508016879697341563144e-01",
+        "effective_coefficient_imag": "0.0000000000000000000000000000000000000000e+00",
+        "quantization_error_real": "-7.5668123593652161415261845672665651538839e-11",
+        "quantization_error_imag": "0.0000000000000000000000000000000000000000e+00",
+        "quantization_error_sign": "real_negative",
+        "accumulator_promotion": false,
+        "promotion_factor_exact": true,
+        "scalar_q01_capacity_ratio": 1.597914663770854e-19,
+        "scalar_centered_unique": true,
+        "source_function": "fastPolynomialWorkspace.evaluateBabyStep",
+        "source_scalar_path": "schemes/ckks/fast/evaluator_ntt.go:MulThenAdd -\u003e scalarNTT",
+        "source_scale_path": "schemes/ckks/fast/evaluator_ntt.go:coefficientScale / scale promotion"
+      },
+      {
+        "id": "B4-term-4",
+        "kind": "scalar_mul_then_add",
+        "coefficient_degree": 4,
+        "coefficient_real": "-1.1266534911439013357972524857738583229577e-02",
+        "coefficient_imag": "0.0000000000000000000000000000000000000000e+00",
+        "coefficient_is_integer": false,
+        "input_power_level": 10,
+        "input_power_scale": "1.1529215046057492450000006970987556135842e+18",
+        "accumulator_scale_before": "4.9517601571415210995964968960000000000000e+27",
+        "accumulator_scale_after": "4.9517601571415210995964968960000000000000e+27",
+        "scalar_encoding_scale": "4.2949672960040893666446221920986343909163e+09",
+        "rounded_integer_real": "-48389399",
+        "rounded_integer_imag": "0",
+        "effective_coefficient_real": "-1.1266534915183188162724808452691548051518e-02",
+        "effective_coefficient_imag": "0.0000000000000000000000000000000000000000e+00",
+        "quantization_error_real": "-3.7441748047522835949529648219412779073080e-12",
+        "quantization_error_imag": "0.0000000000000000000000000000000000000000e+00",
+        "quantization_error_sign": "real_negative",
+        "accumulator_promotion": false,
+        "promotion_factor_exact": true,
+        "scalar_q01_capacity_ratio": 2.443040690334948e-21,
+        "scalar_centered_unique": true,
+        "source_function": "fastPolynomialWorkspace.evaluateBabyStep",
+        "source_scalar_path": "schemes/ckks/fast/evaluator_ntt.go:MulThenAdd -\u003e scalarNTT",
+        "source_scale_path": "schemes/ckks/fast/evaluator_ntt.go:coefficientScale / scale promotion"
+      },
+      {
+        "id": "B4-term-2",
+        "kind": "scalar_mul_then_add",
+        "coefficient_degree": 2,
+        "coefficient_real": "4.3125798028553236964268325201266479780445e-01",
+        "coefficient_imag": "0.0000000000000000000000000000000000000000e+00",
+        "coefficient_is_integer": false,
+        "input_power_level": 11,
+        "input_power_scale": "1.1529215046064701430000001231680641930406e+18",
+        "accumulator_scale_before": "4.9517601571415210995964968960000000000000e+27",
+        "accumulator_scale_after": "4.9517601571415210995964968960000000000000e+27",
+        "scalar_encoding_scale": "4.2949672960014038123190402984619140625000e+09",
+        "rounded_integer_real": "1852238921",
+        "rounded_integer_imag": "0",
+        "effective_coefficient_real": "4.3125798017703802202240168982894724684902e-01",
+        "effective_coefficient_imag": "0.0000000000000000000000000000000000000000e+00",
+        "quantization_error_real": "-1.0849434762028156218371755095542912663319e-10",
+        "quantization_error_imag": "0.0000000000000000000000000000000000000000e+00",
+        "quantization_error_sign": "real_negative",
+        "accumulator_promotion": false,
+        "promotion_factor_exact": true,
+        "scalar_q01_capacity_ratio": 9.351418173689446e-20,
+        "scalar_centered_unique": true,
+        "source_function": "fastPolynomialWorkspace.evaluateBabyStep",
+        "source_scalar_path": "schemes/ckks/fast/evaluator_ntt.go:MulThenAdd -\u003e scalarNTT",
+        "source_scale_path": "schemes/ckks/fast/evaluator_ntt.go:coefficientScale / scale promotion"
+      }
+    ]
+  },
+  "execution_mode_comparison": {
+    "imag": {
+      "f_current_fast": {
+        "mode": "current Fast B4",
+        "available": true,
+        "state": {
+          "q0_q1_state_hash": "3d133433b5962f95a614f8813e71f5bdb3d1807c4786283f567b71ecd99896c2",
+          "level": 8,
+          "scale": "4.9517601571415210995964968960000000000000e+27",
+          "degree": 1,
+          "is_ntt": true,
+          "is_montgomery": true,
+          "decoded_max_abs": 1.0507924550936778,
+          "q01_capacity": {
+            "max_abs_exact_coefficient": "5203271725897595445569204608",
+            "q01_half": "19807037677037493296585048064",
+            "max_abs_over_q01_half": 0.2626981283490869,
+            "outside_count": 0,
+            "pass_unique_centered_reconstruction": true
+          }
+        },
+        "values_vs_q": {
+          "max_component_abs": 1.800410931451779e-10,
+          "max_abs_complex": 1.800410931451779e-10,
+          "mean_abs_complex": 1.8004029430501722e-10,
+          "worst_index": 723,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        }
+      },
+      "n_full_rns_fast_schedule": {
+        "mode": "full-RNS mirror of Fast scalar schedule",
+        "available": true,
+        "state": {
+          "q0_q1_state_hash": "80fc54e10f9d6d1b452640bac9703e2738e4b83aad22ad6f02b888d5e7ce509b",
+          "level": 8,
+          "scale": "4.9517601571415210995964968960000000000000e+27",
+          "degree": 1,
+          "is_ntt": true,
+          "is_montgomery": true,
+          "decoded_max_abs": 1.0507924550936778,
+          "q01_capacity": {
+            "max_abs_exact_coefficient": "5203271725897595509976925652",
+            "q01_half": "19807037677037493296585048064",
+            "max_abs_over_q01_half": 0.2626981283490869,
+            "outside_count": 0,
+            "pass_unique_centered_reconstruction": true
+          }
+        },
+        "values_vs_q": {
+          "max_component_abs": 1.800410931451779e-10,
+          "max_abs_complex": 1.800410931451779e-10,
+          "mean_abs_complex": 1.8004029430501722e-10,
+          "worst_index": 723,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        }
+      },
+      "s_standard_scalar_semantics": {
+        "mode": "genuine Standard scalar semantics",
+        "available": true,
+        "state": {
+          "q0_q1_state_hash": "b7683d297e0b607e4354ce18943458559e2286ec190f8ff8b83d8936d5221aac",
+          "level": 8,
+          "scale": "4.9517601571415210995964968960000000000000e+27",
+          "degree": 1,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "decoded_max_abs": 1.0507924550936778,
+          "q01_capacity": {
+            "max_abs_exact_coefficient": "5203271725897595445569204608",
+            "q01_half": "19807037677037493296585048064",
+            "max_abs_over_q01_half": 0.2626981283490869,
+            "outside_count": 0,
+            "pass_unique_centered_reconstruction": true
+          }
+        },
+        "values_vs_q": {
+          "max_component_abs": 1.800410931451779e-10,
+          "max_abs_complex": 1.800410931451779e-10,
+          "mean_abs_complex": 1.8004029430501722e-10,
+          "worst_index": 723,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        }
+      },
+      "q_canonical_checkpoint": {
+        "mode": "canonical B4 checkpoint",
+        "available": true,
+        "state": {
+          "q0_q1_state_hash": "1476613783583314af775a96a45dff38b54337bab39ac4d002a0248ef909cd41",
+          "level": 8,
+          "scale": "4.9517601571415210995964968960000000000000e+27",
+          "degree": 1,
+          "is_ntt": true,
+          "is_montgomery": true,
+          "decoded_max_abs": 1.0507924552737178,
+          "q01_capacity": {
+            "max_abs_exact_coefficient": "5203271726789111611507343360",
+            "q01_half": "19807037677037493296585048064",
+            "max_abs_over_q01_half": 0.26269812839409695,
+            "outside_count": 0,
+            "pass_unique_centered_reconstruction": true
+          }
+        },
+        "values_vs_q": {
+          "max_component_abs": 0,
+          "max_abs_complex": 0,
+          "mean_abs_complex": 0,
+          "worst_index": -1,
+          "worst_component": "",
+          "pass_threshold": true,
+          "threshold": 1e-10
+        }
+      },
+      "f_minus_n": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 1e-10
+      },
+      "n_minus_q": {
+        "max_component_abs": 1.800410931451779e-10,
+        "max_abs_complex": 1.800410931451779e-10,
+        "mean_abs_complex": 1.8004029430501722e-10,
+        "worst_index": 723,
+        "worst_component": "real",
+        "pass_threshold": false,
+        "threshold": 1e-10
+      },
+      "s_minus_q": {
+        "max_component_abs": 1.800410931451779e-10,
+        "max_abs_complex": 1.800410931451779e-10,
+        "mean_abs_complex": 1.8004029430501722e-10,
+        "worst_index": 723,
+        "worst_component": "real",
+        "pass_threshold": false,
+        "threshold": 1e-10
+      },
+      "f_minus_q": {
+        "max_component_abs": 1.800410931451779e-10,
+        "max_abs_complex": 1.800410931451779e-10,
+        "mean_abs_complex": 1.8004029430501722e-10,
+        "worst_index": 723,
+        "worst_component": "real",
+        "pass_threshold": false,
+        "threshold": 1e-10
+      },
+      "f_n_q01_rows_equal": false,
+      "f_capacity": {
+        "max_abs_exact_coefficient": "5203271725897595445569204608",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 0.2626981283490869,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "n_capacity": {
+        "max_abs_exact_coefficient": "5203271725897595509976925652",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 0.2626981283490869,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      }
+    },
+    "real": {
+      "f_current_fast": {
+        "mode": "current Fast B4",
+        "available": true,
+        "state": {
+          "q0_q1_state_hash": "180ac2c2552a089e09f896356d09cc0c1da375cb57507dcf5cece9db3522e26c",
+          "level": 8,
+          "scale": "4.9517601571415210995964968960000000000000e+27",
+          "degree": 1,
+          "is_ntt": true,
+          "is_montgomery": true,
+          "decoded_max_abs": 1.0507924577416123,
+          "q01_capacity": {
+            "max_abs_exact_coefficient": "5203271714656320640840744576",
+            "q01_half": "19807037677037493296585048064",
+            "max_abs_over_q01_half": 0.2626981277815475,
+            "outside_count": 0,
+            "pass_unique_centered_reconstruction": true
+          }
+        },
+        "values_vs_q": {
+          "max_component_abs": 1.800410931451779e-10,
+          "max_abs_complex": 1.800410931451779e-10,
+          "mean_abs_complex": 1.8004039882210665e-10,
+          "worst_index": 13,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        }
+      },
+      "n_full_rns_fast_schedule": {
+        "mode": "full-RNS mirror of Fast scalar schedule",
+        "available": true,
+        "state": {
+          "q0_q1_state_hash": "dca6827bf0d2784f357a29944ba5cdf9229b6c62edffe58e41b447f6e64e18a4",
+          "level": 8,
+          "scale": "4.9517601571415210995964968960000000000000e+27",
+          "degree": 1,
+          "is_ntt": true,
+          "is_montgomery": true,
+          "decoded_max_abs": 1.0507924577416123,
+          "q01_capacity": {
+            "max_abs_exact_coefficient": "5203271714656320705248465620",
+            "q01_half": "19807037677037493296585048064",
+            "max_abs_over_q01_half": 0.2626981277815475,
+            "outside_count": 0,
+            "pass_unique_centered_reconstruction": true
+          }
+        },
+        "values_vs_q": {
+          "max_component_abs": 1.800410931451779e-10,
+          "max_abs_complex": 1.800410931451779e-10,
+          "mean_abs_complex": 1.8004039882210665e-10,
+          "worst_index": 13,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        }
+      },
+      "s_standard_scalar_semantics": {
+        "mode": "genuine Standard scalar semantics",
+        "available": true,
+        "state": {
+          "q0_q1_state_hash": "fa660b2e1cf5e1e2dbfb383840b03a41f705b4b2b5b95fba7f95e05ef369c83d",
+          "level": 8,
+          "scale": "4.9517601571415210995964968960000000000000e+27",
+          "degree": 1,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "decoded_max_abs": 1.0507924577416123,
+          "q01_capacity": {
+            "max_abs_exact_coefficient": "5203271714656320640840744576",
+            "q01_half": "19807037677037493296585048064",
+            "max_abs_over_q01_half": 0.2626981277815475,
+            "outside_count": 0,
+            "pass_unique_centered_reconstruction": true
+          }
+        },
+        "values_vs_q": {
+          "max_component_abs": 1.800410931451779e-10,
+          "max_abs_complex": 1.800410931451779e-10,
+          "mean_abs_complex": 1.8004039882210665e-10,
+          "worst_index": 13,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        }
+      },
+      "q_canonical_checkpoint": {
+        "mode": "canonical B4 checkpoint",
+        "available": true,
+        "state": {
+          "q0_q1_state_hash": "d97533a21ac9f6b238bf5404327b90a27e796dce1e7a0234a795746c8c243f56",
+          "level": 8,
+          "scale": "4.9517601571415210995964968960000000000000e+27",
+          "degree": 1,
+          "is_ntt": true,
+          "is_montgomery": true,
+          "decoded_max_abs": 1.0507924579216532,
+          "q01_capacity": {
+            "max_abs_exact_coefficient": "5203271715547837188064411648",
+            "q01_half": "19807037677037493296585048064",
+            "max_abs_over_q01_half": 0.26269812782655755,
+            "outside_count": 0,
+            "pass_unique_centered_reconstruction": true
+          }
+        },
+        "values_vs_q": {
+          "max_component_abs": 0,
+          "max_abs_complex": 0,
+          "mean_abs_complex": 0,
+          "worst_index": -1,
+          "worst_component": "",
+          "pass_threshold": true,
+          "threshold": 1e-10
+        }
+      },
+      "f_minus_n": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 1e-10
+      },
+      "n_minus_q": {
+        "max_component_abs": 1.800410931451779e-10,
+        "max_abs_complex": 1.800410931451779e-10,
+        "mean_abs_complex": 1.8004039882210665e-10,
+        "worst_index": 13,
+        "worst_component": "real",
+        "pass_threshold": false,
+        "threshold": 1e-10
+      },
+      "s_minus_q": {
+        "max_component_abs": 1.800410931451779e-10,
+        "max_abs_complex": 1.800410931451779e-10,
+        "mean_abs_complex": 1.8004039882210665e-10,
+        "worst_index": 13,
+        "worst_component": "real",
+        "pass_threshold": false,
+        "threshold": 1e-10
+      },
+      "f_minus_q": {
+        "max_component_abs": 1.800410931451779e-10,
+        "max_abs_complex": 1.800410931451779e-10,
+        "mean_abs_complex": 1.8004039882210665e-10,
+        "worst_index": 13,
+        "worst_component": "real",
+        "pass_threshold": false,
+        "threshold": 1e-10
+      },
+      "f_n_q01_rows_equal": false,
+      "f_capacity": {
+        "max_abs_exact_coefficient": "5203271714656320640840744576",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 0.2626981277815475,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "n_capacity": {
+        "max_abs_exact_coefficient": "5203271714656320705248465620",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 0.2626981277815475,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      }
+    }
+  },
+  "operation_reset_downstream": {
+    "imag": [
+      {
+        "id": "B4-constant",
+        "coefficient_degree": 0,
+        "completed_b4_f_minus_q": {
+          "max_component_abs": 1.175963746531214,
+          "max_abs_complex": 1.175963746531214,
+          "mean_abs_complex": 1.1759636444679562,
+          "worst_index": 2317,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        },
+        "final_ps_minus_q": {
+          "max_component_abs": 1.175963746453299,
+          "max_abs_complex": 1.175963746453299,
+          "mean_abs_complex": 1.1759636443982409,
+          "worst_index": 2317,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        },
+        "downstream": {
+          "evalmod_real": {
+            "max_component_abs": 82.93419800826152,
+            "max_abs_complex": 82.93419800826152,
+            "mean_abs_complex": 82.92981774979627,
+            "worst_index": 2317,
+            "worst_component": "real",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "evalmod_imag": {
+            "max_component_abs": 82.934087554133,
+            "max_abs_complex": 82.934087554133,
+            "mean_abs_complex": 82.9299140942016,
+            "worst_index": 2727,
+            "worst_component": "real",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "public_like": {
+            "max_component_abs": 432494.9299011583,
+            "max_abs_complex": 432494.9378107085,
+            "mean_abs_complex": 555.5522436035483,
+            "worst_index": 0,
+            "worst_component": "imag",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "post_s2c": {
+            "max_component_abs": 13515.466559409375,
+            "max_abs_complex": 13515.466806582817,
+            "mean_abs_complex": 17.361007612608482,
+            "worst_index": 0,
+            "worst_component": "imag",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "metadata_correct": true,
+          "contracts_pass": true,
+          "pass": false
+        },
+        "pass": false
+      },
+      {
+        "id": "B4-term-6",
+        "coefficient_degree": 6,
+        "completed_b4_f_minus_q": {
+          "max_component_abs": 0.4422919471542919,
+          "max_abs_complex": 0.4422919471542919,
+          "mean_abs_complex": 0.44229194030724406,
+          "worst_index": 2317,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        },
+        "final_ps_minus_q": {
+          "max_component_abs": 0.4422919506695716,
+          "max_abs_complex": 0.4422919506695716,
+          "mean_abs_complex": 0.4422919402355942,
+          "worst_index": 3495,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        },
+        "downstream": {
+          "evalmod_real": {
+            "max_component_abs": 152.32315541288605,
+            "max_abs_complex": 152.32315541288605,
+            "mean_abs_complex": 152.31963258111267,
+            "worst_index": 2317,
+            "worst_component": "real",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "evalmod_imag": {
+            "max_component_abs": 152.32306422543095,
+            "max_abs_complex": 152.32306422543095,
+            "mean_abs_complex": 152.3197100904509,
+            "worst_index": 2727,
+            "worst_component": "real",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "public_like": {
+            "max_component_abs": 265283.6341704887,
+            "max_abs_complex": 265283.63908065757,
+            "mean_abs_complex": 340.76306220662536,
+            "worst_index": 0,
+            "worst_component": "imag",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "post_s2c": {
+            "max_component_abs": 8290.113567829594,
+            "max_abs_complex": 8290.113721272372,
+            "mean_abs_complex": 10.648845693959547,
+            "worst_index": 0,
+            "worst_component": "imag",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "metadata_correct": true,
+          "contracts_pass": true,
+          "pass": false
+        },
+        "pass": false
+      },
+      {
+        "id": "B4-term-4",
+        "coefficient_degree": 4,
+        "completed_b4_f_minus_q": {
+          "max_component_abs": 0.431047411172236,
+          "max_abs_complex": 0.431047411172236,
+          "mean_abs_complex": 0.4310474049727164,
+          "worst_index": 2317,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        },
+        "final_ps_minus_q": {
+          "max_component_abs": 0.4310474149390987,
+          "max_abs_complex": 0.4310474149390987,
+          "mean_abs_complex": 0.4310474049021882,
+          "worst_index": 3495,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        },
+        "downstream": {
+          "evalmod_real": {
+            "max_component_abs": 143.87297942059953,
+            "max_abs_complex": 143.87297942059953,
+            "mean_abs_complex": 143.86955219381898,
+            "worst_index": 2317,
+            "worst_component": "real",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "evalmod_imag": {
+            "max_component_abs": 143.87289028745175,
+            "max_abs_complex": 143.87289028745175,
+            "mean_abs_complex": 143.86962759464228,
+            "worst_index": 2727,
+            "worst_component": "real",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "public_like": {
+            "max_component_abs": 309352.4068068656,
+            "max_abs_complex": 309352.4125262637,
+            "mean_abs_complex": 397.3705831713155,
+            "worst_index": 0,
+            "worst_component": "imag",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "post_s2c": {
+            "max_component_abs": 9667.262712716372,
+            "max_abs_complex": 9667.262891447563,
+            "mean_abs_complex": 12.417830724106095,
+            "worst_index": 0,
+            "worst_component": "imag",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "metadata_correct": true,
+          "contracts_pass": true,
+          "pass": false
+        },
+        "pass": false
+      },
+      {
+        "id": "B4-term-2",
+        "coefficient_degree": 2,
+        "completed_b4_f_minus_q": {
+          "max_component_abs": 1.8004153723438776e-10,
+          "max_abs_complex": 1.8004153723438776e-10,
+          "mean_abs_complex": 1.8004031598906067e-10,
+          "worst_index": 1519,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        },
+        "final_ps_minus_q": {
+          "max_component_abs": 7.2505653703203166e-9,
+          "max_abs_complex": 7.2505653703203166e-9,
+          "mean_abs_complex": 1.2204777851467516e-9,
+          "worst_index": 2935,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        },
+        "downstream": {
+          "evalmod_real": {
+            "max_component_abs": 0.00006108569903540205,
+            "max_abs_complex": 0.00006108569903540205,
+            "mean_abs_complex": 0.000010211407687882007,
+            "worst_index": 2935,
+            "worst_component": "real",
+            "pass_threshold": true,
+            "threshold": 0.01
+          },
+          "evalmod_imag": {
+            "max_component_abs": 0.000047945703079329215,
+            "max_abs_complex": 0.000047945703079329215,
+            "mean_abs_complex": 0.00001015768243672585,
+            "worst_index": 2323,
+            "worst_component": "real",
+            "pass_threshold": true,
+            "threshold": 0.01
+          },
+          "public_like": {
+            "max_component_abs": 0.0032351181652570046,
+            "max_abs_complex": 0.0033053618670669293,
+            "mean_abs_complex": 0.0010236646715444774,
+            "worst_index": 2534,
+            "worst_component": "imag",
+            "pass_threshold": true,
+            "threshold": 0.01
+          },
+          "post_s2c": {
+            "max_component_abs": 0.00010109744993419827,
+            "max_abs_complex": 0.00010329257080301273,
+            "mean_abs_complex": 0.00003198952177319024,
+            "worst_index": 2534,
+            "worst_component": "imag",
+            "pass_threshold": true,
+            "threshold": 0.01
+          },
+          "metadata_correct": true,
+          "contracts_pass": true,
+          "pass": true
+        },
+        "pass": true
+      }
+    ],
+    "real": [
+      {
+        "id": "B4-constant",
+        "coefficient_degree": 0,
+        "completed_b4_f_minus_q": {
+          "max_component_abs": 1.175963746531214,
+          "max_abs_complex": 1.175963746531214,
+          "mean_abs_complex": 1.1759636444679562,
+          "worst_index": 2317,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        },
+        "final_ps_minus_q": {
+          "max_component_abs": 1.175963746453299,
+          "max_abs_complex": 1.175963746453299,
+          "mean_abs_complex": 1.1759636443982409,
+          "worst_index": 2317,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        },
+        "downstream": {
+          "evalmod_real": {
+            "max_component_abs": 82.93419800826152,
+            "max_abs_complex": 82.93419800826152,
+            "mean_abs_complex": 82.92981774979627,
+            "worst_index": 2317,
+            "worst_component": "real",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "evalmod_imag": {
+            "max_component_abs": 82.934087554133,
+            "max_abs_complex": 82.934087554133,
+            "mean_abs_complex": 82.9299140942016,
+            "worst_index": 2727,
+            "worst_component": "real",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "public_like": {
+            "max_component_abs": 432494.9299011583,
+            "max_abs_complex": 432494.9378107085,
+            "mean_abs_complex": 555.5522436035483,
+            "worst_index": 0,
+            "worst_component": "imag",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "post_s2c": {
+            "max_component_abs": 13515.466559409375,
+            "max_abs_complex": 13515.466806582817,
+            "mean_abs_complex": 17.361007612608482,
+            "worst_index": 0,
+            "worst_component": "imag",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "metadata_correct": true,
+          "contracts_pass": true,
+          "pass": false
+        },
+        "pass": false
+      },
+      {
+        "id": "B4-term-6",
+        "coefficient_degree": 6,
+        "completed_b4_f_minus_q": {
+          "max_component_abs": 0.4422919471542919,
+          "max_abs_complex": 0.4422919471542919,
+          "mean_abs_complex": 0.44229194030724406,
+          "worst_index": 2317,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        },
+        "final_ps_minus_q": {
+          "max_component_abs": 0.4422919506695716,
+          "max_abs_complex": 0.4422919506695716,
+          "mean_abs_complex": 0.4422919402355942,
+          "worst_index": 3495,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        },
+        "downstream": {
+          "evalmod_real": {
+            "max_component_abs": 152.32315541288605,
+            "max_abs_complex": 152.32315541288605,
+            "mean_abs_complex": 152.31963258111267,
+            "worst_index": 2317,
+            "worst_component": "real",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "evalmod_imag": {
+            "max_component_abs": 152.32306422543095,
+            "max_abs_complex": 152.32306422543095,
+            "mean_abs_complex": 152.3197100904509,
+            "worst_index": 2727,
+            "worst_component": "real",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "public_like": {
+            "max_component_abs": 265283.6341704887,
+            "max_abs_complex": 265283.63908065757,
+            "mean_abs_complex": 340.76306220662536,
+            "worst_index": 0,
+            "worst_component": "imag",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "post_s2c": {
+            "max_component_abs": 8290.113567829594,
+            "max_abs_complex": 8290.113721272372,
+            "mean_abs_complex": 10.648845693959547,
+            "worst_index": 0,
+            "worst_component": "imag",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "metadata_correct": true,
+          "contracts_pass": true,
+          "pass": false
+        },
+        "pass": false
+      },
+      {
+        "id": "B4-term-4",
+        "coefficient_degree": 4,
+        "completed_b4_f_minus_q": {
+          "max_component_abs": 0.431047411172236,
+          "max_abs_complex": 0.431047411172236,
+          "mean_abs_complex": 0.4310474049727164,
+          "worst_index": 2317,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        },
+        "final_ps_minus_q": {
+          "max_component_abs": 0.4310474149390987,
+          "max_abs_complex": 0.4310474149390987,
+          "mean_abs_complex": 0.4310474049021882,
+          "worst_index": 3495,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        },
+        "downstream": {
+          "evalmod_real": {
+            "max_component_abs": 143.87297942059953,
+            "max_abs_complex": 143.87297942059953,
+            "mean_abs_complex": 143.86955219381898,
+            "worst_index": 2317,
+            "worst_component": "real",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "evalmod_imag": {
+            "max_component_abs": 143.87289028745175,
+            "max_abs_complex": 143.87289028745175,
+            "mean_abs_complex": 143.86962759464228,
+            "worst_index": 2727,
+            "worst_component": "real",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "public_like": {
+            "max_component_abs": 309352.4068068656,
+            "max_abs_complex": 309352.4125262637,
+            "mean_abs_complex": 397.3705831713155,
+            "worst_index": 0,
+            "worst_component": "imag",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "post_s2c": {
+            "max_component_abs": 9667.262712716372,
+            "max_abs_complex": 9667.262891447563,
+            "mean_abs_complex": 12.417830724106095,
+            "worst_index": 0,
+            "worst_component": "imag",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "metadata_correct": true,
+          "contracts_pass": true,
+          "pass": false
+        },
+        "pass": false
+      },
+      {
+        "id": "B4-term-2",
+        "coefficient_degree": 2,
+        "completed_b4_f_minus_q": {
+          "max_component_abs": 1.8004153723438776e-10,
+          "max_abs_complex": 1.8004153723438776e-10,
+          "mean_abs_complex": 1.8004031598906067e-10,
+          "worst_index": 1519,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        },
+        "final_ps_minus_q": {
+          "max_component_abs": 7.2505653703203166e-9,
+          "max_abs_complex": 7.2505653703203166e-9,
+          "mean_abs_complex": 1.2204777851467516e-9,
+          "worst_index": 2935,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        },
+        "downstream": {
+          "evalmod_real": {
+            "max_component_abs": 0.00006108569903540205,
+            "max_abs_complex": 0.00006108569903540205,
+            "mean_abs_complex": 0.000010211407687882007,
+            "worst_index": 2935,
+            "worst_component": "real",
+            "pass_threshold": true,
+            "threshold": 0.01
+          },
+          "evalmod_imag": {
+            "max_component_abs": 0.000047945703079329215,
+            "max_abs_complex": 0.000047945703079329215,
+            "mean_abs_complex": 0.00001015768243672585,
+            "worst_index": 2323,
+            "worst_component": "real",
+            "pass_threshold": true,
+            "threshold": 0.01
+          },
+          "public_like": {
+            "max_component_abs": 0.0032351181652570046,
+            "max_abs_complex": 0.0033053618670669293,
+            "mean_abs_complex": 0.0010236646715444774,
+            "worst_index": 2534,
+            "worst_component": "imag",
+            "pass_threshold": true,
+            "threshold": 0.01
+          },
+          "post_s2c": {
+            "max_component_abs": 0.00010109744993419827,
+            "max_abs_complex": 0.00010329257080301273,
+            "mean_abs_complex": 0.00003198952177319024,
+            "worst_index": 2534,
+            "worst_component": "imag",
+            "pass_threshold": true,
+            "threshold": 0.01
+          },
+          "metadata_correct": true,
+          "contracts_pass": true,
+          "pass": true
+        },
+        "pass": true
+      }
+    ]
+  },
+  "smallest_causal_interval": {
+    "interval": "B4-term-4 -\u003e B4-term-2",
+    "latest_passing_operation": "B4-term-2",
+    "previous_failing_operation": "B4-term-4"
+  },
+  "operation_substitutions": {
+    "imag": [
+      {
+        "id": "B4-term-2",
+        "variant": "V0-current-Fast-operation-output-control",
+        "valid": true,
+        "completed_b4_minus_q": {
+          "max_component_abs": 1.8004153723438776e-10,
+          "max_abs_complex": 1.8004153723438776e-10,
+          "mean_abs_complex": 1.8004031598906067e-10,
+          "worst_index": 1519,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        },
+        "downstream": {
+          "evalmod_real": {
+            "max_component_abs": 0.00006108569903540205,
+            "max_abs_complex": 0.00006108569903540205,
+            "mean_abs_complex": 0.000010211407687882007,
+            "worst_index": 2935,
+            "worst_component": "real",
+            "pass_threshold": true,
+            "threshold": 0.01
+          },
+          "evalmod_imag": {
+            "max_component_abs": 0.000047945703079329215,
+            "max_abs_complex": 0.000047945703079329215,
+            "mean_abs_complex": 0.00001015768243672585,
+            "worst_index": 2323,
+            "worst_component": "real",
+            "pass_threshold": true,
+            "threshold": 0.01
+          },
+          "public_like": {
+            "max_component_abs": 0.0032351181652570046,
+            "max_abs_complex": 0.0033053618670669293,
+            "mean_abs_complex": 0.0010236646715444774,
+            "worst_index": 2534,
+            "worst_component": "imag",
+            "pass_threshold": true,
+            "threshold": 0.01
+          },
+          "post_s2c": {
+            "max_component_abs": 0.00010109744993419827,
+            "max_abs_complex": 0.00010329257080301273,
+            "mean_abs_complex": 0.00003198952177319024,
+            "worst_index": 2534,
+            "worst_component": "imag",
+            "pass_threshold": true,
+            "threshold": 0.01
+          },
+          "metadata_correct": true,
+          "contracts_pass": true,
+          "pass": true
+        }
+      },
+      {
+        "id": "B4-term-2",
+        "variant": "V1-full-RNS-same-Fast-scalar-schedule",
+        "valid": true,
+        "reason": "F/N mode comparison is a full-B4 schedule mirror; no downstream replay is needed because F-N is zero",
+        "completed_b4_minus_q": {
+          "max_component_abs": 1.800410931451779e-10,
+          "max_abs_complex": 1.800410931451779e-10,
+          "mean_abs_complex": 1.8004029430501722e-10,
+          "worst_index": 723,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        }
+      },
+      {
+        "id": "B4-term-2",
+        "variant": "V2-genuine-Standard-operation",
+        "valid": true,
+        "reason": "Standard B4 mode is recorded at native metadata; downstream replay remains diagnostic-only",
+        "completed_b4_minus_q": {
+          "max_component_abs": 1.800410931451779e-10,
+          "max_abs_complex": 1.800410931451779e-10,
+          "mean_abs_complex": 1.8004029430501722e-10,
+          "worst_index": 723,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        }
+      }
+    ],
+    "real": [
+      {
+        "id": "B4-term-2",
+        "variant": "V0-current-Fast-operation-output-control",
+        "valid": true,
+        "completed_b4_minus_q": {
+          "max_component_abs": 1.8004153723438776e-10,
+          "max_abs_complex": 1.8004153723438776e-10,
+          "mean_abs_complex": 1.8004031598906067e-10,
+          "worst_index": 1519,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        },
+        "downstream": {
+          "evalmod_real": {
+            "max_component_abs": 0.00006108569903540205,
+            "max_abs_complex": 0.00006108569903540205,
+            "mean_abs_complex": 0.000010211407687882007,
+            "worst_index": 2935,
+            "worst_component": "real",
+            "pass_threshold": true,
+            "threshold": 0.01
+          },
+          "evalmod_imag": {
+            "max_component_abs": 0.000047945703079329215,
+            "max_abs_complex": 0.000047945703079329215,
+            "mean_abs_complex": 0.00001015768243672585,
+            "worst_index": 2323,
+            "worst_component": "real",
+            "pass_threshold": true,
+            "threshold": 0.01
+          },
+          "public_like": {
+            "max_component_abs": 0.0032351181652570046,
+            "max_abs_complex": 0.0033053618670669293,
+            "mean_abs_complex": 0.0010236646715444774,
+            "worst_index": 2534,
+            "worst_component": "imag",
+            "pass_threshold": true,
+            "threshold": 0.01
+          },
+          "post_s2c": {
+            "max_component_abs": 0.00010109744993419827,
+            "max_abs_complex": 0.00010329257080301273,
+            "mean_abs_complex": 0.00003198952177319024,
+            "worst_index": 2534,
+            "worst_component": "imag",
+            "pass_threshold": true,
+            "threshold": 0.01
+          },
+          "metadata_correct": true,
+          "contracts_pass": true,
+          "pass": true
+        }
+      },
+      {
+        "id": "B4-term-2",
+        "variant": "V1-full-RNS-same-Fast-scalar-schedule",
+        "valid": true,
+        "reason": "F/N mode comparison is a full-B4 schedule mirror; no downstream replay is needed because F-N is zero",
+        "completed_b4_minus_q": {
+          "max_component_abs": 1.800410931451779e-10,
+          "max_abs_complex": 1.800410931451779e-10,
+          "mean_abs_complex": 1.8004039882210665e-10,
+          "worst_index": 13,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        }
+      },
+      {
+        "id": "B4-term-2",
+        "variant": "V2-genuine-Standard-operation",
+        "valid": true,
+        "reason": "Standard B4 mode is recorded at native metadata; downstream replay remains diagnostic-only",
+        "completed_b4_minus_q": {
+          "max_component_abs": 1.800410931451779e-10,
+          "max_abs_complex": 1.800410931451779e-10,
+          "mean_abs_complex": 1.8004039882210665e-10,
+          "worst_index": 13,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        }
+      }
+    ]
+  },
+  "scalar_rounding_ledger": {
+    "imag": {
+      "branch": "imag",
+      "rows": [
+        {
+          "id": "B4-constant",
+          "kind": "constant_add",
+          "coefficient_degree": 0,
+          "coefficient_real": "1.2517128878960144620558358087321440690178e-01",
+          "coefficient_imag": "0.0000000000000000000000000000000000000000e+00",
+          "coefficient_is_integer": false,
+          "input_power_level": 12,
+          "input_power_scale": "1.1529215046068469760000000000000000000000e+18",
+          "accumulator_scale_before": "4.9517601571415210995964968960000000000000e+27",
+          "accumulator_scale_after": "4.9517601571415210995964968960000000000000e+27",
+          "scalar_encoding_scale": "4.9517601571415210995964968960000000000000e+27",
+          "rounded_integer_real": "619818200646403575657802668",
+          "rounded_integer_imag": "0",
+          "effective_coefficient_real": "1.2517128878960144620558358079815204829404e-01",
+          "effective_coefficient_imag": "0.0000000000000000000000000000000000000000e+00",
+          "quantization_error_real": "-7.5062358607740357652124478363354409928959e-29",
+          "quantization_error_imag": "0.0000000000000000000000000000000000000000e+00",
+          "quantization_error_sign": "real_negative",
+          "accumulator_promotion": false,
+          "promotion_factor_exact": true,
+          "scalar_q01_capacity_ratio": 0.0312928268604732,
+          "scalar_centered_unique": true,
+          "result_capacity_ratio": 0.0312928268604732,
+          "source_function": "fastPolynomialWorkspace.evaluateBabyStep",
+          "source_scalar_path": "schemes/ckks/fast/evaluator_ntt.go:MulThenAdd -\u003e scalarNTT",
+          "source_scale_path": "schemes/ckks/fast/evaluator_ntt.go:coefficientScale / scale promotion"
+        },
+        {
+          "id": "B4-term-6",
+          "kind": "scalar_mul_then_add",
+          "coefficient_degree": 6,
+          "coefficient_real": "7.3690796162134775661873233021223526130411e-01",
+          "coefficient_imag": "0.0000000000000000000000000000000000000000e+00",
+          "coefficient_is_integer": false,
+          "input_power_level": 9,
+          "input_power_scale": "1.1529215046071091190000000596041900289207e+18",
+          "accumulator_scale_before": "4.9517601571415210995964968960000000000000e+27",
+          "accumulator_scale_after": "4.9517601571415210995964968960000000000000e+27",
+          "scalar_encoding_scale": "4.2949672959990234412252902984619140625000e+09",
+          "rounded_integer_real": "3164995595",
+          "rounded_integer_imag": "0",
+          "effective_coefficient_real": "7.3690796154567963302508016879697341563144e-01",
+          "effective_coefficient_imag": "0.0000000000000000000000000000000000000000e+00",
+          "quantization_error_real": "-7.5668123593652161415261845672665651538839e-11",
+          "quantization_error_imag": "0.0000000000000000000000000000000000000000e+00",
+          "quantization_error_sign": "real_negative",
+          "accumulator_promotion": false,
+          "promotion_factor_exact": true,
+          "scalar_q01_capacity_ratio": 1.597914663770854e-19,
+          "scalar_centered_unique": true,
+          "result_capacity_ratio": 0.152125126776301,
+          "source_function": "fastPolynomialWorkspace.evaluateBabyStep",
+          "source_scalar_path": "schemes/ckks/fast/evaluator_ntt.go:MulThenAdd -\u003e scalarNTT",
+          "source_scale_path": "schemes/ckks/fast/evaluator_ntt.go:coefficientScale / scale promotion"
+        },
+        {
+          "id": "B4-term-4",
+          "kind": "scalar_mul_then_add",
+          "coefficient_degree": 4,
+          "coefficient_real": "-1.1266534911439013357972524857738583229577e-02",
+          "coefficient_imag": "0.0000000000000000000000000000000000000000e+00",
+          "coefficient_is_integer": false,
+          "input_power_level": 10,
+          "input_power_scale": "1.1529215046057492450000006970987556135842e+18",
+          "accumulator_scale_before": "4.9517601571415210995964968960000000000000e+27",
+          "accumulator_scale_after": "4.9517601571415210995964968960000000000000e+27",
+          "scalar_encoding_scale": "4.2949672960040893666446221920986343909163e+09",
+          "rounded_integer_real": "-48389399",
+          "rounded_integer_imag": "0",
+          "effective_coefficient_real": "-1.1266534915183188162724808452691548051518e-02",
+          "effective_coefficient_imag": "0.0000000000000000000000000000000000000000e+00",
+          "quantization_error_real": "-3.7441748047522835949529648219412779073080e-12",
+          "quantization_error_imag": "0.0000000000000000000000000000000000000000e+00",
+          "quantization_error_sign": "real_negative",
+          "accumulator_promotion": false,
+          "promotion_factor_exact": true,
+          "scalar_q01_capacity_ratio": 2.443040690334948e-21,
+          "scalar_centered_unique": true,
+          "result_capacity_ratio": 0.1549362610306319,
+          "source_function": "fastPolynomialWorkspace.evaluateBabyStep",
+          "source_scalar_path": "schemes/ckks/fast/evaluator_ntt.go:MulThenAdd -\u003e scalarNTT",
+          "source_scale_path": "schemes/ckks/fast/evaluator_ntt.go:coefficientScale / scale promotion"
+        },
+        {
+          "id": "B4-term-2",
+          "kind": "scalar_mul_then_add",
+          "coefficient_degree": 2,
+          "coefficient_real": "4.3125798028553236964268325201266479780445e-01",
+          "coefficient_imag": "0.0000000000000000000000000000000000000000e+00",
+          "coefficient_is_integer": false,
+          "input_power_level": 11,
+          "input_power_scale": "1.1529215046064701430000001231680641930406e+18",
+          "accumulator_scale_before": "4.9517601571415210995964968960000000000000e+27",
+          "accumulator_scale_after": "4.9517601571415210995964968960000000000000e+27",
+          "scalar_encoding_scale": "4.2949672960014038123190402984619140625000e+09",
+          "rounded_integer_real": "1852238921",
+          "rounded_integer_imag": "0",
+          "effective_coefficient_real": "4.3125798017703802202240168982894724684902e-01",
+          "effective_coefficient_imag": "0.0000000000000000000000000000000000000000e+00",
+          "quantization_error_real": "-1.0849434762028156218371755095542912663319e-10",
+          "quantization_error_imag": "0.0000000000000000000000000000000000000000e+00",
+          "quantization_error_sign": "real_negative",
+          "accumulator_promotion": false,
+          "promotion_factor_exact": true,
+          "scalar_q01_capacity_ratio": 9.351418173689446e-20,
+          "scalar_centered_unique": true,
+          "result_capacity_ratio": 0.2626981283490869,
+          "source_function": "fastPolynomialWorkspace.evaluateBabyStep",
+          "source_scalar_path": "schemes/ckks/fast/evaluator_ntt.go:MulThenAdd -\u003e scalarNTT",
+          "source_scale_path": "schemes/ckks/fast/evaluator_ntt.go:coefficientScale / scale promotion"
+        }
+      ],
+      "predicted_residual_vs_actual_b4_minus_q": {
+        "max_component_abs": 1.800403330571635e-10,
+        "max_abs_complex": 1.800403330571635e-10,
+        "mean_abs_complex": 1.800403223478152e-10,
+        "worst_index": 2727,
+        "worst_component": "real",
+        "pass_threshold": false,
+        "threshold": 1e-10
+      },
+      "ledger_closure_vs_n_minus_q": {
+        "max_component_abs": 1.0011501130179468e-15,
+        "max_abs_complex": 1.0011501130179468e-15,
+        "mean_abs_complex": 1.9819681473651942e-16,
+        "worst_index": 1079,
+        "worst_component": "real",
+        "pass_threshold": true,
+        "threshold": 1e-12
+      },
+      "closure_max_component": 1.0011501130179468e-15,
+      "closure_numerically_meaningful": true
+    },
+    "real": {
+      "branch": "real",
+      "rows": [
+        {
+          "id": "B4-constant",
+          "kind": "constant_add",
+          "coefficient_degree": 0,
+          "coefficient_real": "1.2517128878960144620558358087321440690178e-01",
+          "coefficient_imag": "0.0000000000000000000000000000000000000000e+00",
+          "coefficient_is_integer": false,
+          "input_power_level": 12,
+          "input_power_scale": "1.1529215046068469760000000000000000000000e+18",
+          "accumulator_scale_before": "4.9517601571415210995964968960000000000000e+27",
+          "accumulator_scale_after": "4.9517601571415210995964968960000000000000e+27",
+          "scalar_encoding_scale": "4.9517601571415210995964968960000000000000e+27",
+          "rounded_integer_real": "619818200646403575657802668",
+          "rounded_integer_imag": "0",
+          "effective_coefficient_real": "1.2517128878960144620558358079815204829404e-01",
+          "effective_coefficient_imag": "0.0000000000000000000000000000000000000000e+00",
+          "quantization_error_real": "-7.5062358607740357652124478363354409928959e-29",
+          "quantization_error_imag": "0.0000000000000000000000000000000000000000e+00",
+          "quantization_error_sign": "real_negative",
+          "accumulator_promotion": false,
+          "promotion_factor_exact": true,
+          "scalar_q01_capacity_ratio": 0.0312928268604732,
+          "scalar_centered_unique": true,
+          "result_capacity_ratio": 0.0312928268604732,
+          "source_function": "fastPolynomialWorkspace.evaluateBabyStep",
+          "source_scalar_path": "schemes/ckks/fast/evaluator_ntt.go:MulThenAdd -\u003e scalarNTT",
+          "source_scale_path": "schemes/ckks/fast/evaluator_ntt.go:coefficientScale / scale promotion"
+        },
+        {
+          "id": "B4-term-6",
+          "kind": "scalar_mul_then_add",
+          "coefficient_degree": 6,
+          "coefficient_real": "7.3690796162134775661873233021223526130411e-01",
+          "coefficient_imag": "0.0000000000000000000000000000000000000000e+00",
+          "coefficient_is_integer": false,
+          "input_power_level": 9,
+          "input_power_scale": "1.1529215046071091190000000596041900289207e+18",
+          "accumulator_scale_before": "4.9517601571415210995964968960000000000000e+27",
+          "accumulator_scale_after": "4.9517601571415210995964968960000000000000e+27",
+          "scalar_encoding_scale": "4.2949672959990234412252902984619140625000e+09",
+          "rounded_integer_real": "3164995595",
+          "rounded_integer_imag": "0",
+          "effective_coefficient_real": "7.3690796154567963302508016879697341563144e-01",
+          "effective_coefficient_imag": "0.0000000000000000000000000000000000000000e+00",
+          "quantization_error_real": "-7.5668123593652161415261845672665651538839e-11",
+          "quantization_error_imag": "0.0000000000000000000000000000000000000000e+00",
+          "quantization_error_sign": "real_negative",
+          "accumulator_promotion": false,
+          "promotion_factor_exact": true,
+          "scalar_q01_capacity_ratio": 1.597914663770854e-19,
+          "scalar_centered_unique": true,
+          "result_capacity_ratio": 0.15212512624683572,
+          "source_function": "fastPolynomialWorkspace.evaluateBabyStep",
+          "source_scalar_path": "schemes/ckks/fast/evaluator_ntt.go:MulThenAdd -\u003e scalarNTT",
+          "source_scale_path": "schemes/ckks/fast/evaluator_ntt.go:coefficientScale / scale promotion"
+        },
+        {
+          "id": "B4-term-4",
+          "kind": "scalar_mul_then_add",
+          "coefficient_degree": 4,
+          "coefficient_real": "-1.1266534911439013357972524857738583229577e-02",
+          "coefficient_imag": "0.0000000000000000000000000000000000000000e+00",
+          "coefficient_is_integer": false,
+          "input_power_level": 10,
+          "input_power_scale": "1.1529215046057492450000006970987556135842e+18",
+          "accumulator_scale_before": "4.9517601571415210995964968960000000000000e+27",
+          "accumulator_scale_after": "4.9517601571415210995964968960000000000000e+27",
+          "scalar_encoding_scale": "4.2949672960040893666446221920986343909163e+09",
+          "rounded_integer_real": "-48389399",
+          "rounded_integer_imag": "0",
+          "effective_coefficient_real": "-1.1266534915183188162724808452691548051518e-02",
+          "effective_coefficient_imag": "0.0000000000000000000000000000000000000000e+00",
+          "quantization_error_real": "-3.7441748047522835949529648219412779073080e-12",
+          "quantization_error_imag": "0.0000000000000000000000000000000000000000e+00",
+          "quantization_error_sign": "real_negative",
+          "accumulator_promotion": false,
+          "promotion_factor_exact": true,
+          "scalar_q01_capacity_ratio": 2.443040690334948e-21,
+          "scalar_centered_unique": true,
+          "result_capacity_ratio": 0.15493626049756593,
+          "source_function": "fastPolynomialWorkspace.evaluateBabyStep",
+          "source_scalar_path": "schemes/ckks/fast/evaluator_ntt.go:MulThenAdd -\u003e scalarNTT",
+          "source_scale_path": "schemes/ckks/fast/evaluator_ntt.go:coefficientScale / scale promotion"
+        },
+        {
+          "id": "B4-term-2",
+          "kind": "scalar_mul_then_add",
+          "coefficient_degree": 2,
+          "coefficient_real": "4.3125798028553236964268325201266479780445e-01",
+          "coefficient_imag": "0.0000000000000000000000000000000000000000e+00",
+          "coefficient_is_integer": false,
+          "input_power_level": 11,
+          "input_power_scale": "1.1529215046064701430000001231680641930406e+18",
+          "accumulator_scale_before": "4.9517601571415210995964968960000000000000e+27",
+          "accumulator_scale_after": "4.9517601571415210995964968960000000000000e+27",
+          "scalar_encoding_scale": "4.2949672960014038123190402984619140625000e+09",
+          "rounded_integer_real": "1852238921",
+          "rounded_integer_imag": "0",
+          "effective_coefficient_real": "4.3125798017703802202240168982894724684902e-01",
+          "effective_coefficient_imag": "0.0000000000000000000000000000000000000000e+00",
+          "quantization_error_real": "-1.0849434762028156218371755095542912663319e-10",
+          "quantization_error_imag": "0.0000000000000000000000000000000000000000e+00",
+          "quantization_error_sign": "real_negative",
+          "accumulator_promotion": false,
+          "promotion_factor_exact": true,
+          "scalar_q01_capacity_ratio": 9.351418173689446e-20,
+          "scalar_centered_unique": true,
+          "result_capacity_ratio": 0.2626981277815475,
+          "source_function": "fastPolynomialWorkspace.evaluateBabyStep",
+          "source_scalar_path": "schemes/ckks/fast/evaluator_ntt.go:MulThenAdd -\u003e scalarNTT",
+          "source_scale_path": "schemes/ckks/fast/evaluator_ntt.go:coefficientScale / scale promotion"
+        }
+      ],
+      "predicted_residual_vs_actual_b4_minus_q": {
+        "max_component_abs": 1.800403333457023e-10,
+        "max_abs_complex": 1.800403333457023e-10,
+        "mean_abs_complex": 1.8004032210044183e-10,
+        "worst_index": 2317,
+        "worst_component": "real",
+        "pass_threshold": false,
+        "threshold": 1e-10
+      },
+      "ledger_closure_vs_n_minus_q": {
+        "max_component_abs": 7.918935859978346e-16,
+        "max_abs_complex": 7.918935859978346e-16,
+        "mean_abs_complex": 2.165475550884522e-16,
+        "worst_index": 2438,
+        "worst_component": "real",
+        "pass_threshold": true,
+        "threshold": 1e-12
+      },
+      "closure_max_component": 7.918935859978346e-16,
+      "closure_numerically_meaningful": true
+    }
+  },
+  "one_coefficient_corrections": {
+    "imag": [
+      {
+        "id": "B4-constant",
+        "variant": "canonical-coefficient-contribution-at-operation-boundary",
+        "valid": false,
+        "completed_b4_minus_q": {
+          "max_component_abs": 1.175963746531214,
+          "max_abs_complex": 1.175963746531214,
+          "mean_abs_complex": 1.1759636444679562,
+          "worst_index": 2317,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        },
+        "downstream": {
+          "evalmod_real": {
+            "max_component_abs": 82.93419800826152,
+            "max_abs_complex": 82.93419800826152,
+            "mean_abs_complex": 82.92981774979627,
+            "worst_index": 2317,
+            "worst_component": "real",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "evalmod_imag": {
+            "max_component_abs": 82.934087554133,
+            "max_abs_complex": 82.934087554133,
+            "mean_abs_complex": 82.9299140942016,
+            "worst_index": 2727,
+            "worst_component": "real",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "public_like": {
+            "max_component_abs": 432494.9299011583,
+            "max_abs_complex": 432494.9378107085,
+            "mean_abs_complex": 555.5522436035483,
+            "worst_index": 0,
+            "worst_component": "imag",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "post_s2c": {
+            "max_component_abs": 13515.466559409375,
+            "max_abs_complex": 13515.466806582817,
+            "mean_abs_complex": 17.361007612608482,
+            "worst_index": 0,
+            "worst_component": "imag",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "metadata_correct": true,
+          "contracts_pass": true,
+          "pass": false
+        }
+      },
+      {
+        "id": "B4-term-6",
+        "variant": "canonical-coefficient-contribution-at-operation-boundary",
+        "valid": false,
+        "completed_b4_minus_q": {
+          "max_component_abs": 0.4422919471542919,
+          "max_abs_complex": 0.4422919471542919,
+          "mean_abs_complex": 0.44229194030724406,
+          "worst_index": 2317,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        },
+        "downstream": {
+          "evalmod_real": {
+            "max_component_abs": 152.32315541288605,
+            "max_abs_complex": 152.32315541288605,
+            "mean_abs_complex": 152.31963258111267,
+            "worst_index": 2317,
+            "worst_component": "real",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "evalmod_imag": {
+            "max_component_abs": 152.32306422543095,
+            "max_abs_complex": 152.32306422543095,
+            "mean_abs_complex": 152.3197100904509,
+            "worst_index": 2727,
+            "worst_component": "real",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "public_like": {
+            "max_component_abs": 265283.6341704887,
+            "max_abs_complex": 265283.63908065757,
+            "mean_abs_complex": 340.76306220662536,
+            "worst_index": 0,
+            "worst_component": "imag",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "post_s2c": {
+            "max_component_abs": 8290.113567829594,
+            "max_abs_complex": 8290.113721272372,
+            "mean_abs_complex": 10.648845693959547,
+            "worst_index": 0,
+            "worst_component": "imag",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "metadata_correct": true,
+          "contracts_pass": true,
+          "pass": false
+        }
+      },
+      {
+        "id": "B4-term-4",
+        "variant": "canonical-coefficient-contribution-at-operation-boundary",
+        "valid": false,
+        "completed_b4_minus_q": {
+          "max_component_abs": 0.431047411172236,
+          "max_abs_complex": 0.431047411172236,
+          "mean_abs_complex": 0.4310474049727164,
+          "worst_index": 2317,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        },
+        "downstream": {
+          "evalmod_real": {
+            "max_component_abs": 143.87297942059953,
+            "max_abs_complex": 143.87297942059953,
+            "mean_abs_complex": 143.86955219381898,
+            "worst_index": 2317,
+            "worst_component": "real",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "evalmod_imag": {
+            "max_component_abs": 143.87289028745175,
+            "max_abs_complex": 143.87289028745175,
+            "mean_abs_complex": 143.86962759464228,
+            "worst_index": 2727,
+            "worst_component": "real",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "public_like": {
+            "max_component_abs": 309352.4068068656,
+            "max_abs_complex": 309352.4125262637,
+            "mean_abs_complex": 397.3705831713155,
+            "worst_index": 0,
+            "worst_component": "imag",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "post_s2c": {
+            "max_component_abs": 9667.262712716372,
+            "max_abs_complex": 9667.262891447563,
+            "mean_abs_complex": 12.417830724106095,
+            "worst_index": 0,
+            "worst_component": "imag",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "metadata_correct": true,
+          "contracts_pass": true,
+          "pass": false
+        }
+      },
+      {
+        "id": "B4-term-2",
+        "variant": "canonical-coefficient-contribution-at-operation-boundary",
+        "valid": true,
+        "completed_b4_minus_q": {
+          "max_component_abs": 1.8004153723438776e-10,
+          "max_abs_complex": 1.8004153723438776e-10,
+          "mean_abs_complex": 1.8004031598906067e-10,
+          "worst_index": 1519,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        },
+        "downstream": {
+          "evalmod_real": {
+            "max_component_abs": 0.00006108569903540205,
+            "max_abs_complex": 0.00006108569903540205,
+            "mean_abs_complex": 0.000010211407687882007,
+            "worst_index": 2935,
+            "worst_component": "real",
+            "pass_threshold": true,
+            "threshold": 0.01
+          },
+          "evalmod_imag": {
+            "max_component_abs": 0.000047945703079329215,
+            "max_abs_complex": 0.000047945703079329215,
+            "mean_abs_complex": 0.00001015768243672585,
+            "worst_index": 2323,
+            "worst_component": "real",
+            "pass_threshold": true,
+            "threshold": 0.01
+          },
+          "public_like": {
+            "max_component_abs": 0.0032351181652570046,
+            "max_abs_complex": 0.0033053618670669293,
+            "mean_abs_complex": 0.0010236646715444774,
+            "worst_index": 2534,
+            "worst_component": "imag",
+            "pass_threshold": true,
+            "threshold": 0.01
+          },
+          "post_s2c": {
+            "max_component_abs": 0.00010109744993419827,
+            "max_abs_complex": 0.00010329257080301273,
+            "mean_abs_complex": 0.00003198952177319024,
+            "worst_index": 2534,
+            "worst_component": "imag",
+            "pass_threshold": true,
+            "threshold": 0.01
+          },
+          "metadata_correct": true,
+          "contracts_pass": true,
+          "pass": true
+        }
+      }
+    ],
+    "real": [
+      {
+        "id": "B4-constant",
+        "variant": "canonical-coefficient-contribution-at-operation-boundary",
+        "valid": false,
+        "completed_b4_minus_q": {
+          "max_component_abs": 1.175963746531214,
+          "max_abs_complex": 1.175963746531214,
+          "mean_abs_complex": 1.1759636444679562,
+          "worst_index": 2317,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        },
+        "downstream": {
+          "evalmod_real": {
+            "max_component_abs": 82.93419800826152,
+            "max_abs_complex": 82.93419800826152,
+            "mean_abs_complex": 82.92981774979627,
+            "worst_index": 2317,
+            "worst_component": "real",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "evalmod_imag": {
+            "max_component_abs": 82.934087554133,
+            "max_abs_complex": 82.934087554133,
+            "mean_abs_complex": 82.9299140942016,
+            "worst_index": 2727,
+            "worst_component": "real",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "public_like": {
+            "max_component_abs": 432494.9299011583,
+            "max_abs_complex": 432494.9378107085,
+            "mean_abs_complex": 555.5522436035483,
+            "worst_index": 0,
+            "worst_component": "imag",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "post_s2c": {
+            "max_component_abs": 13515.466559409375,
+            "max_abs_complex": 13515.466806582817,
+            "mean_abs_complex": 17.361007612608482,
+            "worst_index": 0,
+            "worst_component": "imag",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "metadata_correct": true,
+          "contracts_pass": true,
+          "pass": false
+        }
+      },
+      {
+        "id": "B4-term-6",
+        "variant": "canonical-coefficient-contribution-at-operation-boundary",
+        "valid": false,
+        "completed_b4_minus_q": {
+          "max_component_abs": 0.4422919471542919,
+          "max_abs_complex": 0.4422919471542919,
+          "mean_abs_complex": 0.44229194030724406,
+          "worst_index": 2317,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        },
+        "downstream": {
+          "evalmod_real": {
+            "max_component_abs": 152.32315541288605,
+            "max_abs_complex": 152.32315541288605,
+            "mean_abs_complex": 152.31963258111267,
+            "worst_index": 2317,
+            "worst_component": "real",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "evalmod_imag": {
+            "max_component_abs": 152.32306422543095,
+            "max_abs_complex": 152.32306422543095,
+            "mean_abs_complex": 152.3197100904509,
+            "worst_index": 2727,
+            "worst_component": "real",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "public_like": {
+            "max_component_abs": 265283.6341704887,
+            "max_abs_complex": 265283.63908065757,
+            "mean_abs_complex": 340.76306220662536,
+            "worst_index": 0,
+            "worst_component": "imag",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "post_s2c": {
+            "max_component_abs": 8290.113567829594,
+            "max_abs_complex": 8290.113721272372,
+            "mean_abs_complex": 10.648845693959547,
+            "worst_index": 0,
+            "worst_component": "imag",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "metadata_correct": true,
+          "contracts_pass": true,
+          "pass": false
+        }
+      },
+      {
+        "id": "B4-term-4",
+        "variant": "canonical-coefficient-contribution-at-operation-boundary",
+        "valid": false,
+        "completed_b4_minus_q": {
+          "max_component_abs": 0.431047411172236,
+          "max_abs_complex": 0.431047411172236,
+          "mean_abs_complex": 0.4310474049727164,
+          "worst_index": 2317,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        },
+        "downstream": {
+          "evalmod_real": {
+            "max_component_abs": 143.87297942059953,
+            "max_abs_complex": 143.87297942059953,
+            "mean_abs_complex": 143.86955219381898,
+            "worst_index": 2317,
+            "worst_component": "real",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "evalmod_imag": {
+            "max_component_abs": 143.87289028745175,
+            "max_abs_complex": 143.87289028745175,
+            "mean_abs_complex": 143.86962759464228,
+            "worst_index": 2727,
+            "worst_component": "real",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "public_like": {
+            "max_component_abs": 309352.4068068656,
+            "max_abs_complex": 309352.4125262637,
+            "mean_abs_complex": 397.3705831713155,
+            "worst_index": 0,
+            "worst_component": "imag",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "post_s2c": {
+            "max_component_abs": 9667.262712716372,
+            "max_abs_complex": 9667.262891447563,
+            "mean_abs_complex": 12.417830724106095,
+            "worst_index": 0,
+            "worst_component": "imag",
+            "pass_threshold": false,
+            "threshold": 0.01
+          },
+          "metadata_correct": true,
+          "contracts_pass": true,
+          "pass": false
+        }
+      },
+      {
+        "id": "B4-term-2",
+        "variant": "canonical-coefficient-contribution-at-operation-boundary",
+        "valid": true,
+        "completed_b4_minus_q": {
+          "max_component_abs": 1.8004153723438776e-10,
+          "max_abs_complex": 1.8004153723438776e-10,
+          "mean_abs_complex": 1.8004031598906067e-10,
+          "worst_index": 1519,
+          "worst_component": "real",
+          "pass_threshold": false,
+          "threshold": 1e-10
+        },
+        "downstream": {
+          "evalmod_real": {
+            "max_component_abs": 0.00006108569903540205,
+            "max_abs_complex": 0.00006108569903540205,
+            "mean_abs_complex": 0.000010211407687882007,
+            "worst_index": 2935,
+            "worst_component": "real",
+            "pass_threshold": true,
+            "threshold": 0.01
+          },
+          "evalmod_imag": {
+            "max_component_abs": 0.000047945703079329215,
+            "max_abs_complex": 0.000047945703079329215,
+            "mean_abs_complex": 0.00001015768243672585,
+            "worst_index": 2323,
+            "worst_component": "real",
+            "pass_threshold": true,
+            "threshold": 0.01
+          },
+          "public_like": {
+            "max_component_abs": 0.0032351181652570046,
+            "max_abs_complex": 0.0033053618670669293,
+            "mean_abs_complex": 0.0010236646715444774,
+            "worst_index": 2534,
+            "worst_component": "imag",
+            "pass_threshold": true,
+            "threshold": 0.01
+          },
+          "post_s2c": {
+            "max_component_abs": 0.00010109744993419827,
+            "max_abs_complex": 0.00010329257080301273,
+            "mean_abs_complex": 0.00003198952177319024,
+            "worst_index": 2534,
+            "worst_component": "imag",
+            "pass_threshold": true,
+            "threshold": 0.01
+          },
+          "metadata_correct": true,
+          "contracts_pass": true,
+          "pass": true
+        }
+      }
+    ]
+  },
+  "classification": "logn13_b4_single_scalar_operation_blocker",
+  "first_remaining_blocker": "a source-backed B4 operation reset passes while the immediately preceding reset fails",
+  "recommended_next_design_target": "B4-term-2",
+  "validation": {
+    "b0_canonical_materialization_deterministic": true,
+    "b0_identity_exact": true,
+    "b3_final_b4_reset_passes": true,
+    "b3_previous_reset_failed": true,
+    "b4_operation_schedule_source_confirmed": true,
+    "b5_ledger_present": true,
+    "b6_reached": true,
+    "logn13_only": true,
+    "m0_controls_pass": true,
+    "m0_g0_cases_pass": true,
+    "no_benchmark": true,
+    "no_da_change": true,
+    "no_exp003": true,
+    "no_g0_merge_change": true,
+    "no_gate_4_or_5": true,
+    "no_generated_power_redesign": true,
+    "no_logn16": true,
+    "no_production_integration": true,
+    "no_q_parameter_changes": true,
+    "no_s2c_change": true,
+    "no_secondary_production_changes": true
+  }
+}
