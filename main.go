@@ -70,6 +70,7 @@ func main() {
 	fix001P3DesignLogN13GeneratedPowerMultiplyFirstLocalQ2 := flag.Bool("fix001-p3-design-logn13-generated-power-multiply-first-local-q2", false, "design LogN13 generated-power multiply-first temporary-q2 feasibility")
 	fix001P3DesignLogN13GeneratedPowerNativeQ01MultiplyFirst := flag.Bool("fix001-p3-design-logn13-generated-power-native-q01-multiply-first", false, "design LogN13 native q0/q1 generated-power multiply-first feasibility")
 	fix001P3DesignLogN13GeneratedPowerNativeQ012MultiplyFirst := flag.Bool("fix001-p3-design-logn13-generated-power-native-q012-multiply-first", false, "design LogN13 native q0/q1/q2 generated-power multiply-first feasibility")
+	fix001P3DesignLogN13D0ProductionPreconditionClosure := flag.Bool("fix001-p3-design-logn13-d0-production-precondition-closure", false, "close LogN13 D0 production preconditions")
 	flag.Parse()
 
 	cfg, err := LoadBootstrapConfig(*configPath)
@@ -258,6 +259,9 @@ func main() {
 		selectedModes++
 	}
 	if *fix001P3DesignLogN13GeneratedPowerNativeQ012MultiplyFirst {
+		selectedModes++
+	}
+	if *fix001P3DesignLogN13D0ProductionPreconditionClosure {
 		selectedModes++
 	}
 	if selectedModes > 1 {
@@ -473,6 +477,10 @@ func main() {
 		}
 	} else if *fix001P3DesignLogN13GeneratedPowerNativeQ012MultiplyFirst {
 		if err := runFIX001P3DesignLogN13GeneratedPowerNativeQ012MultiplyFirst(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
+			log.Fatal(err)
+		}
+	} else if *fix001P3DesignLogN13D0ProductionPreconditionClosure {
+		if err := runFIX001P3DesignLogN13D0ProductionPreconditionClosure(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
 			log.Fatal(err)
 		}
 	} else if *finalizationDiagnostic {

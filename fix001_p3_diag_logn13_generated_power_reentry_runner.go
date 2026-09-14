@@ -130,7 +130,11 @@ func generatedPowerReentryGuardMap(run t2GuardBranchRun) map[string]interface{} 
 }
 
 func generatedPowerReentryReplaySuffix(profile q056PreparedProfile, context psLocalizationAcceptedContext, powers map[int]*rlwe.Ciphertext, expected, decoded map[int][]complex128, reset *rlwe.Ciphertext) (*rlwe.Ciphertext, error) {
-	replay, err := psRescaleGuardReplayPSWithBoundaryOverride(profile.BTP.BootstrappingParameters, profile.Fast.FastCKKS, context.Plan, powers, expected, decoded, context.Branch.Base.InputValues, precisionSweepScale(generatedPowerReentryPlanScaleExponent), context.GuardMap, context.FinalOverride, context.BoundaryOverride, psGlobalReplayReset{ID: "B4-term-2", Ciphertext: reset})
+	return generatedPowerReentryReplaySuffixAtPlanScale(profile, context, powers, expected, decoded, reset, precisionSweepScale(generatedPowerReentryPlanScaleExponent))
+}
+
+func generatedPowerReentryReplaySuffixAtPlanScale(profile q056PreparedProfile, context psLocalizationAcceptedContext, powers map[int]*rlwe.Ciphertext, expected, decoded map[int][]complex128, reset *rlwe.Ciphertext, planScale rlwe.Scale) (*rlwe.Ciphertext, error) {
+	replay, err := psRescaleGuardReplayPSWithBoundaryOverride(profile.BTP.BootstrappingParameters, profile.Fast.FastCKKS, context.Plan, powers, expected, decoded, context.Branch.Base.InputValues, planScale, context.GuardMap, context.FinalOverride, context.BoundaryOverride, psGlobalReplayReset{ID: "B4-term-2", Ciphertext: reset})
 	if err != nil {
 		return nil, err
 	}
@@ -141,7 +145,11 @@ func generatedPowerReentryReplaySuffix(profile q056PreparedProfile, context psLo
 }
 
 func generatedPowerReentryReplayBranch(profile q056PreparedProfile, context psLocalizationAcceptedContext, powers map[int]*rlwe.Ciphertext, expected, decoded map[int][]complex128) (*rlwe.Ciphertext, t2GuardBranchRun, error) {
-	replay, err := psRescaleGuardReplayPSWithBoundaryOverride(profile.BTP.BootstrappingParameters, profile.Fast.FastCKKS, context.Plan, powers, expected, decoded, context.Branch.Base.InputValues, precisionSweepScale(generatedPowerReentryPlanScaleExponent), context.GuardMap, context.FinalOverride, context.BoundaryOverride)
+	return generatedPowerReentryReplayBranchAtPlanScale(profile, context, powers, expected, decoded, precisionSweepScale(generatedPowerReentryPlanScaleExponent))
+}
+
+func generatedPowerReentryReplayBranchAtPlanScale(profile q056PreparedProfile, context psLocalizationAcceptedContext, powers map[int]*rlwe.Ciphertext, expected, decoded map[int][]complex128, planScale rlwe.Scale) (*rlwe.Ciphertext, t2GuardBranchRun, error) {
+	replay, err := psRescaleGuardReplayPSWithBoundaryOverride(profile.BTP.BootstrappingParameters, profile.Fast.FastCKKS, context.Plan, powers, expected, decoded, context.Branch.Base.InputValues, planScale, context.GuardMap, context.FinalOverride, context.BoundaryOverride)
 	if err != nil {
 		return nil, t2GuardBranchRun{}, err
 	}
@@ -157,7 +165,7 @@ func generatedPowerReentryReplayBranch(profile q056PreparedProfile, context psLo
 	if guarded.Ciphertext == nil {
 		return nil, guarded, fmt.Errorf("B4 guard contraction did not produce a ciphertext")
 	}
-	final, err := generatedPowerReentryReplaySuffix(profile, context, powers, expected, decoded, guarded.Ciphertext)
+	final, err := generatedPowerReentryReplaySuffixAtPlanScale(profile, context, powers, expected, decoded, guarded.Ciphertext, planScale)
 	if err != nil {
 		return nil, guarded, err
 	}
@@ -165,14 +173,18 @@ func generatedPowerReentryReplayBranch(profile q056PreparedProfile, context psLo
 }
 
 func generatedPowerReentryRunCase(profile q056PreparedProfile, realContext, imagContext psLocalizationAcceptedContext, realPowers, imagPowers map[int]*rlwe.Ciphertext, realExpected, imagExpected, realDecoded, imagDecoded map[int][]complex128, name string, keys []int) (generatedPowerReentryCase, error) {
+	return generatedPowerReentryRunCaseAtPlanScale(profile, realContext, imagContext, realPowers, imagPowers, realExpected, imagExpected, realDecoded, imagDecoded, name, keys, precisionSweepScale(generatedPowerReentryPlanScaleExponent))
+}
+
+func generatedPowerReentryRunCaseAtPlanScale(profile q056PreparedProfile, realContext, imagContext psLocalizationAcceptedContext, realPowers, imagPowers map[int]*rlwe.Ciphertext, realExpected, imagExpected, realDecoded, imagDecoded map[int][]complex128, name string, keys []int, planScale rlwe.Scale) (generatedPowerReentryCase, error) {
 	result := generatedPowerReentryCase{Name: name, GeneratedKeys: append([]int(nil), keys...)}
-	realFinal, realGuard, err := generatedPowerReentryReplayBranch(profile, realContext, realPowers, realExpected, realDecoded)
+	realFinal, realGuard, err := generatedPowerReentryReplayBranchAtPlanScale(profile, realContext, realPowers, realExpected, realDecoded, planScale)
 	if err != nil {
 		result.RealGuard = generatedPowerReentryGuardMap(realGuard)
 		result.Metrics.Reason = "real: " + err.Error()
 		return result, nil
 	}
-	imagFinal, imagGuard, err := generatedPowerReentryReplayBranch(profile, imagContext, imagPowers, imagExpected, imagDecoded)
+	imagFinal, imagGuard, err := generatedPowerReentryReplayBranchAtPlanScale(profile, imagContext, imagPowers, imagExpected, imagDecoded, planScale)
 	if err != nil {
 		result.RealGuard = generatedPowerReentryGuardMap(realGuard)
 		result.ImagGuard = generatedPowerReentryGuardMap(imagGuard)
@@ -181,7 +193,7 @@ func generatedPowerReentryRunCase(profile q056PreparedProfile, realContext, imag
 	}
 	result.RealGuard = generatedPowerReentryGuardMap(realGuard)
 	result.ImagGuard = generatedPowerReentryGuardMap(imagGuard)
-	downstream, err := psLocalizationRunAcceptedDownstream(profile, precisionSweepScale(generatedPowerReentryPlanScaleExponent), realFinal, imagFinal)
+	downstream, err := psLocalizationRunAcceptedDownstream(profile, planScale, realFinal, imagFinal)
 	if err != nil {
 		result.Metrics.Reason = err.Error()
 		return result, nil

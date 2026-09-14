@@ -306,6 +306,13 @@ func nativeQ012FirstMismatch(params ckks.Parameters, a, b *rlwe.Ciphertext) (*in
 	return nil, nil, nil
 }
 
+// nativeQ01FastRowsEqual compares two already-Fast/Montgomery ciphertexts.
+// It deliberately does not apply MForm; full-RNS sources must be contracted
+// with nativeQ01ContractFull before reaching nativeQ01RowsEqual.
+func nativeQ01FastRowsEqual(params ckks.Parameters, a, b *rlwe.Ciphertext) bool {
+	return nativeQ01RowsEqual(params, a, b)
+}
+
 func nativeQ012MetadataEqual(a, b *rlwe.Ciphertext) bool {
 	return a != nil && b != nil && a.Level() == b.Level() && a.Degree() == b.Degree() && a.IsNTT == b.IsNTT && a.Scale.Equal(b.Scale)
 }
@@ -747,7 +754,7 @@ func runFIX001P3DesignLogN13GeneratedPowerNativeQ012MultiplyFirst(cfg BootstrapC
 					delta = d
 				}
 			}
-			result.LocalComparisons = append(result.LocalComparisons, nativeQ012LocalComparison{Branch: branch.name, Power: n, OldBalanced: oldM, FullRNSMultiplyFirst: fullM, NativeQ012: nativeM, NativeVsFullMax: delta, RowsEqual: nativeQ01RowsEqual(params, branch.native[n], mustNativeQ01Contract(params, branch.full[n]))})
+			result.LocalComparisons = append(result.LocalComparisons, nativeQ012LocalComparison{Branch: branch.name, Power: n, OldBalanced: oldM, FullRNSMultiplyFirst: fullM, NativeQ012: nativeM, NativeVsFullMax: delta, RowsEqual: nativeQ01FastRowsEqual(params, branch.native[n], branch.full[n])})
 		}
 	}
 	system, err := generatedPowerReentryRunCase(profile, realContext, imagContext, realNative, imagNative, realContext.Branch.Base.PowerExpected, imagContext.Branch.Base.PowerExpected, realNativeValues, imagNativeValues, "M-all-generated-native-q012", []int{2, 3, 4, 6, 8, 16})
