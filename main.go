@@ -60,6 +60,7 @@ func main() {
 	fix001P3DiagLogN13S2CErrorDecomposition := flag.Bool("fix001-p3-diag-logn13-s2c-error-decomposition", false, "decompose LogN13 S2C error for the accepted G0=2 candidate")
 	fix001P3DiagLogN13EvalModResidualDecomposition := flag.Bool("fix001-p3-diag-logn13-evalmod-residual-error-decomposition", false, "decompose LogN13 EvalMod residual error")
 	fix001P3DiagLogN13HighPrecisionOracleRecovery := flag.Bool("fix001-p3-diag-logn13-high-precision-oracle-recovery", false, "recover LogN13 high-precision EvalMod oracle")
+	fix001P3DiagLogN13QuantizationAwareEvalModDecomposition := flag.Bool("fix001-p3-diag-logn13-quantization-aware-evalmod-decomposition", false, "decompose LogN13 EvalMod with canonical CKKS quantization")
 	flag.Parse()
 
 	cfg, err := LoadBootstrapConfig(*configPath)
@@ -218,6 +219,9 @@ func main() {
 		selectedModes++
 	}
 	if *fix001P3DiagLogN13HighPrecisionOracleRecovery {
+		selectedModes++
+	}
+	if *fix001P3DiagLogN13QuantizationAwareEvalModDecomposition {
 		selectedModes++
 	}
 	if selectedModes > 1 {
@@ -393,6 +397,10 @@ func main() {
 		}
 	} else if *fix001P3DiagLogN13HighPrecisionOracleRecovery {
 		if err := runFIX001P3DiagLogN13HighPrecisionOracleRecovery(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
+			log.Fatal(err)
+		}
+	} else if *fix001P3DiagLogN13QuantizationAwareEvalModDecomposition {
+		if err := runFIX001P3DiagLogN13QuantizationAwareEvalModDecomposition(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
 			log.Fatal(err)
 		}
 	} else if *finalizationDiagnostic {
