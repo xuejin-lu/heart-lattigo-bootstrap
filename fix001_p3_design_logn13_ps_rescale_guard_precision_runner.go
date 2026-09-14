@@ -543,28 +543,22 @@ func psRescaleGuardReplayPS(params ckks.Parameters, eval *fastckks.Evaluator, pl
 func psRescaleGuardReplayPSWithBoundaryOverride(params ckks.Parameters, eval *fastckks.Evaluator, plan commonpolynomial.PatersonStockmeyerPolynomial, powers map[int]*rlwe.Ciphertext, powerExpected, powerDecoded map[int][]complex128, input []complex128, candidate rlwe.Scale, guards map[string]int, override psRescaleGuardFinalOverride, boundaryOverride psRescaleGuardBoundaryOverride, extras ...interface{}) (psRescaleGuardReplay, error) {
 	out := psRescaleGuardReplay{}
 	var mergeOverride *psRescaleGuardG0MergeOverride
-	var reset psGlobalReplayReset
+	var resets []psGlobalReplayReset
 	for _, extra := range extras {
 		switch value := extra.(type) {
 		case psGlobalReplayReset:
-			reset = value
+			resets = append(resets, value)
 		case psRescaleGuardG0MergeOverride:
 			mergeOverride = &value
 		case *psRescaleGuardG0MergeOverride:
 			mergeOverride = value
 		}
 	}
-	var resetID string
-	var resetCiphertext *rlwe.Ciphertext
-	if reset.ID != "" {
-		resetID = reset.ID
-		if reset.Ciphertext != nil {
-			resetCiphertext = reset.Ciphertext.CopyNew()
-		}
-	}
 	applyReset := func(id string, current **rlwe.Ciphertext) {
-		if id == resetID && resetCiphertext != nil {
-			*current = resetCiphertext.CopyNew()
+		for _, reset := range resets {
+			if id == reset.ID && reset.Ciphertext != nil {
+				*current = reset.Ciphertext.CopyNew()
+			}
 		}
 	}
 	type node struct {
