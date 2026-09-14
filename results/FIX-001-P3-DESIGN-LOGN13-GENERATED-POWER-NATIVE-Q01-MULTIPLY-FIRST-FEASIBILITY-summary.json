@@ -1,0 +1,482 @@
+{
+  "schema_version": "fix-001-p3-design-logn13-generated-power-native-q01-multiply-first-feasibility.v1",
+  "timestamp": "2026-09-14T11:37:04.763102Z",
+  "primary_repository": {
+    "path": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap",
+    "commit": "8ab8fb49ee797a2b9543e405c65584b62d14a70c",
+    "ref": "main",
+    "dirty": true
+  },
+  "lattigo_repository": {
+    "path": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/../lattigo",
+    "commit": "7d05f1f3c6f8a14dea2bcb2d3fa05246d322a797",
+    "ref": "fast-ckks",
+    "dirty": false
+  },
+  "environment": {
+    "go_version": "go1.26.4",
+    "os": "darwin",
+    "architecture": "arm64",
+    "cpu": "Apple M4",
+    "logical_cpus": 10
+  },
+  "config": {
+    "log_n": 13,
+    "log_default_scale": 45,
+    "secret_hamming": 192,
+    "q0": [
+      56
+    ],
+    "q_slots_to_coeffs": [
+      39,
+      39,
+      39
+    ],
+    "q_coeffs_to_slots": [
+      56,
+      56,
+      56,
+      56
+    ],
+    "p": [
+      61,
+      61,
+      61,
+      61,
+      61
+    ],
+    "slots_to_coeffs_dft_levels": [
+      1,
+      1,
+      1
+    ],
+    "coeffs_to_slots_dft_levels": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "log_slots": -1,
+    "mod1_log_scale": 60,
+    "mod1_degree": 30,
+    "mod1_double_angle": 3,
+    "mod1_k": 16,
+    "log_message_ratio": 10,
+    "mod1_inv_degree": 0,
+    "repetitions": 3,
+    "warmup": 1
+  },
+  "effective_parameters": {
+    "residual_log_n": 13,
+    "residual_max_level": 1,
+    "bootstrap_log_n": 13,
+    "bootstrap_max_level": 16,
+    "bootstrap_log_slots": 12,
+    "bootstrap_log_q": [
+      56,
+      39,
+      40,
+      39,
+      40,
+      60,
+      60,
+      61,
+      60,
+      60,
+      60,
+      61,
+      61,
+      57,
+      56,
+      56,
+      56
+    ],
+    "bootstrap_log_p": [
+      61,
+      61,
+      62,
+      61,
+      62
+    ],
+    "circuit_order": "ModUpThenEncode"
+  },
+  "workload": {
+    "identifier": "accepted-q056-ps-input.v1",
+    "formula": "accepted evalModMatchedC2SInputs with fixed D0 stack",
+    "logical_slots": 4096
+  },
+  "provenance": {
+    "required_primary_ancestor": "904f0460e36b69add5491f7c7006c72153970789",
+    "secondary_clean": true,
+    "secondary_commit": "7d05f1f3c6f8a14dea2bcb2d3fa05246d322a797",
+    "secondary_required_commit": "7d05f1f3c6f8a14dea2bcb2d3fa05246d322a797"
+  },
+  "q0_controls": {
+    "d0_oracle_public_like": {
+      "max_component_abs": 0.005554220603853743,
+      "max_abs_complex": 0.005639352903342042,
+      "mean_abs_complex": 0.0010250762369357583,
+      "worst_index": 0,
+      "worst_component": "imag",
+      "pass_threshold": true,
+      "threshold": 0.01
+    },
+    "full_rns_multiply_first_public_like": {
+      "max_component_abs": 0.005554220603853743,
+      "max_abs_complex": 0.005639352903342042,
+      "mean_abs_complex": 0.0010250762369357583,
+      "worst_index": 0,
+      "worst_component": "imag",
+      "pass_threshold": true,
+      "threshold": 0.01
+    },
+    "g_all_balanced_public_like": {
+      "max_component_abs": 0.22247498019233428,
+      "max_abs_complex": 0.23334654593824833,
+      "mean_abs_complex": 0.13468874342944984,
+      "worst_index": 3954,
+      "worst_component": "real",
+      "pass_threshold": false,
+      "threshold": 0.01
+    }
+  },
+  "dependency_graph": [
+    {
+      "power": 2,
+      "left": 1,
+      "right": 1,
+      "lazy": false,
+      "balanced": true,
+      "common_level": 12,
+      "current_rescale_divisor_bits": 61,
+      "balanced_factors": "1073741821*1073741828",
+      "left_metadata": "level=12 scale=1.152921504606846976000000000000000000000e+18 degree=1 ntt=true mont=true",
+      "right_metadata": "level=12 scale=1.152921504606846976000000000000000000000e+18 degree=1 ntt=true mont=true",
+      "output_metadata": "level=11 scale=1.152921504606470143000000123168064193041e+18 degree=1 ntt=true mont=true",
+      "operation_lineage": "commonpolynomial.SplitDegree -\u003e native Fast q01 MulRelin -\u003e Add -\u003e recurrence correction -\u003e one Rescale"
+    },
+    {
+      "power": 3,
+      "left": 1,
+      "right": 2,
+      "lazy": false,
+      "balanced": true,
+      "common_level": 11,
+      "current_rescale_divisor_bits": 61,
+      "balanced_factors": "1073741821*1073741828",
+      "left_metadata": "level=12 scale=1.152921504606846976000000000000000000000e+18 degree=1 ntt=true mont=true",
+      "right_metadata": "level=11 scale=1.152921504606470143000000123168064193041e+18 degree=1 ntt=true mont=true",
+      "output_metadata": "level=10 scale=1.152921504606846976000000000000000000000e+18 degree=1 ntt=true mont=true",
+      "operation_lineage": "commonpolynomial.SplitDegree -\u003e native Fast q01 MulRelin -\u003e Add -\u003e recurrence correction -\u003e one Rescale"
+    },
+    {
+      "power": 4,
+      "left": 2,
+      "right": 2,
+      "lazy": false,
+      "balanced": true,
+      "common_level": 11,
+      "current_rescale_divisor_bits": 61,
+      "balanced_factors": "1073741821*1073741828",
+      "left_metadata": "level=11 scale=1.152921504606470143000000123168064193041e+18 degree=1 ntt=true mont=true",
+      "right_metadata": "level=11 scale=1.152921504606470143000000123168064193041e+18 degree=1 ntt=true mont=true",
+      "output_metadata": "level=10 scale=1.152921504605749245000000697098755613584e+18 degree=1 ntt=true mont=true",
+      "operation_lineage": "commonpolynomial.SplitDegree -\u003e native Fast q01 MulRelin -\u003e Add -\u003e recurrence correction -\u003e one Rescale"
+    },
+    {
+      "power": 6,
+      "left": 3,
+      "right": 3,
+      "lazy": false,
+      "balanced": true,
+      "common_level": 10,
+      "current_rescale_divisor_bits": 60,
+      "balanced_factors": "1073741820*1073741828",
+      "left_metadata": "level=10 scale=1.152921504606846976000000000000000000000e+18 degree=1 ntt=true mont=true",
+      "right_metadata": "level=10 scale=1.152921504606846976000000000000000000000e+18 degree=1 ntt=true mont=true",
+      "output_metadata": "level=9 scale=1.152921504607109119000000059604190028921e+18 degree=1 ntt=true mont=true",
+      "operation_lineage": "commonpolynomial.SplitDegree -\u003e native Fast q01 MulRelin -\u003e Add -\u003e recurrence correction -\u003e one Rescale"
+    },
+    {
+      "power": 8,
+      "left": 4,
+      "right": 4,
+      "lazy": false,
+      "balanced": true,
+      "common_level": 10,
+      "current_rescale_divisor_bits": 60,
+      "balanced_factors": "1073741820*1073741828",
+      "left_metadata": "level=10 scale=1.152921504605749245000000697098755613584e+18 degree=1 ntt=true mont=true",
+      "right_metadata": "level=10 scale=1.152921504605749245000000697098755613584e+18 degree=1 ntt=true mont=true",
+      "output_metadata": "level=9 scale=1.152921504604913657000001999795813412611e+18 degree=1 ntt=true mont=true",
+      "operation_lineage": "commonpolynomial.SplitDegree -\u003e native Fast q01 MulRelin -\u003e Add -\u003e recurrence correction -\u003e one Rescale"
+    },
+    {
+      "power": 16,
+      "left": 8,
+      "right": 8,
+      "lazy": false,
+      "balanced": true,
+      "common_level": 9,
+      "current_rescale_divisor_bits": 60,
+      "balanced_factors": "1073741820*1073741828",
+      "left_metadata": "level=9 scale=1.152921504604913657000001999795813412611e+18 degree=1 ntt=true mont=true",
+      "right_metadata": "level=9 scale=1.152921504604913657000001999795813412611e+18 degree=1 ntt=true mont=true",
+      "output_metadata": "level=8 scale=1.152921504603226097000006469715344887877e+18 degree=1 ntt=true mont=true",
+      "operation_lineage": "commonpolynomial.SplitDegree -\u003e native Fast q01 MulRelin -\u003e Add -\u003e recurrence correction -\u003e one Rescale"
+    }
+  ],
+  "q01_capacity_table": [
+    {
+      "checkpoint": "real.T2.raw_product",
+      "max_abs": "183412352083186044017074232",
+      "half_modulus": "19807037677037493296585048064",
+      "ratio": 0.009259958761820194,
+      "outside_count": 0,
+      "minimum_required_bits": 89,
+      "centered_unique": true,
+      "domain": "q01"
+    },
+    {
+      "checkpoint": "real.T2.doubled",
+      "max_abs": "366824704166372088034148464",
+      "half_modulus": "19807037677037493296585048064",
+      "ratio": 0.01851991752364039,
+      "outside_count": 0,
+      "minimum_required_bits": 90,
+      "centered_unique": true,
+      "domain": "q01"
+    },
+    {
+      "checkpoint": "real.T2.recurrence_aligned",
+      "max_abs": "366824704166372088034148464",
+      "half_modulus": "19807037677037493296585048064",
+      "ratio": 0.01851991752364039,
+      "outside_count": 0,
+      "minimum_required_bits": 90,
+      "centered_unique": true,
+      "domain": "q01"
+    },
+    {
+      "checkpoint": "real.T2.recurrence_corrected",
+      "max_abs": "363470662178935648598278261",
+      "half_modulus": "19807037677037493296585048064",
+      "ratio": 0.01835058165211202,
+      "outside_count": 0,
+      "minimum_required_bits": 90,
+      "centered_unique": true,
+      "domain": "q01"
+    }
+  ],
+  "q012_capacity_table": [
+    {
+      "checkpoint": "real.T2.raw_product",
+      "max_abs": "324518688712934373357293444563000",
+      "half_modulus": "10889038337610403961202266989249939021824",
+      "ratio": 2.980232768508646e-8,
+      "outside_count": 0,
+      "minimum_required_bits": 110,
+      "centered_unique": true,
+      "domain": "q012"
+    },
+    {
+      "checkpoint": "real.T2.doubled",
+      "max_abs": "649037377425868746714586889126000",
+      "half_modulus": "10889038337610403961202266989249939021824",
+      "ratio": 5.960465537017292e-8,
+      "outside_count": 0,
+      "minimum_required_bits": 111,
+      "centered_unique": true,
+      "domain": "q012"
+    },
+    {
+      "checkpoint": "real.T2.recurrence_aligned",
+      "max_abs": "649037377425868746714586889126000",
+      "half_modulus": "10889038337610403961202266989249939021824",
+      "ratio": 5.960465537017292e-8,
+      "outside_count": 0,
+      "minimum_required_bits": 111,
+      "centered_unique": true,
+      "domain": "q012"
+    },
+    {
+      "checkpoint": "real.T2.recurrence_corrected",
+      "max_abs": "1328578958407490004157092473391218576",
+      "half_modulus": "10889038337610403961202266989249939021824",
+      "ratio": 0.00012201067874089662,
+      "outside_count": 0,
+      "minimum_required_bits": 121,
+      "centered_unique": true,
+      "domain": "q012"
+    }
+  ],
+  "native_vs_full_checkpoint_rows": [
+    {
+      "branch": "real",
+      "power": 2,
+      "stage": "parent_left",
+      "native_metadata": "level=12 scale=1.152921504606846976000000000000000000000e+18 degree=1 ntt=true mont=true",
+      "mirror_metadata": "level=12 scale=1.152921504606846976000000000000000000000e+18 degree=1 ntt=true mont=true",
+      "q0_q1_rows_equal": true,
+      "metadata_equal": true,
+      "mirror_capacity": {
+        "checkpoint": "real.T2.parent_left",
+        "max_abs": "18014402257704328",
+        "half_modulus": "19807037677037493296585048064",
+        "ratio": 9.094950265373916e-13,
+        "outside_count": 0,
+        "minimum_required_bits": 56,
+        "centered_unique": true,
+        "domain": "q01"
+      },
+      "decoded_max_component_difference": 0
+    },
+    {
+      "branch": "real",
+      "power": 2,
+      "stage": "parent_right",
+      "native_metadata": "level=12 scale=1.152921504606846976000000000000000000000e+18 degree=1 ntt=true mont=true",
+      "mirror_metadata": "level=12 scale=1.152921504606846976000000000000000000000e+18 degree=1 ntt=true mont=true",
+      "q0_q1_rows_equal": true,
+      "metadata_equal": true,
+      "mirror_capacity": {
+        "checkpoint": "real.T2.parent_right",
+        "max_abs": "18014402257704328",
+        "half_modulus": "19807037677037493296585048064",
+        "ratio": 9.094950265373916e-13,
+        "outside_count": 0,
+        "minimum_required_bits": 56,
+        "centered_unique": true,
+        "domain": "q01"
+      },
+      "decoded_max_component_difference": 0
+    },
+    {
+      "branch": "real",
+      "power": 2,
+      "stage": "raw_product",
+      "native_metadata": "level=12 scale=1.329227995784915872903807060280344576000e+36 degree=1 ntt=true mont=true",
+      "mirror_metadata": "level=12 scale=1.329227995784915872903807060280344576000e+36 degree=1 ntt=true mont=true",
+      "q0_q1_rows_equal": true,
+      "metadata_equal": true,
+      "mirror_capacity": {
+        "checkpoint": "real.T2.raw_product",
+        "max_abs": "183412352083186044017074232",
+        "half_modulus": "19807037677037493296585048064",
+        "ratio": 0.009259958761820194,
+        "outside_count": 0,
+        "minimum_required_bits": 89,
+        "centered_unique": true,
+        "domain": "q01"
+      },
+      "decoded_max_component_difference": 0
+    },
+    {
+      "branch": "real",
+      "power": 2,
+      "stage": "doubled",
+      "native_metadata": "level=12 scale=1.329227995784915872903807060280344576000e+36 degree=1 ntt=true mont=true",
+      "mirror_metadata": "level=12 scale=1.329227995784915872903807060280344576000e+36 degree=1 ntt=true mont=true",
+      "q0_q1_rows_equal": true,
+      "metadata_equal": true,
+      "mirror_capacity": {
+        "checkpoint": "real.T2.doubled",
+        "max_abs": "366824704166372088034148464",
+        "half_modulus": "19807037677037493296585048064",
+        "ratio": 0.01851991752364039,
+        "outside_count": 0,
+        "minimum_required_bits": 90,
+        "centered_unique": true,
+        "domain": "q01"
+      },
+      "decoded_max_component_difference": 0
+    },
+    {
+      "branch": "real",
+      "power": 2,
+      "stage": "recurrence_corrected",
+      "native_metadata": "level=12 scale=1.329227995784915872903807060280344576000e+36 degree=1 ntt=true mont=true",
+      "mirror_metadata": "level=12 scale=1.329227995784915872903807060280344576000e+36 degree=1 ntt=true mont=true",
+      "q0_q1_rows_equal": true,
+      "metadata_equal": true,
+      "mirror_capacity": {
+        "checkpoint": "real.T2.recurrence_corrected",
+        "max_abs": "363470662178935648598278261",
+        "half_modulus": "19807037677037493296585048064",
+        "ratio": 0.01835058165211202,
+        "outside_count": 0,
+        "minimum_required_bits": 90,
+        "centered_unique": true,
+        "domain": "q01"
+      },
+      "decoded_max_component_difference": 0
+    },
+    {
+      "branch": "real",
+      "power": 2,
+      "stage": "post_rescale",
+      "native_metadata": "level=11 scale=1.152921504606470143000000123168064193041e+18 degree=1 ntt=true mont=true",
+      "mirror_metadata": "level=11 scale=1.152921504606470143000000123168064193041e+18 degree=1 ntt=true mont=true",
+      "q0_q1_rows_equal": false,
+      "metadata_equal": true,
+      "mirror_capacity": {
+        "checkpoint": "real.T2.post_rescale",
+        "max_abs": "1152358554418766790",
+        "half_modulus": "19807037677037493296585048064",
+        "ratio": 5.8179247861718774e-11,
+        "outside_count": 0,
+        "minimum_required_bits": 61,
+        "centered_unique": true,
+        "domain": "q01"
+      },
+      "decoded_max_component_difference": 0.9995117188202379
+    }
+  ],
+  "rescale_quotient_oracle_table": [
+    {
+      "branch": "real",
+      "power": 2,
+      "divisor": "1152921504607223809",
+      "input_level": 12,
+      "output_level": 11,
+      "rounded_quotient_rows_equal": false,
+      "native_quotient_rows_equal": true,
+      "mirror_quotient_rows_equal": false,
+      "maximum_integer_rounding_discrepancy": 1152358554734027335,
+      "pre_rescale_centered_unique": true,
+      "post_rescale_centered_unique": true,
+      "scale_equal": true,
+      "level_decrement_one": true,
+      "first_expected": "315260545",
+      "first_mirror": "-1152358554418766790"
+    }
+  ],
+  "local_power_comparisons": null,
+  "all_generated_native_system": {},
+  "q0_q1_headroom_evidence": {
+    "q01_bits": 95,
+    "q0_bits": 56,
+    "q1_bits": 39
+  },
+  "classification": "logn13_generated_power_native_q01_rescale_mismatch",
+  "first_remaining_blocker": "real.T2.post_rescale",
+  "recommended_next_target": "localize the first native q0/q1 blocker before production integration",
+  "validation": {
+    "common_plan_scale_2^92": true,
+    "logn13_only": true,
+    "native_candidate_stopped_at_first_hard_blocker": true,
+    "native_fast_operations": "MulRelin/Add/Rescale",
+    "no_benchmark": true,
+    "no_exp003": true,
+    "no_gate_4_or_5": true,
+    "no_logn16": true,
+    "no_production_integration": true,
+    "no_q_parameter_change": true,
+    "no_secondary_production_changes": true,
+    "no_unsafe_q01_operation_executed": true,
+    "q01_capacity_checked_before_native_operations": true,
+    "q0_q1_q2_profile": "56/39/40",
+    "q2_native_arithmetic": false,
+    "rescale_oracle_match": false
+  }
+}

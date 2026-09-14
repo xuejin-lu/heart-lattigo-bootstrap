@@ -68,6 +68,7 @@ func main() {
 	fix001P3IntegrateLogN13B4T2OneBitScalarGuard := flag.Bool("fix001-p3-integrate-logn13-b4-t2-one-bit-scalar-guard", false, "integrate and validate the production LogN13 B4 T2 one-bit scalar guard")
 	fix001P3DiagLogN13GeneratedPowerReentry := flag.Bool("fix001-p3-diag-logn13-generated-power-reentry", false, "diagnose LogN13 generated-power reentry under the accepted oracle stack")
 	fix001P3DesignLogN13GeneratedPowerMultiplyFirstLocalQ2 := flag.Bool("fix001-p3-design-logn13-generated-power-multiply-first-local-q2", false, "design LogN13 generated-power multiply-first temporary-q2 feasibility")
+	fix001P3DesignLogN13GeneratedPowerNativeQ01MultiplyFirst := flag.Bool("fix001-p3-design-logn13-generated-power-native-q01-multiply-first", false, "design LogN13 native q0/q1 generated-power multiply-first feasibility")
 	flag.Parse()
 
 	cfg, err := LoadBootstrapConfig(*configPath)
@@ -250,6 +251,9 @@ func main() {
 		selectedModes++
 	}
 	if *fix001P3DesignLogN13GeneratedPowerMultiplyFirstLocalQ2 {
+		selectedModes++
+	}
+	if *fix001P3DesignLogN13GeneratedPowerNativeQ01MultiplyFirst {
 		selectedModes++
 	}
 	if selectedModes > 1 {
@@ -457,6 +461,10 @@ func main() {
 		}
 	} else if *fix001P3DesignLogN13GeneratedPowerMultiplyFirstLocalQ2 {
 		if err := runFIX001P3DesignLogN13GeneratedPowerMultiplyFirstLocalQ2(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
+			log.Fatal(err)
+		}
+	} else if *fix001P3DesignLogN13GeneratedPowerNativeQ01MultiplyFirst {
+		if err := runFIX001P3DesignLogN13GeneratedPowerNativeQ01MultiplyFirst(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
 			log.Fatal(err)
 		}
 	} else if *finalizationDiagnostic {

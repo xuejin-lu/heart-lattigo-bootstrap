@@ -66,6 +66,8 @@ type designPowerTrace struct {
 	AfterRescaleRight *rlwe.Ciphertext
 	RawProduct        *rlwe.Ciphertext
 	Doubled           *rlwe.Ciphertext
+	Aligned           *rlwe.Ciphertext
+	AlignedSub        *rlwe.Ciphertext
 	Corrected         *rlwe.Ciphertext
 	Completed         *rlwe.Ciphertext
 }
