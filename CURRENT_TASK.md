@@ -1,4 +1,4 @@
 # Current Task
 
-Task: Implement `specs/FIX-001-P3-DIAG-PUBLIC-FINALIZATION.md`
+Task: Implement `specs/FIX-001-P3-DIAG-P93-S2C-ATTRIBUTION-AND-REFERENCE-RECONCILIATION.md`
 Status: READY
