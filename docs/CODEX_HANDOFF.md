@@ -12,7 +12,7 @@ Secondary:
 - `xuejin-lu/lattigo`
 - active branch: `fast-ckks`
 - committed base: `7d05f1f3c6f8a14dea2bcb2d3fa05246d322a797`
-- local worktree is intentionally dirty with the current fixed-width Q012 / PS-wide P93 production candidate.
+- local worktree is intentionally dirty.
 
 Never reset, stash, clean, discard, checkout-overwrite, rebase, pull across, reconstruct, or otherwise alter the Secondary dirty worktree.
 
@@ -22,32 +22,35 @@ When the user says `開始`, follow `AGENTS.md` mandatory preflight first, then 
 
 ## Current accepted evidence
 
-Fresh Genuine Standard is now authoritative:
-- public Bootstrap exact E2E = `5.830057349387463e-8`;
-- staged Standard equals public Standard exactly for the deterministic workload.
+Authoritative Standard:
+- Genuine Standard public/staged exact E2E = `5.830057349387463e-8`.
+- matched diagnostic Standard is only a local/internal proxy from EvalMod onward.
 
-Matched diagnostic Standard:
-- C2S real/imag exactly match Genuine Standard;
-- from EvalMod onward, matched objects use a manually normalized stage oracle;
-- matched EvalMod rows equal Genuine Standard EvalMod rows, but matched/internal Scale is `2^50` while Genuine Standard public EvalMod Scale is `2^45`;
-- therefore matched Standard is valid only as an internal/stage proxy, not as the public exact-E2E oracle.
+Current Fast:
+- C2S real/imag align to Genuine Standard at ~`1e-13`.
+- final internal pre-public Fast-vs-Genuine-Standard EvalMod gap:
+  - real `0.004183019582623534`
+  - imag `0.004261561142162278`.
+- shared public DefaultScale contract maps this to exactly 32x public error.
+- public `1e-2` therefore corresponds to internal target `3.125e-4`.
 
-This revises the previous metadata interpretation:
-- the public `2^50 -> 2^45` EvalMod Scale reset is part of the Genuine Standard public contract, not a Fast-specific bug;
-- the final public DefaultScale restoration is likewise part of the Standard public contract;
-- prior diagnostic "corrections" that preserved `2^50` were useful only to expose internal Fast arithmetic error against a matched internal oracle.
+## Important rejection of the previous task classification
 
-Current Fast-vs-Genuine Standard:
-- C2S real/imag ≈ `1e-13` difference;
-- first material divergence occurs at EvalMod;
-- Fast internal/matched error ≈ `0.00418/0.00426`;
-- common public Scale contract magnifies this internal error by ~32;
-- public Fast-vs-Genuine Standard EvalMod error is ~`0.1339/0.1364`;
-- final Fast exact E2E remains ~`0.188575`.
+Primary commit:
+`0c9987fa2ebaaf924e8a6b4cd85cafe1d53a3406`
 
-For public `1e-2`, the corresponding internal pre-public EvalMod budget is approximately `3.125e-4`.
+Its endpoint controls are useful, but the claimed first material `pre_double_angle` / polynomial classification is not accepted.
 
-Do not repair Scale metadata now. The next blocker is the actual internal Fast EvalMod arithmetic/semantics.
+Why:
+1. the old trace let Fast advance through DoubleAngle while the paired Standard comparison object stayed at polynomial output;
+2. Fast normalized LogN13 uses a deferred maintained scalar / virtual exponent;
+3. raw decode immediately after metadata-only coherent-scale changes is not in the same semantic coordinate system as Standard.
+
+The nonphysical pattern
+`~5e-7 -> 0.779 -> ~7e-7`
+therefore reflects invalid checkpoint pairing/coordinates, not a proven production causal boundary.
+
+No production repair should be based on that classification.
 
 ## Current task
 
@@ -55,34 +58,37 @@ Read synchronized `CURRENT_TASK.md`.
 
 At this revision:
 
-`specs/FIX-001-P3-DIAG-P93-FAST-VS-GENUINE-STANDARD-EVALMOD-INTERNAL-BISECT.md`
+`specs/FIX-001-P3-DIAG-P93-EVALMOD-LOCKSTEP-LOGICAL-SEMANTICS-TRACE.md`
 
 The task must:
-1. prove Fast and Genuine Standard C2S inputs align;
-2. source-faithfully trace actual Standard and Fast EvalMod internals before the shared public Scale reset;
-3. compare preprocessing, polynomial/PS, DoubleAngle, and internal restore semantics;
-4. identify first observable and first material Fast-vs-Genuine-Standard internal divergence;
-5. prove the common public reset maps internal error to approximately 32x public error;
-6. determine whether historical P93 ~1e-4 evidence is comparable to this Genuine Standard internal oracle;
-7. stop after classification; no production repair.
+1. explicitly document the previous trace defect;
+2. run Standard and Fast in true lockstep logical stages;
+3. track Fast virtual maintained-scalar exponent;
+4. canonicalize Fast logical semantics with the virtual exponent before comparison;
+5. compare Standard and Fast only at equivalent logical checkpoints;
+6. reproduce the accepted final internal gap and factor-32 public mapping;
+7. identify the first true observable/material divergence;
+8. keep the committed summary compact (target <=300 JSON lines);
+9. stop after classification; no production repair.
 
 ## Two-word workflow
 
 1. Codex: user says only `開始`.
-2. Codex synchronizes Primary, executes current spec, validates, commits and pushes Primary evidence.
+2. Codex syncs Primary, executes current spec, validates, commits and pushes Primary evidence.
 3. ChatGPT Web: user says only `review`.
-4. Orchestrator reviews and prepares the next task.
+4. Orchestrator independently reviews and prepares the next task.
 
 ## Current prohibitions
 
-- no dirty Secondary source modification
+- no Secondary source modification
 - no Secondary commit/push
 - no destructive operation on dirty Secondary
+- no production repair
 - no metadata repair
 - no coefficient correction
 - no q/planScale tuning
 - no P92/P94 sweep
-- no production PS/C2S/S2C/finalizer repair
+- no C2S/S2C/finalizer work
 - no threshold relaxation
 - no LogN16
 - no Gate4/5
