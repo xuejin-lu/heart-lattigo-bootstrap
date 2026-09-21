@@ -1,0 +1,3313 @@
+{
+  "schema_version": "fix-001-p3-diag-p93-production-c2s-first-material-divergence.v1",
+  "timestamp": "2026-09-21T13:15:42.857762Z",
+  "primary_repository": {
+    "path": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap",
+    "commit": "617c008c006e125db2dbcea96d58716ba9e3922d",
+    "ref": "main",
+    "dirty": true
+  },
+  "secondary_repository": {
+    "path": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/../lattigo",
+    "commit": "7d05f1f3c6f8a14dea2bcb2d3fa05246d322a797",
+    "ref": "fast-ckks",
+    "dirty": true
+  },
+  "environment": {
+    "go_version": "go1.26.4",
+    "os": "darwin",
+    "architecture": "arm64",
+    "cpu": "Apple M4",
+    "logical_cpus": 10
+  },
+  "config": {
+    "log_n": 13,
+    "log_default_scale": 45,
+    "secret_hamming": 192,
+    "q0": [
+      55
+    ],
+    "q_slots_to_coeffs": [
+      39,
+      39,
+      39
+    ],
+    "q_coeffs_to_slots": [
+      56,
+      56,
+      56,
+      56
+    ],
+    "p": [
+      61,
+      61,
+      61,
+      61,
+      61
+    ],
+    "slots_to_coeffs_dft_levels": [
+      1,
+      1,
+      1
+    ],
+    "coeffs_to_slots_dft_levels": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "log_slots": -1,
+    "mod1_log_scale": 60,
+    "mod1_degree": 30,
+    "mod1_double_angle": 3,
+    "mod1_k": 16,
+    "log_message_ratio": 10,
+    "mod1_inv_degree": 0,
+    "repetitions": 3,
+    "warmup": 1
+  },
+  "fixed_profile": {
+    "log_n": 13,
+    "plan_scale": "2^93",
+    "ps_authority": "Q012-wide",
+    "q0_bits": 56,
+    "q1_bits_approx": 39,
+    "q2_bits_approx": 40,
+    "slots": 4096,
+    "threshold": 0.01
+  },
+  "provenance": {
+    "expected_secondary_diff_sha256": "44b430bd7e148c919538c5487d95dbbc2d195054aaf15cae8b4a241d875bb46e",
+    "expected_secondary_head": "7d05f1f3c6f8a14dea2bcb2d3fa05246d322a797",
+    "secondary_branch": "fast-ckks",
+    "secondary_committed_head": "7d05f1f3c6f8a14dea2bcb2d3fa05246d322a797",
+    "secondary_diff_sha256": "44b430bd7e148c919538c5487d95dbbc2d195054aaf15cae8b4a241d875bb46e",
+    "secondary_diff_stat": "circuits/ckks/bootstrapping/fast_bootstrap.go |  5 +-\n circuits/ckks/bootstrapping/fast_modup.go     | 26 ++++++--\n circuits/ckks/bootstrapping/fast_packing.go   | 34 ++++++-----\n circuits/ckks/dft/fast.go                     |  5 +-\n circuits/ckks/mod1/fast.go                    | 48 ++++++++++-----\n circuits/ckks/polynomial/fast.go              |  6 +-\n schemes/ckks/fast/automorphism.go             |  6 +-\n schemes/ckks/fast/ciphertext.go               | 22 ++++---\n schemes/ckks/fast/evaluator.go                | 12 ++--\n schemes/ckks/fast/evaluator_ntt.go            | 62 ++++++++++++-------\n schemes/ckks/fast/fast_add.go                 | 16 ++++-\n schemes/ckks/fast/fast_mul.go                 | 41 ++++++++-----\n schemes/ckks/fast/linear_transform.go         | 44 ++++++++------\n schemes/ckks/fast/partial_ntt.go              | 29 ++++++---\n schemes/ckks/fast/rescale.go                  | 86 +++++++++++++++++++++++++--\n schemes/ckks/fast/ring_degree.go              |  5 +-\n schemes/ckks/fast/trace.go                    |  7 +--\n schemes/ckks/fast/truncate.go                 | 32 ++++++++--\n 18 files changed, 342 insertions(+), 144 deletions(-)",
+    "secondary_dirty": true
+  },
+  "r0_path_reproduction": {
+    "actual_production": {
+      "evalmod_imag_vs_ordinary_standard": {
+        "max_component_abs": 0.1363699565491929,
+        "max_abs_complex": 0.1363699565491929,
+        "mean_abs_complex": 0.04352085550679738,
+        "worst_index": 3058,
+        "worst_component": "real",
+        "pass_threshold": false,
+        "threshold": 0.01
+      },
+      "evalmod_real_vs_ordinary_standard": {
+        "max_component_abs": 0.1338566266439531,
+        "max_abs_complex": 0.1338566266439531,
+        "mean_abs_complex": 0.04308374096705661,
+        "worst_index": 2504,
+        "worst_component": "real",
+        "pass_threshold": false,
+        "threshold": 0.01
+      },
+      "expected_full_core_imag": 0.020569287028685726,
+      "expected_full_core_real": 0.022317936759951508,
+      "modup": {
+        "degree": 1,
+        "level": 16,
+        "scale": "1.125899906842624000000000000000000000000e+15"
+      }
+    },
+    "controlled_established_final_match": {
+      "imag": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "real": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      }
+    },
+    "controlled_matched_c2s": {
+      "evalmod_imag": {
+        "max_component_abs": 0.004261561141286309,
+        "max_abs_complex": 0.004261561141286309,
+        "mean_abs_complex": 0.001360026734561572,
+        "worst_index": 3058,
+        "worst_component": "real",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "evalmod_real": {
+        "max_component_abs": 0.0041830195838036925,
+        "max_abs_complex": 0.0041830195838036925,
+        "mean_abs_complex": 0.0013463669052206186,
+        "worst_index": 2504,
+        "worst_component": "real",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "expected_imag": 0.004261561142162278,
+      "expected_real": 0.004183019582623534
+    }
+  },
+  "r1_boundary_comparisons": {
+    "controlled_vs_aligned_standard_imag": {
+      "max_component_abs": 0.004261561141286309,
+      "max_abs_complex": 0.004261561141286309,
+      "mean_abs_complex": 0.001360026734561572,
+      "worst_index": 3058,
+      "worst_component": "real",
+      "pass_threshold": true,
+      "threshold": 0.01
+    },
+    "controlled_vs_aligned_standard_real": {
+      "max_component_abs": 0.0041830195838036925,
+      "max_abs_complex": 0.0041830195838036925,
+      "mean_abs_complex": 0.0013463669052206186,
+      "worst_index": 2504,
+      "worst_component": "real",
+      "pass_threshold": true,
+      "threshold": 0.01
+    },
+    "production_c2s_imag_vs_controlled_c2s_imag": {
+      "max_component_abs": 0,
+      "max_abs_complex": 0,
+      "mean_abs_complex": 0,
+      "worst_index": -1,
+      "worst_component": "",
+      "pass_threshold": true,
+      "threshold": 0.01
+    },
+    "production_c2s_real_vs_controlled_c2s_real": {
+      "max_component_abs": 0,
+      "max_abs_complex": 0,
+      "mean_abs_complex": 0,
+      "worst_index": -1,
+      "worst_component": "",
+      "pass_threshold": true,
+      "threshold": 0.01
+    },
+    "production_evalmod_vs_ordinary_standard_imag": {
+      "max_component_abs": 0.1363699565491929,
+      "max_abs_complex": 0.1363699565491929,
+      "mean_abs_complex": 0.04352085550679738,
+      "worst_index": 3058,
+      "worst_component": "real",
+      "pass_threshold": false,
+      "threshold": 0.01
+    },
+    "production_evalmod_vs_ordinary_standard_real": {
+      "max_component_abs": 0.1338566266439531,
+      "max_abs_complex": 0.1338566266439531,
+      "mean_abs_complex": 0.04308374096705661,
+      "worst_index": 2504,
+      "worst_component": "real",
+      "pass_threshold": false,
+      "threshold": 0.01
+    },
+    "production_modup_vs_controlled_modup": {
+      "max_component_abs": 0,
+      "max_abs_complex": 0,
+      "mean_abs_complex": 0,
+      "worst_index": -1,
+      "worst_component": "",
+      "pass_threshold": true,
+      "threshold": 0.01
+    },
+    "production_vs_aligned_standard_imag": {
+      "max_component_abs": 0,
+      "max_abs_complex": 0,
+      "mean_abs_complex": 0,
+      "worst_index": -1,
+      "worst_component": "",
+      "pass_threshold": true,
+      "threshold": 0.01
+    },
+    "production_vs_aligned_standard_real": {
+      "max_component_abs": 0,
+      "max_abs_complex": 0,
+      "mean_abs_complex": 0,
+      "worst_index": -1,
+      "worst_component": "",
+      "pass_threshold": true,
+      "threshold": 0.01
+    }
+  },
+  "r2_source_faithful_c2s_trace": [
+    {
+      "checkpoint": "group0_input",
+      "operation": "production_group_input",
+      "production_vs_controlled_diagnostic": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "diagnostic_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_metadata": {
+        "source_level": 16,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "diagnostic_metadata": {
+        "source_level": 16,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "aligned_standard_metadata": {
+        "source_level": 16,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": false,
+        "projected_is_montgomery": false
+      },
+      "production_diagnostic_metadata_equal": {
+        "degree": true,
+        "is_montgomery": true,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_aligned_metadata_equal": {
+        "degree": true,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "diagnostic_aligned_metadata_equal": {
+        "degree": true,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_capacity": {
+        "max_abs_exact_coefficient": "4246320593024",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 2.1438443558608484e-16,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "diagnostic_capacity": {
+        "max_abs_exact_coefficient": "4246320593024",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 2.1438443558608484e-16,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "aligned_standard_capacity": {
+        "max_abs_exact_coefficient": "4246320593024",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 2.1438443558608484e-16,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "amplification_from_previous": 0,
+      "level_scale_degree_transition": {
+        "diagnostic": {
+          "degree": 1,
+          "level": 16,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "production": {
+          "degree": 1,
+          "level": 16,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        }
+      }
+    },
+    {
+      "checkpoint": "group0_after_transform",
+      "operation": "production_linear_transform",
+      "production_vs_controlled_diagnostic": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "diagnostic_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_metadata": {
+        "source_level": 15,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "diagnostic_metadata": {
+        "source_level": 15,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "aligned_standard_metadata": {
+        "source_level": 15,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": false,
+        "projected_is_montgomery": false
+      },
+      "production_diagnostic_metadata_equal": {
+        "degree": true,
+        "is_montgomery": true,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_aligned_metadata_equal": {
+        "degree": true,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "diagnostic_aligned_metadata_equal": {
+        "degree": true,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_capacity": {
+        "max_abs_exact_coefficient": "997817243296",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 5.037690438953322e-17,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "diagnostic_capacity": {
+        "max_abs_exact_coefficient": "997817243296",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 5.037690438953322e-17,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "aligned_standard_capacity": {
+        "max_abs_exact_coefficient": "997817243296",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 5.037690438953322e-17,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "amplification_from_previous": 0,
+      "level_scale_degree_transition": {
+        "diagnostic": {
+          "degree": 1,
+          "level": 15,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "production": {
+          "degree": 1,
+          "level": 15,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        }
+      }
+    },
+    {
+      "checkpoint": "group0_after_rescale",
+      "operation": "production_rescale",
+      "production_vs_controlled_diagnostic": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "diagnostic_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_metadata": {
+        "source_level": 15,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "diagnostic_metadata": {
+        "source_level": 15,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "aligned_standard_metadata": {
+        "source_level": 15,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": false,
+        "projected_is_montgomery": false
+      },
+      "production_diagnostic_metadata_equal": {
+        "degree": true,
+        "is_montgomery": true,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_aligned_metadata_equal": {
+        "degree": true,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "diagnostic_aligned_metadata_equal": {
+        "degree": true,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_capacity": {
+        "max_abs_exact_coefficient": "997817243296",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 5.037690438953322e-17,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "diagnostic_capacity": {
+        "max_abs_exact_coefficient": "997817243296",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 5.037690438953322e-17,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "aligned_standard_capacity": {
+        "max_abs_exact_coefficient": "997817243296",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 5.037690438953322e-17,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "amplification_from_previous": 0,
+      "level_scale_degree_transition": {
+        "diagnostic": {
+          "degree": 1,
+          "level": 15,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "production": {
+          "degree": 1,
+          "level": 15,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        }
+      }
+    },
+    {
+      "checkpoint": "group0_after_restore",
+      "operation": "production_restore",
+      "production_vs_controlled_diagnostic": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "diagnostic_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_metadata": {
+        "source_level": 15,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "diagnostic_metadata": {
+        "source_level": 15,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "aligned_standard_metadata": {
+        "source_level": 15,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": false,
+        "projected_is_montgomery": false
+      },
+      "production_diagnostic_metadata_equal": {
+        "degree": true,
+        "is_montgomery": true,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_aligned_metadata_equal": {
+        "degree": true,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "diagnostic_aligned_metadata_equal": {
+        "degree": true,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_capacity": {
+        "max_abs_exact_coefficient": "997817243296",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 5.037690438953322e-17,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "diagnostic_capacity": {
+        "max_abs_exact_coefficient": "997817243296",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 5.037690438953322e-17,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "aligned_standard_capacity": {
+        "max_abs_exact_coefficient": "997817243296",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 5.037690438953322e-17,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "amplification_from_previous": 0,
+      "level_scale_degree_transition": {
+        "diagnostic": {
+          "degree": 1,
+          "level": 15,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "production": {
+          "degree": 1,
+          "level": 15,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        }
+      }
+    },
+    {
+      "checkpoint": "group1_input",
+      "operation": "production_group_input",
+      "production_vs_controlled_diagnostic": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "diagnostic_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_metadata": {
+        "source_level": 15,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "diagnostic_metadata": {
+        "source_level": 15,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "aligned_standard_metadata": {
+        "source_level": 15,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": false,
+        "projected_is_montgomery": false
+      },
+      "production_diagnostic_metadata_equal": {
+        "degree": true,
+        "is_montgomery": true,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_aligned_metadata_equal": {
+        "degree": true,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "diagnostic_aligned_metadata_equal": {
+        "degree": true,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_capacity": {
+        "max_abs_exact_coefficient": "997817243296",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 5.037690438953322e-17,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "diagnostic_capacity": {
+        "max_abs_exact_coefficient": "997817243296",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 5.037690438953322e-17,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "aligned_standard_capacity": {
+        "max_abs_exact_coefficient": "997817243296",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 5.037690438953322e-17,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "amplification_from_previous": 0,
+      "level_scale_degree_transition": {
+        "diagnostic": {
+          "degree": 1,
+          "level": 15,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "production": {
+          "degree": 1,
+          "level": 15,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        }
+      }
+    },
+    {
+      "checkpoint": "group1_after_transform",
+      "operation": "production_linear_transform",
+      "production_vs_controlled_diagnostic": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "diagnostic_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_metadata": {
+        "source_level": 14,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "diagnostic_metadata": {
+        "source_level": 14,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "aligned_standard_metadata": {
+        "source_level": 14,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": false,
+        "projected_is_montgomery": false
+      },
+      "production_diagnostic_metadata_equal": {
+        "degree": true,
+        "is_montgomery": true,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_aligned_metadata_equal": {
+        "degree": true,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "diagnostic_aligned_metadata_equal": {
+        "degree": true,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_capacity": {
+        "max_abs_exact_coefficient": "143479010992",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 7.243839958881723e-18,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "diagnostic_capacity": {
+        "max_abs_exact_coefficient": "143479010992",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 7.243839958881723e-18,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "aligned_standard_capacity": {
+        "max_abs_exact_coefficient": "143479010992",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 7.243839958881723e-18,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "amplification_from_previous": 0,
+      "level_scale_degree_transition": {
+        "diagnostic": {
+          "degree": 1,
+          "level": 14,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "production": {
+          "degree": 1,
+          "level": 14,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        }
+      }
+    },
+    {
+      "checkpoint": "group1_after_rescale",
+      "operation": "production_rescale",
+      "production_vs_controlled_diagnostic": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "diagnostic_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_metadata": {
+        "source_level": 14,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "diagnostic_metadata": {
+        "source_level": 14,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "aligned_standard_metadata": {
+        "source_level": 14,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": false,
+        "projected_is_montgomery": false
+      },
+      "production_diagnostic_metadata_equal": {
+        "degree": true,
+        "is_montgomery": true,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_aligned_metadata_equal": {
+        "degree": true,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "diagnostic_aligned_metadata_equal": {
+        "degree": true,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_capacity": {
+        "max_abs_exact_coefficient": "143479010992",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 7.243839958881723e-18,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "diagnostic_capacity": {
+        "max_abs_exact_coefficient": "143479010992",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 7.243839958881723e-18,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "aligned_standard_capacity": {
+        "max_abs_exact_coefficient": "143479010992",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 7.243839958881723e-18,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "amplification_from_previous": 0,
+      "level_scale_degree_transition": {
+        "diagnostic": {
+          "degree": 1,
+          "level": 14,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "production": {
+          "degree": 1,
+          "level": 14,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        }
+      }
+    },
+    {
+      "checkpoint": "group1_after_restore",
+      "operation": "production_restore",
+      "production_vs_controlled_diagnostic": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "diagnostic_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_metadata": {
+        "source_level": 14,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "diagnostic_metadata": {
+        "source_level": 14,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "aligned_standard_metadata": {
+        "source_level": 14,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": false,
+        "projected_is_montgomery": false
+      },
+      "production_diagnostic_metadata_equal": {
+        "degree": true,
+        "is_montgomery": true,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_aligned_metadata_equal": {
+        "degree": true,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "diagnostic_aligned_metadata_equal": {
+        "degree": true,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_capacity": {
+        "max_abs_exact_coefficient": "143479010992",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 7.243839958881723e-18,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "diagnostic_capacity": {
+        "max_abs_exact_coefficient": "143479010992",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 7.243839958881723e-18,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "aligned_standard_capacity": {
+        "max_abs_exact_coefficient": "143479010992",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 7.243839958881723e-18,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "amplification_from_previous": 0,
+      "level_scale_degree_transition": {
+        "diagnostic": {
+          "degree": 1,
+          "level": 14,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "production": {
+          "degree": 1,
+          "level": 14,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        }
+      }
+    },
+    {
+      "checkpoint": "group2_input",
+      "operation": "production_group_input",
+      "production_vs_controlled_diagnostic": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "diagnostic_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_metadata": {
+        "source_level": 14,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "diagnostic_metadata": {
+        "source_level": 14,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "aligned_standard_metadata": {
+        "source_level": 14,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": false,
+        "projected_is_montgomery": false
+      },
+      "production_diagnostic_metadata_equal": {
+        "degree": true,
+        "is_montgomery": true,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_aligned_metadata_equal": {
+        "degree": true,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "diagnostic_aligned_metadata_equal": {
+        "degree": true,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_capacity": {
+        "max_abs_exact_coefficient": "143479010992",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 7.243839958881723e-18,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "diagnostic_capacity": {
+        "max_abs_exact_coefficient": "143479010992",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 7.243839958881723e-18,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "aligned_standard_capacity": {
+        "max_abs_exact_coefficient": "143479010992",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 7.243839958881723e-18,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "amplification_from_previous": 0,
+      "level_scale_degree_transition": {
+        "diagnostic": {
+          "degree": 1,
+          "level": 14,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "production": {
+          "degree": 1,
+          "level": 14,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        }
+      }
+    },
+    {
+      "checkpoint": "group2_after_transform",
+      "operation": "production_linear_transform",
+      "production_vs_controlled_diagnostic": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "diagnostic_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_metadata": {
+        "source_level": 13,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "diagnostic_metadata": {
+        "source_level": 13,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "aligned_standard_metadata": {
+        "source_level": 13,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": false,
+        "projected_is_montgomery": false
+      },
+      "production_diagnostic_metadata_equal": {
+        "degree": true,
+        "is_montgomery": true,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_aligned_metadata_equal": {
+        "degree": true,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "diagnostic_aligned_metadata_equal": {
+        "degree": true,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_capacity": {
+        "max_abs_exact_coefficient": "21637024898",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 1.0923907578104942e-18,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "diagnostic_capacity": {
+        "max_abs_exact_coefficient": "21637024898",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 1.0923907578104942e-18,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "aligned_standard_capacity": {
+        "max_abs_exact_coefficient": "21637024898",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 1.0923907578104942e-18,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "amplification_from_previous": 0,
+      "level_scale_degree_transition": {
+        "diagnostic": {
+          "degree": 1,
+          "level": 13,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "production": {
+          "degree": 1,
+          "level": 13,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        }
+      }
+    },
+    {
+      "checkpoint": "group2_after_rescale",
+      "operation": "production_rescale",
+      "production_vs_controlled_diagnostic": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "diagnostic_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_metadata": {
+        "source_level": 13,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "diagnostic_metadata": {
+        "source_level": 13,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "aligned_standard_metadata": {
+        "source_level": 13,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": false,
+        "projected_is_montgomery": false
+      },
+      "production_diagnostic_metadata_equal": {
+        "degree": true,
+        "is_montgomery": true,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_aligned_metadata_equal": {
+        "degree": true,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "diagnostic_aligned_metadata_equal": {
+        "degree": true,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_capacity": {
+        "max_abs_exact_coefficient": "21637024898",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 1.0923907578104942e-18,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "diagnostic_capacity": {
+        "max_abs_exact_coefficient": "21637024898",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 1.0923907578104942e-18,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "aligned_standard_capacity": {
+        "max_abs_exact_coefficient": "21637024898",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 1.0923907578104942e-18,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "amplification_from_previous": 0,
+      "level_scale_degree_transition": {
+        "diagnostic": {
+          "degree": 1,
+          "level": 13,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "production": {
+          "degree": 1,
+          "level": 13,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        }
+      }
+    },
+    {
+      "checkpoint": "group2_after_restore",
+      "operation": "production_restore",
+      "production_vs_controlled_diagnostic": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "diagnostic_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_metadata": {
+        "source_level": 13,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "diagnostic_metadata": {
+        "source_level": 13,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "aligned_standard_metadata": {
+        "source_level": 13,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": false,
+        "projected_is_montgomery": false
+      },
+      "production_diagnostic_metadata_equal": {
+        "degree": true,
+        "is_montgomery": true,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_aligned_metadata_equal": {
+        "degree": true,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "diagnostic_aligned_metadata_equal": {
+        "degree": true,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_capacity": {
+        "max_abs_exact_coefficient": "21637024898",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 1.0923907578104942e-18,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "diagnostic_capacity": {
+        "max_abs_exact_coefficient": "21637024898",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 1.0923907578104942e-18,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "aligned_standard_capacity": {
+        "max_abs_exact_coefficient": "21637024898",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 1.0923907578104942e-18,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "amplification_from_previous": 0,
+      "level_scale_degree_transition": {
+        "diagnostic": {
+          "degree": 1,
+          "level": 13,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "production": {
+          "degree": 1,
+          "level": 13,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        }
+      }
+    },
+    {
+      "checkpoint": "group3_input",
+      "operation": "production_group_input",
+      "production_vs_controlled_diagnostic": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "diagnostic_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_metadata": {
+        "source_level": 13,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "diagnostic_metadata": {
+        "source_level": 13,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "aligned_standard_metadata": {
+        "source_level": 13,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": false,
+        "projected_is_montgomery": false
+      },
+      "production_diagnostic_metadata_equal": {
+        "degree": true,
+        "is_montgomery": true,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_aligned_metadata_equal": {
+        "degree": true,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "diagnostic_aligned_metadata_equal": {
+        "degree": true,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_capacity": {
+        "max_abs_exact_coefficient": "21637024898",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 1.0923907578104942e-18,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "diagnostic_capacity": {
+        "max_abs_exact_coefficient": "21637024898",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 1.0923907578104942e-18,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "aligned_standard_capacity": {
+        "max_abs_exact_coefficient": "21637024898",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 1.0923907578104942e-18,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "amplification_from_previous": 0,
+      "level_scale_degree_transition": {
+        "diagnostic": {
+          "degree": 1,
+          "level": 13,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "production": {
+          "degree": 1,
+          "level": 13,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        }
+      }
+    },
+    {
+      "checkpoint": "group3_after_transform",
+      "operation": "production_linear_transform",
+      "production_vs_controlled_diagnostic": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "diagnostic_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_metadata": {
+        "source_level": 12,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "diagnostic_metadata": {
+        "source_level": 12,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "aligned_standard_metadata": {
+        "source_level": 12,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": false,
+        "projected_is_montgomery": false
+      },
+      "production_diagnostic_metadata_equal": {
+        "degree": true,
+        "is_montgomery": true,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_aligned_metadata_equal": {
+        "degree": true,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "diagnostic_aligned_metadata_equal": {
+        "degree": true,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_capacity": {
+        "max_abs_exact_coefficient": "3076098482",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 1.553033084581928e-19,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "diagnostic_capacity": {
+        "max_abs_exact_coefficient": "3076098482",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 1.553033084581928e-19,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "aligned_standard_capacity": {
+        "max_abs_exact_coefficient": "3076098482",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 1.553033084581928e-19,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "amplification_from_previous": 0,
+      "level_scale_degree_transition": {
+        "diagnostic": {
+          "degree": 1,
+          "level": 12,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "production": {
+          "degree": 1,
+          "level": 12,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        }
+      }
+    },
+    {
+      "checkpoint": "group3_after_rescale",
+      "operation": "production_rescale",
+      "production_vs_controlled_diagnostic": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "diagnostic_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_metadata": {
+        "source_level": 12,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "diagnostic_metadata": {
+        "source_level": 12,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "aligned_standard_metadata": {
+        "source_level": 12,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": false,
+        "projected_is_montgomery": false
+      },
+      "production_diagnostic_metadata_equal": {
+        "degree": true,
+        "is_montgomery": true,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_aligned_metadata_equal": {
+        "degree": true,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "diagnostic_aligned_metadata_equal": {
+        "degree": true,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_capacity": {
+        "max_abs_exact_coefficient": "3076098482",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 1.553033084581928e-19,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "diagnostic_capacity": {
+        "max_abs_exact_coefficient": "3076098482",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 1.553033084581928e-19,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "aligned_standard_capacity": {
+        "max_abs_exact_coefficient": "3076098482",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 1.553033084581928e-19,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "amplification_from_previous": 0,
+      "level_scale_degree_transition": {
+        "diagnostic": {
+          "degree": 1,
+          "level": 12,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "production": {
+          "degree": 1,
+          "level": 12,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        }
+      }
+    },
+    {
+      "checkpoint": "group3_after_restore",
+      "operation": "production_restore",
+      "production_vs_controlled_diagnostic": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "diagnostic_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_metadata": {
+        "source_level": 12,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "diagnostic_metadata": {
+        "source_level": 12,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "aligned_standard_metadata": {
+        "source_level": 12,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": false,
+        "projected_is_montgomery": false
+      },
+      "production_diagnostic_metadata_equal": {
+        "degree": true,
+        "is_montgomery": true,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_aligned_metadata_equal": {
+        "degree": true,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "diagnostic_aligned_metadata_equal": {
+        "degree": true,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_capacity": {
+        "max_abs_exact_coefficient": "3076098482",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 1.553033084581928e-19,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "diagnostic_capacity": {
+        "max_abs_exact_coefficient": "3076098482",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 1.553033084581928e-19,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "aligned_standard_capacity": {
+        "max_abs_exact_coefficient": "3076098482",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 1.553033084581928e-19,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "amplification_from_previous": 0,
+      "level_scale_degree_transition": {
+        "diagnostic": {
+          "degree": 1,
+          "level": 12,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "production": {
+          "degree": 1,
+          "level": 12,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        }
+      }
+    },
+    {
+      "checkpoint": "split_conjugate",
+      "operation": "production_split_conjugate",
+      "production_vs_controlled_diagnostic": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_metadata": {
+        "source_level": 12,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "diagnostic_metadata": {
+        "source_level": 12,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "aligned_standard_metadata": {
+        "source_level": 0,
+        "decode_level": 0,
+        "scale": "",
+        "scale_log2": 0,
+        "degree": 0,
+        "n": 0,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 0
+        },
+        "is_ntt": false,
+        "is_montgomery": false,
+        "projected_is_montgomery": false
+      },
+      "production_diagnostic_metadata_equal": {
+        "degree": true,
+        "is_montgomery": true,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_capacity": {
+        "max_abs_exact_coefficient": "4266722694",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 2.154144786096134e-19,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "diagnostic_capacity": {
+        "max_abs_exact_coefficient": "4266722694",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 2.154144786096134e-19,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "amplification_from_previous": 0,
+      "level_scale_degree_transition": {
+        "diagnostic": {
+          "degree": 1,
+          "level": 12,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "production": {
+          "degree": 1,
+          "level": 12,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        }
+      }
+    },
+    {
+      "checkpoint": "split_imag_sub",
+      "operation": "production_split_imag_sub",
+      "production_vs_controlled_diagnostic": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_metadata": {
+        "source_level": 12,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "diagnostic_metadata": {
+        "source_level": 12,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "aligned_standard_metadata": {
+        "source_level": 0,
+        "decode_level": 0,
+        "scale": "",
+        "scale_log2": 0,
+        "degree": 0,
+        "n": 0,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 0
+        },
+        "is_ntt": false,
+        "is_montgomery": false,
+        "projected_is_montgomery": false
+      },
+      "production_diagnostic_metadata_equal": {
+        "degree": true,
+        "is_montgomery": true,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_capacity": {
+        "max_abs_exact_coefficient": "4089577457",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 2.064709283479119e-19,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "diagnostic_capacity": {
+        "max_abs_exact_coefficient": "4089577457",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 2.064709283479119e-19,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "amplification_from_previous": 0,
+      "level_scale_degree_transition": {
+        "diagnostic": {
+          "degree": 1,
+          "level": 12,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "production": {
+          "degree": 1,
+          "level": 12,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        }
+      }
+    },
+    {
+      "checkpoint": "split_imag_mul_minus_i",
+      "operation": "production_split_imag_mul_minus_i",
+      "production_vs_controlled_diagnostic": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_metadata": {
+        "source_level": 12,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "diagnostic_metadata": {
+        "source_level": 12,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "aligned_standard_metadata": {
+        "source_level": 0,
+        "decode_level": 0,
+        "scale": "",
+        "scale_log2": 0,
+        "degree": 0,
+        "n": 0,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 0
+        },
+        "is_ntt": false,
+        "is_montgomery": false,
+        "projected_is_montgomery": false
+      },
+      "production_diagnostic_metadata_equal": {
+        "degree": true,
+        "is_montgomery": true,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_capacity": {
+        "max_abs_exact_coefficient": "4089577457",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 2.064709283479119e-19,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "diagnostic_capacity": {
+        "max_abs_exact_coefficient": "4089577457",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 2.064709283479119e-19,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "amplification_from_previous": 0,
+      "level_scale_degree_transition": {
+        "diagnostic": {
+          "degree": 1,
+          "level": 12,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "production": {
+          "degree": 1,
+          "level": 12,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        }
+      }
+    },
+    {
+      "checkpoint": "split_real_add",
+      "operation": "production_split_real_add",
+      "production_vs_controlled_diagnostic": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_metadata": {
+        "source_level": 12,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "diagnostic_metadata": {
+        "source_level": 12,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "aligned_standard_metadata": {
+        "source_level": 0,
+        "decode_level": 0,
+        "scale": "",
+        "scale_log2": 0,
+        "degree": 0,
+        "n": 0,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 0
+        },
+        "is_ntt": false,
+        "is_montgomery": false,
+        "projected_is_montgomery": false
+      },
+      "production_diagnostic_metadata_equal": {
+        "degree": true,
+        "is_montgomery": true,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_capacity": {
+        "max_abs_exact_coefficient": "4266722694",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 2.154144786096134e-19,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "diagnostic_capacity": {
+        "max_abs_exact_coefficient": "4266722694",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 2.154144786096134e-19,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "amplification_from_previous": 0,
+      "level_scale_degree_transition": {
+        "diagnostic": {
+          "degree": 1,
+          "level": 12,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "production": {
+          "degree": 1,
+          "level": 12,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        }
+      }
+    },
+    {
+      "checkpoint": "final_real",
+      "operation": "production_final_output",
+      "production_vs_controlled_diagnostic": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "diagnostic_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_metadata": {
+        "source_level": 12,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "diagnostic_metadata": {
+        "source_level": 12,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "aligned_standard_metadata": {
+        "source_level": 12,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": false,
+        "projected_is_montgomery": false
+      },
+      "production_diagnostic_metadata_equal": {
+        "degree": true,
+        "is_montgomery": true,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_aligned_metadata_equal": {
+        "degree": true,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "diagnostic_aligned_metadata_equal": {
+        "degree": true,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_capacity": {
+        "max_abs_exact_coefficient": "4266722694",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 2.154144786096134e-19,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "diagnostic_capacity": {
+        "max_abs_exact_coefficient": "4266722694",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 2.154144786096134e-19,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "aligned_standard_capacity": {
+        "max_abs_exact_coefficient": "4266722694",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 2.154144786096134e-19,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "amplification_from_previous": 0,
+      "level_scale_degree_transition": {
+        "diagnostic": {
+          "degree": 1,
+          "level": 12,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "production": {
+          "degree": 1,
+          "level": 12,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        }
+      }
+    },
+    {
+      "checkpoint": "final_imag",
+      "operation": "production_final_output",
+      "production_vs_controlled_diagnostic": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "diagnostic_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "production_metadata": {
+        "source_level": 12,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "diagnostic_metadata": {
+        "source_level": 12,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": true,
+        "projected_is_montgomery": false
+      },
+      "aligned_standard_metadata": {
+        "source_level": 12,
+        "decode_level": 1,
+        "scale": "1.125899906842624000000000000000000000000e+15",
+        "scale_log2": 50,
+        "degree": 1,
+        "n": 8192,
+        "log_dimensions": {
+          "Rows": 0,
+          "Cols": 12
+        },
+        "is_ntt": true,
+        "is_montgomery": false,
+        "projected_is_montgomery": false
+      },
+      "production_diagnostic_metadata_equal": {
+        "degree": true,
+        "is_montgomery": true,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_aligned_metadata_equal": {
+        "degree": true,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "diagnostic_aligned_metadata_equal": {
+        "degree": true,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": true,
+        "log_dimensions": true,
+        "n": true,
+        "scale": true
+      },
+      "production_capacity": {
+        "max_abs_exact_coefficient": "4089577457",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 2.064709283479119e-19,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "diagnostic_capacity": {
+        "max_abs_exact_coefficient": "4089577457",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 2.064709283479119e-19,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "aligned_standard_capacity": {
+        "max_abs_exact_coefficient": "4089577457",
+        "q01_half": "19807037677037493296585048064",
+        "max_abs_over_q01_half": 2.064709283479119e-19,
+        "outside_count": 0,
+        "pass_unique_centered_reconstruction": true
+      },
+      "amplification_from_previous": 0,
+      "level_scale_degree_transition": {
+        "diagnostic": {
+          "degree": 1,
+          "level": 12,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "production": {
+          "degree": 1,
+          "level": 12,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        }
+      }
+    }
+  ],
+  "r3_downstream_causal_confirmation": {
+    "actual_evalmod_vs_full_core_imag": {
+      "max_component_abs": 0,
+      "max_abs_complex": 0,
+      "mean_abs_complex": 0,
+      "worst_index": -1,
+      "worst_component": "",
+      "pass_threshold": true,
+      "threshold": 1e-12
+    },
+    "actual_evalmod_vs_full_core_real": {
+      "max_component_abs": 0,
+      "max_abs_complex": 0,
+      "mean_abs_complex": 0,
+      "worst_index": -1,
+      "worst_component": "",
+      "pass_threshold": true,
+      "threshold": 1e-12
+    },
+    "c2s_input_delta_imag": {
+      "max_component_abs": 0,
+      "max_abs_complex": 0,
+      "mean_abs_complex": 0,
+      "worst_index": -1,
+      "worst_component": "",
+      "pass_threshold": true,
+      "threshold": 0.01
+    },
+    "c2s_input_delta_real": {
+      "max_component_abs": 0,
+      "max_abs_complex": 0,
+      "mean_abs_complex": 0,
+      "worst_index": -1,
+      "worst_component": "",
+      "pass_threshold": true,
+      "threshold": 0.01
+    },
+    "empirical_amplification": {
+      "imag": "not_applicable_zero_c2s_delta",
+      "real": "not_applicable_zero_c2s_delta"
+    },
+    "interpretation": "The same current production EvalMod map gives zero delta because actual and controlled C2S outputs are identical. The observed ~0.022 versus ~0.004 gap is between the production map and the matched normalized reference, not a C2S causal delta.",
+    "production_map_evalmod_delta_imag": {
+      "max_component_abs": 0,
+      "max_abs_complex": 0,
+      "mean_abs_complex": 0,
+      "worst_index": -1,
+      "worst_component": "",
+      "pass_threshold": true,
+      "threshold": 0.01
+    },
+    "production_map_evalmod_delta_real": {
+      "max_component_abs": 0,
+      "max_abs_complex": 0,
+      "mean_abs_complex": 0,
+      "worst_index": -1,
+      "worst_component": "",
+      "pass_threshold": true,
+      "threshold": 0.01
+    },
+    "production_vs_matched_normalized_evalmod_imag": {
+      "max_component_abs": 0.01657172300885934,
+      "max_abs_complex": 0.01657172300885934,
+      "mean_abs_complex": 0.00485917277374716,
+      "worst_index": 3446,
+      "worst_component": "real",
+      "pass_threshold": false,
+      "threshold": 0.01
+    },
+    "production_vs_matched_normalized_evalmod_real": {
+      "max_component_abs": 0.018243003747759622,
+      "max_abs_complex": 0.018243003747759622,
+      "mean_abs_complex": 0.0048026718041769565,
+      "worst_index": 2045,
+      "worst_component": "real",
+      "pass_threshold": false,
+      "threshold": 0.01
+    },
+    "vector_closure_residual": {
+      "imag": 0,
+      "real": 0
+    }
+  },
+  "first_observable_divergence": {
+    "checkpoint": "none_above_floor",
+    "numerical_floor": 1e-12
+  },
+  "first_material_divergence": {
+    "criterion": "10% of final actual-vs-controlled C2S output difference",
+    "final_imag_difference": {
+      "max_component_abs": 0,
+      "max_abs_complex": 0,
+      "mean_abs_complex": 0,
+      "worst_index": -1,
+      "worst_component": "",
+      "pass_threshold": true,
+      "threshold": 0.01
+    },
+    "final_real_difference": {
+      "max_component_abs": 0,
+      "max_abs_complex": 0,
+      "mean_abs_complex": 0,
+      "worst_index": -1,
+      "worst_component": "",
+      "pass_threshold": true,
+      "threshold": 0.01
+    },
+    "material_threshold": 0
+  },
+  "r5_standard_reference_reconciliation": {
+    "imag": {
+      "actual_fast_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "actual_fast_vs_ordinary_standard": {
+        "max_component_abs": 9.504534339470697e-14,
+        "max_abs_complex": 9.504534339471234e-14,
+        "mean_abs_complex": 1.9709133334287426e-14,
+        "worst_index": 778,
+        "worst_component": "real",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "aligned_standard_vs_ordinary_standard": {
+        "max_component_abs": 9.504534339470697e-14,
+        "max_abs_complex": 9.504534339471234e-14,
+        "mean_abs_complex": 1.9709133334287426e-14,
+        "worst_index": 778,
+        "worst_component": "real",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "controlled_fast_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "controlled_fast_vs_ordinary_standard": {
+        "max_component_abs": 9.504534339470697e-14,
+        "max_abs_complex": 9.504534339471234e-14,
+        "mean_abs_complex": 1.9709133334287426e-14,
+        "worst_index": 778,
+        "worst_component": "real",
+        "pass_threshold": true,
+        "threshold": 0.01
+      }
+    },
+    "real": {
+      "actual_fast_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "actual_fast_vs_ordinary_standard": {
+        "max_component_abs": 9.423671153314939e-14,
+        "max_abs_complex": 9.423671153314947e-14,
+        "mean_abs_complex": 2.0025553817279963e-14,
+        "worst_index": 3366,
+        "worst_component": "real",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "aligned_standard_vs_ordinary_standard": {
+        "max_component_abs": 9.423671153314939e-14,
+        "max_abs_complex": 9.423671153314947e-14,
+        "mean_abs_complex": 2.0025553817279963e-14,
+        "worst_index": 3366,
+        "worst_component": "real",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "controlled_fast_vs_aligned_standard": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "controlled_fast_vs_ordinary_standard": {
+        "max_component_abs": 9.423671153314939e-14,
+        "max_abs_complex": 9.423671153314947e-14,
+        "mean_abs_complex": 2.0025553817279963e-14,
+        "worst_index": 3366,
+        "worst_component": "real",
+        "pass_threshold": true,
+        "threshold": 0.01
+      }
+    },
+    "roles": {
+      "actual_fast": "current production Fast C2S output for full-core correctness",
+      "aligned_standard": "controlled compressed/aligned C2S reference for Fast stage fidelity",
+      "controlled_fast": "controlled diagnostic C2S input for EvalMod stage fidelity",
+      "ordinary_standard": "actual production full-core reference for end-to-end correctness"
+    }
+  },
+  "classification": "P93_STANDARD_REFERENCE_SEMANTICS_MISMATCH",
+  "validation": {
+    "logn13_only": true,
+    "no_benchmark": true,
+    "no_evalmod_repair": true,
+    "no_exp003": true,
+    "no_finalizer_repair": true,
+    "no_gate_4_or_5": true,
+    "no_logn16": true,
+    "no_parameter_tuning": true,
+    "no_ps_repair": true,
+    "no_s2c_repair": true,
+    "no_secondary_commit_or_push": true,
+    "no_secondary_source_modification": true,
+    "secondary_unchanged_confirmed": true
+  }
+}

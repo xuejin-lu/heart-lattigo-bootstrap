@@ -78,6 +78,7 @@ func main() {
 	fix001P3DesignLogN13PSWideQ012Q056ScaleSweep := flag.Bool("fix001-p3-design-logn13-ps-wide-q012-q056-scale-sweep", false, "sweep diagnostic PS-wide Q012 q0=56 scales")
 	fix001P3DiagP93EvalModFirstDivergence := flag.Bool("fix001-p3-diag-p93-evalmod-first-divergence", false, "locate first fresh P93 reference versus production EvalMod divergence")
 	fix001P3DiagP93S2CAttribution := flag.Bool("fix001-p3-diag-p93-s2c-attribution", false, "reconcile accepted P93 reference with dirty production S2C")
+	fix001P3DiagP93ProductionC2SFirstMaterialDivergence := flag.Bool("fix001-p3-diag-p93-production-c2s-first-material-divergence", false, "locate first P93 production C2S material divergence")
 	flag.Parse()
 
 	cfg, err := LoadBootstrapConfig(*configPath)
@@ -278,6 +279,9 @@ func main() {
 		selectedModes++
 	}
 	if *fix001P3DiagLogN13Q055Plan92PSDependencyWindowClosure {
+		selectedModes++
+	}
+	if *fix001P3DiagP93ProductionC2SFirstMaterialDivergence {
 		selectedModes++
 	}
 	if selectedModes > 1 {
@@ -525,6 +529,10 @@ func main() {
 		}
 	} else if *fix001P3DiagP93S2CAttribution {
 		if err := runFIX001P3DiagP93S2CAttribution(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
+			log.Fatal(err)
+		}
+	} else if *fix001P3DiagP93ProductionC2SFirstMaterialDivergence {
+		if err := runFIX001P3DiagP93ProductionC2SFirstMaterialDivergence(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
 			log.Fatal(err)
 		}
 	} else if *finalizationDiagnostic {
