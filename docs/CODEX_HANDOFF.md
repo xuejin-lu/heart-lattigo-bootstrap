@@ -26,45 +26,41 @@ When the user says `開始`, follow `AGENTS.md` mandatory preflight first, then 
 - q0 = 56-bit effective profile
 - q1 ≈ 39 bits
 - q2 ≈ 40 bits
-- intended PS-wide Q012
-- intended planScale = `2^93`
+- PS-wide Q012
+- planScale = `2^93`
 - deterministic 4096-slot workload
 
-No parameter tuning unless a later synchronized spec explicitly authorizes it.
+No tuning unless a later synchronized spec explicitly authorizes it.
 
 ## Current accepted evidence
 
-The `1e-2` production milestone is not end-to-end passed.
+The `1e-2` production milestone is not yet end-to-end passed.
 
-Fresh historical P93 reference replay:
+Fresh P93 reference:
 - EvalMod real ≈ `1.6351e-4`
 - EvalMod imag ≈ `1.3360e-4`
-- post-S2C proxy ≈ `3.0329e-4`
+- post-S2C ≈ `3.0329e-4`
 - public-like ≈ `9.7054e-3`
 
-P93 reference vs production forced-path arithmetic:
-- T2 difference ~ `6.94e-9`
-- T16 ~ `9.1e-7`
-- PS final ~ `5.0e-7`
-- DoubleAngle ~ `1e-14`
-- no material reference-vs-production divergence.
-
-Latest C2S diagnostic:
+C2S is excluded:
 - production ModUp vs controlled ModUp = `0`
 - actual production Fast C2S vs controlled Fast C2S = `0`
-- Fast C2S vs aligned Standard = `0`
-- ordinary Standard C2S differs only ~ `1e-13`
+- ordinary Standard C2S differs only ~`1e-13`.
 
-Therefore C2S is not the blocker.
-
-Do **not** trust the latest task's final classification `P93_STANDARD_REFERENCE_SEMANTICS_MISMATCH` as authoritative because its R0 replay expected `0.0223/0.0206` but its ordinary-Standard comparison measured about `0.1339/0.1364` and the runner failed to stop on that mismatch.
-
-The strongest current clue is a direct Fast-vs-Fast difference from the same C2S input:
-- actual `FastEvaluator.EvalMod` vs forced explicit P93 path:
+Actual-vs-forced P93 Fast EvalMod diagnostic:
+- identical C2S inputs proven by semantics, metadata and active q0/q1/q2 row hashes;
+- effective production planScale is also `2^93`;
+- PS generated powers/rows align;
+- all three DoubleAngle rounds align;
+- internal final scale reset aligns exactly at input scale `2^50`;
+- then public wrapper changes only Scale metadata to residual DefaultScale `2^45`;
+- q0/q1/q2 rows remain equal;
+- direct decoded Fast-vs-Fast gap becomes:
   - real ≈ `0.01824300375`
-  - imag ≈ `0.01657172301`
+  - imag ≈ `0.01657172301`.
+- scale ratio is exactly `2^50 / 2^45 = 32`.
 
-The next task must compare those two Fast EvalMod paths directly, without using Standard as the primary boundary.
+Therefore the broad prior classification `P93_PRODUCTION_POST_PS_DOUBLEANGLE_DIVERGENCE` should be refined: the supported first material boundary is the public EvalMod scale metadata reset, not PS or DoubleAngle arithmetic.
 
 ## Current task
 
@@ -72,15 +68,16 @@ Read synchronized `CURRENT_TASK.md`.
 
 At this revision:
 
-`specs/FIX-001-P3-DIAG-P93-ACTUAL-EVALMOD-VS-FORCED-P93-PATH.md`
+`specs/FIX-001-P3-DIAG-P93-EVALMOD-PUBLIC-SCALE-RESET-CAUSAL-PROOF.md`
 
 The task must:
-1. prove identical C2S input for both Fast EvalMod paths;
-2. reproduce direct actual-vs-forced-P93 Fast output gap;
-3. audit the effective public `FastEvaluator.EvalMod` configuration/planScale read-only;
-4. stage-align the two Fast paths;
-5. test only the exact effective production configuration against forced P93;
-6. stop after classification; no repair.
+1. reproduce the metadata-only `2^50 -> 2^45` public EvalMod reset;
+2. prove rows stay unchanged;
+3. on diagnostic clones only, restore Scale to `2^50`;
+4. prove corrected actual output matches forced P93;
+5. replay full downstream S2C/unpack/finalization with only that metadata correction;
+6. determine whether the full current LogN13 production pipeline returns to <= `1e-2`;
+7. audit the exact source assignment but do not repair Secondary.
 
 ## Two-word workflow
 
@@ -96,15 +93,13 @@ Only exceptional repository/provenance/safety failures interrupt this workflow.
 - no dirty Secondary source modification
 - no Secondary commit/push
 - no destructive operation on dirty Secondary
-- no C2S repair
-- no PS repair
-- no EvalMod repair
-- no S2C repair
-- no finalizer repair
-- no q tuning
-- no open-ended scale sweep
+- no coefficient correction
+- no q/planScale tuning
+- no PS/C2S/S2C/finalizer repair
 - no threshold relaxation
 - no LogN16
 - no Gate4/5
 - no EXP-003
 - no benchmark campaign
+
+Only diagnostic clone metadata Scale correction is allowed in the current task.
