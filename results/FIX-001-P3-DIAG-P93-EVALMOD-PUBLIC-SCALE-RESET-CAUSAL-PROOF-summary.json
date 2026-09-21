@@ -1,0 +1,478 @@
+{
+  "schema_version": "fix-001-p3-diag-p93-evalmod-public-scale-reset-causal-proof.v1",
+  "timestamp": "2026-09-21T16:16:37.907354Z",
+  "primary_repository": {
+    "path": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap",
+    "commit": "9dfcd248a7dcfbf638419c193181782dae92715d",
+    "ref": "main",
+    "dirty": true
+  },
+  "secondary_repository": {
+    "path": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/../lattigo",
+    "commit": "7d05f1f3c6f8a14dea2bcb2d3fa05246d322a797",
+    "ref": "fast-ckks",
+    "dirty": true
+  },
+  "environment": {
+    "go_version": "go1.26.4",
+    "os": "darwin",
+    "architecture": "arm64",
+    "logical_cpus": 10
+  },
+  "config": {
+    "log_n": 13,
+    "log_default_scale": 45,
+    "secret_hamming": 192,
+    "q0": [
+      55
+    ],
+    "q_slots_to_coeffs": [
+      39,
+      39,
+      39
+    ],
+    "q_coeffs_to_slots": [
+      56,
+      56,
+      56,
+      56
+    ],
+    "p": [
+      61,
+      61,
+      61,
+      61,
+      61
+    ],
+    "slots_to_coeffs_dft_levels": [
+      1,
+      1,
+      1
+    ],
+    "coeffs_to_slots_dft_levels": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "log_slots": -1,
+    "mod1_log_scale": 60,
+    "mod1_degree": 30,
+    "mod1_double_angle": 3,
+    "mod1_k": 16,
+    "log_message_ratio": 10,
+    "mod1_inv_degree": 0,
+    "repetitions": 3,
+    "warmup": 1
+  },
+  "fixed_profile": {
+    "log_n": 13,
+    "plan_scale": "2^93",
+    "ps_authority": "Q012-wide",
+    "q0_bits": 56,
+    "q1_bits_approx": 39,
+    "q2_bits_approx": 40,
+    "slots": 4096,
+    "threshold": 0.01
+  },
+  "provenance": {
+    "expected_secondary_diff_sha256": "44b430bd7e148c919538c5487d95dbbc2d195054aaf15cae8b4a241d875bb46e",
+    "expected_secondary_head": "7d05f1f3c6f8a14dea2bcb2d3fa05246d322a797",
+    "secondary_branch": "fast-ckks",
+    "secondary_committed_head": "7d05f1f3c6f8a14dea2bcb2d3fa05246d322a797",
+    "secondary_diff_sha256": "44b430bd7e148c919538c5487d95dbbc2d195054aaf15cae8b4a241d875bb46e",
+    "secondary_diff_stat": "circuits/ckks/bootstrapping/fast_bootstrap.go |  5 +-\n circuits/ckks/bootstrapping/fast_modup.go     | 26 ++++++--\n circuits/ckks/bootstrapping/fast_packing.go   | 34 ++++++-----\n circuits/ckks/dft/fast.go                     |  5 +-\n circuits/ckks/mod1/fast.go                    | 48 ++++++++++-----\n circuits/ckks/polynomial/fast.go              |  6 +-\n schemes/ckks/fast/automorphism.go             |  6 +-\n schemes/ckks/fast/ciphertext.go               | 22 ++++---\n schemes/ckks/fast/evaluator.go                | 12 ++--\n schemes/ckks/fast/evaluator_ntt.go            | 62 ++++++++++++-------\n schemes/ckks/fast/fast_add.go                 | 16 ++++-\n schemes/ckks/fast/fast_mul.go                 | 41 ++++++++-----\n schemes/ckks/fast/linear_transform.go         | 44 ++++++++------\n schemes/ckks/fast/partial_ntt.go              | 29 ++++++---\n schemes/ckks/fast/rescale.go                  | 86 +++++++++++++++++++++++++--\n schemes/ckks/fast/ring_degree.go              |  5 +-\n schemes/ckks/fast/trace.go                    |  7 +--\n schemes/ckks/fast/truncate.go                 | 32 ++++++++--\n 18 files changed, 342 insertions(+), 144 deletions(-)",
+    "secondary_dirty": true
+  },
+  "r0_public_scale_reset_boundary": {
+    "imag": {
+      "decoded_public_vs_internal": {
+        "max_component_abs": 0.01657172300885934,
+        "max_abs_complex": 0.01657172300885934,
+        "mean_abs_complex": 0.00485917277374716,
+        "worst_index": 3446,
+        "worst_component": "real",
+        "threshold": 0.01,
+        "pass": false
+      },
+      "degree_equal": true,
+      "internal": {
+        "degree": 1,
+        "is_montgomery": true,
+        "is_ntt": true,
+        "level": 4,
+        "n": 8192,
+        "scale": "1.125899906842624000000000000000000000000e+15"
+      },
+      "internal_scale_expected": "2^50",
+      "level_equal": true,
+      "public": {
+        "degree": 1,
+        "is_montgomery": true,
+        "is_ntt": true,
+        "level": 4,
+        "n": 8192,
+        "scale": "3.518437208883200000000000000000000000000e+13"
+      },
+      "public_scale_expected": "2^45",
+      "row_hashes_equal": {
+        "c0q0": true,
+        "c0q1": true,
+        "c0q2": true,
+        "c1q0": true,
+        "c1q1": true,
+        "c1q2": true
+      },
+      "scale_ratio": 32
+    },
+    "metadata_only": true,
+    "real": {
+      "decoded_public_vs_internal": {
+        "max_component_abs": 0.018243003747759622,
+        "max_abs_complex": 0.018243003747759622,
+        "mean_abs_complex": 0.0048026718041769565,
+        "worst_index": 2045,
+        "worst_component": "real",
+        "threshold": 0.01,
+        "pass": false
+      },
+      "degree_equal": true,
+      "internal": {
+        "degree": 1,
+        "is_montgomery": true,
+        "is_ntt": true,
+        "level": 4,
+        "n": 8192,
+        "scale": "1.125899906842624000000000000000000000000e+15"
+      },
+      "internal_scale_expected": "2^50",
+      "level_equal": true,
+      "public": {
+        "degree": 1,
+        "is_montgomery": true,
+        "is_ntt": true,
+        "level": 4,
+        "n": 8192,
+        "scale": "3.518437208883200000000000000000000000000e+13"
+      },
+      "public_scale_expected": "2^45",
+      "row_hashes_equal": {
+        "c0q0": true,
+        "c0q1": true,
+        "c0q2": true,
+        "c1q0": true,
+        "c1q1": true,
+        "c1q2": true
+      },
+      "scale_ratio": 32
+    },
+    "scale_expression": "ctOut.Scale = eval.Parameters.BootstrappingParameters.DefaultScale()"
+  },
+  "r1_metadata_only_correction": {
+    "correction": "corrected.Scale = original_C2S_input.Scale",
+    "imag": {
+      "after": {
+        "degree": 1,
+        "is_montgomery": true,
+        "is_ntt": true,
+        "level": 4,
+        "n": 8192,
+        "scale": "1.125899906842624000000000000000000000000e+15"
+      },
+      "before": {
+        "degree": 1,
+        "is_montgomery": true,
+        "is_ntt": true,
+        "level": 4,
+        "n": 8192,
+        "scale": "3.518437208883200000000000000000000000000e+13"
+      },
+      "corrected_vs_forced": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "threshold": 1e-10,
+        "pass": true
+      },
+      "row_hashes_unchanged": true,
+      "scale_only": true
+    },
+    "real": {
+      "after": {
+        "degree": 1,
+        "is_montgomery": true,
+        "is_ntt": true,
+        "level": 4,
+        "n": 8192,
+        "scale": "1.125899906842624000000000000000000000000e+15"
+      },
+      "before": {
+        "degree": 1,
+        "is_montgomery": true,
+        "is_ntt": true,
+        "level": 4,
+        "n": 8192,
+        "scale": "3.518437208883200000000000000000000000000e+13"
+      },
+      "corrected_vs_forced": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "threshold": 1e-10,
+        "pass": true
+      },
+      "row_hashes_unchanged": true,
+      "scale_only": true
+    }
+  },
+  "r2_evalmod_corrected_vs_uncorrected": {
+    "expected_forced_imag": 0.004261561142162278,
+    "expected_forced_real": 0.004183019582623534,
+    "expected_uncorrected_imag": 0.020569287028685726,
+    "expected_uncorrected_real": 0.022317936759951508,
+    "imag": {
+      "corrected_vs_matched_standard": {
+        "max_component_abs": 0.004261561142162278,
+        "max_abs_complex": 0.004261561142162278,
+        "mean_abs_complex": 0.001360026734587418,
+        "worst_index": 3058,
+        "worst_component": "real",
+        "threshold": 0.01,
+        "pass": true
+      },
+      "uncorrected_public_vs_forced": {
+        "max_component_abs": 0.01657172300885934,
+        "max_abs_complex": 0.01657172300885934,
+        "mean_abs_complex": 0.00485917277374716,
+        "worst_index": 3446,
+        "worst_component": "real",
+        "threshold": 0.01,
+        "pass": false
+      },
+      "uncorrected_vs_matched_standard": {
+        "max_component_abs": 0.020569287028685726,
+        "max_abs_complex": 0.020569287028685726,
+        "mean_abs_complex": 0.006195650655502521,
+        "worst_index": 3446,
+        "worst_component": "real",
+        "threshold": 0.01,
+        "pass": false
+      }
+    },
+    "real": {
+      "corrected_vs_matched_standard": {
+        "max_component_abs": 0.004183019582623534,
+        "max_abs_complex": 0.004183019582623534,
+        "mean_abs_complex": 0.001346366905220519,
+        "worst_index": 2504,
+        "worst_component": "real",
+        "threshold": 0.01,
+        "pass": true
+      },
+      "uncorrected_public_vs_forced": {
+        "max_component_abs": 0.018243003747759622,
+        "max_abs_complex": 0.018243003747759622,
+        "mean_abs_complex": 0.0048026718041769565,
+        "worst_index": 2045,
+        "worst_component": "real",
+        "threshold": 0.01,
+        "pass": false
+      },
+      "uncorrected_vs_matched_standard": {
+        "max_component_abs": 0.022317936759951508,
+        "max_abs_complex": 0.022317936759951508,
+        "mean_abs_complex": 0.0061246660929604605,
+        "worst_index": 3595,
+        "worst_component": "real",
+        "threshold": 0.01,
+        "pass": false
+      }
+    },
+    "threshold": 0.01
+  },
+  "r3_downstream_production_replay": {
+    "corrected": {
+      "evalmod_imag": {
+        "degree": 1,
+        "is_montgomery": true,
+        "is_ntt": true,
+        "level": 4,
+        "n": 8192,
+        "scale": "1.125899906842624000000000000000000000000e+15"
+      },
+      "evalmod_real": {
+        "degree": 1,
+        "is_montgomery": true,
+        "is_ntt": true,
+        "level": 4,
+        "n": 8192,
+        "scale": "1.125899906842624000000000000000000000000e+15"
+      },
+      "final_metadata": {
+        "degree": 1,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": 1,
+        "n": 8192,
+        "scale": "3.518437208883200000000000000000000000000e+13"
+      },
+      "final_public_like": {
+        "max_component_abs": 0.2219142519401473,
+        "max_abs_complex": 0.23310197994498466,
+        "mean_abs_complex": 0.13507097597368597,
+        "worst_index": 3954,
+        "worst_component": "real",
+        "threshold": 0.01,
+        "pass": false
+      },
+      "post_s2c_f0": {
+        "max_component_abs": 0.006934820352192803,
+        "max_abs_complex": 0.007284436894668098,
+        "mean_abs_complex": 0.004220967999135567,
+        "worst_index": 3954,
+        "worst_component": "real",
+        "threshold": 0.01,
+        "pass": true
+      },
+      "post_s2c_f0_vs_workload": {
+        "max_component_abs": 0.1885754453731296,
+        "max_abs_complex": 0.19875042204573037,
+        "mean_abs_complex": 0.12037402301632193,
+        "worst_index": 3954,
+        "worst_component": "real",
+        "threshold": 0.01,
+        "pass": false
+      }
+    },
+    "threshold": 0.01,
+    "uncorrected": {
+      "evalmod_imag": {
+        "degree": 1,
+        "is_montgomery": true,
+        "is_ntt": true,
+        "level": 4,
+        "n": 8192,
+        "scale": "3.518437208883200000000000000000000000000e+13"
+      },
+      "evalmod_real": {
+        "degree": 1,
+        "is_montgomery": true,
+        "is_ntt": true,
+        "level": 4,
+        "n": 8192,
+        "scale": "3.518437208883200000000000000000000000000e+13"
+      },
+      "final_metadata": {
+        "degree": 1,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": 1,
+        "n": 8192,
+        "scale": "3.518437208883200000000000000000000000000e+13"
+      },
+      "final_public_like": {
+        "max_component_abs": 0.2219142519401473,
+        "max_abs_complex": 0.23310197994498466,
+        "mean_abs_complex": 0.13507097597368597,
+        "worst_index": 3954,
+        "worst_component": "real",
+        "threshold": 0.01,
+        "pass": false
+      },
+      "post_s2c_f0": {
+        "max_component_abs": 0.0402736269192105,
+        "max_abs_complex": 0.04164282812516197,
+        "mean_abs_complex": 0.019212048527419034,
+        "worst_index": 3954,
+        "worst_component": "real",
+        "threshold": 0.01,
+        "pass": false
+      },
+      "post_s2c_f0_vs_workload": {
+        "max_component_abs": 0.2219142519401473,
+        "max_abs_complex": 0.23310197994498466,
+        "mean_abs_complex": 0.13507097597368597,
+        "worst_index": 3954,
+        "worst_component": "real",
+        "threshold": 0.01,
+        "pass": false
+      }
+    }
+  },
+  "r4_vector_causal_closure": {
+    "evalmod_imag_corrected_minus_uncorrected": {
+      "max_component_abs": 0.01657172300885934,
+      "max_abs_complex": 0.01657172300885934,
+      "mean_abs_complex": 0.00485917277374716,
+      "worst_index": 3446,
+      "worst_component": "real",
+      "threshold": 0.01,
+      "pass": false
+    },
+    "evalmod_real_corrected_minus_uncorrected": {
+      "max_component_abs": 0.018243003747759622,
+      "max_abs_complex": 0.018243003747759622,
+      "mean_abs_complex": 0.0048026718041769565,
+      "worst_index": 2045,
+      "worst_component": "real",
+      "threshold": 0.01,
+      "pass": false
+    },
+    "final_amplification": 0,
+    "final_corrected_minus_uncorrected": {
+      "max_component_abs": 0,
+      "max_abs_complex": 0,
+      "mean_abs_complex": 0,
+      "worst_index": -1,
+      "worst_component": "",
+      "threshold": 0.01,
+      "pass": true
+    },
+    "no_exact_linearity_claim": true,
+    "post_s2c_amplification": 1.82748449915283,
+    "post_s2c_corrected_minus_uncorrected": {
+      "max_component_abs": 0.033338806567017695,
+      "max_abs_complex": 0.03435958901517046,
+      "mean_abs_complex": 0.015068695252122606,
+      "worst_index": 3954,
+      "worst_component": "real",
+      "threshold": 0.01,
+      "pass": false
+    },
+    "vector_based": true
+  },
+  "r5_source_audit": {
+    "documented_reason_observed": "wrapper comment says restore Bootstrap boundary public default scale; no separate API justification for replacing the internal restored/input scale was found",
+    "internal_final_scale": "1.125899906842624000000000000000000000000e+15",
+    "internal_final_scale_assignment": "res.Scale = inputScale",
+    "internal_input_scale_capture": "inputScale := ct.Scale",
+    "internal_mod1_file": "circuits/ckks/mod1/fast.go",
+    "public_scale_assignment": "ctOut.Scale = eval.Parameters.BootstrappingParameters.DefaultScale()",
+    "public_wrapper_file": "circuits/ckks/bootstrapping/fast_evalmod.go",
+    "public_wrapper_function": "(*FastEvaluator).EvalMod",
+    "residual_default_scale": "3.518437208883200000000000000000000000000e+13",
+    "smallest_candidate_repair": "preserve the internal restored/input Scale at this boundary, subject to Standard/public API compatibility review",
+    "source_read_only": true,
+    "wrapper_overwrites_internal_scale_unconditionally": true
+  },
+  "classification": "P93_SCALE_METADATA_CAUSAL_BUT_SYSTEM_STILL_FAILS_1E2",
+  "validation": {
+    "logn13_only": true,
+    "no_benchmark": true,
+    "no_c2s_repair": true,
+    "no_coefficient_correction": true,
+    "no_exp003": true,
+    "no_finalizer_repair": true,
+    "no_gate_4_or_5": true,
+    "no_logn16": true,
+    "no_ps_repair": true,
+    "no_q_or_plan_scale_tuning": true,
+    "no_s2c_repair": true,
+    "no_secondary_commit_or_push": true,
+    "no_secondary_source_modification": true
+  }
+}
