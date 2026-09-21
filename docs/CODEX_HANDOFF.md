@@ -14,109 +14,104 @@ Secondary:
 - committed base: `7d05f1f3c6f8a14dea2bcb2d3fa05246d322a797`
 - local worktree is intentionally dirty with the current fixed-width Q012 / PS-wide P93 production candidate.
 
-Never reset, stash, clean, discard, checkout-overwrite, rebase, or otherwise destroy the Secondary dirty worktree.
+Never reset, stash, clean, discard, checkout-overwrite, rebase, pull across, reconstruct, or otherwise alter the Secondary dirty worktree.
 
 ## Startup rule
 
-When the user says `開始`, first follow the mandatory startup preflight in `AGENTS.md`:
+When the user says `開始`, follow `AGENTS.md` mandatory preflight first:
 
 1. safely synchronize Primary `main`;
 2. re-read `AGENTS.md`;
 3. re-read this file;
-4. re-read the freshly synchronized `CURRENT_TASK.md`;
-5. read the exact spec referenced by `CURRENT_TASK.md`;
-6. then execute only that task.
+4. re-read synchronized `CURRENT_TASK.md`;
+5. read the exact referenced spec;
+6. execute only that task.
 
-`CURRENT_TASK.md` after safe remote synchronization is authoritative if any older historical document disagrees.
+`CURRENT_TASK.md` is authoritative after synchronization.
 
-## Current architecture
+## Fixed current architecture
 
-The active LogN13 Fast-CKKS candidate is fixed at:
+- LogN13
+- q0 = 56-bit effective/diagnostic profile
+- q1 ≈ 39 bits
+- q2 ≈ 40 bits
+- PS-wide Q012
+- planScale = `2^93`
+- q3+ are not PS arithmetic sources
+- Q012 -> Q01 once at PS exit
+- deterministic 4096-slot workload
 
-- q0 = 56-bit profile;
-- q1 approximately 39 bits;
-- q2 approximately 40 bits;
-- PS-wide Q012 authoritative arithmetic;
-- planScale = `2^93`;
-- q3+ are not arithmetic sources;
-- Q012 -> Q01 contraction once at PS exit;
-- existing bounded downstream local-q2 behavior;
-- same deterministic 4096-slot workload.
-
-Do not retune these parameters unless a later synchronized spec explicitly authorizes it.
+Do not retune parameters unless a later synchronized spec explicitly authorizes it.
 
 ## Current correctness status
 
-The `1e-2` milestone is **not yet end-to-end passed** by the current dirty production path.
+The `1e-2` milestone is not end-to-end passed by current production.
 
-Accepted/reference evidence:
-- historical accepted P93 design proxy public-like error ≈ `0.0097053814`, which is below `1e-2`.
+Historical P93 design/reference path:
+- EvalMod real ≈ `1.6351e-4`
+- EvalMod imag ≈ `1.3360e-4`
+- post-S2C proxy ≈ `3.0329e-4`
+- public-like ≈ `9.7054e-3` (passes `1e-2`)
 
-Current dirty production evidence:
-- EvalMod real ≈ `0.0041830196`;
-- EvalMod imag ≈ `0.0042615611`;
-- raw post-S2C/F0 vs matched P93 Standard-core reference ≈ `0.0402736269`, which fails `1e-2`;
-- official Fast public output max-component error ≈ `0.2219142513`, which fails `1e-2`.
+Important: this historical candidate did not pass every strict internal precision criterion; treat it only as a design/reference path that reached the `1e-2` system milestone.
 
-The latest public-finalization diagnostic ruled out the public finalizer as the supported cause:
-- F0 -> F1 unpack exact;
-- IMForm <-> MForm round-trip bit-exact;
-- F1 Scale / residual DefaultScale = 1;
-- F3 equals official F4.
+Current dirty production evidence from commit `35b06d1c2ef67c1962f02971dcef225049fbc692`:
+- EvalMod real ≈ `0.02231793676`
+- EvalMod imag ≈ `0.02056928703`
+- post-S2C/F0 ≈ `0.04027362692`
+- official public output ≈ `0.22191425127`
 
-Therefore the remaining immediate question is upstream of public finalization: reconcile the accepted P93 proxy with the current production path and determine whether the post-S2C failure is dominated by propagated EvalMod error or by Fast S2C implementation divergence.
+The same-input S2C decomposition showed:
+- Fast S2C implementation effect = `0`
+- upstream EvalMod propagation accounts for the observed F0 difference
+- linear-delta residual ≈ `9.29e-12`
+
+Therefore do not repair or re-debug S2C now.
+
+The previous diagnostic did not literally rerun the historical P93 reference; it loaded the committed artifact. The next task must first perform a fresh isolated historical P93 replay, then localize the first material reference-vs-production divergence through PS/EvalMod.
 
 ## Current task
 
-The authoritative task is the one referenced by synchronized `CURRENT_TASK.md`.
+Read synchronized `CURRENT_TASK.md`.
 
-At this handoff revision, it is:
+At this revision it points to:
 
-`specs/FIX-001-P3-DIAG-P93-S2C-ATTRIBUTION-AND-REFERENCE-RECONCILIATION.md`
+`specs/FIX-001-P3-DIAG-P93-EVALMOD-REFERENCE-VS-PRODUCTION-FIRST-DIVERGENCE.md`
 
 This task is diagnostic only.
 
 It must:
-1. reproduce the accepted P93 reference proxy under its original methodology;
-2. reproduce the current dirty production EvalMod and F0 boundary;
-3. validate a stage-aligned full-RNS S2C mirror;
-4. separate:
-   - upstream EvalMod error propagated through reference S2C; from
-   - Fast S2C implementation effect;
-5. perform group-by-group and linear-delta confirmation;
-6. commit/push a compact Primary summary and stop at the specified classification.
-
-Do not repair Secondary in this task.
+1. create isolated temporary detached reference worktrees and freshly rerun historical P93 methodology;
+2. leave the existing dirty Secondary worktree untouched;
+3. reproduce current production EvalMod/F0;
+4. compare fresh reference vs production checkpoint-by-checkpoint;
+5. report first observable and first material divergence;
+6. commit/push compact Primary evidence and stop without repair.
 
 ## Two-word operating workflow
 
-The intended user workflow is:
+Normal workflow:
 
-1. In Codex, user says only: `開始`.
-2. Codex safely synchronizes Primary, reads the current task/spec, performs the task, runs required validation, and when authorized/safe commits and pushes the compact Primary evidence.
-3. The user returns to ChatGPT Web and says only: `review`.
-4. The orchestrator reviews the newest Primary evidence independently and either:
-   - accepts the result and prepares the next spec/`CURRENT_TASK.md`; or
-   - identifies an evidence gap and prepares the smallest next diagnostic.
+1. Codex: user says only `開始`.
+2. Codex syncs Primary, reads current spec, executes, validates, commits and pushes authorized Primary evidence.
+3. ChatGPT Web: user says only `review`.
+4. Orchestrator independently reviews GitHub evidence and prepares the next spec/`CURRENT_TASK.md`.
 
-Do not require the user to manually restate the task or paste old conversational context.
+Only exceptional repository/provenance/safety failures should interrupt this workflow.
 
-If an exceptional safety stop occurs before Codex can safely record/push Primary evidence (for example Primary itself is dirty, remote sync fails, or repository provenance is unsafe), report that exception clearly to the user. Otherwise preserve the two-word workflow.
+## Current prohibitions
 
-## Prohibitions for the current task
-
-- no Secondary production source changes;
-- no Secondary commit/push;
-- no q0/q1/q2 tuning;
-- no planScale sweep;
-- no T2 repair;
+- no dirty Secondary production source modification;
+- no Secondary production commit/push;
+- no destructive Git operation on dirty Secondary;
+- no S2C repair;
+- no q/planScale tuning;
+- no T2 repair merely because it is early;
 - no PS repair;
-- no generated-power replacement sweep;
-- no S2C production repair;
-- no public-finalization repair;
+- no replacement sweep;
+- no finalizer repair;
 - no threshold relaxation;
 - no LogN16;
 - no Gate4/5;
 - no EXP-003;
-- no benchmark campaign;
-- no destructive operation on the intentional Secondary dirty worktree.
+- no benchmark campaign.
