@@ -30,52 +30,59 @@ When the user says `開始`, follow `AGENTS.md` preflight, synchronize Primary, 
 - shared public DefaultScale contract maps internal error to exactly 32x public error.
 - internal target corresponding to public `1e-2`: `3.125e-4`.
 
-## Rejected prior classifications
+## Final restore factor hypothesis rejected
 
-Do not use:
-- old polynomial/pre-DA classification from `0c9987fa...`;
-- DA0 classification from `469c2417...`.
+Primary commit:
+`58fd5ecc2f4ac4063da23736895fe3ed7ddc7c42`
 
-The lockstep trace still showed nonphysical pre-Rescale semantics:
-large apparent error before Rescale followed by micro-error immediately after Rescale.
+Accepted:
+- DA2 post-Rescale to internal-final error ratio is ~1024;
+- runtime formula `2^e * S_out/S_in` yields ~`2^17`;
+- current restore uses `2^27`.
 
-## Strong current causal clue
+But diagnostic counterfactual `2^17` did not solve the problem:
+- internal error only improved to ~`0.00376/0.00377`;
+- public error remained ~`0.120`;
+- exact E2E remained ~`0.1875`.
 
-From commit `469c24171b0b480830eac52dc7ec4a5814f1059d`:
+Therefore do not repair final restore factor.
+
+Also, the ~1024 error scaling is consistent with the common Standard final Scale restoration from roughly `2^60` to `2^50`, so it is not itself evidence of a Fast-specific bug.
+
+## Stable current checkpoints
+
+Use semantically stable post-Rescale checkpoints only:
 
 Real:
-- DA2 post-Rescale error `4.084980061155408e-6`
-- internal final error `0.004183019582623534`
-- ratio ≈ `1024 = 2^10`.
+- polynomial output ~`4.986e-7`
+- DA0 post-Rescale ~`1.549e-6`
+- DA1 post-Rescale ~`3.615e-6`
+- DA2 post-Rescale ~`4.085e-6`
 
 Imag:
-- DA2 post-Rescale error `4.161680802892462e-6`
-- internal final error `0.004261561142162278`
-- ratio ≈ `1024 = 2^10`.
+- polynomial output ~`5.078e-7`
+- DA0 post-Rescale ~`1.578e-6`
+- DA1 post-Rescale ~`3.683e-6`
+- DA2 post-Rescale ~`4.162e-6`
 
-Current Fast restore uses virtual exponent `e=27`, raw Scale near `2^60`, then materializes `2^27` and resets Scale to caller `2^50`.
+Pre-Rescale virtual-coordinate metrics are not causal evidence.
 
-The mathematically required factor for preserving logical semantics across both virtual exponent and Scale transition is:
-
-[
-F^* = 2^e cdot S_{out}/S_{in},
-]
-
-which is expected near `2^17`, making the current `2^27` factor too large by `2^10=1024`.
+The DA2 post-Rescale budget corresponding to public `1e-2` is approximately:
+`3.0517578125e-7`.
 
 ## Current task
 
-`specs/FIX-001-P3-DIAG-P93-FINAL-MAINTAINED-RESTORE-FACTOR-CAUSAL-PROOF.md`
+`specs/FIX-001-P3-DIAG-P93-DOUBLEANGLE-PLAINTEXT-CAUSAL-DECOMPOSITION.md`
 
 It must:
-1. reproduce the exact 1024 amplification;
-2. derive the required restore factor from runtime scales;
-3. apply a diagnostic-only counterfactual factor on a clone;
-4. test internal EvalMod against Genuine Standard;
-5. keep the real public DefaultScale contract unchanged;
-6. run exact LogN13 E2E;
-7. source-audit the restore formula;
-8. stop after classification, with no Secondary production change.
+1. build and validate the exact plaintext DoubleAngle recurrence against Genuine Standard;
+2. propagate the Fast polynomial-output semantic error through that plaintext recurrence;
+3. compare propagated error with actual Fast post-Rescale DA outputs;
+4. decompose polynomial-error propagation vs Fast DA implementation effect;
+5. verify vector closure each round;
+6. determine whether DA2 error is propagation-dominated, implementation-dominated, or mixed;
+7. derive the polynomial-output error budget needed for public `1e-2`;
+8. stop after classification, no production repair.
 
 ## Two-word workflow
 
@@ -89,10 +96,11 @@ It must:
 - no Secondary source modification
 - no Secondary commit/push
 - no destructive Git operation on dirty Secondary
+- no production repair
 - no q/planScale tuning
 - no public Scale-contract modification
-- no C2S/S2C/finalizer repair
 - no P92/P94 sweep
+- no C2S/S2C/finalizer work
 - no threshold relaxation
 - no LogN16
 - no Gate4/5
