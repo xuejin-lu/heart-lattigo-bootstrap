@@ -206,6 +206,7 @@ func evalModMatchedCheckpointFor(name string, round int, fast, normalized, stand
 		checkpoint.NormalizedSafe = capacity.Pass
 		checkpoint.NormalizedCapacity = &capacity
 	}
+	fix001P3TraceRecord("evalmod", name, round, fast, fastValues)
 	return checkpoint, nil
 }
 

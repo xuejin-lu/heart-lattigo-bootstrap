@@ -56,16 +56,20 @@ type fix001P3P93S2CResult struct {
 type fix001P3P93S2CAcceptedCandidate struct {
 	PlanScaleExponent int `json:"plan_scale_exponent"`
 	Real              struct {
-		PublicLike         *PSGlobalMetric `json:"public_like"`
-		StandardPublicLike *PSGlobalMetric `json:"standard_public_like"`
-		EvalMod            *PSGlobalMetric `json:"evalmod_vs_standard"`
-		PostS2C            *PSGlobalMetric `json:"post_s2c_vs_standard"`
+		Polynomial         *PSGlobalMetric        `json:"ps_polynomial_vs_standard"`
+		PublicLike         *PSGlobalMetric        `json:"public_like"`
+		StandardPublicLike *PSGlobalMetric        `json:"standard_public_like"`
+		EvalMod            *PSGlobalMetric        `json:"evalmod_vs_standard"`
+		PostS2C            *PSGlobalMetric        `json:"post_s2c_vs_standard"`
+		Contraction        psWideContractionProof `json:"ps_exit_contraction"`
 	} `json:"real"`
 	Imag struct {
-		PublicLike         *PSGlobalMetric `json:"public_like"`
-		StandardPublicLike *PSGlobalMetric `json:"standard_public_like"`
-		EvalMod            *PSGlobalMetric `json:"evalmod_vs_standard"`
-		PostS2C            *PSGlobalMetric `json:"post_s2c_vs_standard"`
+		Polynomial         *PSGlobalMetric        `json:"ps_polynomial_vs_standard"`
+		PublicLike         *PSGlobalMetric        `json:"public_like"`
+		StandardPublicLike *PSGlobalMetric        `json:"standard_public_like"`
+		EvalMod            *PSGlobalMetric        `json:"evalmod_vs_standard"`
+		PostS2C            *PSGlobalMetric        `json:"post_s2c_vs_standard"`
+		Contraction        psWideContractionProof `json:"ps_exit_contraction"`
 	} `json:"imag"`
 }
 

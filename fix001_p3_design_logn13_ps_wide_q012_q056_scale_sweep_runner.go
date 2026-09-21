@@ -519,6 +519,7 @@ func psWideCheckpointFor(params ckks.Parameters, id, operation string, ct *rlwe.
 	if localExpected != nil {
 		checkpoint.LocalResidual = polynomialDecompositionResidualMetric(localExpected, actual, psWideSemanticThreshold)
 	}
+	fix001P3TraceRecord("ps", id, -1, ct, actual)
 	return checkpoint, nil
 }
 
