@@ -1,0 +1,1246 @@
+{
+  "schema_version": "fix-001-p3-diag-p93-genuine-standard-vs-matched-reference-reconciliation.v1",
+  "timestamp": "2026-09-21T17:07:48.665354Z",
+  "primary_repository": {
+    "path": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap",
+    "commit": "057f12e2519049fb05e5c4f4320f1a377398e06e",
+    "ref": "main",
+    "dirty": true
+  },
+  "secondary_repository": {
+    "path": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/../lattigo",
+    "commit": "7d05f1f3c6f8a14dea2bcb2d3fa05246d322a797",
+    "ref": "fast-ckks",
+    "dirty": true
+  },
+  "environment": {
+    "go_version": "go1.26.4",
+    "os": "darwin",
+    "architecture": "arm64",
+    "logical_cpus": 10
+  },
+  "config": {
+    "log_n": 13,
+    "log_default_scale": 45,
+    "secret_hamming": 192,
+    "q0": [
+      55
+    ],
+    "q_slots_to_coeffs": [
+      39,
+      39,
+      39
+    ],
+    "q_coeffs_to_slots": [
+      56,
+      56,
+      56,
+      56
+    ],
+    "p": [
+      61,
+      61,
+      61,
+      61,
+      61
+    ],
+    "slots_to_coeffs_dft_levels": [
+      1,
+      1,
+      1
+    ],
+    "coeffs_to_slots_dft_levels": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "log_slots": -1,
+    "mod1_log_scale": 60,
+    "mod1_degree": 30,
+    "mod1_double_angle": 3,
+    "mod1_k": 16,
+    "log_message_ratio": 10,
+    "mod1_inv_degree": 0,
+    "repetitions": 3,
+    "warmup": 1
+  },
+  "fixed_profile": {
+    "log_n": 13,
+    "plan_scale": "2^93",
+    "q0_bits": 56,
+    "q1_bits_approx": 39,
+    "q2_bits_approx": 40,
+    "slots": 4096,
+    "threshold": 0.01
+  },
+  "provenance": {
+    "expected_secondary_diff_sha256": "44b430bd7e148c919538c5487d95dbbc2d195054aaf15cae8b4a241d875bb46e",
+    "expected_secondary_head": "7d05f1f3c6f8a14dea2bcb2d3fa05246d322a797",
+    "secondary_branch": "fast-ckks",
+    "secondary_committed_head": "7d05f1f3c6f8a14dea2bcb2d3fa05246d322a797",
+    "secondary_diff_sha256": "44b430bd7e148c919538c5487d95dbbc2d195054aaf15cae8b4a241d875bb46e",
+    "secondary_diff_stat": "circuits/ckks/bootstrapping/fast_bootstrap.go |  5 +-\n circuits/ckks/bootstrapping/fast_modup.go     | 26 ++++++--\n circuits/ckks/bootstrapping/fast_packing.go   | 34 ++++++-----\n circuits/ckks/dft/fast.go                     |  5 +-\n circuits/ckks/mod1/fast.go                    | 48 ++++++++++-----\n circuits/ckks/polynomial/fast.go              |  6 +-\n schemes/ckks/fast/automorphism.go             |  6 +-\n schemes/ckks/fast/ciphertext.go               | 22 ++++---\n schemes/ckks/fast/evaluator.go                | 12 ++--\n schemes/ckks/fast/evaluator_ntt.go            | 62 ++++++++++++-------\n schemes/ckks/fast/fast_add.go                 | 16 ++++-\n schemes/ckks/fast/fast_mul.go                 | 41 ++++++++-----\n schemes/ckks/fast/linear_transform.go         | 44 ++++++++------\n schemes/ckks/fast/partial_ntt.go              | 29 ++++++---\n schemes/ckks/fast/rescale.go                  | 86 +++++++++++++++++++++++++--\n schemes/ckks/fast/ring_degree.go              |  5 +-\n schemes/ckks/fast/trace.go                    |  7 +--\n schemes/ckks/fast/truncate.go                 | 32 ++++++++--\n 18 files changed, 342 insertions(+), 144 deletions(-)",
+    "secondary_dirty": true
+  },
+  "r0_genuine_standard_baseline": {
+    "baseline_agreement_threshold": 1e-8,
+    "public_exact_e2e": {
+      "max_component_abs": 5.830057349387463e-8,
+      "max_abs_complex": 5.8301329087484385e-8,
+      "mean_abs_complex": 6.059716380251585e-10,
+      "worst_index": 0,
+      "worst_component": "imag",
+      "threshold": 0.01,
+      "pass": true
+    },
+    "public_output": {
+      "metadata": {
+        "degree": 1,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": 1,
+        "log_dimensions": {
+          "cols": 12,
+          "rows": 0
+        },
+        "log_slots": 12,
+        "n": 8192,
+        "scale": "3.518437208883200000000000000000000000000e+13"
+      },
+      "row_hashes": {
+        "c0q0": "f952c8ba6c933c116d758fa011d116335f86ad41bc6b15ed03550ba9fcaacfca",
+        "c0q1": "38b8a214a4eb67de8e3755a4826cd05f5a77ee5450867920000419960252c1bb",
+        "c1q0": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+        "c1q1": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+      }
+    },
+    "public_structural_equal_staged": true,
+    "public_vs_staged": {
+      "max_component_abs": 0,
+      "max_abs_complex": 0,
+      "mean_abs_complex": 0,
+      "worst_index": -1,
+      "worst_component": "",
+      "threshold": 0.01,
+      "pass": true
+    },
+    "staged_exact_e2e": {
+      "max_component_abs": 5.830057349387463e-8,
+      "max_abs_complex": 5.8301329087484385e-8,
+      "mean_abs_complex": 6.059716380251585e-10,
+      "worst_index": 0,
+      "worst_component": "imag",
+      "threshold": 0.01,
+      "pass": true
+    },
+    "staged_output": {
+      "metadata": {
+        "degree": 1,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": 1,
+        "log_dimensions": {
+          "cols": 12,
+          "rows": 0
+        },
+        "log_slots": 12,
+        "n": 8192,
+        "scale": "3.518437208883200000000000000000000000000e+13"
+      },
+      "row_hashes": {
+        "c0q0": "f952c8ba6c933c116d758fa011d116335f86ad41bc6b15ed03550ba9fcaacfca",
+        "c0q1": "38b8a214a4eb67de8e3755a4826cd05f5a77ee5450867920000419960252c1bb",
+        "c1q0": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+        "c1q1": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+      }
+    }
+  },
+  "r1_matched_reference_lineage": {
+    "c2s_imag": {
+      "constructor": "evalModMatchedC2SInputs",
+      "object": {
+        "degree": 1,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": 12,
+        "log_dimensions": {
+          "cols": 12,
+          "rows": 0
+        },
+        "log_slots": 12,
+        "n": 8192,
+        "scale": "1.125899906842624000000000000000000000000e+15"
+      },
+      "secret_key": "profile.StandardSK",
+      "source_input": "reproducibleInput(residual, btp) -\u003e standardEval.PackAndSwitchN1ToN2 -\u003e ScaleDown -\u003e ModUp -\u003e standardEval.CoeffsToSlots"
+    },
+    "c2s_input_lineage_exact": true,
+    "c2s_real": {
+      "constructor": "evalModMatchedC2SInputs",
+      "object": {
+        "degree": 1,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": 12,
+        "log_dimensions": {
+          "cols": 12,
+          "rows": 0
+        },
+        "log_slots": 12,
+        "n": 8192,
+        "scale": "1.125899906842624000000000000000000000000e+15"
+      },
+      "secret_key": "profile.StandardSK",
+      "source_input": "reproducibleInput(residual, btp) -\u003e standardEval.PackAndSwitchN1ToN2 -\u003e ScaleDown -\u003e ModUp -\u003e standardEval.CoeffsToSlots"
+    },
+    "evalmod_imag": {
+      "constructor": "evalModMatchedRunPathWithPlanScaleAndFastPolynomial.StandardFinal",
+      "object": {
+        "degree": 1,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": 4,
+        "log_dimensions": {
+          "cols": 12,
+          "rows": 0
+        },
+        "log_slots": 12,
+        "n": 8192,
+        "scale": "1.125899906842624000000000000000000000000e+15"
+      },
+      "secret_key": "profile.StandardSK",
+      "source_input": "profile.Inputs.OrdinaryImag plus manual Standard polynomial/DoubleAngle replay"
+    },
+    "evalmod_real": {
+      "constructor": "evalModMatchedRunPathWithPlanScaleAndFastPolynomial.StandardFinal",
+      "object": {
+        "degree": 1,
+        "is_montgomery": false,
+        "is_ntt": true,
+        "level": 4,
+        "log_dimensions": {
+          "cols": 12,
+          "rows": 0
+        },
+        "log_slots": 12,
+        "n": 8192,
+        "scale": "1.125899906842624000000000000000000000000e+15"
+      },
+      "secret_key": "profile.StandardSK",
+      "source_input": "profile.Inputs.OrdinaryReal plus manual Standard polynomial/DoubleAngle replay"
+    },
+    "full_bootstrap_lineage_reused": false
+  },
+  "r2_matched_vs_genuine_alignment": [
+    {
+      "coefficient_rows_equal": true,
+      "genuine": {
+        "metadata": {
+          "degree": 1,
+          "is_montgomery": false,
+          "is_ntt": true,
+          "level": 12,
+          "log_dimensions": {
+            "cols": 12,
+            "rows": 0
+          },
+          "log_slots": 12,
+          "n": 8192,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "row_hashes": {
+          "c0q0": "f995e64a6a6cb46ae4e4aa9e836a7c7d7ea330783bc3d6cdeae08e15a13bf740",
+          "c0q1": "fe413d73fcd0cff4aa693e8df62398f216addf722ee8b966dafe71b44dec60d9",
+          "c0q2": "44150ecf059129ac4d602fddcba02fd6fb75dc656cea0cb605b48108827de11b",
+          "c1q0": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q1": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q2": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        }
+      },
+      "genuine_lineage": "fresh Standard staged CoeffsToSlots real",
+      "matched": {
+        "metadata": {
+          "degree": 1,
+          "is_montgomery": false,
+          "is_ntt": true,
+          "level": 12,
+          "log_dimensions": {
+            "cols": 12,
+            "rows": 0
+          },
+          "log_slots": 12,
+          "n": 8192,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "row_hashes": {
+          "c0q0": "f995e64a6a6cb46ae4e4aa9e836a7c7d7ea330783bc3d6cdeae08e15a13bf740",
+          "c0q1": "fe413d73fcd0cff4aa693e8df62398f216addf722ee8b966dafe71b44dec60d9",
+          "c0q2": "44150ecf059129ac4d602fddcba02fd6fb75dc656cea0cb605b48108827de11b",
+          "c1q0": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q1": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q2": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        }
+      },
+      "matched_lineage": "evalModMatchedC2SInputs.OrdinaryReal",
+      "metadata_equal": true,
+      "metric": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "threshold": 0.01,
+        "pass": true
+      },
+      "semantically_comparable": true,
+      "stage": "c2s_real"
+    },
+    {
+      "coefficient_rows_equal": true,
+      "genuine": {
+        "metadata": {
+          "degree": 1,
+          "is_montgomery": false,
+          "is_ntt": true,
+          "level": 12,
+          "log_dimensions": {
+            "cols": 12,
+            "rows": 0
+          },
+          "log_slots": 12,
+          "n": 8192,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "row_hashes": {
+          "c0q0": "ae759d4d84ed9d1e451d62295b374c4090c21196d22c90800d8decb8d0f2fd39",
+          "c0q1": "230d020bb5c7f1e316f4013d34ec8ce276696e85f6185033fb23051d283814fb",
+          "c0q2": "bf559af097ed3af4b9a192e0a71163cd3625d2b72020c42bfbdbea7841f9a8f1",
+          "c1q0": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q1": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q2": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        }
+      },
+      "genuine_lineage": "fresh Standard staged CoeffsToSlots imag",
+      "matched": {
+        "metadata": {
+          "degree": 1,
+          "is_montgomery": false,
+          "is_ntt": true,
+          "level": 12,
+          "log_dimensions": {
+            "cols": 12,
+            "rows": 0
+          },
+          "log_slots": 12,
+          "n": 8192,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "row_hashes": {
+          "c0q0": "ae759d4d84ed9d1e451d62295b374c4090c21196d22c90800d8decb8d0f2fd39",
+          "c0q1": "230d020bb5c7f1e316f4013d34ec8ce276696e85f6185033fb23051d283814fb",
+          "c0q2": "bf559af097ed3af4b9a192e0a71163cd3625d2b72020c42bfbdbea7841f9a8f1",
+          "c1q0": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q1": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q2": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        }
+      },
+      "matched_lineage": "evalModMatchedC2SInputs.OrdinaryImag",
+      "metadata_equal": true,
+      "metric": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "threshold": 0.01,
+        "pass": true
+      },
+      "semantically_comparable": true,
+      "stage": "c2s_imag"
+    },
+    {
+      "coefficient_rows_equal": true,
+      "genuine": {
+        "metadata": {
+          "degree": 1,
+          "is_montgomery": false,
+          "is_ntt": true,
+          "level": 4,
+          "log_dimensions": {
+            "cols": 12,
+            "rows": 0
+          },
+          "log_slots": 12,
+          "n": 8192,
+          "scale": "3.518437208883200000000000000000000000000e+13"
+        },
+        "row_hashes": {
+          "c0q0": "1eefcc8c5e873f7f60331154f91cc833e4cfa0543f2fbc05d578f9bc327c19d8",
+          "c0q1": "10827b6c00d95539ac18c39bfe0b0a62a7e32d9bb6e83b5a7092def60cc50e53",
+          "c0q2": "45c99b52f229f5ecb9db1541492467fccd705c156917284491e76d8467f1c553",
+          "c1q0": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q1": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q2": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        }
+      },
+      "genuine_lineage": "fresh Standard EvalMod real",
+      "matched": {
+        "metadata": {
+          "degree": 1,
+          "is_montgomery": false,
+          "is_ntt": true,
+          "level": 4,
+          "log_dimensions": {
+            "cols": 12,
+            "rows": 0
+          },
+          "log_slots": 12,
+          "n": 8192,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "row_hashes": {
+          "c0q0": "1eefcc8c5e873f7f60331154f91cc833e4cfa0543f2fbc05d578f9bc327c19d8",
+          "c0q1": "10827b6c00d95539ac18c39bfe0b0a62a7e32d9bb6e83b5a7092def60cc50e53",
+          "c0q2": "45c99b52f229f5ecb9db1541492467fccd705c156917284491e76d8467f1c553",
+          "c1q0": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q1": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q2": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        }
+      },
+      "matched_lineage": "manual Standard polynomial/DoubleAngle StandardFinal",
+      "metadata_equal": false,
+      "metric": {
+        "max_component_abs": 0.116470120122351,
+        "max_abs_complex": 0.116470120122351,
+        "mean_abs_complex": 0.037068332451353894,
+        "worst_index": 2317,
+        "worst_component": "real",
+        "threshold": 0.01,
+        "pass": false
+      },
+      "semantically_comparable": true,
+      "stage": "evalmod_real"
+    },
+    {
+      "coefficient_rows_equal": true,
+      "genuine": {
+        "metadata": {
+          "degree": 1,
+          "is_montgomery": false,
+          "is_ntt": true,
+          "level": 4,
+          "log_dimensions": {
+            "cols": 12,
+            "rows": 0
+          },
+          "log_slots": 12,
+          "n": 8192,
+          "scale": "3.518437208883200000000000000000000000000e+13"
+        },
+        "row_hashes": {
+          "c0q0": "c3938e61341796b19ad5be0819dbfe678b9a4685a462c591dc4c03e3ee49a5f9",
+          "c0q1": "726719f7076f9ca017c5a269464822cbd63f51d0fc04edb1aba3e421201e4c5c",
+          "c0q2": "89c6f6185914ec08d18fbff2c59dac9307de7bad1aa93dfd2cf0f948482c7c76",
+          "c1q0": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q1": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q2": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        }
+      },
+      "genuine_lineage": "fresh Standard EvalMod imag",
+      "matched": {
+        "metadata": {
+          "degree": 1,
+          "is_montgomery": false,
+          "is_ntt": true,
+          "level": 4,
+          "log_dimensions": {
+            "cols": 12,
+            "rows": 0
+          },
+          "log_slots": 12,
+          "n": 8192,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "row_hashes": {
+          "c0q0": "c3938e61341796b19ad5be0819dbfe678b9a4685a462c591dc4c03e3ee49a5f9",
+          "c0q1": "726719f7076f9ca017c5a269464822cbd63f51d0fc04edb1aba3e421201e4c5c",
+          "c0q2": "89c6f6185914ec08d18fbff2c59dac9307de7bad1aa93dfd2cf0f948482c7c76",
+          "c1q0": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q1": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q2": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        }
+      },
+      "matched_lineage": "manual Standard polynomial/DoubleAngle StandardFinal",
+      "metadata_equal": false,
+      "metric": {
+        "max_component_abs": 0.11691619982639724,
+        "max_abs_complex": 0.11691619982639724,
+        "mean_abs_complex": 0.03742958311644192,
+        "worst_index": 3058,
+        "worst_component": "real",
+        "threshold": 0.01,
+        "pass": false
+      },
+      "semantically_comparable": true,
+      "stage": "evalmod_imag"
+    },
+    {
+      "coefficient_rows_equal": true,
+      "genuine": {
+        "metadata": {
+          "degree": 1,
+          "is_montgomery": false,
+          "is_ntt": true,
+          "level": 1,
+          "log_dimensions": {
+            "cols": 12,
+            "rows": 0
+          },
+          "log_slots": 12,
+          "n": 8192,
+          "scale": "3.518437208883200000000000000000000000000e+13"
+        },
+        "row_hashes": {
+          "c0q0": "f952c8ba6c933c116d758fa011d116335f86ad41bc6b15ed03550ba9fcaacfca",
+          "c0q1": "38b8a214a4eb67de8e3755a4826cd05f5a77ee5450867920000419960252c1bb",
+          "c1q0": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q1": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        }
+      },
+      "genuine_lineage": "fresh Standard staged SlotsToCoeffs",
+      "matched": {
+        "metadata": {
+          "degree": 1,
+          "is_montgomery": false,
+          "is_ntt": true,
+          "level": 1,
+          "log_dimensions": {
+            "cols": 12,
+            "rows": 0
+          },
+          "log_slots": 12,
+          "n": 8192,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "row_hashes": {
+          "c0q0": "f952c8ba6c933c116d758fa011d116335f86ad41bc6b15ed03550ba9fcaacfca",
+          "c0q1": "38b8a214a4eb67de8e3755a4826cd05f5a77ee5450867920000419960252c1bb",
+          "c1q0": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q1": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        }
+      },
+      "matched_lineage": "Standard SlotsToCoeffs(matched StandardFinal real/imag)",
+      "metadata_equal": false,
+      "metric": {
+        "max_component_abs": 0.18164062632288647,
+        "max_abs_complex": 0.1914660483384327,
+        "mean_abs_complex": 0.11615440569813427,
+        "worst_index": 3457,
+        "worst_component": "real",
+        "threshold": 0.01,
+        "pass": false
+      },
+      "semantically_comparable": true,
+      "stage": "s2c_core"
+    },
+    {
+      "coefficient_rows_equal": true,
+      "genuine": {
+        "metadata": {
+          "degree": 1,
+          "is_montgomery": false,
+          "is_ntt": true,
+          "level": 1,
+          "log_dimensions": {
+            "cols": 12,
+            "rows": 0
+          },
+          "log_slots": 12,
+          "n": 8192,
+          "scale": "3.518437208883200000000000000000000000000e+13"
+        },
+        "row_hashes": {
+          "c0q0": "f952c8ba6c933c116d758fa011d116335f86ad41bc6b15ed03550ba9fcaacfca",
+          "c0q1": "38b8a214a4eb67de8e3755a4826cd05f5a77ee5450867920000419960252c1bb",
+          "c1q0": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q1": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        }
+      },
+      "genuine_lineage": "fresh Standard staged Unpack",
+      "matched": {
+        "metadata": {
+          "degree": 1,
+          "is_montgomery": false,
+          "is_ntt": true,
+          "level": 1,
+          "log_dimensions": {
+            "cols": 12,
+            "rows": 0
+          },
+          "log_slots": 12,
+          "n": 8192,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "row_hashes": {
+          "c0q0": "f952c8ba6c933c116d758fa011d116335f86ad41bc6b15ed03550ba9fcaacfca",
+          "c0q1": "38b8a214a4eb67de8e3755a4826cd05f5a77ee5450867920000419960252c1bb",
+          "c1q0": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q1": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        }
+      },
+      "matched_lineage": "Standard Unpack(matched core)",
+      "metadata_equal": false,
+      "metric": {
+        "max_component_abs": 0.18164062632288647,
+        "max_abs_complex": 0.1914660483384327,
+        "mean_abs_complex": 0.11615440569813427,
+        "worst_index": 3457,
+        "worst_component": "real",
+        "threshold": 0.01,
+        "pass": false
+      },
+      "semantically_comparable": true,
+      "stage": "unpacked_output"
+    },
+    {
+      "coefficient_rows_equal": true,
+      "genuine": {
+        "metadata": {
+          "degree": 1,
+          "is_montgomery": false,
+          "is_ntt": true,
+          "level": 1,
+          "log_dimensions": {
+            "cols": 12,
+            "rows": 0
+          },
+          "log_slots": 12,
+          "n": 8192,
+          "scale": "3.518437208883200000000000000000000000000e+13"
+        },
+        "row_hashes": {
+          "c0q0": "f952c8ba6c933c116d758fa011d116335f86ad41bc6b15ed03550ba9fcaacfca",
+          "c0q1": "38b8a214a4eb67de8e3755a4826cd05f5a77ee5450867920000419960252c1bb",
+          "c1q0": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q1": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        }
+      },
+      "genuine_lineage": "fresh Standard staged public boundary",
+      "matched": {
+        "metadata": {
+          "degree": 1,
+          "is_montgomery": false,
+          "is_ntt": true,
+          "level": 1,
+          "log_dimensions": {
+            "cols": 12,
+            "rows": 0
+          },
+          "log_slots": 12,
+          "n": 8192,
+          "scale": "3.518437208883200000000000000000000000000e+13"
+        },
+        "row_hashes": {
+          "c0q0": "f952c8ba6c933c116d758fa011d116335f86ad41bc6b15ed03550ba9fcaacfca",
+          "c0q1": "38b8a214a4eb67de8e3755a4826cd05f5a77ee5450867920000419960252c1bb",
+          "c1q0": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q1": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        }
+      },
+      "matched_lineage": "matched final-like decoded object",
+      "metadata_equal": true,
+      "metric": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "threshold": 0.01,
+        "pass": true
+      },
+      "semantically_comparable": true,
+      "stage": "final_decoded_message"
+    }
+  ],
+  "r3_exact_e2e_vs_proxy_distinction": {
+    "fast_corrected_final_role": "exact E2E metric",
+    "fast_corrected_with_both_metadata_preserved": {
+      "max_component_abs": 0.1885754453731296,
+      "max_abs_complex": 0.19875042204573037,
+      "mean_abs_complex": 0.12037402301632193,
+      "worst_index": 3954,
+      "worst_component": "real",
+      "threshold": 0.01,
+      "pass": false
+    },
+    "genuine_standard_public": {
+      "max_component_abs": 5.830057349387463e-8,
+      "max_abs_complex": 5.8301329087484385e-8,
+      "mean_abs_complex": 6.059716380251585e-10,
+      "worst_index": 0,
+      "worst_component": "imag",
+      "threshold": 0.01,
+      "pass": true
+    },
+    "genuine_standard_staged": {
+      "max_component_abs": 5.830057349387463e-8,
+      "max_abs_complex": 5.8301329087484385e-8,
+      "mean_abs_complex": 6.059716380251585e-10,
+      "worst_index": 0,
+      "worst_component": "imag",
+      "threshold": 0.01,
+      "pass": true
+    },
+    "matched_s2c_core_is_exact_e2e": false,
+    "matched_s2c_core_role": "stage/proxy metric only",
+    "matched_standard_final_like": {
+      "max_component_abs": 5.830057349387463e-8,
+      "max_abs_complex": 5.8301329087484385e-8,
+      "mean_abs_complex": 6.059716380251585e-10,
+      "worst_index": 0,
+      "worst_component": "imag",
+      "threshold": 0.01,
+      "pass": true
+    },
+    "threshold": 0.01
+  },
+  "r4_corrected_fast_vs_genuine": [
+    {
+      "fast": {
+        "metadata": {
+          "degree": 1,
+          "is_montgomery": true,
+          "is_ntt": true,
+          "level": 16,
+          "log_dimensions": {
+            "cols": 12,
+            "rows": 0
+          },
+          "log_slots": 12,
+          "n": 8192,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "row_hashes": {
+          "c0q0": "bd3c51687abb3611b5dc6aa23fa5f95c579c32d6ab396664d16167412b885a4f",
+          "c0q1": "8269c5b586cd7096becd56788a8a812c6822dd06f9ce4186fd77334f225ffa34",
+          "c0q2": "3b6450c5bb0703753de0e1cc17dfc4c47710a73eb5ca73dd5cdbdce5c32ebe79",
+          "c1q0": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q1": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q2": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        }
+      },
+      "fast_lineage": "Fast Pack/ScaleDown/ModUp from reproducibleInput",
+      "genuine": {
+        "metadata": {
+          "degree": 1,
+          "is_montgomery": false,
+          "is_ntt": true,
+          "level": 16,
+          "log_dimensions": {
+            "cols": 12,
+            "rows": 0
+          },
+          "log_slots": 12,
+          "n": 8192,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "row_hashes": {
+          "c0q0": "bd879c9c496633625410af6b2d772f95150ef81d85a0236ae5f5e341736dade0",
+          "c0q1": "e552fa8a8add2ae1e019c9495c8e01a16dba58feeacb1def888d80385c5361c5",
+          "c0q2": "7e48e4c3e363f4551c4844a3efa87940ba0407cb4c28ea02626b164d9da50ab6",
+          "c1q0": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q1": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q2": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        }
+      },
+      "genuine_lineage": "fresh Standard Pack/ScaleDown/ModUp from reproducibleInput",
+      "material": false,
+      "material_threshold": 0.018857538707255612,
+      "metric": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "threshold": 0.01,
+        "pass": true
+      },
+      "stage": "c2s_input_modup"
+    },
+    {
+      "fast": {
+        "metadata": {
+          "degree": 1,
+          "is_montgomery": true,
+          "is_ntt": true,
+          "level": 12,
+          "log_dimensions": {
+            "cols": 12,
+            "rows": 0
+          },
+          "log_slots": 12,
+          "n": 8192,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "row_hashes": {
+          "c0q0": "d5842191d27450db9e0837fc35c8067775bb1cc4cb1752b3ec7bd2335245a9af",
+          "c0q1": "3cf55d105a95e45d5dc4e71e2b0e3a49b3f3cbec31ea39d83125baa78fb9979f",
+          "c0q2": "6d9f26c232c16486aab5f82daa90ab52d5167d9e0d269cd811100e491d86b90c",
+          "c1q0": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q1": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q2": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        }
+      },
+      "fast_lineage": "production Fast CoeffsToSlots real",
+      "genuine": {
+        "metadata": {
+          "degree": 1,
+          "is_montgomery": false,
+          "is_ntt": true,
+          "level": 12,
+          "log_dimensions": {
+            "cols": 12,
+            "rows": 0
+          },
+          "log_slots": 12,
+          "n": 8192,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "row_hashes": {
+          "c0q0": "f995e64a6a6cb46ae4e4aa9e836a7c7d7ea330783bc3d6cdeae08e15a13bf740",
+          "c0q1": "fe413d73fcd0cff4aa693e8df62398f216addf722ee8b966dafe71b44dec60d9",
+          "c0q2": "44150ecf059129ac4d602fddcba02fd6fb75dc656cea0cb605b48108827de11b",
+          "c1q0": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q1": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q2": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        }
+      },
+      "genuine_lineage": "fresh Standard CoeffsToSlots real",
+      "material": false,
+      "material_threshold": 0.018857538707255612,
+      "metric": {
+        "max_component_abs": 9.423671153314939e-14,
+        "max_abs_complex": 9.423671153314947e-14,
+        "mean_abs_complex": 2.0025553817279963e-14,
+        "worst_index": 3366,
+        "worst_component": "real",
+        "threshold": 0.01,
+        "pass": true
+      },
+      "stage": "c2s_real"
+    },
+    {
+      "fast": {
+        "metadata": {
+          "degree": 1,
+          "is_montgomery": true,
+          "is_ntt": true,
+          "level": 12,
+          "log_dimensions": {
+            "cols": 12,
+            "rows": 0
+          },
+          "log_slots": 12,
+          "n": 8192,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "row_hashes": {
+          "c0q0": "f66f2e3a96b9220f327370c4e8e22af740de6ad7f21eaea569c19730d9d5d23a",
+          "c0q1": "23eb96608e7dc99cf6ccc60d615ceab4756d2bbf30240b34fb5e9a54df35b8b0",
+          "c0q2": "d1b88c78d79e0ca8cd2920f07c6251c5d154751b6656a96ae0ea372d6962897c",
+          "c1q0": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q1": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q2": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        }
+      },
+      "fast_lineage": "production Fast CoeffsToSlots imag",
+      "genuine": {
+        "metadata": {
+          "degree": 1,
+          "is_montgomery": false,
+          "is_ntt": true,
+          "level": 12,
+          "log_dimensions": {
+            "cols": 12,
+            "rows": 0
+          },
+          "log_slots": 12,
+          "n": 8192,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "row_hashes": {
+          "c0q0": "ae759d4d84ed9d1e451d62295b374c4090c21196d22c90800d8decb8d0f2fd39",
+          "c0q1": "230d020bb5c7f1e316f4013d34ec8ce276696e85f6185033fb23051d283814fb",
+          "c0q2": "bf559af097ed3af4b9a192e0a71163cd3625d2b72020c42bfbdbea7841f9a8f1",
+          "c1q0": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q1": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q2": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        }
+      },
+      "genuine_lineage": "fresh Standard CoeffsToSlots imag",
+      "material": false,
+      "material_threshold": 0.018857538707255612,
+      "metric": {
+        "max_component_abs": 9.504534339470697e-14,
+        "max_abs_complex": 9.504534339471234e-14,
+        "mean_abs_complex": 1.9709133334287426e-14,
+        "worst_index": 778,
+        "worst_component": "real",
+        "threshold": 0.01,
+        "pass": true
+      },
+      "stage": "c2s_imag"
+    },
+    {
+      "fast": {
+        "metadata": {
+          "degree": 1,
+          "is_montgomery": true,
+          "is_ntt": true,
+          "level": 4,
+          "log_dimensions": {
+            "cols": 12,
+            "rows": 0
+          },
+          "log_slots": 12,
+          "n": 8192,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "row_hashes": {
+          "c0q0": "00596eae17e786bf5be840f571b1be6e945d5942e9d466b7af573e1cbbbc1e17",
+          "c0q1": "fc87db0e223b091cdb561c9bc7ea3e31ae0085138ce8430ac8d669d955fc2b4e",
+          "c0q2": "b92daa040b4c43a37387925264d5c1e5d6710012f328ca6dd913a9facb8da35d",
+          "c1q0": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q1": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q2": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        }
+      },
+      "fast_lineage": "Fast EvalMod with proven Scale restoration",
+      "genuine": {
+        "metadata": {
+          "degree": 1,
+          "is_montgomery": false,
+          "is_ntt": true,
+          "level": 4,
+          "log_dimensions": {
+            "cols": 12,
+            "rows": 0
+          },
+          "log_slots": 12,
+          "n": 8192,
+          "scale": "3.518437208883200000000000000000000000000e+13"
+        },
+        "row_hashes": {
+          "c0q0": "1eefcc8c5e873f7f60331154f91cc833e4cfa0543f2fbc05d578f9bc327c19d8",
+          "c0q1": "10827b6c00d95539ac18c39bfe0b0a62a7e32d9bb6e83b5a7092def60cc50e53",
+          "c0q2": "45c99b52f229f5ecb9db1541492467fccd705c156917284491e76d8467f1c553",
+          "c1q0": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q1": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q2": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        }
+      },
+      "genuine_lineage": "fresh Standard EvalMod real",
+      "material": true,
+      "material_threshold": 0.018857538707255612,
+      "metric": {
+        "max_component_abs": 0.12065008737702457,
+        "max_abs_complex": 0.12065008737702457,
+        "mean_abs_complex": 0.038414147433153197,
+        "worst_index": 2317,
+        "worst_component": "real",
+        "threshold": 0.01,
+        "pass": false
+      },
+      "stage": "evalmod_real"
+    },
+    {
+      "fast": {
+        "metadata": {
+          "degree": 1,
+          "is_montgomery": true,
+          "is_ntt": true,
+          "level": 4,
+          "log_dimensions": {
+            "cols": 12,
+            "rows": 0
+          },
+          "log_slots": 12,
+          "n": 8192,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "row_hashes": {
+          "c0q0": "3a6cfd579d585d71c81f0ac16884693f8d8c030918c2099f0c3fe9662b22223a",
+          "c0q1": "b66dba39f52dba864d3c1f817a185a43f6b0164312c24f024fd89b564da927eb",
+          "c0q2": "98d14284c2224ac8729da92d276d24ca6ef3e2edbfba38cafa96a4bdff28b199",
+          "c1q0": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q1": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q2": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        }
+      },
+      "fast_lineage": "Fast EvalMod with proven Scale restoration",
+      "genuine": {
+        "metadata": {
+          "degree": 1,
+          "is_montgomery": false,
+          "is_ntt": true,
+          "level": 4,
+          "log_dimensions": {
+            "cols": 12,
+            "rows": 0
+          },
+          "log_slots": 12,
+          "n": 8192,
+          "scale": "3.518437208883200000000000000000000000000e+13"
+        },
+        "row_hashes": {
+          "c0q0": "c3938e61341796b19ad5be0819dbfe678b9a4685a462c591dc4c03e3ee49a5f9",
+          "c0q1": "726719f7076f9ca017c5a269464822cbd63f51d0fc04edb1aba3e421201e4c5c",
+          "c0q2": "89c6f6185914ec08d18fbff2c59dac9307de7bad1aa93dfd2cf0f948482c7c76",
+          "c1q0": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q1": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q2": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        }
+      },
+      "genuine_lineage": "fresh Standard EvalMod imag",
+      "material": true,
+      "material_threshold": 0.018857538707255612,
+      "metric": {
+        "max_component_abs": 0.12117776096855952,
+        "max_abs_complex": 0.12117776096855952,
+        "mean_abs_complex": 0.0387890193941762,
+        "worst_index": 3058,
+        "worst_component": "real",
+        "threshold": 0.01,
+        "pass": false
+      },
+      "stage": "evalmod_imag"
+    },
+    {
+      "fast": {
+        "metadata": {
+          "degree": 1,
+          "is_montgomery": true,
+          "is_ntt": true,
+          "level": 1,
+          "log_dimensions": {
+            "cols": 12,
+            "rows": 0
+          },
+          "log_slots": 12,
+          "n": 8192,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "row_hashes": {
+          "c0q0": "253a483c6a06580fb1106cf9b199047a5f889a3b05399b7800bf7251810c9019",
+          "c0q1": "8caac81f03b41c431873bda542cf48cef7ddae36445b5fec09d7df7118fb7ba4",
+          "c1q0": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q1": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        }
+      },
+      "fast_lineage": "Fast SlotsToCoeffs corrected branch",
+      "genuine": {
+        "metadata": {
+          "degree": 1,
+          "is_montgomery": false,
+          "is_ntt": true,
+          "level": 1,
+          "log_dimensions": {
+            "cols": 12,
+            "rows": 0
+          },
+          "log_slots": 12,
+          "n": 8192,
+          "scale": "3.518437208883200000000000000000000000000e+13"
+        },
+        "row_hashes": {
+          "c0q0": "f952c8ba6c933c116d758fa011d116335f86ad41bc6b15ed03550ba9fcaacfca",
+          "c0q1": "38b8a214a4eb67de8e3755a4826cd05f5a77ee5450867920000419960252c1bb",
+          "c1q0": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q1": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        }
+      },
+      "genuine_lineage": "fresh Standard staged SlotsToCoeffs",
+      "material": true,
+      "material_threshold": 0.018857538707255612,
+      "metric": {
+        "max_component_abs": 0.188575444703152,
+        "max_abs_complex": 0.19875042273035862,
+        "mean_abs_complex": 0.12037402301514477,
+        "worst_index": 3954,
+        "worst_component": "real",
+        "threshold": 0.01,
+        "pass": false
+      },
+      "stage": "s2c_core"
+    },
+    {
+      "fast": {
+        "metadata": {
+          "degree": 1,
+          "is_montgomery": true,
+          "is_ntt": true,
+          "level": 1,
+          "log_dimensions": {
+            "cols": 12,
+            "rows": 0
+          },
+          "log_slots": 12,
+          "n": 8192,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "row_hashes": {
+          "c0q0": "253a483c6a06580fb1106cf9b199047a5f889a3b05399b7800bf7251810c9019",
+          "c0q1": "8caac81f03b41c431873bda542cf48cef7ddae36445b5fec09d7df7118fb7ba4",
+          "c1q0": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q1": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        }
+      },
+      "fast_lineage": "Fast UnpackAndSwitchN2ToN1",
+      "genuine": {
+        "metadata": {
+          "degree": 1,
+          "is_montgomery": false,
+          "is_ntt": true,
+          "level": 1,
+          "log_dimensions": {
+            "cols": 12,
+            "rows": 0
+          },
+          "log_slots": 12,
+          "n": 8192,
+          "scale": "3.518437208883200000000000000000000000000e+13"
+        },
+        "row_hashes": {
+          "c0q0": "f952c8ba6c933c116d758fa011d116335f86ad41bc6b15ed03550ba9fcaacfca",
+          "c0q1": "38b8a214a4eb67de8e3755a4826cd05f5a77ee5450867920000419960252c1bb",
+          "c1q0": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q1": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        }
+      },
+      "genuine_lineage": "fresh Standard UnpackAndSwitchN2ToN1",
+      "material": true,
+      "material_threshold": 0.018857538707255612,
+      "metric": {
+        "max_component_abs": 0.188575444703152,
+        "max_abs_complex": 0.19875042273035862,
+        "mean_abs_complex": 0.12037402301514477,
+        "worst_index": 3954,
+        "worst_component": "real",
+        "threshold": 0.01,
+        "pass": false
+      },
+      "stage": "unpacked_output"
+    },
+    {
+      "fast": {
+        "metadata": {
+          "degree": 1,
+          "is_montgomery": false,
+          "is_ntt": true,
+          "level": 1,
+          "log_dimensions": {
+            "cols": 12,
+            "rows": 0
+          },
+          "log_slots": 12,
+          "n": 8192,
+          "scale": "1.125899906842624000000000000000000000000e+15"
+        },
+        "row_hashes": {
+          "c0q0": "f8e8c0827bc816b73deadbb37a9016f89a278879d1bd1d99a154ed946917ccc7",
+          "c0q1": "bce95763b6d21f6ec7b452dc0b5272d7fd85b2c74b5980dbbb6fe28c8fff0a82",
+          "c1q0": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q1": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        }
+      },
+      "fast_lineage": "Fast corrected EvalMod + downstream Scale preserved",
+      "genuine": {
+        "metadata": {
+          "degree": 1,
+          "is_montgomery": false,
+          "is_ntt": true,
+          "level": 1,
+          "log_dimensions": {
+            "cols": 12,
+            "rows": 0
+          },
+          "log_slots": 12,
+          "n": 8192,
+          "scale": "3.518437208883200000000000000000000000000e+13"
+        },
+        "row_hashes": {
+          "c0q0": "f952c8ba6c933c116d758fa011d116335f86ad41bc6b15ed03550ba9fcaacfca",
+          "c0q1": "38b8a214a4eb67de8e3755a4826cd05f5a77ee5450867920000419960252c1bb",
+          "c1q0": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "c1q1": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        }
+      },
+      "genuine_lineage": "fresh Standard staged public boundary",
+      "material": true,
+      "material_threshold": 0.018857538707255612,
+      "metric": {
+        "max_component_abs": 0.188575444703152,
+        "max_abs_complex": 0.19875042273035862,
+        "mean_abs_complex": 0.12037402301514477,
+        "worst_index": 3954,
+        "worst_component": "real",
+        "threshold": 0.01,
+        "pass": false
+      },
+      "stage": "final_decoded_message"
+    }
+  ],
+  "first_material_divergence": {
+    "fast_vs_genuine_first_material_stage": "evalmod_real",
+    "final_fast_corrected_e2e": {
+      "max_component_abs": 0.1885754453731296,
+      "max_abs_complex": 0.19875042204573037,
+      "mean_abs_complex": 0.12037402301632193,
+      "worst_index": 3954,
+      "worst_component": "real",
+      "threshold": 0.01,
+      "pass": false
+    },
+    "final_gap": 0.1885753870725561,
+    "genuine_standard_public_e2e": {
+      "max_component_abs": 5.830057349387463e-8,
+      "max_abs_complex": 5.8301329087484385e-8,
+      "mean_abs_complex": 6.059716380251585e-10,
+      "worst_index": 0,
+      "worst_component": "imag",
+      "threshold": 0.01,
+      "pass": true
+    },
+    "material_fraction": 0.1,
+    "material_threshold": 0.018857538707255612
+  },
+  "r5_reference_lineage_audit": {
+    "matched_reference_exact_e2e_validity": false,
+    "matched_reference_original_validity": "valid for local Fast-vs-normalized/matched stage diagnostics",
+    "normalization_or_synthetic_split": "matched EvalMod StandardFinal uses manual normalized polynomial/DoubleAngle replay; it is not the public Standard EvalMod object",
+    "ordinary_inputs_origin": "evalModMatchedC2SInputs creates a separate reproducibleInput, then runs the genuine Standard Pack/ScaleDown/ModUp/CoeffsToSlots path",
+    "primary_helpers": [
+      "evalModMatchedC2SInputs",
+      "evalModMatchedRunPathWithPlanScaleAndFastPolynomial",
+      "buildFIX001P3GenuineStandardEvaluator"
+    ],
+    "reason": "matched StandardFinal/core lineage is a manually reconstructed stage object and must not replace fresh Genuine Standard public/staged final output as the exact E2E oracle",
+    "same_ciphertext_lineage": false,
+    "same_original_input_values": true,
+    "secondary_modified": false
+  },
+  "classification": "P93_MATCHED_STANDARD_EVALMOD_REFERENCE_MISMATCH",
+  "validation": {
+    "logn13_only": true,
+    "no_benchmark": true,
+    "no_coefficient_correction": true,
+    "no_exp003": true,
+    "no_fast_production_repair": true,
+    "no_gate_4_or_5": true,
+    "no_logn16": true,
+    "no_parameter_tuning": true,
+    "no_secondary_commit_or_push": true,
+    "no_secondary_source_modification": true
+  }
+}

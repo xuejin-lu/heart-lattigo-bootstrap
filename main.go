@@ -82,6 +82,7 @@ func main() {
 	fix001P3DiagP93ActualEvalModVsForced := flag.Bool("fix001-p3-diag-p93-actual-evalmod-vs-forced", false, "compare actual public Fast EvalMod with forced P93 Fast path")
 	fix001P3DiagP93EvalModPublicScaleResetCausalProof := flag.Bool("fix001-p3-diag-p93-evalmod-public-scale-reset-causal-proof", false, "prove causal effect of the public Fast EvalMod scale reset")
 	fix001P3DiagP93PostS2CScaleCollapseCausalProof := flag.Bool("fix001-p3-diag-p93-post-s2c-scale-collapse-causal-proof", false, "prove the first downstream post-S2C scale convergence boundary")
+	fix001P3DiagP93GenuineStandardVsMatchedReconciliation := flag.Bool("fix001-p3-diag-p93-genuine-standard-vs-matched-reconciliation", false, "reconcile Genuine Standard and matched diagnostic reference lineages")
 	flag.Parse()
 
 	cfg, err := LoadBootstrapConfig(*configPath)
@@ -294,6 +295,9 @@ func main() {
 		selectedModes++
 	}
 	if *fix001P3DiagP93PostS2CScaleCollapseCausalProof {
+		selectedModes++
+	}
+	if *fix001P3DiagP93GenuineStandardVsMatchedReconciliation {
 		selectedModes++
 	}
 	if selectedModes > 1 {
@@ -557,6 +561,10 @@ func main() {
 		}
 	} else if *fix001P3DiagP93PostS2CScaleCollapseCausalProof {
 		if err := runFIX001P3DiagP93PostS2CScaleCollapseCausalProof(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
+			log.Fatal(err)
+		}
+	} else if *fix001P3DiagP93GenuineStandardVsMatchedReconciliation {
+		if err := runFIX001P3DiagP93GenuineStandardVsMatchedReconciliation(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
 			log.Fatal(err)
 		}
 	} else if *finalizationDiagnostic {
