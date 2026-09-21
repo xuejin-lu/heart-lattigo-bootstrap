@@ -1,0 +1,465 @@
+{
+  "schema_version": "fix-001-p3-diag-p93-s2c-attribution-and-reference-reconciliation.v1",
+  "timestamp": "2026-09-21T12:04:37.014009Z",
+  "primary_repository": {
+    "path": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap",
+    "commit": "f1c55d198a41e0f901fc26a1e9ea5e626caf2bd6",
+    "ref": "main",
+    "dirty": true
+  },
+  "lattigo_repository": {
+    "path": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/../lattigo",
+    "commit": "7d05f1f3c6f8a14dea2bcb2d3fa05246d322a797",
+    "ref": "fast-ckks",
+    "dirty": true
+  },
+  "environment": {
+    "go_version": "go1.26.4",
+    "os": "darwin",
+    "architecture": "arm64",
+    "logical_cpus": 10
+  },
+  "config": {
+    "log_n": 13,
+    "log_default_scale": 45,
+    "secret_hamming": 192,
+    "q0": [
+      55
+    ],
+    "q_slots_to_coeffs": [
+      39,
+      39,
+      39
+    ],
+    "q_coeffs_to_slots": [
+      56,
+      56,
+      56,
+      56
+    ],
+    "p": [
+      61,
+      61,
+      61,
+      61,
+      61
+    ],
+    "slots_to_coeffs_dft_levels": [
+      1,
+      1,
+      1
+    ],
+    "coeffs_to_slots_dft_levels": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "log_slots": -1,
+    "mod1_log_scale": 60,
+    "mod1_degree": 30,
+    "mod1_double_angle": 3,
+    "mod1_k": 16,
+    "log_message_ratio": 10,
+    "mod1_inv_degree": 0,
+    "repetitions": 3,
+    "warmup": 1
+  },
+  "effective_parameters": {
+    "residual_log_n": 13,
+    "residual_max_level": 1,
+    "bootstrap_log_n": 13,
+    "bootstrap_max_level": 16,
+    "bootstrap_log_slots": 12,
+    "bootstrap_log_q": [
+      56,
+      39,
+      40,
+      39,
+      40,
+      60,
+      60,
+      61,
+      60,
+      60,
+      60,
+      61,
+      61,
+      57,
+      56,
+      56,
+      56
+    ],
+    "bootstrap_log_p": [
+      61,
+      61,
+      62,
+      61,
+      62
+    ],
+    "circuit_order": "ModUpThenEncode"
+  },
+  "fixed_p93_architecture": {
+    "log_n": 13,
+    "plan_scale": "2^93",
+    "ps_authority": "Q012-wide",
+    "q0_bits": 56,
+    "q1_bits_approx": 39,
+    "q2_bits_approx": 40,
+    "slots": 4096,
+    "threshold": 0.01
+  },
+  "secondary_provenance": {
+    "branch": "fast-ckks",
+    "committed_head": "7d05f1f3c6f8a14dea2bcb2d3fa05246d322a797",
+    "diff_sha256": "44b430bd7e148c919538c5487d95dbbc2d195054aaf15cae8b4a241d875bb46e",
+    "diff_stat": "circuits/ckks/bootstrapping/fast_bootstrap.go |  5 +-\n circuits/ckks/bootstrapping/fast_modup.go     | 26 ++++++--\n circuits/ckks/bootstrapping/fast_packing.go   | 34 ++++++-----\n circuits/ckks/dft/fast.go                     |  5 +-\n circuits/ckks/mod1/fast.go                    | 48 ++++++++++-----\n circuits/ckks/polynomial/fast.go              |  6 +-\n schemes/ckks/fast/automorphism.go             |  6 +-\n schemes/ckks/fast/ciphertext.go               | 22 ++++---\n schemes/ckks/fast/evaluator.go                | 12 ++--\n schemes/ckks/fast/evaluator_ntt.go            | 62 ++++++++++++-------\n schemes/ckks/fast/fast_add.go                 | 16 ++++-\n schemes/ckks/fast/fast_mul.go                 | 41 ++++++++-----\n schemes/ckks/fast/linear_transform.go         | 44 ++++++++------\n schemes/ckks/fast/partial_ntt.go              | 29 ++++++---\n schemes/ckks/fast/rescale.go                  | 86 +++++++++++++++++++++++++--\n schemes/ckks/fast/ring_degree.go              |  5 +-\n schemes/ckks/fast/trace.go                    |  7 +--\n schemes/ckks/fast/truncate.go                 | 32 ++++++++--\n 18 files changed, 342 insertions(+), 144 deletions(-)",
+    "dirty": true,
+    "expected_committed_head": "7d05f1f3c6f8a14dea2bcb2d3fa05246d322a797",
+    "expected_diff_sha256": "44b430bd7e148c919538c5487d95dbbc2d195054aaf15cae8b4a241d875bb46e"
+  },
+  "r0_reproduction": {
+    "accepted_p93_design_proxy": {
+      "evalmod_imag": {
+        "max_component_abs": 0.00013359983063118935,
+        "max_abs_complex": 0.00013359983063118935,
+        "mean_abs_complex": 0.000029860342494065862,
+        "worst_index": 2849,
+        "worst_component": "real",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "evalmod_real": {
+        "max_component_abs": 0.0001635104343335875,
+        "max_abs_complex": 0.0001635104343335875,
+        "mean_abs_complex": 0.000029144113118151992,
+        "worst_index": 1223,
+        "worst_component": "real",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "historical_public_like": 0.009705381393898434,
+      "method": "committed FIX-001-P3-DESIGN-LOGN13-PS-WIDE-Q012-Q056-SCALE-SWEEP P93 compact evidence; dirty production backend is not reused for R0-A",
+      "post_s2c_reference_proxy": {
+        "max_component_abs": 0.0003032931504531125,
+        "max_abs_complex": 0.0003039595311012903,
+        "mean_abs_complex": 0.00009279193132185869,
+        "worst_index": 3647,
+        "worst_component": "imag",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "public_like": {
+        "max_component_abs": 0.009705381393898434,
+        "max_abs_complex": 0.009726705561756536,
+        "mean_abs_complex": 0.0029693417897085,
+        "worst_index": 3647,
+        "worst_component": "imag",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "source_artifact": "results/FIX-001-P3-DESIGN-LOGN13-PS-WIDE-Q012-Q056-SCALE-SWEEP-summary.json",
+      "standard_public_like": {
+        "max_component_abs": 0.18164062504850154,
+        "max_abs_complex": 0.19146603025340492,
+        "mean_abs_complex": 0.11615440568672371,
+        "worst_index": 615,
+        "worst_component": "real",
+        "pass_threshold": false,
+        "threshold": 0.01
+      }
+    },
+    "current_dirty_production_boundary": {
+      "evalmod_imag": {
+        "max_component_abs": 0.020569287028685726,
+        "max_abs_complex": 0.020569287028685726,
+        "mean_abs_complex": 0.006195650655502521,
+        "worst_index": 3446,
+        "worst_component": "real",
+        "pass_threshold": false,
+        "threshold": 0.01
+      },
+      "evalmod_real": {
+        "max_component_abs": 0.022317936759951508,
+        "max_abs_complex": 0.022317936759951508,
+        "mean_abs_complex": 0.0061246660929604605,
+        "worst_index": 3595,
+        "worst_component": "real",
+        "pass_threshold": false,
+        "threshold": 0.01
+      },
+      "expected_f0": 0.0402736269192105,
+      "f0_reproduced": true,
+      "method": "fix001P3P93S2CRunFastEvalModCore: Pack/ScaleDown/ModUp/C2S/EvalMod/SlotsToCoeffs; F0 compared with matched StandardFinal -\u003e Standard SlotsToCoeffs",
+      "post_s2c_f0": {
+        "max_component_abs": 0.0402736269192105,
+        "max_abs_complex": 0.04164282812516197,
+        "mean_abs_complex": 0.019212048527419034,
+        "worst_index": 3954,
+        "worst_component": "real",
+        "pass_threshold": false,
+        "threshold": 0.01
+      }
+    }
+  },
+  "r2_mirror_validation": {
+    "production_input_full_rns_mirror_fidelity": {
+      "max_component_abs": 0,
+      "max_abs_complex": 0,
+      "mean_abs_complex": 0,
+      "worst_index": -1,
+      "worst_component": "",
+      "pass_threshold": true,
+      "threshold": 1e-10
+    },
+    "production_rows_match": true,
+    "reference_full_rns_mirror_fidelity": {
+      "max_component_abs": 0,
+      "max_abs_complex": 0,
+      "mean_abs_complex": 0,
+      "worst_index": -1,
+      "worst_component": "",
+      "pass_threshold": true,
+      "threshold": 1e-10
+    },
+    "reference_rows_match": true,
+    "tolerance": 1e-10
+  },
+  "r3_causal_decomposition": {
+    "closure_residual": {
+      "max_component_abs": 0,
+      "max_abs_complex": 0,
+      "mean_abs_complex": 0,
+      "worst_index": -1,
+      "worst_component": "",
+      "pass_threshold": true,
+      "threshold": 1e-10
+    },
+    "fast_s2c_implementation_effect_s_f_minus_n_f": {
+      "max_component_abs": 0,
+      "max_abs_complex": 0,
+      "mean_abs_complex": 0,
+      "worst_index": -1,
+      "worst_component": "",
+      "pass_threshold": true,
+      "threshold": 0.01
+    },
+    "implementation_relative_to_observed": 0,
+    "observed_total_s_f_minus_s_r": {
+      "max_component_abs": 0.0402736269192105,
+      "max_abs_complex": 0.04164282812516197,
+      "mean_abs_complex": 0.019212048527419034,
+      "worst_index": 3954,
+      "worst_component": "real",
+      "pass_threshold": false,
+      "threshold": 0.01
+    },
+    "propagation_relative_to_observed": 1,
+    "upstream_input_propagation_n_f_minus_s_r": {
+      "max_component_abs": 0.0402736269192105,
+      "max_abs_complex": 0.04164282812516197,
+      "mean_abs_complex": 0.019212048527419034,
+      "worst_index": 3954,
+      "worst_component": "real",
+      "pass_threshold": false,
+      "threshold": 0.01
+    }
+  },
+  "r4_group_attribution": [
+    {
+      "stage": "group0_post_rescale",
+      "input_propagation": {
+        "max_component_abs": 0.05944478828136406,
+        "max_abs_complex": 0.06288736677898325,
+        "mean_abs_complex": 0.008047906161659762,
+        "worst_index": 3565,
+        "worst_component": "imag",
+        "pass_threshold": false,
+        "threshold": 0.01
+      },
+      "implementation_effect": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "empirical_amplification": 2.663543181466261,
+      "fast_pre_rows_match_mirror": true,
+      "fast_post_rows_match_mirror": true,
+      "level_equal": true,
+      "scale_equal": true,
+      "degree_equal": true,
+      "first_material_implementation_effect": false
+    },
+    {
+      "stage": "group1_post_rescale",
+      "input_propagation": {
+        "max_component_abs": 0.045898782268376265,
+        "max_abs_complex": 0.04709858524740851,
+        "mean_abs_complex": 0.013842330363718524,
+        "worst_index": 2214,
+        "worst_component": "real",
+        "pass_threshold": false,
+        "threshold": 0.01
+      },
+      "implementation_effect": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "empirical_amplification": 0.7721245814036406,
+      "fast_pre_rows_match_mirror": true,
+      "fast_post_rows_match_mirror": true,
+      "level_equal": true,
+      "scale_equal": true,
+      "degree_equal": true,
+      "first_material_implementation_effect": false
+    },
+    {
+      "stage": "group2_post_rescale",
+      "input_propagation": {
+        "max_component_abs": 0.0402736269192105,
+        "max_abs_complex": 0.04164282812516197,
+        "mean_abs_complex": 0.019212048527419034,
+        "worst_index": 3954,
+        "worst_component": "real",
+        "pass_threshold": false,
+        "threshold": 0.01
+      },
+      "implementation_effect": {
+        "max_component_abs": 0,
+        "max_abs_complex": 0,
+        "mean_abs_complex": 0,
+        "worst_index": -1,
+        "worst_component": "",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "empirical_amplification": 0.8774443444648545,
+      "fast_pre_rows_match_mirror": true,
+      "fast_post_rows_match_mirror": true,
+      "level_equal": true,
+      "scale_equal": true,
+      "degree_equal": true,
+      "first_material_implementation_effect": false
+    }
+  ],
+  "r5_linear_delta_confirmation": {
+    "agreement_tolerance": 1e-10,
+    "agreement_with_n_f_minus_s_r": {
+      "max_component_abs": 9.286998253754675e-12,
+      "max_abs_complex": 9.369187830468628e-12,
+      "mean_abs_complex": 2.8051615319858806e-12,
+      "worst_index": 3832,
+      "worst_component": "real",
+      "pass_threshold": true,
+      "threshold": 1e-10
+    },
+    "input_delta": {
+      "max_component_abs": 0.02231793675995151,
+      "max_abs_complex": 0.025896080635092425,
+      "mean_abs_complex": 0.009449826787144998,
+      "worst_index": 3595,
+      "worst_component": "real",
+      "pass_threshold": false,
+      "threshold": 0.01
+    },
+    "output_delta": {
+      "max_component_abs": 0.04027362691807424,
+      "max_abs_complex": 0.04164282812597528,
+      "mean_abs_complex": 0.01921204852747016,
+      "worst_index": 3954,
+      "worst_component": "real",
+      "pass_threshold": false,
+      "threshold": 0.01
+    }
+  },
+  "r6_reconciliation": [
+    {
+      "changed_from_previous": "P93 PS-wide design arithmetic and ordinary reference proxy",
+      "max_component_error": {
+        "max_component_abs": 0.009705381393898434,
+        "max_abs_complex": 0.009726705561756536,
+        "mean_abs_complex": 0.0029693417897085,
+        "worst_index": 3647,
+        "worst_component": "imag",
+        "pass_threshold": true,
+        "threshold": 0.01
+      },
+      "pass_vs_1e-2": true,
+      "reference": "reproduced accepted P93 design proxy",
+      "row": "accepted_p93_reference_evalmod_to_reference_s2c"
+    },
+    {
+      "changed_from_previous": "only EvalMod semantics changed",
+      "max_component_error": {
+        "max_component_abs": 0.0402736269192105,
+        "max_abs_complex": 0.04164282812516197,
+        "mean_abs_complex": 0.019212048527419034,
+        "worst_index": 3954,
+        "worst_component": "real",
+        "pass_threshold": false,
+        "threshold": 0.01
+      },
+      "pass_vs_1e-2": false,
+      "reference": "matched P93 StandardFinal -\u003e Standard S2C",
+      "row": "current_production_evalmod_to_reference_s2c"
+    },
+    {
+      "changed_from_previous": "Fast S2C implementation added after controlling input",
+      "max_component_error": {
+        "max_component_abs": 0.0402736269192105,
+        "max_abs_complex": 0.04164282812516197,
+        "mean_abs_complex": 0.019212048527419034,
+        "worst_index": 3954,
+        "worst_component": "real",
+        "pass_threshold": false,
+        "threshold": 0.01
+      },
+      "pass_vs_1e-2": false,
+      "reference": "matched P93 StandardFinal -\u003e Fast S2C",
+      "row": "current_production_evalmod_to_fast_production_s2c"
+    },
+    {
+      "changed_from_previous": "context only; finalization not modified",
+      "max_component_error": {
+        "max_component_abs": 0.2219142512701697,
+        "max_abs_complex": 0.23310198062937915,
+        "mean_abs_complex": 0.13507097597233814,
+        "worst_index": 3954,
+        "worst_component": "real",
+        "pass_threshold": false,
+        "threshold": 0.01
+      },
+      "pass_vs_1e-2": false,
+      "reference": "genuine Standard Bootstrap",
+      "row": "current_official_public_output"
+    }
+  ],
+  "classification": "P93_EVALMOD_ERROR_AMPLIFIED_BY_S2C",
+  "first_remaining_blocker": "upstream production EvalMod error dominates after linear S2C control",
+  "validation": {
+    "closure_pass": true,
+    "f0_boundary_reproduced": true,
+    "linear_delta_pass": true,
+    "logn13_only": true,
+    "mirror_fidelity_pass": true,
+    "no_benchmark": true,
+    "no_exp003": true,
+    "no_gate_4_or_5": true,
+    "no_logn16": true,
+    "no_parameter_tuning": true,
+    "no_power_replacement_sweep": true,
+    "no_ps_repair": true,
+    "no_secondary_source_modification": true,
+    "no_t2_repair": true,
+    "reference_proxy_pass": true
+  }
+}
