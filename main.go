@@ -85,6 +85,7 @@ func main() {
 	fix001P3DiagP93GenuineStandardVsMatchedReconciliation := flag.Bool("fix001-p3-diag-p93-genuine-standard-vs-matched-reconciliation", false, "reconcile Genuine Standard and matched diagnostic reference lineages")
 	fix001P3DiagP93FastVsGenuineStandardInternalBisect := flag.Bool("fix001-p3-diag-p93-fast-vs-genuine-standard-evalmod-internal-bisect", false, "bisect source-faithful Fast vs Genuine Standard EvalMod internals")
 	fix001P3DiagP93EvalModLockstepLogicalSemantics := flag.Bool("fix001-p3-diag-p93-evalmod-lockstep-logical-semantics-trace", false, "trace source-faithful Fast and Genuine Standard EvalMod in canonical logical coordinates")
+	fix001P3DiagP93FinalMaintainedRestoreFactor := flag.Bool("fix001-p3-diag-p93-final-maintained-restore-factor-causal-proof", false, "prove the causal effect of the final Fast maintained restore factor")
 	flag.Parse()
 
 	cfg, err := LoadBootstrapConfig(*configPath)
@@ -306,6 +307,9 @@ func main() {
 		selectedModes++
 	}
 	if *fix001P3DiagP93EvalModLockstepLogicalSemantics {
+		selectedModes++
+	}
+	if *fix001P3DiagP93FinalMaintainedRestoreFactor {
 		selectedModes++
 	}
 	if selectedModes > 1 {
@@ -581,6 +585,10 @@ func main() {
 		}
 	} else if *fix001P3DiagP93EvalModLockstepLogicalSemantics {
 		if err := runFIX001P3DiagP93EvalModLockstepLogicalSemantics(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
+			log.Fatal(err)
+		}
+	} else if *fix001P3DiagP93FinalMaintainedRestoreFactor {
+		if err := runFIX001P3DiagP93FinalMaintainedRestoreFactorCausalProof(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
 			log.Fatal(err)
 		}
 	} else if *finalizationDiagnostic {
