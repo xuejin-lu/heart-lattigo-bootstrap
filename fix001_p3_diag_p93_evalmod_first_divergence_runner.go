@@ -152,7 +152,7 @@ func fix001P3P93ProductionPSTrace(params ckks.Parameters, eval *bootstrapping.Fa
 		powers[snapshot.N] = snapshot.Ciphertext
 		decoded[snapshot.N] = values
 		expected[snapshot.N] = fix001ExpectedPower(snapshot.N, inputValues, memo)
-		events = append(events, fix001P3TraceEvent{Kind: "ps", Branch: fix001P3TraceBranch, Name: fmt.Sprintf("T%d-final", snapshot.N), Round: -1, Level: snapshot.Ciphertext.Level(), Scale: finalizationScaleString(snapshot.Ciphertext.Scale), Degree: snapshot.Ciphertext.Degree(), Values: fix001P3P93TraceComplex(values)})
+		events = append(events, fix001P3TraceEvent{Kind: "ps", Branch: fix001P3TraceBranch, Name: fmt.Sprintf("T%d-final", snapshot.N), Round: -1, Level: snapshot.Ciphertext.Level(), Scale: finalizationScaleString(snapshot.Ciphertext.Scale), Degree: snapshot.Ciphertext.Degree(), RowHashes: fix001P3ActualForcedRowHashes(snapshot.Ciphertext), Values: fix001P3P93TraceComplex(values)})
 	}
 	plan := psWidePlan(eval, e2, targetScale, planScale)
 	checks, giants, root, _, err := psGlobalReplay(params, eval.FastCKKS, plan, powers, expected, decoded, inputValues, planScale)
@@ -170,7 +170,7 @@ func fix001P3P93ProductionPSTrace(params ckks.Parameters, eval *bootstrapping.Fa
 	if root.ciphertext == nil {
 		return nil, fmt.Errorf("production PS root is nil")
 	}
-	events = append(events, fix001P3TraceEvent{Kind: "ps", Branch: fix001P3TraceBranch, Name: root.ID, Round: root.Round, Level: root.Level, Scale: root.Scale, Degree: root.Degree, Values: fix001P3P93TraceComplex(root.actual)})
+	events = append(events, fix001P3TraceEvent{Kind: "ps", Branch: fix001P3TraceBranch, Name: root.ID, Round: root.Round, Level: root.Level, Scale: root.Scale, Degree: root.Degree, RowHashes: fix001P3ActualForcedRowHashes(root.ciphertext), Values: fix001P3P93TraceComplex(root.actual)})
 	output := root.ciphertext.CopyNew()
 	if err := eval.FastCKKS.Rescale(output, output); err != nil {
 		return nil, err
@@ -179,7 +179,7 @@ func fix001P3P93ProductionPSTrace(params ckks.Parameters, eval *bootstrapping.Fa
 	if err != nil {
 		return nil, err
 	}
-	events = append(events, fix001P3TraceEvent{Kind: "ps", Branch: fix001P3TraceBranch, Name: "F0-replay-final-rescale", Round: -1, Level: output.Level(), Scale: finalizationScaleString(output.Scale), Degree: output.Degree(), Values: fix001P3P93TraceComplex(outputValues)})
+	events = append(events, fix001P3TraceEvent{Kind: "ps", Branch: fix001P3TraceBranch, Name: "F0-replay-final-rescale", Round: -1, Level: output.Level(), Scale: finalizationScaleString(output.Scale), Degree: output.Degree(), RowHashes: fix001P3ActualForcedRowHashes(output), Values: fix001P3P93TraceComplex(outputValues)})
 	actual, err := eval.PolynomialEvaluator.EvaluateWithPlanScale(e2.CopyNew(), eval.Mod1Parameters.Mod1Poly, targetScale, planScale)
 	if err != nil {
 		return nil, err
@@ -188,7 +188,7 @@ func fix001P3P93ProductionPSTrace(params ckks.Parameters, eval *bootstrapping.Fa
 	if err != nil {
 		return nil, err
 	}
-	events = append(events, fix001P3TraceEvent{Kind: "ps", Branch: fix001P3TraceBranch, Name: "F0-final-rescale", Round: -1, Level: actual.Level(), Scale: finalizationScaleString(actual.Scale), Degree: actual.Degree(), Values: fix001P3P93TraceComplex(actualValues)})
+	events = append(events, fix001P3TraceEvent{Kind: "ps", Branch: fix001P3TraceBranch, Name: "F0-final-rescale", Round: -1, Level: actual.Level(), Scale: finalizationScaleString(actual.Scale), Degree: actual.Degree(), RowHashes: fix001P3ActualForcedRowHashes(actual), Values: fix001P3P93TraceComplex(actualValues)})
 	sort.SliceStable(events, func(i, j int) bool {
 		if events[i].Kind != events[j].Kind {
 			return events[i].Kind < events[j].Kind

@@ -8,14 +8,15 @@ type fix001P3TraceComplex struct {
 }
 
 type fix001P3TraceEvent struct {
-	Kind   string                 `json:"kind"`
-	Branch string                 `json:"branch"`
-	Name   string                 `json:"name"`
-	Round  int                    `json:"round"`
-	Level  int                    `json:"level"`
-	Scale  string                 `json:"scale"`
-	Degree int                    `json:"degree"`
-	Values []fix001P3TraceComplex `json:"values"`
+	Kind      string                 `json:"kind"`
+	Branch    string                 `json:"branch"`
+	Name      string                 `json:"name"`
+	Round     int                    `json:"round"`
+	Level     int                    `json:"level"`
+	Scale     string                 `json:"scale"`
+	Degree    int                    `json:"degree"`
+	RowHashes map[string]string      `json:"row_hashes,omitempty"`
+	Values    []fix001P3TraceComplex `json:"values"`
 }
 
 var fix001P3TraceSink func(fix001P3TraceEvent)
@@ -25,7 +26,7 @@ func fix001P3TraceRecord(kind, name string, round int, ct *rlwe.Ciphertext, valu
 	if fix001P3TraceSink == nil || ct == nil {
 		return
 	}
-	event := fix001P3TraceEvent{Kind: kind, Branch: fix001P3TraceBranch, Name: name, Round: round, Level: ct.Level(), Scale: finalizationScaleString(ct.Scale), Degree: ct.Degree(), Values: make([]fix001P3TraceComplex, len(values))}
+	event := fix001P3TraceEvent{Kind: kind, Branch: fix001P3TraceBranch, Name: name, Round: round, Level: ct.Level(), Scale: finalizationScaleString(ct.Scale), Degree: ct.Degree(), RowHashes: fix001P3ActualForcedRowHashes(ct), Values: make([]fix001P3TraceComplex, len(values))}
 	for i, value := range values {
 		event.Values[i] = fix001P3TraceComplex{Real: real(value), Imag: imag(value)}
 	}
