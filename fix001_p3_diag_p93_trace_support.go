@@ -15,6 +15,7 @@ type fix001P3TraceEvent struct {
 	Level     int                    `json:"level"`
 	Scale     string                 `json:"scale"`
 	Degree    int                    `json:"degree"`
+	Capacity  *postMod1S2CCapacity   `json:"capacity,omitempty"`
 	RowHashes map[string]string      `json:"row_hashes,omitempty"`
 	Values    []fix001P3TraceComplex `json:"values"`
 }

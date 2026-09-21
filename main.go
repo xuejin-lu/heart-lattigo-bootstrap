@@ -87,6 +87,7 @@ func main() {
 	fix001P3DiagP93EvalModLockstepLogicalSemantics := flag.Bool("fix001-p3-diag-p93-evalmod-lockstep-logical-semantics-trace", false, "trace source-faithful Fast and Genuine Standard EvalMod in canonical logical coordinates")
 	fix001P3DiagP93FinalMaintainedRestoreFactor := flag.Bool("fix001-p3-diag-p93-final-maintained-restore-factor-causal-proof", false, "prove the causal effect of the final Fast maintained restore factor")
 	fix001P3DiagP93DoubleAnglePlaintextDecomposition := flag.Bool("fix001-p3-diag-p93-doubleangle-plaintext-causal-decomposition", false, "decompose plaintext DoubleAngle propagation from Fast implementation error")
+	fix001P3DiagP93PolynomialReferenceReconciliation := flag.Bool("fix001-p3-diag-p93-polynomial-reference-reconciliation", false, "reconcile fresh historical P93 polynomial reference with Genuine Standard and localize PS regression")
 	flag.Parse()
 
 	cfg, err := LoadBootstrapConfig(*configPath)
@@ -314,6 +315,9 @@ func main() {
 		selectedModes++
 	}
 	if *fix001P3DiagP93DoubleAnglePlaintextDecomposition {
+		selectedModes++
+	}
+	if *fix001P3DiagP93PolynomialReferenceReconciliation {
 		selectedModes++
 	}
 	if selectedModes > 1 {
@@ -597,6 +601,10 @@ func main() {
 		}
 	} else if *fix001P3DiagP93DoubleAnglePlaintextDecomposition {
 		if err := runFIX001P3DiagP93DoubleAnglePlaintextCausalDecomposition(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
+			log.Fatal(err)
+		}
+	} else if *fix001P3DiagP93PolynomialReferenceReconciliation {
+		if err := runFIX001P3DiagP93PolynomialReferenceReconciliation(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
 			log.Fatal(err)
 		}
 	} else if *finalizationDiagnostic {
