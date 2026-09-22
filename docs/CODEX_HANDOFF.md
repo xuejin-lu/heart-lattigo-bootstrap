@@ -23,54 +23,66 @@ When the user says `開始`, follow `AGENTS.md` preflight, synchronize Primary, 
 - Genuine Standard exact E2E: `5.830057349387463e-8`.
 - Fast/Genuine C2S difference: ~`1e-13`.
 - DoubleAngle implementation effect is <1%; DA error is polynomial-error propagation dominated.
-- Required polynomial-output budget for current public `1e-2`: `3.716228023823462e-8`.
+- Required polynomial-output budget for public `1e-2`: `3.716228023823462e-8`.
+- Historical P93 polynomial error is genuine and within budget:
+  - real `1.8570138426987626e-8`
+  - imag `1.6219059983946238e-8`.
+- Current production polynomial error is ~`5e-7`.
 
-### Historical P93 polynomial reference is now reconciled
+## T3 causal decomposition accepted
 
 Primary commit:
-`e23337b8087cb8fec28d857be3bff2efe78f60e0`
+`bd1a001017ea5f32e46d5fcebc3808fd4d3bbc07`
 
-Accepted:
-- historical/design Standard polynomial comparator equals Genuine Standard polynomial oracle exactly for the deterministic workload;
-- fresh historical P93 polynomial error:
-  - real `1.8570138426987626e-8`
-  - imag `1.6219059983946238e-8`
-- historical P93 therefore meets the derived polynomial budget;
-- current production polynomial error:
-  - real `4.986373945969902e-7`
-  - imag `5.07761187318323e-7`
-- regression vector closure passes.
+For current vs historical:
 
-### First budget-breaking generated-power checkpoint
+Real:
+- T1 regression = 0
+- T2 regression = `6.940818919609626e-9`
+- observed T3 regression = `2.2233773797064593e-7`
+- T1/T2 propagation contribution = `2.16898193849957e-10`
+- implementation-regression contribution = `2.225546361644959e-7`
 
-Current production vs historical P93:
+Imag:
+- T1 regression = 0
+- T2 regression = `5.797987645550506e-9`
+- observed T3 regression = `1.855698303146469e-7`
+- input propagation = `1.8118786332399495e-10`
+- implementation-regression = `1.857510181779709e-7`
 
-- T2 real: `6.940818919609626e-9` — within budget
-- T3 real: `2.2233773797064593e-7` — first budget break
-- capacity remains safe.
+Vector closure passes to numerical floor.
 
-This proves a generated-power regression is present, but **does not yet prove T3 implementation itself is causal** for final polynomial regression.
+Therefore T3 regression is overwhelmingly an implementation regression, not propagated T1/T2 error.
+
+However, the preceding task could only identify `T3-final` as the first stable material boundary. Dirty source candidates on the executed path include:
+- maintained q2 copies/workspace
+- q012 `MulIntegerMaintained`
+- q012 multiplication
+- Q012 rescale
+
+None is yet causally identified.
 
 Do not repair T3 yet.
 
 ## Current task
 
-`specs/FIX-001-P3-DIAG-P93-T3-GENERATED-POWER-CAUSAL-DECOMPOSITION.md`
+`specs/FIX-001-P3-DIAG-P93-T3-PRIMITIVE-SEMANTIC-RESIDUAL-LOCALIZATION.md`
 
 It must:
-
-1. freshly reproduce historical/current T1/T2/T3;
-2. establish the exact T3 Chebyshev recurrence and active schedule;
-3. build plaintext T3 oracles for historical and current inputs;
-4. decompose observed T3 regression into:
-   - propagation of T1/T2 input error;
-   - net T3 implementation-regression effect;
-5. verify vector closure;
-6. if input-propagation dominated, recurse one level into T2;
-7. if implementation effect is material, localize the first stable T3 primitive boundary;
-8. audit only dirty source changes actually on the executed T3 path;
-9. assess T3 relevance to final PS output without replacement experiments;
-10. stop after classification; no repair.
+1. build a source-faithful diagnostic shadow of current T3 using the exact current T1/T2 inputs;
+2. reproduce actual production T3;
+3. compare semantically stable boundaries against the exact plaintext recurrence:
+   [
+   T_3=2T_2T_1-T_1;
+   ]
+4. locate the first material implementation residual among:
+   - balanced operands post-Rescale
+   - product
+   - doubling
+   - subtraction/alignment;
+5. validate historical clean semantics at the relevant stable boundaries;
+6. perform at most one bounded q01-vs-q012 primitive A/B if required by the observed first boundary;
+7. stop after classification; no repair.
 
 ## Two-word workflow
 
@@ -88,8 +100,7 @@ It must:
 - no generated-power replacement sweep
 - no PS repair
 - no q/planScale tuning
-- no DoubleAngle repair
-- no C2S/S2C/finalizer work
+- no DoubleAngle/C2S/S2C/finalizer work
 - no P92/P94 sweep
 - no threshold relaxation
 - no LogN16
