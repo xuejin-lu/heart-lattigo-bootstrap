@@ -89,6 +89,7 @@ func main() {
 	fix001P3DiagP93DoubleAnglePlaintextDecomposition := flag.Bool("fix001-p3-diag-p93-doubleangle-plaintext-causal-decomposition", false, "decompose plaintext DoubleAngle propagation from Fast implementation error")
 	fix001P3DiagP93PolynomialReferenceReconciliation := flag.Bool("fix001-p3-diag-p93-polynomial-reference-reconciliation", false, "reconcile fresh historical P93 polynomial reference with Genuine Standard and localize PS regression")
 	fix001P3DiagP93T3CausalDecomposition := flag.Bool("fix001-p3-diag-p93-t3-generated-power-causal-decomposition", false, "decompose P93 T3 generated-power regression into input propagation and implementation effect")
+	fix001P3DiagP93T3PrimitiveSemanticResidualLocalization := flag.Bool("fix001-p3-diag-p93-t3-primitive-semantic-residual-localization", false, "localize P93 T3 primitive semantic residual at stable checkpoints")
 	flag.Parse()
 
 	cfg, err := LoadBootstrapConfig(*configPath)
@@ -322,6 +323,9 @@ func main() {
 		selectedModes++
 	}
 	if *fix001P3DiagP93T3CausalDecomposition {
+		selectedModes++
+	}
+	if *fix001P3DiagP93T3PrimitiveSemanticResidualLocalization {
 		selectedModes++
 	}
 	if selectedModes > 1 {
@@ -613,6 +617,10 @@ func main() {
 		}
 	} else if *fix001P3DiagP93T3CausalDecomposition {
 		if err := runFIX001P3DiagP93T3CausalDecomposition(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
+			log.Fatal(err)
+		}
+	} else if *fix001P3DiagP93T3PrimitiveSemanticResidualLocalization {
+		if err := runFIX001P3DiagP93T3PrimitiveSemanticResidualLocalization(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
 			log.Fatal(err)
 		}
 	} else if *finalizationDiagnostic {
