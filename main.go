@@ -91,6 +91,7 @@ func main() {
 	fix001P3DiagP93T3CausalDecomposition := flag.Bool("fix001-p3-diag-p93-t3-generated-power-causal-decomposition", false, "decompose P93 T3 generated-power regression into input propagation and implementation effect")
 	fix001P3DiagP93T3PrimitiveSemanticResidualLocalization := flag.Bool("fix001-p3-diag-p93-t3-primitive-semantic-residual-localization", false, "localize P93 T3 primitive semantic residual at stable checkpoints")
 	fix001P3DiagP93T3Q012RescaleCausalAB := flag.Bool("fix001-p3-diag-p93-t3-q012-rescale-causal-ab", false, "run bounded P93 T3 q012 versus q01 Rescale causal A/B")
+	fix001P3DiagP93T3BalancedVsPostProduct := flag.Bool("fix001-p3-diag-p93-t3-balanced-vs-postproduct-schedule-causal-ab", false, "run bounded P93 T3 balanced versus post-product schedule causal A/B")
 	flag.Parse()
 
 	cfg, err := LoadBootstrapConfig(*configPath)
@@ -330,6 +331,9 @@ func main() {
 		selectedModes++
 	}
 	if *fix001P3DiagP93T3Q012RescaleCausalAB {
+		selectedModes++
+	}
+	if *fix001P3DiagP93T3BalancedVsPostProduct {
 		selectedModes++
 	}
 	if selectedModes > 1 {
@@ -629,6 +633,10 @@ func main() {
 		}
 	} else if *fix001P3DiagP93T3Q012RescaleCausalAB {
 		if err := runFIX001P3DiagP93T3Q012RescaleCausalAB(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
+			log.Fatal(err)
+		}
+	} else if *fix001P3DiagP93T3BalancedVsPostProduct {
+		if err := runFIX001P3DiagP93T3BalancedVsPostProduct(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
 			log.Fatal(err)
 		}
 	} else if *finalizationDiagnostic {
