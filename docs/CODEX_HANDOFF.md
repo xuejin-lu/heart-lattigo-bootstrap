@@ -10,14 +10,18 @@ Secondary:
 - `xuejin-lu/lattigo`
 - branch `fast-ckks`
 - committed base before finalization: `7d05f1f3c6f8a14dea2bcb2d3fa05246d322a797`
-- local worktree intentionally dirty with the fully validated LogN13/P93/Q012 candidate.
 
 Finalized Secondary candidate:
 - committed SHA: `40532b4dce5c7eeae2db5b0b6f21be64801ce923`
 - `origin/fast-ckks`: `40532b4dce5c7eeae2db5b0b6f21be64801ce923`
 - local worktree: clean
+- finalized commit contains 21 files total:
+  - 19 previously tracked files modified from the starting base
+  - 2 intentional new Q012 files:
+    - `schemes/ckks/fast/q012.go`
+    - `schemes/ckks/fast/q012_test.go`
 
-Never reset, stash, clean, discard, checkout-overwrite, rebase, pull across, reconstruct, or otherwise alter the validated dirty candidate.
+Do not rewrite or discard the finalized candidate history.
 
 ## Startup
 
@@ -60,60 +64,49 @@ Therefore the current `1e-2` system milestone is passed end-to-end.
 
 Important: this is not the final research precision target. Tightening toward ~`1e-7` is a later phase.
 
-## Validated Secondary final dirty state
+## Finalized Secondary provenance
 
-Required starting fingerprint for finalization:
+Starting dirty fingerprint before finalization:
 
 `4d2567717bb0a88024d8330cf57db6a4a3b93a7faea2374ada6ac5161ec84764`
 
-Expected:
+Starting state:
 - branch `fast-ckks`
 - committed HEAD `7d05f1f3c6f8a14dea2bcb2d3fa05246d322a797`
-- 19-file accumulated Fast-CKKS candidate
-- 418 insertions / 146 deletions.
+- 19 previously tracked files modified
+- 2 intentional untracked Q012 source/test files later included in the finalized commit.
+
+Final state:
+- commit `40532b4dce5c7eeae2db5b0b6f21be64801ce923`
+- ordinary fast-forward push
+- local/remote synchronized
+- worktree clean.
 
 ## Finalization status
 
-The LogN13/P93/Q012 candidate was audited, committed, and pushed by ordinary
-fast-forward. The `1e-2` system milestone is complete; the final precision
-target remains a later phase.
+The LogN13/P93/Q012 candidate was audited, committed, and pushed by ordinary fast-forward.
+
+Primary finalization classification:
+`LOGN13_P93_Q012_MILESTONE_1E2_FINALIZED`
+
+The `1e-2` system milestone is complete; the final precision target remains a later phase.
 
 ## Current task
 
-`specs/FIX-001-P3-FINALIZE-LOGN13-P93-Q012-SECONDARY-CANDIDATE-COMMIT-PUSH.md`
+None.
 
-Completed with Primary `CURRENT_TASK.md` status `MILESTONE_1E2_COMPLETE`.
+Primary `CURRENT_TASK.md` status:
 
-This task must:
+`MILESTONE_1E2_COMPLETE`
 
-1. audit the complete 19-file Secondary dirty diff;
-2. reject any unexpected/unrelated change;
-3. safely inspect remote `origin/fast-ckks` without pulling across the dirty tree;
-4. run final Secondary regression tests and authoritative Primary exact-E2E confirmation;
-5. if all pass, commit the entire validated Secondary candidate;
-6. push `fast-ckks` by fast-forward only;
-7. verify remote/local synchronization and clean Secondary worktree;
-8. record the new Secondary commit SHA in Primary;
-9. set `CURRENT_TASK.md` to `MILESTONE_1E2_COMPLETE`.
+No further Codex action is pending for this milestone.
 
-No new algorithmic work is authorized.
+## Prohibitions for this completed milestone
 
-## Two-word workflow
-
-1. Codex: `開始`
-2. Codex audits, validates, commits/pushes Secondary safely, then updates/pushes Primary evidence/state.
-3. ChatGPT Web: `review`
-4. Orchestrator confirms milestone finalization.
-
-## Prohibitions
-
-- no new algorithmic changes
-- no parameter tuning
+- no retroactive parameter tuning
 - no threshold relaxation
-- no force push
-- no reset/stash/clean/discard
-- no history rewrite
+- no force push/history rewrite
 - no LogN16
 - no Gate4/5
 - no EXP-003
-- no benchmark campaign
+- no benchmark campaign as part of this completed milestone
