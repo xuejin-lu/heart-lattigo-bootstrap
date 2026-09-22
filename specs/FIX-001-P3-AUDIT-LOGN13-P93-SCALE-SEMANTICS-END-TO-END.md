@@ -1,5 +1,10 @@
 # FIX-001-P3-AUDIT-LOGN13-P93-SCALE-SEMANTICS-END-TO-END
 
+> **STATUS: SUPERSEDED AS AN EXECUTABLE CODEX TASK**
+>
+> Preserve this file as the original audit design and decision record. Do **not** execute it directly.
+> The scaling audit is now orchestrator-led: ChatGPT performs the static/mathematical review first. A later Codex task, if any, will be measurement-only and limited to runtime quantities that cannot be established from committed source/evidence.
+
 ## Purpose
 
 The LogN13/P93/Q012 `1e-2` system milestone is already finalized and must remain frozen.
