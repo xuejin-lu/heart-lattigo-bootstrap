@@ -1,0 +1,71 @@
+{
+  "secondary_sha": "40532b4dce5c7eeae2db5b0b6f21be64801ce923",
+  "classification": "SCALE_AUDIT_ALL_CONTRACTS_VERIFIED",
+  "frozen_fast_e2e": 0.009705381393898434,
+  "standard_e2e": 5.830057349387463e-8,
+  "findings": {
+    "scaledown": {
+      "relative_target_rounding_mismatch": 4.3200859556522646e-12,
+      "semantic_residual": 0,
+      "status": "PASS_STANDARD_CONTRACT"
+    },
+    "modup": {
+      "exact_ratio": 16,
+      "float64_ratio": 16,
+      "scalar": 16,
+      "semantic_residual": 0,
+      "status": "PASS_EXACT"
+    },
+    "ps_alignment": {
+      "count": 8,
+      "max_relative_mismatch": 0,
+      "max_semantic_residual": 0,
+      "status": "PASS_EXACT"
+    },
+    "ps_metadata_snap": {
+      "max_semantic_residual": 2.6065816172149425e-12,
+      "max_relative_scale_difference": 2.927449949114433e-12,
+      "status": "PASS_NUMERICAL_FLOOR"
+    },
+    "c2s_restore": {
+      "exponents": [
+        4,
+        2,
+        0,
+        0
+      ],
+      "max_semantic_residual": 0,
+      "status": "PASS_EXACT"
+    },
+    "mod1": {
+      "input_scale": "2^50",
+      "plan_scale": "2^93",
+      "polynomial_scale_approx": "2^33",
+      "virtual_exponent": 27,
+      "double_angle_multiplier_exponent": 28,
+      "coherent_target_relative_difference": 1.0125071354257578e-13,
+      "da2_scale_relative_to_2pow60": 8.100057083408933e-13,
+      "status": "PASS_MATHEMATICAL"
+    },
+    "public_scale": {
+      "fast": "2^45",
+      "standard": "2^45",
+      "status": "PASS_STANDARD_CONTRACT"
+    }
+  },
+  "ruled_out_as_material_scale_causes": [
+    "ScaleDown rounding",
+    "ModUp Float64/round scalar selection",
+    "PS BigInt alignment",
+    "PS metadata snapping",
+    "C2S restore",
+    "Mod1 virtual exponent selection",
+    "public DefaultScale resets"
+  ],
+  "test_maintenance": {
+    "stale_test": "TestFIX001P3GenuineStandardPublicVsStagedConsistency",
+    "cause": "historical runner requires obsolete dirty Secondary provenance before executing Standard comparison",
+    "affects_scale_conclusion": false
+  },
+  "secondary_change_authorized": false
+}
