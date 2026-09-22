@@ -1,0 +1,32 @@
+{
+  "secondary_sha": "40532b4dce5c7eeae2db5b0b6f21be64801ce923",
+  "frozen_fast_e2e": 0.009705381393898434,
+  "standard_e2e": 5.830057349387463e-8,
+  "classification": "STATIC_SCALE_AUDIT_NO_CAUSAL_DEFECT_FOUND_RUNTIME_ROUNDING_CHECKS_REQUIRED",
+  "pass_standard_contract": [
+    "ScaleDown algorithm",
+    "ModUp scale-lift algorithm structure",
+    "EvalMod normalization",
+    "EvalMod public DefaultScale reset",
+    "final residual DefaultScale reset",
+    "DFT group Rescale progression"
+  ],
+  "pass_mathematical": [
+    "C2S power-of-two restore physical+metadata pairing",
+    "normalized Mod1 virtual-exponent recurrence",
+    "post-product generated-power scale schedule"
+  ],
+  "runtime_measurements_required": [
+    "ScaleDown BigInt rounding mismatch",
+    "ModUp Float64/round mismatch",
+    "PS addAligned/subAligned rounded scale ratios",
+    "PS giant-step InDelta metadata snaps",
+    "normalized Mod1 coherent/target and DA scale deltas",
+    "C2S restore exact runtime factors"
+  ],
+  "source_corrections": [
+    "rlwe.Scale.BigInt rounds to nearest; it does not truncate",
+    "ModUp round(scale) vs metadata scale is also present in Genuine Standard",
+    "EvalMod 2^50-to-2^45 public reset is Standard contract, not a Fast bug"
+  ]
+}
