@@ -21,81 +21,69 @@ When the user says `開始`, follow `AGENTS.md` preflight, synchronize Primary, 
 ## Accepted evidence
 
 - Genuine Standard exact E2E: `5.830057349387463e-8`.
-- Fast/Genuine C2S difference: ~`1e-13`.
-- DoubleAngle implementation effect is <1%; DA error is polynomial-error propagation dominated.
 - Required polynomial-output budget for public `1e-2`: `3.716228023823462e-8`.
-- Historical P93 polynomial error is genuine and within budget:
-  - real `1.8570138426987626e-8`
-  - imag `1.6219059983946238e-8`.
+- Historical P93 polynomial error is valid and within budget.
 - Current production polynomial error is ~`5e-7`.
+- DoubleAngle is not the blocker.
 
-## T3 causal decomposition accepted
+## T3 implementation regression is proven
 
 Primary commit:
 `bd1a001017ea5f32e46d5fcebc3808fd4d3bbc07`
 
-For current vs historical:
+T3 regression is >99.9% implementation effect, not propagated T1/T2 error.
+
+## First primitive boundary
+
+Primary commit:
+`a4872ef14b4bde43aa6c8c307b9a7d6c2b533daf`
+
+A source-faithful T3 shadow reproduces production exactly.
+
+The first material semantic residual is the **right balanced operand post-Rescale**:
 
 Real:
-- T1 regression = 0
-- T2 regression = `6.940818919609626e-9`
-- observed T3 regression = `2.2233773797064593e-7`
-- T1/T2 propagation contribution = `2.16898193849957e-10`
-- implementation-regression contribution = `2.225546361644959e-7`
+- left post-Rescale residual `1.771577862186291e-8`
+- right post-Rescale residual `1.1105472362549218e-7`
 
 Imag:
-- T1 regression = 0
-- T2 regression = `5.797987645550506e-9`
-- observed T3 regression = `1.855698303146469e-7`
-- input propagation = `1.8118786332399495e-10`
-- implementation-regression = `1.857510181779709e-7`
+- left post-Rescale residual `1.606223765104886e-8`
+- right post-Rescale residual `9.276714673864261e-8`
 
-Vector closure passes to numerical floor.
+Capacity is extremely safe; this is not centered-CRT overflow.
 
-Therefore T3 regression is overwhelmingly an implementation regression, not propagated T1/T2 error.
-
-However, the preceding task could only identify `T3-final` as the first stable material boundary. Dirty source candidates on the executed path include:
-- maintained q2 copies/workspace
-- q012 `MulIntegerMaintained`
-- q012 multiplication
-- Q012 rescale
-
-None is yet causally identified.
-
-Do not repair T3 yet.
+The previous spec required a bounded q01-vs-q012 A/B when operand Rescale became the first material boundary, but that A/B was not executed. Therefore do not repair production yet.
 
 ## Current task
 
-`specs/FIX-001-P3-DIAG-P93-T3-PRIMITIVE-SEMANTIC-RESIDUAL-LOCALIZATION.md`
+`specs/FIX-001-P3-DIAG-P93-T3-Q012-RESCALE-CAUSAL-AB.md`
 
 It must:
-1. build a source-faithful diagnostic shadow of current T3 using the exact current T1/T2 inputs;
-2. reproduce actual production T3;
-3. compare semantically stable boundaries against the exact plaintext recurrence:
-   [
-   T_3=2T_2T_1-T_1;
-   ]
-4. locate the first material implementation residual among:
-   - balanced operands post-Rescale
-   - product
-   - doubling
-   - subtraction/alignment;
-5. validate historical clean semantics at the relevant stable boundaries;
-6. perform at most one bounded q01-vs-q012 primitive A/B if required by the observed first boundary;
-7. stop after classification; no repair.
+
+1. reproduce the current right-operand residual;
+2. compare current q2-aware maintained scaling against a q01-only scaling shadow on the exact same input;
+3. run current Q012 Rescale vs clean q01-authoritative Rescale on the exact same pre-Rescale ciphertext;
+4. run q01 scaling + q01 Rescale as the third bounded control;
+5. repeat the same bounded check on the left operand;
+6. feed the causally supported operand path back into T3 and measure endpoint residual;
+7. decide whether Q012 Rescale, q2-scaling/rescale interaction, or neither is causal;
+8. state whether a later minimal production repair is authorized;
+9. stop without modifying Secondary.
 
 ## Two-word workflow
 
 1. Codex: `開始`
 2. Codex executes current spec, validates, commits/pushes Primary evidence.
 3. ChatGPT Web: `review`
-4. Orchestrator reviews and prepares next task.
+4. Orchestrator reviews and prepares the next task.
 
 ## Prohibitions
 
 - no Secondary production source modification
 - no Secondary production commit/push
 - no destructive operation on dirty Secondary
+- no Rescale production repair
+- no q2 production disablement
 - no T3/T2 repair
 - no generated-power replacement sweep
 - no PS repair
