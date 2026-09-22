@@ -297,7 +297,7 @@ func chebyshevCanonicalState(cfg BootstrapConfig) (chebyshevOracleState, error) 
 	for i := range plan.Value {
 		plan.Value[i].Scale = candidate
 	}
-	_, _, root, _, err := psGlobalReplay(btp.BootstrappingParameters, eval.FastCKKS, plan, powerMap, powerExpected, powerDecoded, z, candidate)
+	_, _, root, _, err := psGlobalReplay(btp.BootstrappingParameters, eval.FastCKKS, plan, powerMap, powerExpected, powerDecoded, z, candidate, nil)
 	if err != nil {
 		return chebyshevOracleState{}, err
 	}

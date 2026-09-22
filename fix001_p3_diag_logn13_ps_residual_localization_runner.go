@@ -288,9 +288,9 @@ func psLocalizationReplay(params ckks.Parameters, eval *bootstrapping.FastEvalua
 	var root PSGlobalCheckpoint
 	var err error
 	if reset == nil {
-		checks, giants, root, _, err = psGlobalReplay(params, eval.FastCKKS, plan, powers, expected, decoded, input, planScale)
+		checks, giants, root, _, err = psGlobalReplay(params, eval.FastCKKS, plan, powers, expected, decoded, input, planScale, nil)
 	} else {
-		checks, giants, root, _, err = psGlobalReplay(params, eval.FastCKKS, plan, powers, expected, decoded, input, planScale, *reset)
+		checks, giants, root, _, err = psGlobalReplay(params, eval.FastCKKS, plan, powers, expected, decoded, input, planScale, nil, *reset)
 	}
 	if err != nil {
 		return nil, nil, checks, giants, err

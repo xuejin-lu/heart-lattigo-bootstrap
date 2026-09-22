@@ -78,6 +78,7 @@ type evalModMatchedRound struct {
 	PostRescale        evalModMatchedCheckpoint `json:"post_rescale"`
 	NVsCPostRescale    *PSGlobalMetric          `json:"normalized_mapped_vs_coherent"`
 	CVsSPostRescale    *PSGlobalMetric          `json:"coherent_vs_standard"`
+	RuntimeScale       map[string]interface{}   `json:"runtime_scale,omitempty"`
 }
 
 type evalModMatchedFinal struct {
@@ -210,7 +211,17 @@ func evalModMatchedCheckpointFor(name string, round int, fast, normalized, stand
 	return checkpoint, nil
 }
 
-func evalModMatchedC2SInputs(cfg BootstrapConfig, btp bootstrapping.Parameters, fastEval *bootstrapping.FastEvaluator, standardEval *bootstrapping.Evaluator, standardSK *rlwe.SecretKey) (evalModMatchedInputs, error) {
+func evalModMatchedC2SInputs(cfg BootstrapConfig, btp bootstrapping.Parameters, fastEval *bootstrapping.FastEvaluator, standardEval *bootstrapping.Evaluator, standardSK *rlwe.SecretKey, options ...interface{}) (evalModMatchedInputs, error) {
+	var restoreLedgers []*[]map[string]interface{}
+	allowLevelZero := false
+	for _, option := range options {
+		switch value := option.(type) {
+		case bool:
+			allowLevelZero = value
+		case *[]map[string]interface{}:
+			restoreLedgers = append(restoreLedgers, value)
+		}
+	}
 	params := btp.BootstrappingParameters
 	residual := btp.ResidualParameters
 	fastInput := reproducibleInput(residual, btp)
@@ -234,6 +245,35 @@ func evalModMatchedC2SInputs(cfg BootstrapConfig, btp bootstrapping.Parameters, 
 	fastModUp, err := fastEval.ModUp(fastScaled)
 	if err != nil {
 		return evalModMatchedInputs{}, err
+	}
+	var restoreLedger *[]map[string]interface{}
+	if len(restoreLedgers) > 0 {
+		restoreLedger = restoreLedgers[0]
+	}
+	recordRestore := func(group, k int, matrixScale, compressedScale string, preRescale, postRescale, beforeRestore, afterRestore *rlwe.Ciphertext) error {
+		if restoreLedger == nil {
+			return nil
+		}
+		semanticResidual := 0.0
+		if beforeRestore != nil && afterRestore != nil {
+			beforeValues, e := psGlobalDecode(params, beforeRestore)
+			if e != nil {
+				return e
+			}
+			afterValues, e := psGlobalDecode(params, afterRestore)
+			if e != nil {
+				return e
+			}
+			semanticResidual = psGlobalMetric(beforeValues, afterValues).MaxComponent
+		}
+		physical := new(big.Int).Lsh(big.NewInt(1), uint(k))
+		*restoreLedger = append(*restoreLedger, map[string]interface{}{
+			"group": group, "compression_exponent": k, "matrix_scale_before_compression": matrixScale, "compressed_matrix_scale": compressedScale,
+			"post_group_rescale_scale": finalizationScaleString(postRescale.Scale), "physical_restore_scalar": physical.String(), "metadata_restore_scalar": physical.String(),
+			"resulting_scale": finalizationScaleString(afterRestore.Scale), "semantic_before_after_restore_max_component": semanticResidual,
+			"pre_rescale_scale": finalizationScaleString(preRescale.Scale),
+		})
+		return nil
 	}
 	standardModUp, err := standardEval.ModUp(standardScaled)
 	if err != nil {
@@ -264,7 +304,11 @@ func evalModMatchedC2SInputs(cfg BootstrapConfig, btp bootstrapping.Parameters, 
 	if err = c2sCompressedRescale(params, standardEval, fastEval, stdCurrent, fastCurrent); err != nil {
 		return evalModMatchedInputs{}, err
 	}
+	group0PreRestore := fastCurrent.CopyNew()
 	if err = c2sCompressedApplyRestore(params, fastEval.FastCKKS, fastCurrent, stdCurrent, 4); err != nil {
+		return evalModMatchedInputs{}, err
+	}
+	if err = recordRestore(0, 4, finalizationScaleString(original.Matrices[0].Scale), finalizationScaleString(compressed0.Scale), group0PreRestore, fastCurrent, group0PreRestore, fastCurrent); err != nil {
 		return evalModMatchedInputs{}, err
 	}
 	group0Std, group0Fast := stdCurrent, fastCurrent
@@ -279,7 +323,11 @@ func evalModMatchedC2SInputs(cfg BootstrapConfig, btp bootstrapping.Parameters, 
 	if err = c2sCompressedRescale(params, standardEval, fastEval, stdCurrent, fastCurrent); err != nil {
 		return evalModMatchedInputs{}, err
 	}
+	group1PreRestore := fastCurrent.CopyNew()
 	if err = c2sCompressedApplyRestore(params, fastEval.FastCKKS, fastCurrent, stdCurrent, 2); err != nil {
+		return evalModMatchedInputs{}, err
+	}
+	if err = recordRestore(1, 2, finalizationScaleString(original.Matrices[1].Scale), finalizationScaleString(compressed1.Scale), group1PreRestore, fastCurrent, group1PreRestore, fastCurrent); err != nil {
 		return evalModMatchedInputs{}, err
 	}
 	for group := 2; group <= 3; group++ {
@@ -288,6 +336,9 @@ func evalModMatchedC2SInputs(cfg BootstrapConfig, btp bootstrapping.Parameters, 
 			return evalModMatchedInputs{}, err
 		}
 		if err = c2sCompressedRescale(params, standardEval, fastEval, stdCurrent, fastCurrent); err != nil {
+			return evalModMatchedInputs{}, err
+		}
+		if err = recordRestore(group, 0, finalizationScaleString(original.Matrices[group].Scale), finalizationScaleString(original.Matrices[group].Scale), fastCurrent, fastCurrent, nil, fastCurrent); err != nil {
 			return evalModMatchedInputs{}, err
 		}
 	}
@@ -326,15 +377,15 @@ func evalModMatchedC2SInputs(cfg BootstrapConfig, btp bootstrapping.Parameters, 
 	alignedRealOrdinaryMetric := evalModMatchedMetricFor(ordinaryRealValues, alignedRealValues, acceptedC2SGroup1Budget)
 	alignedImagOrdinaryMetric := evalModMatchedMetricFor(ordinaryImagValues, alignedImagValues, acceptedC2SGroup1Budget)
 	fastCapacity, err := postMod1S2CCapacityFromFastCiphertext(params, realSplit.Fast)
-	if err != nil {
+	if err != nil && !allowLevelZero {
 		return evalModMatchedInputs{}, err
 	}
 	alignedCapacity, err := postMod1S2CCapacityFromCiphertext(params, realSplit.Standard)
-	if err != nil {
+	if err != nil && !allowLevelZero {
 		return evalModMatchedInputs{}, err
 	}
 	fastImagCapacity, err := postMod1S2CCapacityFromFastCiphertext(params, imagSplit.Fast)
-	if err != nil {
+	if err != nil && !allowLevelZero {
 		return evalModMatchedInputs{}, err
 	}
 	_ = alignedRealOrdinaryMetric
@@ -415,6 +466,7 @@ type evalModMatchedPath struct {
 	FirstFailure                    string
 	NormalizedBeforeRestoreCapacity *NormalizedExactCapacity
 	FinalRestoreCapacity            *NormalizedFinalRestoreCapacity
+	ScaleLedger                     []map[string]interface{}
 }
 
 func evalModMatchedAddFullConstant(params ckks.Parameters, input *rlwe.Ciphertext, constant float64) *rlwe.Ciphertext {
@@ -576,6 +628,11 @@ func evalModMatchedRunPathWithPlanScaleAndFastPolynomial(fastInput, standardInpu
 	coherentMultiplier := initialK
 	coherentCurrent := normalizedFullIntegerMultiply(params, normalizedPoly, coherentMultiplier)
 	coherentCurrent.Scale = normalizedPoly.Scale.Mul(rlwe.NewScale(coherentMultiplier))
+	path.ScaleLedger = append(path.ScaleLedger, map[string]interface{}{
+		"kind": "initial_normalization", "input_scale": finalizationScaleString(fastPoly.Scale), "working_scale": finalizationScaleString(workingScale),
+		"k_in": kExponent, "coherent_scale": finalizationScaleString(coherentCurrent.Scale), "coherent_target_ratio": finalizationScaleString(coherentCurrent.Scale.Div(targetScale)),
+		"coherent_target_log2_delta": coherentCurrent.Scale.Log2Delta(targetScale),
+	})
 	standardPolyCurrent := standardPoly.CopyNew()
 	for round := 0; round < fastEval.Mod1Parameters.DoubleAngle; round++ {
 		sqrt2pi *= sqrt2pi
@@ -659,6 +716,15 @@ func evalModMatchedRunPathWithPlanScaleAndFastPolynomial(fastInput, standardInpu
 		if err := fastEval.FastCKKS.Rescale(fastNormalized, fastNormalized); err != nil {
 			return path, err
 		}
+		nextScale := scheduleScaleValue(schedule, params, schedule.NextLevel, currentScale)
+		runtimeRatio := nextScale.Div(workingScale)
+		pathScaleRow := map[string]interface{}{
+			"kind": "double_angle", "round": round, "input_scale": finalizationScaleString(currentScale), "current_exponent": kIn,
+			"next_scale": finalizationScaleString(nextScale), "working_scale": finalizationScaleString(workingScale), "next_scale_over_working_scale": finalizationScaleString(runtimeRatio),
+			"next_scale_over_working_log2_delta": runtimeRatio.Log2Delta(rlwe.NewScale(1)), "next_exponent": schedule.KOutExponent, "a_exponent": schedule.AExponent,
+			"factor": new(big.Int).Lsh(big.NewInt(1), uint(schedule.AExponent)).String(), "post_rescale_scale": finalizationScaleString(fastNormalized.Scale),
+		}
+		path.ScaleLedger = append(path.ScaleLedger, pathScaleRow)
 		normalizedCurrent, err = normalizedFullRescale(params, refAfterConstant)
 		if err != nil {
 			return path, err
@@ -714,7 +780,7 @@ func evalModMatchedRunPathWithPlanScaleAndFastPolynomial(fastInput, standardInpu
 			return path, err
 		}
 		cVsS := evalModMatchedMetricFor(sValues, cValues, evalModMatchedLocalThreshold)
-		path.Rounds = append(path.Rounds, evalModMatchedRound{Round: round, KInExponent: kIn, KOutExponent: schedule.KOutExponent, MultiplierExponent: schedule.AExponent, NormalizedConstant: constantValue, Input: inputCheckpoint, Square: squareCheckpoint, AfterMultiplier: aCheckpoint, AfterConstant: constantCheckpoint, PostRescale: postCheckpoint, NVsCPostRescale: nVsC, CVsSPostRescale: cVsS})
+		path.Rounds = append(path.Rounds, evalModMatchedRound{Round: round, KInExponent: kIn, KOutExponent: schedule.KOutExponent, MultiplierExponent: schedule.AExponent, NormalizedConstant: constantValue, Input: inputCheckpoint, Square: squareCheckpoint, AfterMultiplier: aCheckpoint, AfterConstant: constantCheckpoint, PostRescale: postCheckpoint, NVsCPostRescale: nVsC, CVsSPostRescale: cVsS, RuntimeScale: pathScaleRow})
 		fastNormalized = fastAfterRescale
 		currentLevel = schedule.NextLevel
 		currentScale = scheduleScaleValue(schedule, params, currentLevel, currentScale)
@@ -725,6 +791,7 @@ func evalModMatchedRunPathWithPlanScaleAndFastPolynomial(fastInput, standardInpu
 	coherentBeforeReset := coherentCurrent.CopyNew()
 	standardBeforeReset := standardPolyCurrent.CopyNew()
 	finalK := new(big.Int).Lsh(big.NewInt(1), uint(kIn))
+	path.ScaleLedger = append(path.ScaleLedger, map[string]interface{}{"kind": "final_pre_materialization", "scale": finalizationScaleString(fastBeforeRestore.Scale), "virtual_exponent": kIn, "physical_materialization_factor": finalK.String(), "caller_input_scale": finalizationScaleString(originalFastScale)})
 	beforeRestoreCapacity, err := normalizedExactCapacity(params, normalizedCurrent)
 	if err != nil {
 		return path, err
@@ -756,6 +823,7 @@ func evalModMatchedRunPathWithPlanScaleAndFastPolynomial(fastInput, standardInpu
 	normalizedCurrent.Scale = originalFastScale
 	standardPolyCurrent.Scale = originalStandardScale
 	coherentCurrent.Scale = originalStandardScale
+	path.ScaleLedger = append(path.ScaleLedger, map[string]interface{}{"kind": "post_reset", "caller_input_scale": finalizationScaleString(originalFastScale), "public_default_scale": finalizationScaleString(fastEval.Parameters.BootstrappingParameters.DefaultScale()), "fast_scale": finalizationScaleString(fastNormalized.Scale), "normalized_scale": finalizationScaleString(normalizedCurrent.Scale)})
 	path.ScaleResetRowsUnchanged = doubleAngleRowsMatch(fastRestoreRows, finalizationEvidence(fastNormalized).Rows) && doubleAngleRowsMatch(normalizedRestoreRows, finalizationEvidence(normalizedCurrent).Rows)
 	path.LevelDegreeUnchanged = fastNormalized.Level() == fastBeforeRestore.Level() && fastNormalized.Degree() == fastBeforeRestore.Degree() && normalizedCurrent.Level() == normalizedBeforeRestore.Level() && normalizedCurrent.Degree() == normalizedBeforeRestore.Degree()
 	path.FastFinal, path.NormalizedFinal, path.CoherentFinal, path.StandardFinal = fastNormalized, normalizedCurrent, coherentCurrent, standardPolyCurrent

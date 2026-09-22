@@ -123,7 +123,7 @@ func fix001P3P93TraceRepeatability(events []fix001P3TraceEvent) float64 {
 	return maxDifference
 }
 
-func fix001P3P93ProductionPSTrace(params ckks.Parameters, eval *bootstrapping.FastEvaluator, input *rlwe.Ciphertext, planScale rlwe.Scale) ([]fix001P3TraceEvent, error) {
+func fix001P3P93ProductionPSTrace(params ckks.Parameters, eval *bootstrapping.FastEvaluator, input *rlwe.Ciphertext, planScale rlwe.Scale, traces ...*fix001P3ScaleMeasurementTrace) ([]fix001P3TraceEvent, error) {
 	capacityFor := func(ct *rlwe.Ciphertext) *postMod1S2CCapacity {
 		capacity, err := postMod1S2CCapacityFromFastCiphertext(params, ct)
 		if err != nil {
@@ -162,7 +162,11 @@ func fix001P3P93ProductionPSTrace(params ckks.Parameters, eval *bootstrapping.Fa
 		events = append(events, fix001P3TraceEvent{Kind: "ps", Branch: fix001P3TraceBranch, Name: fmt.Sprintf("T%d-final", snapshot.N), Round: -1, Level: snapshot.Ciphertext.Level(), Scale: finalizationScaleString(snapshot.Ciphertext.Scale), Degree: snapshot.Ciphertext.Degree(), Capacity: capacityFor(snapshot.Ciphertext), RowHashes: fix001P3ActualForcedRowHashes(snapshot.Ciphertext), Values: fix001P3P93TraceComplex(values)})
 	}
 	plan := psWidePlan(eval, e2, targetScale, planScale)
-	checks, giants, root, _, err := psGlobalReplay(params, eval.FastCKKS, plan, powers, expected, decoded, inputValues, planScale)
+	var trace *fix001P3ScaleMeasurementTrace
+	if len(traces) > 0 {
+		trace = traces[0]
+	}
+	checks, giants, root, _, err := psGlobalReplay(params, eval.FastCKKS, plan, powers, expected, decoded, inputValues, planScale, trace)
 	if err != nil {
 		return nil, err
 	}

@@ -93,6 +93,7 @@ func main() {
 	fix001P3DiagP93T3Q012RescaleCausalAB := flag.Bool("fix001-p3-diag-p93-t3-q012-rescale-causal-ab", false, "run bounded P93 T3 q012 versus q01 Rescale causal A/B")
 	fix001P3DiagP93T3BalancedVsPostProduct := flag.Bool("fix001-p3-diag-p93-t3-balanced-vs-postproduct-schedule-causal-ab", false, "run bounded P93 T3 balanced versus post-product schedule causal A/B")
 	fix001P3ProdLogN13PostProductRepair := flag.Bool("fix001-p3-prod-logn13-postproduct-schedule-repair", false, "validate the LogN13 Q012 generated-power post-product schedule repair")
+	fix001P3MeasureScaleRuntimeFacts := flag.Bool("fix001-p3-measure-logn13-p93-scale-runtime-facts", false, "measure FIX-001 LogN13/P93 runtime scale facts")
 	flag.Parse()
 
 	cfg, err := LoadBootstrapConfig(*configPath)
@@ -338,6 +339,9 @@ func main() {
 		selectedModes++
 	}
 	if *fix001P3ProdLogN13PostProductRepair {
+		selectedModes++
+	}
+	if *fix001P3MeasureScaleRuntimeFacts {
 		selectedModes++
 	}
 	if selectedModes > 1 {
@@ -645,6 +649,10 @@ func main() {
 		}
 	} else if *fix001P3ProdLogN13PostProductRepair {
 		if err := runFIX001P3ProdLogN13PostProductScheduleRepair(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
+			log.Fatal(err)
+		}
+	} else if *fix001P3MeasureScaleRuntimeFacts {
+		if err := runFIX001P3MeasureLogN13P93ScaleRuntimeFacts(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
 			log.Fatal(err)
 		}
 	} else if *finalizationDiagnostic {

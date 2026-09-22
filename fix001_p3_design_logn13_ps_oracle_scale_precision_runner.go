@@ -175,7 +175,7 @@ func psOracleScaleCandidateForBranch(params ckks.Parameters, eval *bootstrapping
 	planScale := precisionSweepScale(exponent)
 	candidate := psOracleScaleCandidate{Exponent: exponent, PlanScale: finalizationScaleString(planScale), FirstFailure: "none", FirstCumulativeBudgetCross: "none", WorstCapacityRatio: 0, AllCenteredUnique: true, AllRowsMatch: true, Classification: "ps_oracle_stage_pass", firstFailureOrder: math.MaxInt}
 	plan := psOracleScalePlan(branch.Base.Plan, planScale)
-	checks, _, root, _, replayErr := psGlobalReplay(params, eval.FastCKKS, plan, branch.Base.OraclePowerMap, branch.Base.PowerExpected, branch.Base.OraclePowerValues, branch.Base.InputValues, planScale)
+	checks, _, root, _, replayErr := psGlobalReplay(params, eval.FastCKKS, plan, branch.Base.OraclePowerMap, branch.Base.PowerExpected, branch.Base.OraclePowerValues, branch.Base.InputValues, planScale, nil)
 	candidate.CheckpointCount = len(checks) + 1
 	attribution := true
 	check := func(id string, cp *PSGlobalCheckpoint) error {

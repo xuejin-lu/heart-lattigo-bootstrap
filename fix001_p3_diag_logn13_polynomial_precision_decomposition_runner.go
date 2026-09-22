@@ -307,7 +307,7 @@ func polynomialDecompositionCapacity(params ckks.Parameters, ct *rlwe.Ciphertext
 }
 
 func polynomialDecompositionReplay(params ckks.Parameters, eval *bootstrapping.FastEvaluator, plan commonpolynomial.PatersonStockmeyerPolynomial, powers map[int]*rlwe.Ciphertext, expected, decoded map[int][]complex128, input []complex128, planScale rlwe.Scale) ([]complex128, *rlwe.Ciphertext, []PSGlobalCheckpoint, error) {
-	checks, _, root, _, err := psGlobalReplay(params, eval.FastCKKS, plan, powers, expected, decoded, input, planScale)
+	checks, _, root, _, err := psGlobalReplay(params, eval.FastCKKS, plan, powers, expected, decoded, input, planScale, nil)
 	if err != nil {
 		return nil, nil, checks, err
 	}

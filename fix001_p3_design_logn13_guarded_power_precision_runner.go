@@ -532,7 +532,7 @@ func guardedPowerPolynomial(eval *bootstrapping.FastEvaluator, params ckks.Param
 	for i := range plan.Value {
 		plan.Value[i].Scale = planScale
 	}
-	_, _, root, _, err := psGlobalReplay(params, eval.FastCKKS, plan, run.Powers, run.Expected, run.Decoded, z, planScale)
+	_, _, root, _, err := psGlobalReplay(params, eval.FastCKKS, plan, run.Powers, run.Expected, run.Decoded, z, planScale, nil)
 	if err != nil {
 		run.FirstFailure, run.Classification = "PS.replay", "guard_generated_power_semantic_failure"
 		return run, nil, nil, nil

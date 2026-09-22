@@ -197,6 +197,16 @@ func psGlobalCopyMaintained(params ckks.Parameters, src, dst *rlwe.Ciphertext) {
 	}
 }
 func psGlobalDecode(params ckks.Parameters, ct *rlwe.Ciphertext) ([]complex128, error) {
+	if ct != nil && ct.Level() == 0 {
+		copyCT := ct.CopyNew()
+		if copyCT.IsMontgomery {
+			for component := range copyCT.Value {
+				params.RingQ().SubRings[0].IMForm(copyCT.Value[component].Coeffs[0], copyCT.Value[component].Coeffs[0])
+			}
+			copyCT.IsMontgomery = false
+		}
+		return diagnosticDecode(params, copyCT, zeroSecret(params))
+	}
 	projection, _, err := q01Projection(params, ct, true)
 	if err != nil {
 		return nil, err
@@ -257,24 +267,116 @@ func psGlobalLog2Delta(a, b rlwe.Scale) float64 {
 }
 
 func psGlobalAddAligned(params ckks.Parameters, eval *fastckks.Evaluator, a, b *rlwe.Ciphertext) error {
+	return psGlobalAddAlignedWithTrace(params, eval, a, b, nil, "")
+}
+
+type fix001P3ScaleAlignmentObservation struct {
+	OperationID         string
+	Checkpoint          string
+	NumeratorScale      string
+	DenominatorScale    string
+	ExactRatio          string
+	RatioBigInt         string
+	AbsRoundingMismatch float64
+	RelativeMismatch    float64
+	SemanticResidual    float64
+	ExactIntegral       bool
+}
+
+type fix001P3MetadataSnapObservation struct {
+	OperationID         string
+	Checkpoint          string
+	ScaleA              string
+	ScaleB              string
+	RatioAOverB         string
+	Log2Delta           float64
+	RelativeDifference  float64
+	InterpretationShift float64
+	SemanticResidual    float64
+}
+
+type fix001P3ScaleMeasurementTrace struct {
+	Alignments []fix001P3ScaleAlignmentObservation
+	Snaps      []fix001P3MetadataSnapObservation
+	Checkpoint string
+}
+
+func fix001P3ScaleRelativeDifference(a, b rlwe.Scale) float64 {
+	d := new(big.Float).Sub(&a.Value, &b.Value)
+	d.Abs(d)
+	max := a.Max(b)
+	if max.Value.Sign() == 0 {
+		return 0
+	}
+	d.Quo(d, &max.Value)
+	value, _ := d.Float64()
+	return value
+}
+
+func fix001P3ScaleRounding(ratio rlwe.Scale) (string, float64, float64, bool) {
+	rounded := ratio.BigInt()
+	difference := new(big.Float).Sub(new(big.Float).SetInt(rounded), &ratio.Value)
+	difference.Abs(difference)
+	absMismatch, _ := difference.Float64()
+	relative := 0.0
+	if ratio.Value.Sign() != 0 {
+		relativeBig := new(big.Float).Quo(new(big.Float).Set(difference), new(big.Float).Set(&ratio.Value))
+		relative, _ = relativeBig.Float64()
+	}
+	return rounded.String(), absMismatch, relative, ratio.Equal(rlwe.NewScale(rounded))
+}
+
+func fix001P3ScaleSemanticResidual(params ckks.Parameters, before, after *rlwe.Ciphertext) float64 {
+	if before == nil || after == nil {
+		return 0
+	}
+	beforeValues, err := psGlobalDecode(params, before)
+	if err != nil {
+		return 0
+	}
+	afterValues, err := psGlobalDecode(params, after)
+	if err != nil {
+		return 0
+	}
+	return psGlobalMetric(beforeValues, afterValues).MaxComponent
+}
+
+func psGlobalAddAlignedWithTrace(params ckks.Parameters, eval *fastckks.Evaluator, a, b *rlwe.Ciphertext, trace *fix001P3ScaleMeasurementTrace, checkpoint string) error {
 	if a.Scale.Equal(b.Scale) {
+		if trace != nil {
+			ratio := rlwe.NewScale(1)
+			rounded, absMismatch, relative, exact := fix001P3ScaleRounding(ratio)
+			trace.Alignments = append(trace.Alignments, fix001P3ScaleAlignmentObservation{OperationID: fmt.Sprintf("addAligned-%d", len(trace.Alignments)), Checkpoint: checkpoint, NumeratorScale: finalizationScaleString(b.Scale), DenominatorScale: finalizationScaleString(a.Scale), ExactRatio: finalizationScaleString(ratio), RatioBigInt: rounded, AbsRoundingMismatch: absMismatch, RelativeMismatch: relative, SemanticResidual: 0, ExactIntegral: exact})
+		}
 		return eval.Add(b, a, b)
 	}
 	if b.Scale.Cmp(a.Scale) > 0 {
+		ratio := b.Scale.Div(a.Scale)
+		before := a.CopyNew()
 		scratch := fastckks.NewCiphertext(params.Parameters, a.Degree(), minInt(a.Level(), b.Level()))
 		psGlobalCopyMaintained(params, a, scratch)
-		if err := eval.MulIntegerMaintained(a, b.Scale.Div(a.Scale).BigInt(), scratch); err != nil {
+		if err := eval.MulIntegerMaintained(a, ratio.BigInt(), scratch); err != nil {
 			return err
 		}
 		scratch.Scale = b.Scale
+		if trace != nil {
+			rounded, absMismatch, relative, exact := fix001P3ScaleRounding(ratio)
+			trace.Alignments = append(trace.Alignments, fix001P3ScaleAlignmentObservation{OperationID: fmt.Sprintf("addAligned-%d", len(trace.Alignments)), Checkpoint: checkpoint, NumeratorScale: finalizationScaleString(b.Scale), DenominatorScale: finalizationScaleString(a.Scale), ExactRatio: finalizationScaleString(ratio), RatioBigInt: rounded, AbsRoundingMismatch: absMismatch, RelativeMismatch: relative, SemanticResidual: fix001P3ScaleSemanticResidual(params, before, scratch), ExactIntegral: exact})
+		}
 		return eval.Add(b, scratch, b)
 	}
+	ratio := a.Scale.Div(b.Scale)
+	before := b.CopyNew()
 	scratch := fastckks.NewCiphertext(params.Parameters, b.Degree(), minInt(a.Level(), b.Level()))
 	psGlobalCopyMaintained(params, b, scratch)
-	if err := eval.MulIntegerMaintained(b, a.Scale.Div(b.Scale).BigInt(), scratch); err != nil {
+	if err := eval.MulIntegerMaintained(b, ratio.BigInt(), scratch); err != nil {
 		return err
 	}
 	scratch.Scale = a.Scale
+	if trace != nil {
+		rounded, absMismatch, relative, exact := fix001P3ScaleRounding(ratio)
+		trace.Alignments = append(trace.Alignments, fix001P3ScaleAlignmentObservation{OperationID: fmt.Sprintf("addAligned-%d", len(trace.Alignments)), Checkpoint: checkpoint, NumeratorScale: finalizationScaleString(a.Scale), DenominatorScale: finalizationScaleString(b.Scale), ExactRatio: finalizationScaleString(ratio), RatioBigInt: rounded, AbsRoundingMismatch: absMismatch, RelativeMismatch: relative, SemanticResidual: fix001P3ScaleSemanticResidual(params, before, scratch), ExactIntegral: exact})
+	}
 	if err := eval.Add(scratch, a, scratch); err != nil {
 		return err
 	}
@@ -361,7 +463,7 @@ type psGlobalReplayReset struct {
 // psGlobalReplay executes the exact normalized PS schedule and uses source
 // polynomial values for every expected node. The decode callback is set by the
 // caller because the checkpoint constructor keeps artifacts compact.
-func psGlobalReplay(params ckks.Parameters, eval *fastckks.Evaluator, plan commonpolynomial.PatersonStockmeyerPolynomial, powers map[int]*rlwe.Ciphertext, powerExpected, powerDecoded map[int][]complex128, input []complex128, candidate rlwe.Scale, resets ...psGlobalReplayReset) ([]PSGlobalCheckpoint, []PSGiantStepRecord, PSGlobalCheckpoint, []complex128, error) {
+func psGlobalReplay(params ckks.Parameters, eval *fastckks.Evaluator, plan commonpolynomial.PatersonStockmeyerPolynomial, powers map[int]*rlwe.Ciphertext, powerExpected, powerDecoded map[int][]complex128, input []complex128, candidate rlwe.Scale, trace *fix001P3ScaleMeasurementTrace, resets ...psGlobalReplayReset) ([]PSGlobalCheckpoint, []PSGiantStepRecord, PSGlobalCheckpoint, []complex128, error) {
 	var resetID string
 	var resetCiphertext *rlwe.Ciphertext
 	if len(resets) > 0 {
@@ -505,6 +607,15 @@ func psGlobalReplay(params ckks.Parameters, eval *fastckks.Evaluator, plan commo
 			applyReset(record.Checkpoints[len(record.Checkpoints)-1].ID, &b.value)
 			productForAdd := productDecoded
 			if !a.value.Scale.InDelta(b.value.Scale, float64(rlwe.ScalePrecision-12)) {
+				if trace != nil {
+					ratio := b.value.Scale.Div(a.value.Scale)
+					before := b.value.CopyNew()
+					beforeValues, _ := psGlobalDecode(params, before)
+					b.value.Scale = a.value.Scale
+					afterValues, _ := psGlobalDecode(params, b.value)
+					semanticResidual := psGlobalMetric(beforeValues, afterValues).MaxComponent
+					trace.Snaps = append(trace.Snaps, fix001P3MetadataSnapObservation{OperationID: fmt.Sprintf("metadata-snap-%d", len(trace.Snaps)), Checkpoint: fmt.Sprintf("G%d-add", record.Round), ScaleA: finalizationScaleString(a.value.Scale), ScaleB: finalizationScaleString(before.Scale), RatioAOverB: finalizationScaleString(a.value.Scale.Div(before.Scale)), Log2Delta: psGlobalLog2Delta(a.value.Scale, before.Scale), RelativeDifference: fix001P3ScaleRelativeDifference(a.value.Scale, before.Scale), InterpretationShift: math.Abs(ratio.Log2()), SemanticResidual: semanticResidual})
+				}
 				logDelta := psGlobalLog2Delta(a.value.Scale, b.value.Scale)
 				if logDelta < 32 {
 					return checks, giants, PSGlobalCheckpoint{}, nil, fmt.Errorf("giant scale drift below normalization bound: %g", logDelta)
@@ -524,7 +635,10 @@ func psGlobalReplay(params ckks.Parameters, eval *fastckks.Evaluator, plan commo
 			copy(parentSource, a.source)
 			psGlobalAddScaled(parentSource, productSource, 1)
 			parentID := hashSourceVector(fmt.Sprintf("%s+%s", a.identity, productID))
-			if err := psGlobalAddAligned(params, eval, a.value, b.value); err != nil {
+			if trace != nil {
+				trace.Checkpoint = parentID
+			}
+			if err := psGlobalAddAlignedWithTrace(params, eval, a.value, b.value, trace, parentID); err != nil {
 				return checks, giants, PSGlobalCheckpoint{}, nil, err
 			}
 			parentDecoded, _ := psGlobalDecode(params, b.value)
@@ -658,7 +772,7 @@ func psGlobalRunProbe(cfg BootstrapConfig, scaleBits int) (PSGlobalProbeResult, 
 	for i := range plan.Value {
 		plan.Value[i].Scale = candidate
 	}
-	checks, giants, root, rootSource, err := psGlobalReplay(btp.BootstrappingParameters, eval.FastCKKS, plan, powerMap, powerExpected, powerDecoded, sourceInput, candidate)
+	checks, giants, root, rootSource, err := psGlobalReplay(btp.BootstrappingParameters, eval.FastCKKS, plan, powerMap, powerExpected, powerDecoded, sourceInput, candidate, nil)
 	if err != nil {
 		return PSGlobalProbeResult{}, err
 	}
