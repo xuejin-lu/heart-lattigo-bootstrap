@@ -12,6 +12,11 @@ Secondary:
 - committed base before finalization: `7d05f1f3c6f8a14dea2bcb2d3fa05246d322a797`
 - local worktree intentionally dirty with the fully validated LogN13/P93/Q012 candidate.
 
+Finalized Secondary candidate:
+- committed SHA: `40532b4dce5c7eeae2db5b0b6f21be64801ce923`
+- `origin/fast-ckks`: `40532b4dce5c7eeae2db5b0b6f21be64801ce923`
+- local worktree: clean
+
 Never reset, stash, clean, discard, checkout-overwrite, rebase, pull across, reconstruct, or otherwise alter the validated dirty candidate.
 
 ## Startup
@@ -67,9 +72,17 @@ Expected:
 - 19-file accumulated Fast-CKKS candidate
 - 418 insertions / 146 deletions.
 
+## Finalization status
+
+The LogN13/P93/Q012 candidate was audited, committed, and pushed by ordinary
+fast-forward. The `1e-2` system milestone is complete; the final precision
+target remains a later phase.
+
 ## Current task
 
 `specs/FIX-001-P3-FINALIZE-LOGN13-P93-Q012-SECONDARY-CANDIDATE-COMMIT-PUSH.md`
+
+Completed with Primary `CURRENT_TASK.md` status `MILESTONE_1E2_COMPLETE`.
 
 This task must:
 

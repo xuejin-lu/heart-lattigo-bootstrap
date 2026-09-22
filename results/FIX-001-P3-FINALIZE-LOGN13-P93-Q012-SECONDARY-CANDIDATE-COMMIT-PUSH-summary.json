@@ -1,0 +1,89 @@
+{
+  "schema_version": "fix-001-p3-finalize-logn13-p93-q012-secondary-candidate-commit-push.v1",
+  "timestamp": "2026-09-22T09:31:15Z",
+  "classification": "LOGN13_P93_Q012_MILESTONE_1E2_FINALIZED",
+  "primary": {
+    "repository": "xuejin-lu/heart-lattigo-bootstrap",
+    "pre_finalize_commit": "d4d8315fe60bf368c27d7f7e99931ed08455fea7",
+    "branch": "main"
+  },
+  "secondary_start": {
+    "repository": "xuejin-lu/lattigo",
+    "branch": "fast-ckks",
+    "committed_head": "7d05f1f3c6f8a14dea2bcb2d3fa05246d322a797",
+    "dirty_diff_sha256": "4d2567717bb0a88024d8330cf57db6a4a3b93a7faea2374ada6ac5161ec84764",
+    "tracked_files_changed": 19,
+    "insertions": 418,
+    "deletions": 146
+  },
+  "audit": {
+    "classification": "PASS",
+    "scope": "zero-key/maintained arithmetic, Q012 representation, NTT/partial NTT, arithmetic, transforms, bootstrap, DFT, Mod1, polynomial, and tests",
+    "no_unrelated_changes": true,
+    "no_temporary_instrumentation": true,
+    "no_parameter_tuning": true,
+    "audited_files": [
+      "circuits/ckks/bootstrapping/fast_bootstrap.go",
+      "circuits/ckks/bootstrapping/fast_modup.go",
+      "circuits/ckks/bootstrapping/fast_packing.go",
+      "circuits/ckks/dft/fast.go",
+      "circuits/ckks/mod1/fast.go",
+      "circuits/ckks/polynomial/fast.go",
+      "circuits/ckks/polynomial/fast_test.go",
+      "schemes/ckks/fast/automorphism.go",
+      "schemes/ckks/fast/ciphertext.go",
+      "schemes/ckks/fast/evaluator.go",
+      "schemes/ckks/fast/evaluator_ntt.go",
+      "schemes/ckks/fast/fast_add.go",
+      "schemes/ckks/fast/fast_mul.go",
+      "schemes/ckks/fast/linear_transform.go",
+      "schemes/ckks/fast/partial_ntt.go",
+      "schemes/ckks/fast/q012.go",
+      "schemes/ckks/fast/q012_test.go",
+      "schemes/ckks/fast/rescale.go",
+      "schemes/ckks/fast/ring_degree.go",
+      "schemes/ckks/fast/trace.go",
+      "schemes/ckks/fast/truncate.go"
+    ],
+    "q012_generated_power_order": "Mul/MulRelin -> full Chebyshev recurrence -> single Rescale",
+    "balanced_fallback_preserved": true
+  },
+  "remote": {
+    "pre_push_fast_ckks": "7d05f1f3c6f8a14dea2bcb2d3fa05246d322a797",
+    "new_secondary_commit": "40532b4dce5c7eeae2db5b0b6f21be64801ce923",
+    "post_push_fast_ckks": "40532b4dce5c7eeae2db5b0b6f21be64801ce923",
+    "push_mode": "ordinary fast-forward",
+    "force_push": false
+  },
+  "validation": {
+    "secondary_git_diff_check": "pass",
+    "secondary_focused_tests": "pass",
+    "secondary_package_tests": [
+      "go test ./circuits/ckks/polynomial/...",
+      "go test ./schemes/ckks/fast/...",
+      "go test ./circuits/ckks/mod1/...",
+      "go test ./circuits/ckks/bootstrapping/...",
+      "go test ./..."
+    ],
+    "primary_authoritative_validation": "P93_POSTPRODUCT_REPAIR_1E2_SYSTEM_PASS",
+    "secondary_worktree_clean": true,
+    "secondary_local_remote_synchronized": true
+  },
+  "metrics": {
+    "polynomial_max_component_abs": {"real": 1.8570138426987626e-8, "imag": 1.6219059983946238e-8, "budget": 3.716228023823462e-8},
+    "da2_max_component_abs": {"real": 1.5967815852787189e-7, "imag": 1.3046858460163482e-7, "budget": 3.0517578125e-7},
+    "internal_final_max_component_abs": {"real": 1.635104343335875e-4, "imag": 1.3359983063118935e-4, "budget": 3.125e-4},
+    "public_evalmod_max_component_abs": {"real": 0.0052323338986748, "imag": 0.004275194580198059, "budget": 1e-2},
+    "exact_fast_e2e_max_component_abs": 0.009705381393898434,
+    "genuine_standard_control_max_component_abs": 5.830057349387463e-8,
+    "system_budget": 1e-2
+  },
+  "milestone": {
+    "status": "MILESTONE_1E2_COMPLETE",
+    "summary": "1e-2 system milestone passed; final precision target remains a later phase",
+    "no_logn16": true,
+    "no_gate4_or_5": true,
+    "no_exp003": true,
+    "no_benchmark_campaign": true
+  }
+}
