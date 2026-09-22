@@ -18,7 +18,7 @@ const (
 	fix001P3P93ReferencePrimary = "41993cd03f85ec5f2de54dc21ade5ec812090d50"
 	fix001P3P93ReferenceSecond  = "7d05f1f3c6f8a14dea2bcb2d3fa05246d322a797"
 	fix001P3P93ProdSecond       = "7d05f1f3c6f8a14dea2bcb2d3fa05246d322a797"
-	fix001P3P93ProdDiffSHA      = "44b430bd7e148c919538c5487d95dbbc2d195054aaf15cae8b4a241d875bb46e"
+	fix001P3P93ProdDiffSHA      = "4d2567717bb0a88024d8330cf57db6a4a3b93a7faea2374ada6ac5161ec84764"
 	fix001P3P93FirstDiffFloor   = 1e-12
 	fix001P3P93MaterialFraction = 0.1
 )

@@ -17,7 +17,7 @@ import (
 
 const (
 	requiredFIX001P3ActualForcedSecondary = "7d05f1f3c6f8a14dea2bcb2d3fa05246d322a797"
-	requiredFIX001P3ActualForcedDiff      = "44b430bd7e148c919538c5487d95dbbc2d195054aaf15cae8b4a241d875bb46e"
+	requiredFIX001P3ActualForcedDiff      = "4d2567717bb0a88024d8330cf57db6a4a3b93a7faea2374ada6ac5161ec84764"
 	fix001P3ActualForcedThreshold         = 1e-2
 	fix001P3ActualForcedFloor             = 1e-10
 )

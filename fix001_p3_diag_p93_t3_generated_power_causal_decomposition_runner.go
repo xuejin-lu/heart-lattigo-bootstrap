@@ -16,7 +16,7 @@ const (
 	fix001P3T3CausalReferencePrimary    = "41993cd03f85ec5f2de54dc21ade5ec812090d50"
 	fix001P3T3CausalReferenceSecondary  = "7d05f1f3c6f8a14dea2bcb2d3fa05246d322a797"
 	fix001P3T3CausalProductionSecondary = "7d05f1f3c6f8a14dea2bcb2d3fa05246d322a797"
-	fix001P3T3CausalProductionDiffSHA   = "44b430bd7e148c919538c5487d95dbbc2d195054aaf15cae8b4a241d875bb46e"
+	fix001P3T3CausalProductionDiffSHA   = "4d2567717bb0a88024d8330cf57db6a4a3b93a7faea2374ada6ac5161ec84764"
 	fix001P3T3CausalBudget              = 3.716228023823462e-8
 	fix001P3T3CausalOracleThreshold     = 1e-10
 )
