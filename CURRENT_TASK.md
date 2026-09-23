@@ -1,15 +1,23 @@
 # Current Task
 
-Task: None
-Status: SCALE_AUDIT_COMPLETE
+Task: FAST-OBS-001
+Status: READY_FOR_CODEX
 
-The orchestrator-led LogN13/P93 scaling-factor audit is complete.
+Specification:
+`specs/FAST-OBS-001-UNIFIED-FAST-STATE-INVARIANT-MEASUREMENT.md`
 
-Final classification:
-`SCALE_AUDIT_ALL_CONTRACTS_VERIFIED`
+Purpose:
+Build the unified Fast observability/oracle infrastructure before widened-storage implementation.
 
-Authoritative Secondary:
-`40532b4dce5c7eeae2db5b0b6f21be64801ce923`
+Constraints:
+- Primary only.
+- Secondary is read-only.
+- No Fast arithmetic semantic changes.
+- No 60/60/60 production implementation.
+- No precision tuning.
 
-No Codex action is pending.
-Precision tightening has not started.
+Secondary constitution authority:
+`xuejin-lu/lattigo@89e71b2bce3a4b063343cbea9178828a32afbcf4`
+`docs/FAST_CKKS_SPEC.md`
+
+When Codex is started, it should sync safely, read AGENTS.md, this task pointer, the exact spec, and the Secondary constitution, then implement/test/commit/push the Primary task.
