@@ -144,6 +144,44 @@ Reserve schema fields sufficient for future semantic boundaries:
 
 Do not integrate a CNN or fingerprint model in this task.
 
+## Known downstream BTS calibration context
+
+Current team practice for the downstream noise-aware model is to inject noise **after Bootstrap (BTS) boundaries**, not after every homomorphic multiplication.
+
+The currently identified model locations are:
+
+- after `layer1.2`
+- after `layer2.3`
+- after `layer3.3`
+- after `layer3.7`
+- after `layer3.11`
+- after `layer4.1`
+
+These identifiers are downstream-model context, not hard-coded Fast arithmetic semantics.
+
+For future ML calibration, each such BTS site should support paired semantic checkpoints:
+
+```text
+pre_bts_semantic_tensor
+post_bts_semantic_tensor
+bts_residual = post_bts - pre_bts_reference
+```
+
+The framework must be able to summarize both signal and residual distributions at these boundaries. Primitive-level `Mul / Rescale / Rotate / KeySwitch` traces remain available in FULL mode to explain where the BTS residual came from, but they are **not** the default training-noise injection granularity.
+
+Historical team experiments reportedly used additive noise magnitudes around `0.001-0.005` in an older model. Treat this only as a provisional historical range. The number is not meaningful enough for a durable model without recording the activation normalization/scale and whether it denotes max magnitude, standard deviation, uniform half-width, or another parameter. The new framework must therefore record the semantic signal scale and empirical residual distribution instead of hard-coding this range.
+
+Recommended future BTS calibration fields include:
+
+- `model_layer_id`
+- `bts_site_id`
+- pre-BTS signal statistics
+- post-BTS signal statistics
+- residual statistics
+- absolute residual quantiles
+- relative residual metrics such as `rms(error)/rms(signal)`
+- optional correlation of residual magnitude with signal magnitude
+
 ## Why max|X| alone is not enough for ML calibration
 
 For representation/capacity debugging, `max_abs_X` and `headroom_bits` are primary metrics.
