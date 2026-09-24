@@ -1,23 +1,30 @@
 # Current Task
 
 Task: FAST-OBS-001
-Status: READY_FOR_CODEX
+Status: COMPLETE
 
-Specification:
-`specs/FAST-OBS-001-UNIFIED-FAST-STATE-INVARIANT-MEASUREMENT.md`
+Accepted implementation:
+`6f728f19a6300da339541e3f67259e873b9f942e`
 
-Purpose:
-Build the unified Fast observability/oracle infrastructure before widened-storage implementation.
+Classification:
+`FAST_OBS_001_ACCEPTED`
 
-Constraints:
-- Primary only.
-- Secondary is read-only.
-- No Fast arithmetic semantic changes.
-- No 60/60/60 production implementation.
-- No precision tuning.
+Accepted scope:
+- typed unified Fast measurement schema;
+- OFF / LIGHT / FULL collection modes;
+- exact `math/big` diagnostic oracles for centered CRT, residue consistency, logical congruence, capacity/headroom, logical Rescale, storage contraction, and ModUp canonicalization;
+- first-divergence summary;
+- compact distribution statistics and ML-calibration metadata;
+- focused property/oracle tests.
 
-Secondary constitution authority:
-`xuejin-lu/lattigo@89e71b2bce3a4b063343cbea9178828a32afbcf4`
-`docs/FAST_CKKS_SPEC.md`
+Scientific review:
+No blocking mathematical or architectural defect found in the accepted framework.
 
-When Codex is started, it should sync safely, read AGENTS.md, this task pointer, the exact spec, and the Secondary constitution, then implement/test/commit/push the Primary task.
+Known unrelated repository-wide test debt remains:
+`TestFIX001P3GenuineStandardPublicVsStagedConsistency`
+classification:
+`P93_GENUINE_STANDARD_BASELINE_REPLAY_CONFLICT`
+
+Secondary remained unchanged.
+
+No production widened-storage implementation has started yet.
