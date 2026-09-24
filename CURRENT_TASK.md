@@ -1,35 +1,31 @@
 # Current Task
 
 Task: FAST-STORAGE-001
-Status: READY_FOR_WEB_REVIEW
+Status: COMPLETE
 
-Specification:
-`specs/FAST-STORAGE-001-PRIVATE-STORAGE-BASIS-FOUNDATION.md`
+Accepted Secondary implementation:
+`cc5028c872a89aff05ca43aa7e6f8c4269fcf8b5`
 
-Task class:
-`I — Implementation`
+Classification:
+`FAST_STORAGE_001_FOUNDATION_ACCEPTED`
 
-Purpose:
-Create the backend-private fixed three-prime Fast storage-basis foundation, independent of logical CKKS Q, before any production arithmetic integration.
+Accepted facts:
+- fixed private storage primes:
+  - `1152921504606584833`
+  - `1152921504598720513`
+  - `1152921504592429057`
+- all are 60-bit, below `2^60`, prime, and congruent to 1 modulo `2^18`;
+- fixed basis validated across LogN 12, 13, and 16;
+- width 1/2/3 signed centered encode/decode foundation implemented;
+- strict centered uniqueness `2|X| < S` implemented;
+- fixed-width reconstruction cross-checked against tests;
+- existing q012 production path remained unchanged.
 
-Authorized repositories:
-- Primary: task/documentation coordination.
-- Secondary `xuejin-lu/lattigo@fast-ckks`: storage foundation implementation and tests.
+Scientific review:
+No blocking defect found in the storage-basis foundation.
 
-Important prohibitions:
-- no current ciphertext/evaluator integration;
-- no Fast Rescale/ModUp/Bootstrap changes;
-- no KeySwitch/Relinearize/Rotate changes;
-- no parameter tuning;
-- no application/CNN changes.
+Post-review architecture refinement:
+Secondary constitution commit `3c3fe59f24fd9e80ab03ca566a39336c53b6c121` now explicitly requires widened `f_i` residues to live in a physically distinct Fast storage container/basis context rather than ordinary logical-q ciphertext rows.
 
-Accepted prerequisite:
-FAST-OBS-001 at `6f728f19a6300da339541e3f67259e873b9f942e`.
-
-Secondary architecture authority:
-`docs/FAST_CKKS_SPEC.md`
-
-Codex should follow the bounded implementation → self-review → one repair pass → final validation workflow, then return `READY_FOR_WEB_REVIEW`.
-
-Implementation candidate:
-- Secondary `xuejin-lu/lattigo@fast-ckks`: `cc5028c872a89aff05ca43aa7e6f8c4269fcf8b5`
+No production integration has started.
+The next phase is a Web-led mathematics/architecture design for the Fast storage container and LogicalQ <-> FastStorage conversion boundaries before Codex implementation.
