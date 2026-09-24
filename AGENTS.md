@@ -55,8 +55,82 @@ After the mandatory startup preflight has completed:
 2. Read the referenced specification in `specs/`.
 3. If the task requires modifying the secondary `lattigo` repository, read that repository's `AGENTS.md` and `docs/FAST_CKKS_SPEC.md` after safely synchronizing the required secondary branch.
 4. Inspect current source before editing. Repository evidence overrides assumptions from previous work.
-5. Implement only the requested scope, run the required tests/benchmarks, review the diff, commit, and push.
-6. Report commits, tests, benchmark evidence, and any unresolved compatibility gap.
+5. Execute the current task with the bounded autonomous cycle below.
+6. Report commits, tests, benchmark evidence, self-review findings, and any unresolved compatibility gap.
+
+### Bounded autonomous implementation/review cycle
+
+A normal `開始` run should not stop after the first implementation pass merely to ask the user for a review. Codex owns one bounded local review-and-repair cycle before handing the result back to the independent GPT Web orchestrator.
+
+Default cycle:
+
+```text
+Pass 1: implement
+        ↓
+Self-review: inspect spec compliance + diff + tests + edge cases
+        ↓
+Pass 2: repair only findings supported by that self-review
+        ↓
+Final validation
+        ↓
+Commit + normal push
+        ↓
+READY_FOR_WEB_REVIEW
+```
+
+#### Pass 1 — implementation
+
+- Implement only the synchronized task specification.
+- Run the task's required targeted tests/benchmarks.
+- Do not expand scope merely because adjacent cleanup is convenient.
+
+#### Self-review — mandatory
+
+Before committing, review the actual local result as if reviewing another developer's change:
+
+- compare every acceptance criterion against the implementation;
+- inspect the complete task diff for unintended changes;
+- check architecture/invariant compliance;
+- inspect error handling, boundary cases, and stale assumptions;
+- run or re-run the most relevant targeted tests;
+- classify every discovered issue as either a concrete task defect, unrelated pre-existing debt, or an unresolved design question.
+
+Do not treat self-review as independent scientific validation. It is a coding-quality gate only.
+
+#### Pass 2 — bounded repair
+
+- Fix concrete defects found by the self-review.
+- Re-run affected tests.
+- Do not start a third design/implementation direction.
+- Do not broaden the task specification.
+- If self-review finds no concrete defect, Pass 2 may be a no-op.
+
+After Pass 2, perform final validation, review the final diff, commit, and push under the standing safe-push rules.
+
+Intermediate commits/pushes between Pass 1 and Pass 2 are not required unless the active task explicitly requests them. Prefer one clean final task commit (or the minimum coherent commits naturally required by the task) rather than creating bookkeeping commits solely for the self-review cycle.
+
+#### Mandatory escalation to GPT Web
+
+Stop the autonomous cycle and report `NEEDS_WEB_REVIEW` instead of continuing to improvise when any of the following occurs:
+
+- the specification conflicts with durable architecture or current source evidence;
+- a mathematical/cryptographic semantic decision is required rather than a coding decision;
+- the same unexplained acceptance/test failure remains after Pass 2;
+- the supported repair would require expanding the authorized task scope;
+- a Primary-only task appears to require Secondary changes, or vice versa;
+- safe Git synchronization/push conditions fail;
+- evidence is insufficient to distinguish a real defect from stale diagnostic/provenance debt;
+- completing the task would require relaxing a threshold, changing parameters, or weakening an invariant not authorized by the specification.
+
+Do not loop indefinitely. The default autonomous budget is exactly one implementation pass, one self-review, and one repair pass.
+
+#### Handoff status
+
+On successful completion, report:
+
+`READY_FOR_WEB_REVIEW`
+
+The independent GPT Web orchestrator remains responsible for accepting/rejecting the result and deciding the next task. Codex must not invent the next task or treat its own self-review as final project acceptance unless the synchronized specification explicitly delegates that authority.
 
 ## Standing safe-push authorization
 
