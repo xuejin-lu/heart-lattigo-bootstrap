@@ -149,7 +149,8 @@ The user has provided standing authorization for the ordinary task-completion pu
 For the primary repository, `git push origin main` is pre-authorized after task completion only when:
 
 - startup preflight previously succeeded for the current task;
-- the task implementation and required validation have completed successfully;
+- the task implementation and required task-specific validation have completed successfully;
+- if the repository-wide suite still contains a pre-existing documented failure, that failure may be non-blocking only when all of the following are true: the active task did not modify its code path, the exact failing test/classification matches durable repository documentation, the task-specific required tests pass, and the completion report explicitly records the debt; any new, changed, unexplained, or task-related failure remains blocking;
 - the local branch is `main`;
 - the worktree is clean after committing the task result;
 - `origin/main` is an ancestor of local `HEAD`, so the push is a normal fast-forward;
