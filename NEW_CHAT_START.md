@@ -11,19 +11,20 @@
 依序做：
 
 1. 讀 Primary `heart-lattigo-bootstrap/AGENTS.md`。
-2. 讀 Primary `docs/ORCHESTRATOR_HANDOFF.md`。
-3. 讀 Primary `docs/DEVELOPMENT_LESSONS.md`。
-4. 讀 Primary `CURRENT_TASK.md` 與它指向的 `specs/...`。
-5. 若任務涉及 Secondary，再讀 `lattigo/AGENTS.md` 與 `lattigo/docs/FAST_CKKS_SPEC.md`，並核對目前 `fast-ckks` remote HEAD。
-6. 若使用者貼 Codex 的完成報告，**不可只相信報告內容**；必須獨立檢查 GitHub remote commit、diff、source、tests、artifacts 與 methodology，再決定 PASS / FAIL / 下一個 spec。
-7. GitHub 是共同真相來源。對話記憶、舊 summary、Codex 口頭報告都不能凌駕目前 repo evidence。
+2. 讀 Primary `docs/RESEARCH_ENGINEERING_WORKFLOW.md`，先恢復 Web/Codex 的權責與審查邊界。
+3. 讀 Primary `docs/ORCHESTRATOR_HANDOFF.md`。
+4. 讀 Primary `docs/DEVELOPMENT_LESSONS.md`。
+5. 讀 Primary `CURRENT_TASK.md` 與它指向的 `specs/...`。
+6. 若任務涉及 Secondary，再讀 `lattigo/AGENTS.md` 與 `lattigo/docs/FAST_CKKS_SPEC.md`，並核對目前 `fast-ckks` remote HEAD。
+7. 若使用者貼 Codex 的完成報告，**不可只相信報告內容**；必須獨立檢查 GitHub remote commit、diff、source、tests、artifacts 與 methodology，再決定 PASS / FAIL / 下一個 spec。
+8. GitHub 是共同真相來源。對話記憶、舊 summary、Codex 口頭報告都不能凌駕目前 repo evidence。
 
 ## 使用者偏好的合作模式
 
 - 使用繁體中文（台灣用語）。
 - 回覆直接、精簡、不要重複已知結論。
-- ChatGPT 的角色：產品／研究架構師、spec writer、獨立 reviewer、下一步決策者。
-- Codex 的角色：依 spec 實作、測試、commit、push。
+- GPT Web 的角色：數學／研究架構 authority、spec writer、scientific reviewer、下一步決策者。
+- Codex 的角色：依 spec 實作、測試、一次 bounded coding self-review/repair、commit、push；遇到數學／密碼語意問題必須升級回 Web。
 - 使用者最好只需要對 Codex 說：`開始`。
 - 不要讓使用者在兩個 AI 之間搬運大量技術細節；應把 durable context 寫進 GitHub。
 - 不要未經證據就改 production。先做最小診斷，定位 first supported cause，再寫 repair spec。
