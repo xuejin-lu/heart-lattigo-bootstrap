@@ -1,7 +1,7 @@
 # Current Task
 
 Task: FAST-STORAGE-002
-Status: READY_FOR_CODEX
+Status: READY_FOR_WEB_REVIEW
 
 Specification:
 `specs/FAST-STORAGE-002-CONTAINER-CONVERSION-BOUNDARIES.md`
@@ -28,3 +28,6 @@ Accepted storage foundation:
 `cc5028c872a89aff05ca43aa7e6f8c4269fcf8b5`
 
 Codex should execute the bounded implementation -> self-review -> one repair pass -> final validation workflow, then return `READY_FOR_WEB_REVIEW`.
+
+Implementation candidate:
+- Secondary `xuejin-lu/lattigo@fast-ckks`: `3b57a52b311397e0e1cf8298027782eec20d4ffc`
