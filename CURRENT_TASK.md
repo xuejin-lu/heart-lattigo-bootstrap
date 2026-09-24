@@ -1,30 +1,32 @@
 # Current Task
 
-Task: FAST-OBS-001
-Status: COMPLETE
+Task: FAST-STORAGE-001
+Status: READY_FOR_CODEX
 
-Accepted implementation:
-`6f728f19a6300da339541e3f67259e873b9f942e`
+Specification:
+`specs/FAST-STORAGE-001-PRIVATE-STORAGE-BASIS-FOUNDATION.md`
 
-Classification:
-`FAST_OBS_001_ACCEPTED`
+Task class:
+`I — Implementation`
 
-Accepted scope:
-- typed unified Fast measurement schema;
-- OFF / LIGHT / FULL collection modes;
-- exact `math/big` diagnostic oracles for centered CRT, residue consistency, logical congruence, capacity/headroom, logical Rescale, storage contraction, and ModUp canonicalization;
-- first-divergence summary;
-- compact distribution statistics and ML-calibration metadata;
-- focused property/oracle tests.
+Purpose:
+Create the backend-private fixed three-prime Fast storage-basis foundation, independent of logical CKKS Q, before any production arithmetic integration.
 
-Scientific review:
-No blocking mathematical or architectural defect found in the accepted framework.
+Authorized repositories:
+- Primary: task/documentation coordination.
+- Secondary `xuejin-lu/lattigo@fast-ckks`: storage foundation implementation and tests.
 
-Known unrelated repository-wide test debt remains:
-`TestFIX001P3GenuineStandardPublicVsStagedConsistency`
-classification:
-`P93_GENUINE_STANDARD_BASELINE_REPLAY_CONFLICT`
+Important prohibitions:
+- no current ciphertext/evaluator integration;
+- no Fast Rescale/ModUp/Bootstrap changes;
+- no KeySwitch/Relinearize/Rotate changes;
+- no parameter tuning;
+- no application/CNN changes.
 
-Secondary remained unchanged.
+Accepted prerequisite:
+FAST-OBS-001 at `6f728f19a6300da339541e3f67259e873b9f942e`.
 
-No production widened-storage implementation has started yet.
+Secondary architecture authority:
+`docs/FAST_CKKS_SPEC.md`
+
+Codex should follow the bounded implementation → self-review → one repair pass → final validation workflow, then return `READY_FOR_WEB_REVIEW`.
