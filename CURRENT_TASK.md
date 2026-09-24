@@ -32,4 +32,4 @@ Secondary architecture authority:
 Codex should follow the bounded implementation → self-review → one repair pass → final validation workflow, then return `READY_FOR_WEB_REVIEW`.
 
 Implementation candidate:
-- Secondary `xuejin-lu/lattigo@fast-ckks`: `354aa8565d298ca425555faafba6c457e206f7a1`
+- Secondary `xuejin-lu/lattigo@fast-ckks`: `cc5028c872a89aff05ca43aa7e6f8c4269fcf8b5`
