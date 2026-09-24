@@ -1,7 +1,7 @@
 # Current Task
 
 Task: FAST-STORAGE-001
-Status: READY_FOR_CODEX
+Status: READY_FOR_WEB_REVIEW
 
 Specification:
 `specs/FAST-STORAGE-001-PRIVATE-STORAGE-BASIS-FOUNDATION.md`
@@ -30,3 +30,6 @@ Secondary architecture authority:
 `docs/FAST_CKKS_SPEC.md`
 
 Codex should follow the bounded implementation → self-review → one repair pass → final validation workflow, then return `READY_FOR_WEB_REVIEW`.
+
+Implementation candidate:
+- Secondary `xuejin-lu/lattigo@fast-ckks`: `354aa8565d298ca425555faafba6c457e206f7a1`
