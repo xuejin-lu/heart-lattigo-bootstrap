@@ -31,6 +31,16 @@ A previous local `CURRENT_TASK.md` saying `COMPLETE` is never sufficient reason 
 
 If the synchronized task requires work in the secondary `lattigo` repository, then perform the secondary repository's own safe synchronization procedure before reading or editing its task-relevant files.
 
+## Durable research workflow authority
+
+Before executing or reviewing nontrivial research work, use:
+
+`docs/RESEARCH_ENGINEERING_WORKFLOW.md`
+
+That document defines the permanent Web/Codex division of labor, M/I/E task classes, scientific-versus-coding review boundaries, escalation rules, and the minimal `開始` / `review` user workflow.
+
+If this file and an active task spec are silent about who should make a mathematical/scientific decision, defer to that workflow document rather than improvising authority.
+
 ## Project role
 
 This repository is the primary project and experiment harness for CKKS bootstrapping experiments.
