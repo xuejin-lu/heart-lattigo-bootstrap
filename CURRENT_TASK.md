@@ -1,36 +1,44 @@
 # Current Task
 
 Task: FAST-INTEGRATION-001
-Status: READY_FOR_CODEX_AFTER_WEB_RESOLUTION
+Status: COMPLETE
 
-Specification:
-`specs/FAST-INTEGRATION-001-PRIVATE-F-MODUP-BASIS-BRIDGE.md`
+Accepted Secondary implementation:
+`31efadc693559217b48d3e76a2e3655b9e6cd14d`
 
-Task class:
-`I — Implementation`
+Classification:
+`FAST_INTEGRATION_001_PRIVATE_F_MODUP_BRIDGE_ACCEPTED`
 
-Repositories:
-- Primary `xuejin-lu/heart-lattigo-bootstrap@main`: orchestration/spec only.
-- Secondary `xuejin-lu/lattigo@fast-ckks`: implementation target.
+Accepted result:
+- production `FastEvaluator.modUpBasis` now crosses the accepted private-F boundary:
+  `ImportLevel0(width=3) -> FastStorageModUpLevel0(MaxLevel) -> ExportToCompactLogical`;
+- compact logical export materializes only the existing maintained q rows and leaves dormant rows nil;
+- accepted canonical odd-q0 midpoint semantics are preserved: `q0>>1` remains the positive centered representative;
+- existing scale alignment is preserved after the bridge;
+- downstream Trace, Montgomery conversion, DFT, EvalMod, packing, and production Rescale are not migrated or semantically changed;
+- q01 and q012 maintained profiles are covered;
+- poisoned/dormant logical rows are not treated as authoritative input state.
 
-Accepted prerequisites:
-- FAST-STORAGE-005 at `531aca50b5b38741e4e71cc98ea4b626bf88cb84`.
-- Fixed-width-3 initial production policy at `d9919f9c080e0dfa731746f5c447f93633ae2f36`.
+Independent review:
+- implementation commit changes only `fast_modup.go`, `fast_modup_test.go`, `storage_conversion.go`, and the new compact-conversion tests;
+- production `modUpBasis` no longer performs the historical direct q0->q1/q2 basis raise;
+- `ExportToCompactLogical` reconstructs the private-F lift and reduces only into maintained logical rows; it does not call generic full `ExportToLogical`;
+- midpoint conflict is resolved according to durable canonicalization rules rather than historical off-by-one behavior;
+- no blocking correctness defect found.
 
-Implement only the first bounded production integration seam:
-- replace the historical basis-raise portion of `FastEvaluator.modUpBasis` with
-  Level-0 LogicalQ -> ImportLevel0(width=3) -> FastStorageModUpLevel0(MaxLevel) -> compact maintained LogicalQ;
-- add a compact private-F -> logical-Q bridge that materializes only the existing maintained q rows;
-- preserve existing scale alignment, Trace, Montgomery conversion, downstream DFT/EvalMod/S2C, packing, and production Rescale semantics;
-- record ModUp-basis benchmark evidence.
+Performance evidence (LogN13, three reported runs):
+- Fast bridge average: approximately 4.50 ms/op;
+- Standard basis raise average: approximately 2.94 ms/op;
+- current bridge is approximately 1.53x slower;
+- Fast memory is approximately 1.70x higher;
+- Fast allocations are approximately 87,263/op versus 46/op, roughly 1,900x higher.
 
-Do not migrate downstream arithmetic to `FastCiphertext`, do not add KeySwitch/Relinearize/Rotate, contraction/adaptive width, frontend flags, or full-RNS fallback.
+Performance interpretation:
+This task had no speed acceptance threshold, so the correctness bridge is accepted. The current bridge is not suitable as the final production hot path. The source shows redundant domain/basis transitions and per-call private storage basis construction; a follow-up optimization/integration task is required before treating this ModUp path as performance-complete.
 
-Codex must follow the normal startup sync and bounded implementation -> self-review -> one repair pass -> validation workflow, commit/push Secondary `fast-ckks`, then report `READY_FOR_WEB_REVIEW`.
-
-
-Web resolution:
-- Accepted canonical centered-q0 semantics are authoritative.
-- For odd q0=2m+1, residue r=m=q0>>1 maps to +m, not -(m+1).
-- Historical >= q0>>1 behavior at that single residue is treated as an off-by-one convention and is not an integration acceptance oracle.
-- Codex may continue FAST-INTEGRATION-001 using the updated spec commit 242b279c351fe4b13d399e9aed6d0891f8673ac4 and Secondary durable-spec clarification a98c00aa5e9c3fd4118c745159f5e9dc8e89db4b.
+Reported validation:
+- Fast CKKS package tests passed;
+- bootstrapping package tests passed;
+- `go test ./...` passed;
+- focused q01/q012 ModUp regressions passed;
+- `git diff --check` and gofmt checks passed.
