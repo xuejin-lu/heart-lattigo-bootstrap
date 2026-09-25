@@ -1,31 +1,41 @@
 # Current Task
 
 Task: FAST-STORAGE-004
-Status: READY_FOR_CODEX
+Status: COMPLETE
 
-Specification:
-`specs/FAST-STORAGE-004-LOGICAL-Q-RESCALE-OVER-PRIVATE-F.md`
+Accepted Secondary implementation:
+`1b9ecd7973505cac1c4a1673a9578260a761950f`
 
-Task class:
-`I — Implementation`
+Classification:
+`FAST_STORAGE_004_LOGICAL_RESCALE_ACCEPTED`
 
-Repositories:
-- Primary `xuejin-lu/heart-lattigo-bootstrap@main`: orchestration/spec only.
-- Secondary `xuejin-lu/lattigo@fast-ckks`: implementation target.
+Accepted result:
+- standalone one-step private-storage Rescale implemented as `FastStorageRescale`;
+- coefficient rounded division and Scale division both use the frontend logical modulus `q_ell = params.Q()[LogicalLevel]`;
+- private storage moduli `f_i` are never used as CKKS Rescale divisors;
+- coefficient-domain and NTT-domain private-F inputs are supported;
+- NTT inputs follow the explicit F-INTT -> integer rounded division -> F-NTT path;
+- logical Level decrements by one;
+- Scale divides by the same logical `q_ell`;
+- degree, storage width, representation domain, public parameters, and compatible plaintext metadata are preserved;
+- per-component bounds use the frozen exact transition
+  `floor((B_j + (q_ell-1)/2)/q_ell)`;
+- storage contraction is not performed;
+- fixed-width signed 192-bit rounded division is used in the coefficient hot loop without per-coefficient `math/big`;
+- Standard CKKS logical Rescale oracle passes, including noncanonical lifts `X = c + k Q_ell`;
+- chained `FastStorageMul -> FastStorageRescale` passes while preserving raw multiplication degree.
 
-Accepted prerequisite:
-`FAST-STORAGE-003` at Secondary commit
-`b8305a7e3d4ff15591a2249e97a54ad0b3311dde`.
+Independent review:
+- commit changes only the new `storage_rescale.go` and its focused test file;
+- historical production `Evaluator.Rescale` / `RescaleTo` are unchanged;
+- `rlwe.Scale.Div` is non-mutating, so the implementation preserves the input transactional contract;
+- fixed-width long division uses `bits.Div64` with valid remainder preconditions and exact odd-divisor nearest rounding;
+- no hidden Standard/full-RNS fallback is present.
 
-Implement only the standalone one-step private-storage Rescale defined by the spec:
-- exact rounded division by logical `q_ell`;
-- Level -> Level-1;
-- Scale -> Scale/q_ell;
-- exact post-Rescale bound propagation;
-- unchanged storage width;
-- coefficient and NTT private-F support;
-- independent Standard-logical oracle validation.
+Validation reported:
+- targeted storage Rescale tests passed;
+- `go test ./schemes/ckks/fast ./circuits/ckks/bootstrapping` passed;
+- `go test ./...` passed;
+- `git diff --check` passed.
 
-Do not modify historical production `Evaluator.Rescale`, do not wire into Bootstrap, and do not implement contraction, RescaleTo, ModUp, KeySwitch, Relinearize, Rotate, or application changes.
-
-Codex must follow the normal startup sync and bounded implementation -> self-review -> one repair pass -> validation workflow, commit/push Secondary `fast-ckks`, then report `READY_FOR_WEB_REVIEW`.
+No benchmark gate applied for this correctness-foundation task.
