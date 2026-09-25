@@ -1,41 +1,30 @@
 # Current Task
 
-Task: FAST-STORAGE-004
-Status: COMPLETE
+Task: FAST-STORAGE-005
+Status: READY_FOR_CODEX
 
-Accepted Secondary implementation:
-`1b9ecd7973505cac1c4a1673a9578260a761950f`
+Specification:
+`specs/FAST-STORAGE-005-LEVEL0-MODUP-CANONICALIZATION.md`
 
-Classification:
-`FAST_STORAGE_004_LOGICAL_RESCALE_ACCEPTED`
+Task class:
+`I — Implementation`
 
-Accepted result:
-- standalone one-step private-storage Rescale implemented as `FastStorageRescale`;
-- coefficient rounded division and Scale division both use the frontend logical modulus `q_ell = params.Q()[LogicalLevel]`;
-- private storage moduli `f_i` are never used as CKKS Rescale divisors;
-- coefficient-domain and NTT-domain private-F inputs are supported;
-- NTT inputs follow the explicit F-INTT -> integer rounded division -> F-NTT path;
-- logical Level decrements by one;
-- Scale divides by the same logical `q_ell`;
-- degree, storage width, representation domain, public parameters, and compatible plaintext metadata are preserved;
-- per-component bounds use the frozen exact transition
-  `floor((B_j + (q_ell-1)/2)/q_ell)`;
-- storage contraction is not performed;
-- fixed-width signed 192-bit rounded division is used in the coefficient hot loop without per-coefficient `math/big`;
-- Standard CKKS logical Rescale oracle passes, including noncanonical lifts `X = c + k Q_ell`;
-- chained `FastStorageMul -> FastStorageRescale` passes while preserving raw multiplication degree.
+Repositories:
+- Primary `xuejin-lu/heart-lattigo-bootstrap@main`: orchestration/spec only.
+- Secondary `xuejin-lu/lattigo@fast-ckks`: implementation target.
 
-Independent review:
-- commit changes only the new `storage_rescale.go` and its focused test file;
-- historical production `Evaluator.Rescale` / `RescaleTo` are unchanged;
-- `rlwe.Scale.Div` is non-mutating, so the implementation preserves the input transactional contract;
-- fixed-width long division uses `bits.Div64` with valid remainder preconditions and exact odd-divisor nearest rounding;
-- no hidden Standard/full-RNS fallback is present.
+Accepted prerequisite:
+- FAST-STORAGE-004 at `1b9ecd7973505cac1c4a1673a9578260a761950f`.
+- Fixed-width-3 initial production policy at Secondary docs commit `d9919f9c080e0dfa731746f5c447f93633ae2f36`.
 
-Validation reported:
-- targeted storage Rescale tests passed;
-- `go test ./schemes/ckks/fast ./circuits/ckks/bootstrapping` passed;
-- `go test ./...` passed;
-- `git diff --check` passed.
+Implement only the standalone Level-0 private-F ModUp canonicalization boundary:
+- require Level 0, width 3;
+- canonicalize `X` to `Center_q0(X mod q0)`;
+- raise only logical Level metadata to an explicit target level;
+- preserve Scale, degree, domain, metadata, and width 3;
+- reset per-component bounds to the exact observed canonical magnitude;
+- validate by logical-Q export and Rescale -> ModUp chaining.
 
-No benchmark gate applied for this correctness-foundation task.
+Do not modify historical production `FastEvaluator.modUpBasis`/`ModUp`, do not wire into Bootstrap, and do not implement Trace, scale alignment, Montgomery conversion, KeySwitch, Relinearize, Rotate, contraction, or adaptive width.
+
+Codex must follow the normal startup sync and bounded implementation -> self-review -> one repair pass -> validation workflow, commit/push Secondary `fast-ckks`, then report `READY_FOR_WEB_REVIEW`.
