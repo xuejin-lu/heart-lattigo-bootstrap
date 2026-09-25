@@ -1,7 +1,7 @@
 # Current Task
 
 Task: FAST-INTEGRATION-001
-Status: READY_FOR_CODEX
+Status: READY_FOR_CODEX_AFTER_WEB_RESOLUTION
 
 Specification:
 `specs/FAST-INTEGRATION-001-PRIVATE-F-MODUP-BASIS-BRIDGE.md`
@@ -27,3 +27,10 @@ Implement only the first bounded production integration seam:
 Do not migrate downstream arithmetic to `FastCiphertext`, do not add KeySwitch/Relinearize/Rotate, contraction/adaptive width, frontend flags, or full-RNS fallback.
 
 Codex must follow the normal startup sync and bounded implementation -> self-review -> one repair pass -> validation workflow, commit/push Secondary `fast-ckks`, then report `READY_FOR_WEB_REVIEW`.
+
+
+Web resolution:
+- Accepted canonical centered-q0 semantics are authoritative.
+- For odd q0=2m+1, residue r=m=q0>>1 maps to +m, not -(m+1).
+- Historical >= q0>>1 behavior at that single residue is treated as an off-by-one convention and is not an integration acceptance oracle.
+- Codex may continue FAST-INTEGRATION-001 using the updated spec commit 242b279c351fe4b13d399e9aed6d0891f8673ac4 and Secondary durable-spec clarification a98c00aa5e9c3fd4118c745159f5e9dc8e89db4b.
