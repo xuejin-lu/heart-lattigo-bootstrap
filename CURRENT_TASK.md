@@ -1,32 +1,25 @@
 # Current Task
 
-Task: FAST-INTEGRATION-003
-Status: READY_FOR_CODEX
+Task: FAST-STORAGE-006
+Status: READY_FOR_CODEX_DIRTY_RECOVERY
 
 Specification:
-`specs/FAST-INTEGRATION-003-PRIVATE-F-RESIDENT-MODUP-TRACE.md`
+`specs/FAST-STORAGE-006-PRIVATE-F-TRACE-FOUNDATION-SALVAGE.md`
 
 Task class:
-`I — Implementation`
+`I — Implementation / controlled dirty-worktree recovery`
 
-Repositories:
-- Primary `xuejin-lu/heart-lattigo-bootstrap@main`: orchestration/spec only.
-- Secondary `xuejin-lu/lattigo@fast-ckks`: implementation target.
+Decision:
+- FAST-INTEGRATION-003 production residency is rejected on performance.
+- Do not weaken the 20% gate.
+- Preserve reusable private-F scalar/normalized-Trace foundation only.
+- Restore production ModUp exactly to accepted FAST-INTEGRATION-002 semantics.
 
-Accepted prerequisites:
-- FAST-INTEGRATION-002 at `57ffb88744c82778c0a9392ecab394e19f712a3d`.
-- Private-F normalized Trace theorem at `8f823fdb9464c2738f71c30d156ce574098d8605`.
+Known Secondary state:
+- committed HEAD remains `775e8901ffdb7496b345be852af04bd0e0b03c96`;
+- FAST-INTEGRATION-003 left 7 dirty files intentionally uncommitted;
+- those known 003 changes may be reconciled under the recovery authority in the spec.
 
-Implement only the first private-F resident production segment:
-- Level-0 import into width-3 private-F;
-- logical ModUp canonical boundary in F;
-- integer scale alignment in F;
-- normalized Trace in F using unnormalized automorphism sum followed by exact normalization;
-- compact LogicalQ export only after Trace;
-- preserve existing Montgomery conversion and downstream C2S/EvalMod/S2C.
+Codex must inspect the dirty diff, preserve only standalone foundation work, revert rejected production wiring, run the required tests, commit/push the salvaged Secondary result, and return `READY_FOR_WEB_REVIEW`.
 
-Do not pre-multiply private-F Trace by modular gap inverse.
-Do not add LogicalQ/full-RNS fallback for capacity failures.
-Do not migrate downstream stages or production Rescale.
-
-Codex must follow the normal startup sync and bounded implementation -> self-review -> at most one repair -> validation workflow, commit/push Secondary `fast-ckks`, then report `READY_FOR_WEB_REVIEW` or `NEEDS_WEB_REVIEW`.
+If any dirty change is unrelated to FAST-INTEGRATION-003, stop with `NEEDS_WEB_REVIEW`.
