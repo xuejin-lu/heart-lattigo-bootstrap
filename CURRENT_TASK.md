@@ -1,29 +1,27 @@
 # Current Task
 
-Task: FAST-STORAGE-002
-Status: COMPLETE
+Task: BUILD-ISO-001
+Status: READY_FOR_CODEX
 
-Accepted Secondary implementation:
-`3b57a52b311397e0e1cf8298027782eec20d4ffc`
+Specification:
+`specs/BUILD-ISO-001-STANDARD-FAST-LINUX-BUILD-ISOLATION.md`
 
-Classification:
-`FAST_STORAGE_002_CONTAINER_BOUNDARIES_ACCEPTED`
+Task class:
+`I — Implementation`
 
-Accepted scope:
-- physically separate `FastCiphertext` private-F container;
-- explicit LogicalLevel independent from ActiveStorageWidth;
-- exact Level-0 logical-q0 -> FastStorage import by canonical centered lifting;
-- exact FastStorage -> logical-Q export by reconstruction and reduction modulo q_i;
-- correct coefficient-domain crossing between q_i-NTT and f_i-NTT domains;
-- explicit rejection of unsupported Montgomery conversions;
-- metadata preservation and capacity guards.
+Scope:
+Primary-only build isolation so the same benchmark frontend can produce:
+- `bootstrap-standard-linux-amd64` using `../lattigo@main`
+- `bootstrap-fast-linux-amd64` using `../lattigo@fast-ckks`
 
-Scientific review:
-No blocking mathematical or architectural defect found.
+This task must not modify:
+- research architecture;
+- mathematics;
+- Fast-CKKS arithmetic or storage logic;
+- CKKS/Bootstrap parameters;
+- benchmark/experiment semantics;
+- Secondary source.
 
-Non-blocking deferred work:
-- dynamic storage-width contraction/expansion API;
-- production Bootstrap integration;
-- FastStorage arithmetic, logical Rescale, ModUp/Trace, and key operations.
+Use the minimal build-tag + Standard-stub + build-script solution defined in the spec.
 
-Current production q-based Fast Bootstrap remains unchanged.
+Codex should follow the bounded implementation -> self-review -> one repair pass -> final validation workflow, commit/push Primary only, then return `READY_FOR_WEB_REVIEW`.
