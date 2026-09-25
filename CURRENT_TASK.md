@@ -1,33 +1,31 @@
 # Current Task
 
-Task: FAST-STORAGE-003
-Status: COMPLETE
+Task: FAST-STORAGE-004
+Status: READY_FOR_CODEX
 
-Accepted Secondary implementation:
-`b8305a7e3d4ff15591a2249e97a54ad0b3311dde`
+Specification:
+`specs/FAST-STORAGE-004-LOGICAL-Q-RESCALE-OVER-PRIVATE-F.md`
 
-Classification:
-`FAST_STORAGE_003_BOUNDED_ARITHMETIC_ACCEPTED`
+Task class:
+`I — Implementation`
 
-Accepted result:
-- `FastCiphertext` now carries private per-component proven coefficient-infinity bounds.
-- `ImportLevel0` records exact observed centered-q0 component bounds.
-- exact required-width planning uses the strict condition `2B < S_w`;
-- private-F storage expansion supports 1->2, 1->3, and 2->3 without changing the represented lift;
-- standalone private-storage Add/Sub preserve logical CKKS level/scale semantics and never implicitly contract width;
-- standalone raw NTT Mul uses the accepted bound
-  `B_Z,k <= N * sum_i B_X,i B_Y,k-i`,
-  multiplies Scale, increases degree, and performs no relinearize/rescale;
-- capacity failures are explicit and transactional;
-- successful arithmetic exports back to LogicalQ with the expected congruence;
-- no production Bootstrap/Evaluator path was wired to the new arithmetic foundation.
+Repositories:
+- Primary `xuejin-lu/heart-lattigo-bootstrap@main`: orchestration/spec only.
+- Secondary `xuejin-lu/lattigo@fast-ckks`: implementation target.
 
-Validation reported and independently reviewed:
-- targeted Fast storage tests passed;
-- `go test ./schemes/ckks/fast ./circuits/ckks/bootstrapping` passed;
-- `go test ./...` passed;
-- `git diff --check` passed;
-- low-level `MulCoeffsBarrettThenAdd` semantics are modular per accumulation, so generic ciphertext-component convolution is compatible with the implementation.
+Accepted prerequisite:
+`FAST-STORAGE-003` at Secondary commit
+`b8305a7e3d4ff15591a2249e97a54ad0b3311dde`.
 
-Review note:
-The bound invariant is provenance-based rather than re-scanning all coefficients on every operation. That is intentional for this foundation: all current production constructors/conversions/arithmetic transitions establish or conservatively propagate the bound, the fields are private, and this new container is still not wired into production Bootstrap.
+Implement only the standalone one-step private-storage Rescale defined by the spec:
+- exact rounded division by logical `q_ell`;
+- Level -> Level-1;
+- Scale -> Scale/q_ell;
+- exact post-Rescale bound propagation;
+- unchanged storage width;
+- coefficient and NTT private-F support;
+- independent Standard-logical oracle validation.
+
+Do not modify historical production `Evaluator.Rescale`, do not wire into Bootstrap, and do not implement contraction, RescaleTo, ModUp, KeySwitch, Relinearize, Rotate, or application changes.
+
+Codex must follow the normal startup sync and bounded implementation -> self-review -> one repair pass -> validation workflow, commit/push Secondary `fast-ckks`, then report `READY_FOR_WEB_REVIEW`.
