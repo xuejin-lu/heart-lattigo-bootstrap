@@ -1,30 +1,37 @@
 # Current Task
 
 Task: FAST-STORAGE-005
-Status: READY_FOR_CODEX
+Status: COMPLETE
 
-Specification:
-`specs/FAST-STORAGE-005-LEVEL0-MODUP-CANONICALIZATION.md`
+Accepted Secondary implementation:
+`531aca50b5b38741e4e71cc98ea4b626bf88cb84`
 
-Task class:
-`I — Implementation`
+Classification:
+`FAST_STORAGE_005_LEVEL0_MODUP_CANONICALIZATION_ACCEPTED`
 
-Repositories:
-- Primary `xuejin-lu/heart-lattigo-bootstrap@main`: orchestration/spec only.
-- Secondary `xuejin-lu/lattigo@fast-ckks`: implementation target.
+Accepted result:
+- standalone `FastStorageModUpLevel0` canonicalizes a valid Level-0 width-3 private-F ciphertext before logical basis growth;
+- canonicalization is exactly `Center_q0(X mod q0)`;
+- target logical Level is explicit and bounded by public CKKS parameters;
+- Scale, degree, domain, plaintext metadata, parameter identity, and width 3 are preserved;
+- output bounds are reset to the exact observed maximum magnitude after canonicalization;
+- coefficient and NTT private-F inputs are supported;
+- private storage remains exactly three F rows regardless of logical target Level;
+- no adaptive width or contraction is performed;
+- noncanonical lifts `c + k q0` collapse to the same canonical output;
+- `Rescale -> ModUp` boundary behavior is covered by focused tests;
+- historical production `FastEvaluator.modUpBasis`/`ModUp` and Bootstrap are unchanged.
 
-Accepted prerequisite:
-- FAST-STORAGE-004 at `1b9ecd7973505cac1c4a1673a9578260a761950f`.
-- Fixed-width-3 initial production policy at Secondary docs commit `d9919f9c080e0dfa731746f5c447f93633ae2f36`.
+Independent review:
+- commit changes only `storage_modup.go` and `storage_modup_test.go`;
+- implementation reconstructs the authoritative private-F lift before canonicalization rather than merely changing Level metadata;
+- signed reduction for negative lifts is consistent with the centered odd-q0 convention;
+- NTT inputs explicitly follow F-INTT -> integer canonicalization -> F-NTT;
+- component bounds are recomputed from canonicalized coefficients;
+- transactionality is preserved because outputs are newly allocated and input state is not modified.
 
-Implement only the standalone Level-0 private-F ModUp canonicalization boundary:
-- require Level 0, width 3;
-- canonicalize `X` to `Center_q0(X mod q0)`;
-- raise only logical Level metadata to an explicit target level;
-- preserve Scale, degree, domain, metadata, and width 3;
-- reset per-component bounds to the exact observed canonical magnitude;
-- validate by logical-Q export and Rescale -> ModUp chaining.
+Validation evidence available from repository review:
+- focused tests cover centered q0 boundaries, coefficient/NTT exactness, target levels, bound reset, noncanonical-lift equivalence, transactional failures, logical export, and Rescale -> ModUp chaining;
+- repository has no configured remote commit status/check runs for this commit, so acceptance does not claim independent CI execution.
 
-Do not modify historical production `FastEvaluator.modUpBasis`/`ModUp`, do not wire into Bootstrap, and do not implement Trace, scale alignment, Montgomery conversion, KeySwitch, Relinearize, Rotate, contraction, or adaptive width.
-
-Codex must follow the normal startup sync and bounded implementation -> self-review -> one repair pass -> validation workflow, commit/push Secondary `fast-ckks`, then report `READY_FOR_WEB_REVIEW`.
+The initial production storage policy remains fixed width 3.
