@@ -1,29 +1,39 @@
 # Current Task
 
 Task: FAST-INTEGRATION-002
-Status: READY_FOR_CODEX
+Status: NEEDS_BENCHMARK_EVIDENCE
+
+Candidate Secondary implementation:
+`57ffb88744c82778c0a9392ecab394e19f712a3d`
 
 Specification:
 `specs/FAST-INTEGRATION-002-FUSED-MODUP-BRIDGE-OPTIMIZATION.md`
 
-Task class:
-`I — Implementation`
+Independent Web code review:
+- fused production kernel is present;
+- production `modUpBasis` no longer materializes transient private-F state;
+- standalone private-F Import/ModUp/compact-export APIs remain as semantic oracle;
+- canonical q0 midpoint semantics are preserved;
+- only maintained logical rows are materialized;
+- input is non-mutating;
+- no blocking correctness defect found in source review.
 
-Repositories:
-- Primary `xuejin-lu/heart-lattigo-bootstrap@main`: orchestration/spec only.
-- Secondary `xuejin-lu/lattigo@fast-ckks`: implementation target.
+Acceptance is blocked only on the mandatory performance evidence.
 
-Accepted prerequisite:
-- FAST-INTEGRATION-001 at `31efadc693559217b48d3e76a2e3655b9e6cd14d`.
-- Fusion architecture clarification at `dc698e2d99a488f0de2cf4f3207b09ef94521303`.
+Codex must, on the current candidate commit, run the same LogN13 benchmark pair used for FAST-INTEGRATION-001 at least three times each:
+- `BenchmarkFastModUpBasisLogN13`
+- `BenchmarkStandardModUpBasisLogN13`
 
-Implement only the fused Level-0 ModUp production bridge optimization:
-- replace the hot-path `ImportLevel0 -> FastStorageModUpLevel0 -> ExportToCompactLogical` chain with a fused canonical q0 -> maintained logical-q conversion;
-- preserve exact semantics using the unfused private-F path as the test oracle;
-- keep dormant logical rows nil;
-- preserve downstream Trace/Montgomery/DFT/EvalMod/packing/Rescale behavior;
-- meet the performance gates in the spec.
+Report for every run:
+- ns/op
+- B/op
+- allocs/op
 
-Do not migrate downstream arithmetic, change CKKS math, delete standalone private-F APIs, add contraction/adaptive width, or broaden into general pooling/refactoring.
+Acceptance gates:
+- fused Fast allocs/op <= 873;
+- B/op materially below the Integration-001 ~3.35 MB/op baseline;
+- ns/op below the Integration-001 ~4.50 ms/op baseline.
 
-Codex must follow the normal startup sync and bounded implementation -> self-review -> at most one repair -> validation workflow, commit/push Secondary `fast-ckks`, then report `READY_FOR_WEB_REVIEW` or `NEEDS_WEB_REVIEW` according to the performance gates.
+Do not modify code unless a gate fails and the existing task permits one bounded repair pass.
+If all gates pass, report `READY_FOR_WEB_REVIEW`.
+If any gate fails after the bounded repair allowance, report `NEEDS_WEB_REVIEW` with the measurements.
