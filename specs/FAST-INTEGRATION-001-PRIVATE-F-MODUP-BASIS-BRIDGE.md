@@ -201,23 +201,40 @@ Do not preserve stale dormant data at the cost of reading or synchronizing it.
 
 # 5. Equivalence contract
 
-Before scale alignment, the maintained logical rows produced by the new private-F basis raise must equal the historical centered-q0 basis raise.
+The authoritative rule is the accepted canonical centered-q0 semantics, not byte-for-byte preservation of every historical boundary convention.
 
-For canonical Level-0 coefficient `c`:
-
-[
-C=operatorname{Center}_{q_0}(c)
-]
-
-and for every maintained logical row:
+For a canonical Level-0 residue `r in [0,q0)`, let
 
 [
-row_i=Cmod q_i.
+C=\operatorname{Center}_{q_0}(r).
 ]
 
-After the existing scale-alignment step, the maintained output must match the historical `modUpBasis` semantics for the supported profile.
+For odd `q0 = 2m+1`:
 
-The target is semantic equivalence on maintained authoritative rows, not preservation of dormant-row garbage or backing-pointer identity.
+[
+C=
+\begin{cases}
+r,&0\le r\le m,\\
+r-q_0,&m+1\le r<q_0.
+\end{cases}
+]
+
+Therefore `r = q0>>1 = m` maps to the positive representative `+m`.
+
+Historical Fast/Standard ModUp source contains an off-by-one convention in some no-key component paths using `r >= q0>>1`, which maps this single residue to `-(m+1)`. That historical choice is congruent modulo q0 but is not the accepted canonical representative and is not an authority for this integration.
+
+For every maintained logical row the integrated bridge must satisfy:
+
+[
+row_i=C\bmod q_i.
+]
+
+Equivalence requirements:
+- for all non-boundary residues where the historical path and canonical rule agree, maintained rows must match the historical basis-raise result;
+- for the single residue `r=q0>>1`, the new path must follow canonical `+m` semantics even if the historical row differs by q0;
+- after scale alignment, preserve all unchanged scale/metadata behavior.
+
+The target is semantic correctness on maintained authoritative rows, not preservation of dormant-row garbage, backing-pointer identity, or the historical midpoint off-by-one.
 
 ---
 
@@ -280,7 +297,11 @@ For Level-0 inputs with:
 - q0-half boundary-near values;
 - zero;
 
-compare the new `modUpBasis` maintained rows against an independent historical/Standard centered-q0 basis-raise oracle.
+compare the new `modUpBasis` maintained rows against an independent canonical centered-q0 oracle.
+
+Also compare against the historical basis-raise path for non-boundary residues where both definitions agree.
+
+The fixture must include `q0>>1` and prove that this boundary follows the accepted positive canonical representative rather than the historical `>= q0>>1` off-by-one convention.
 
 Cover q01 and q012 maintained profiles where practical.
 
