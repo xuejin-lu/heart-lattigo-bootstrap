@@ -1,3 +1,5 @@
+//go:build !lattigo_standard
+
 package main
 
 import (

@@ -1,4 +1,4 @@
-//go:build fix001t3capacity
+//go:build fix001t3capacity && !lattigo_standard
 
 package main
 

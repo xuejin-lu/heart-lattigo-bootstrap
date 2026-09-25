@@ -1,4 +1,4 @@
-//go:build !fix001t3diag
+//go:build !fix001t3diag && !lattigo_standard
 
 package main
 

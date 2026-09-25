@@ -1,4 +1,4 @@
-//go:build fix001diag
+//go:build fix001diag && !lattigo_standard
 
 package main
 
