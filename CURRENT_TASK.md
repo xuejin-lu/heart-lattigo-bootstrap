@@ -1,27 +1,29 @@
 # Current Task
 
-Task: BUILD-ISO-001
-Status: COMPLETE
+Task: FAST-STORAGE-003
+Status: READY_FOR_CODEX
 
-Accepted Primary implementation:
-`ef3c99f997d636de6b26078eb3acbb76512478e0`
+Specification:
+`specs/FAST-STORAGE-003-BOUNDED-PRIVATE-STORAGE-ARITHMETIC.md`
 
-Classification:
-`BUILD_ISO_001_ACCEPTED`
+Task class:
+`I — Implementation`
 
-Accepted result:
-- Standard Linux amd64 build uses `../lattigo@main` with `-tags lattigo_standard`.
-- Fast Linux amd64 build uses `../lattigo@fast-ckks` without that tag.
-- Fast-only diagnostic compilation units are excluded only from Standard builds.
-- Standard stubs preserve the formal frontend entrypoints and fail explicitly when a Fast-only diagnostic is requested.
-- Existing Fast/default source-selection behavior is preserved because `!lattigo_standard` is true for ordinary Fast builds.
-- No Secondary source, CKKS/Fast arithmetic, mathematics, Bootstrap parameters, or benchmark semantics were modified.
-- `scripts/build-linux-amd64.sh` produces:
-  - `dist/bootstrap-standard-linux-amd64`
-  - `dist/bootstrap-fast-linux-amd64`
+Repositories:
+- Primary `xuejin-lu/heart-lattigo-bootstrap@main`: orchestration/spec only.
+- Secondary `xuejin-lu/lattigo@fast-ckks`: implementation target.
 
-Review note:
-Most touched FIX-001 files changed only by a Go build constraint (plus its required separating blank line). Shared PSGlobal types/helpers were moved without semantic changes into `fix001_p3_global_semantics_types.go` so they remain available to the Standard compilation unit set.
+Accepted prerequisite:
+`FAST-STORAGE-002` at Secondary commit
+`3b57a52b311397e0e1cf8298027782eec20d4ffc`.
 
-Non-blocking note:
-The implementation report did not run `go test ./...`; this was not an acceptance gate for BUILD-ISO-001. Default Fast build behavior remains source-equivalent apart from the shared same-package type/helper relocation.
+Implement only the bounded private-storage arithmetic foundation defined by the spec:
+- per-component proven coefficient bounds;
+- exact width planner;
+- exact F-basis expansion;
+- standalone Add/Sub;
+- standalone raw Mul.
+
+Do not wire into production Bootstrap/Evaluator and do not implement Rescale, ModUp, KeySwitch, Relinearize, Rotate, storage contraction, or application changes.
+
+Codex must follow the normal startup sync and bounded implementation -> self-review -> one repair pass -> validation workflow, commit/push Secondary `fast-ckks`, then report `READY_FOR_WEB_REVIEW`.
