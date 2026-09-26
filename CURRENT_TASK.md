@@ -1,49 +1,28 @@
 # Current Task
 
-Task: QPREFIX-IMPL-002
+Task: QPREFIX-IMPL-003
 Status: READY_FOR_CODEX
 
-Architecture plan:
-`docs/QPREFIX-V2-PRODUCTION-MIGRATION-PLAN.md`
-
-Accepted prerequisite:
-- QPREFIX-IMPL-001 at Secondary commit `6553491f9fb9b964c8fd0d743f3a302de83d0b54`.
+Specification:
+`specs/QPREFIX-IMPL-003-PREFIX-COMPLETE-PRIMITIVE-KERNELS.md`
 
 Task class:
 `I — Implementation`
 
-Goal:
-Connect compact ciphertext lifecycle and evaluator-owned storage allocation to the single Q-prefix v2 policy.
+Accepted prerequisite:
+- QPREFIX-IMPL-001 at `6553491f9fb9b964c8fd0d743f3a302de83d0b54`.
+- QPREFIX-IMPL-002 at `91baa6a4655e10fe2460a399633fa54a03a35318`.
 
-Frozen policy:
-[
-w_Q(ell)=min(ell+1,4)
-]
+Implement only prefix-complete primitive kernels with explicit validated row counts up to four q rows.
 
-Scope:
-- constructors for Fast-owned ciphertexts/temporaries;
-- copy/copy-new behavior;
-- resize/degree growth where it controls physical row backing;
-- evaluator scratch/buffer allocation;
-- output allocation helpers;
-- preserve logical Level header independently from physically maintained rows;
-- dormant rows must remain unallocated/stale and must not become authoritative.
+Important transitional rule:
+- do not globally activate q2/q3 consumption in production wrappers yet;
+- existing wrappers keep their accepted legacy authoritative-row behavior unless the spec explicitly proves otherwise;
+- width-4 capability must be exercised by focused synthetic/oracle tests;
+- poisoned higher rows must prove no accidental promotion.
 
-Acceptance:
-- Level 0/1/2/3/high-Level Fast-owned temporaries have exactly policy-width N-sized backing rows;
-- copy/alias/degree-growth behavior preserves maintained rows exactly;
-- shrinking logical Level across 3->2, 2->1, 1->0 changes physical maintained width structurally but does not invent representative semantics;
-- no dormant-row reads/writes;
-- existing production semantics remain unchanged because arithmetic producers/consumers are not yet generalized;
-- focused lifecycle tests plus relevant fast package regressions and `go test ./...`.
+Do not modify Rescale, ModUp, ScaleDown, DFT/LinearTransform production routing, EvalMod/PS/DA, Bootstrap orchestration, or `fast-ckks`.
 
-Out of scope:
-- arithmetic primitive widening;
-- Rescale semantics;
-- ModUp;
-- DFT/EvalMod/Bootstrap;
-- F;
-- adaptive width;
-- `fast-ckks`.
+Run focused tests, `go test ./schemes/ckks/fast`, relevant indirect tests, `go test ./...`, `git diff --check`, gofmt.
 
 Commit/push Secondary `fast-qprefix`, then report `READY_FOR_WEB_REVIEW`.
