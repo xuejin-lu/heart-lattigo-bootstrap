@@ -19,7 +19,7 @@
 
 ## 2. Migration order
 
-開始廣泛 production migration 前，先設一道不改 production 的 readiness gate：把現有 QPREFIX-AUDIT-001/002 證據與其 provenance 整合，補齊 current `fast-qprefix` 的 ScaleDown、ModUp/Trace、C2S、EvalMod/PS、DoubleAngle、S2C、finalization/packing stage map，逐站記錄 Level、prefix、q product、界與 dormant-row 需求。現有 Audit-002 已覆蓋四個 C2S group；Primary 舊 Audit-001 的非 C2S 容量數據不是 current `fast-qprefix` provenance。此 gate 必須由後續任務明確授權；本計畫不重跑研究，也不恢復暫停的 `QPREFIX-AUDIT-003`。
+Q-prefix v2 已是確定的 production 方向，不再要求先完成一個全路徑 readiness audit 才能開始 implementation。現有 QPREFIX-AUDIT-001/002 保留作 provenance 與 C2S correctness 證據；尚未補齊的 EvalMod/PS/DoubleAngle、S2C、finalization/packing capacity 證據，改由各自 implementation milestone 的 acceptance gate 同步完成。若某個 milestone 實際遇到 capacity failure，再針對該具體 stage 停止並回報；不要為了證明「不需要 F」而預先重跑整條 pipeline audit。
 
 ### QPREFIX-IMPL-001 — Prefix and capacity contract
 
@@ -87,7 +87,7 @@
 ## 3. Dependency graph
 
 ```text
-Readiness gate → 001 policy/bounds → 002 lifecycle → 003 primitives
+001 policy/bounds → 002 lifecycle → 003 primitives
                                                     ├→ 004 Rescale/Level ─┐
                                                     └→ 005 ModUp/Trace ───┴→ 006 DFT/C2S/S2C
                                            003 + 004 ───────────────────────→ 007 EvalMod/PS/DA
@@ -128,13 +128,12 @@ Readiness gate → 001 policy/bounds → 002 lifecycle → 003 primitives
 4. **ModUp midpoint 合約衝突（High）— `NEEDS_LOCAL_IMPLEMENTATION_INVESTIGATION`.** 規格要求奇數 q0 的 `r=q0>>1` 使用正代表；目前 `circuits/ckks/bootstrapping/fast_modup.go` 的比較式是 `coeff >= q0>>1`。未做新實驗或修碼前，需由具體邊界 oracle 確認實作是否符合 frozen contract。
 5. **Public structural boundary — `NEEDS_LOCAL_IMPLEMENTATION_INVESTIGATION`.** `schemes/ckks/fast/ring_degree.go` 的 conversion 驗證 maintained width，但目前 coefficient mapping 有 Q01 限制；需確認 N1/N2 packing 和 Bootstrap 外部消費者何處允許 compact rows、何處需要 materialization，避免暗中 full-RNS fallback。
 
-另有一項 `NEEDS_LOCAL_IMPLEMENTATION_INVESTIGATION` readiness evidence 缺口：既有 current-branch 證據只完成 C2S；完整 EvalMod/PS/DA、S2C 與 finalization stage map 尚需後續明確授權的 bounded task。這不等於恢復暫停的 `QPREFIX-AUDIT-003`，亦不在本規劃中執行。
+尚未補齊的 EvalMod/PS/DA、S2C 與 finalization stage-map/capacity 證據，不再視為開始 implementation 的前置阻塞；它們分別由 QPREFIX-IMPL-007、QPREFIX-IMPL-006/008 的 acceptance gate 在實作時補齊。
 
 ## 6. First Codex task
 
 ### QPREFIX-IMPL-001 — Prefix and capacity contract
 
-- 先等待 readiness stage-map gate 由後續任務明確結案；本計畫不啟動或代替該 gate。
 - 在 `fast-qprefix` 建立唯一的 `w_Q(ell)=min(ell+1,4)` policy 與 prefix-product / per-component bound contract。
 - 將 strict centered-capacity predicate 與可辨識的 transactional capacity failure 形式固定為小型、可測的核心介面。
 - 測試 Level 0、1、2、3、>=4，實際 q 值、`2B<S_Q` strict 邊界，以及失敗時 output 保持不變。
