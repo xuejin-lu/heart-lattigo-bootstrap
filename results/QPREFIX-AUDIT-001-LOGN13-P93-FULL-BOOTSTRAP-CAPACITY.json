@@ -1,0 +1,1266 @@
+{
+  "schema_version": "qprefix-audit-001.full-bootstrap-capacity.v1",
+  "classification": "QPREFIX_V2_AUDIT_EVIDENCE_INCOMPLETE",
+  "decision": "No full-profile capacity authorization yet; the observed inherited PS/DA and endpoint capacities are below strict limits, but a required current-branch C2S pre-Rescale bound is missing.",
+  "profile": {
+    "log_n": 13,
+    "ring_n": 8192,
+    "slots": 4096,
+    "residual_max_level": 1,
+    "bootstrap_max_level": 16,
+    "plan_scale": "2^93",
+    "ps_authority": "Q012-wide",
+    "q": [
+      "72057594037616641",
+      "549755731969",
+      "549756026881",
+      "549755486209"
+    ],
+    "q_bits": [
+      56,
+      39,
+      40,
+      39
+    ],
+    "p": [
+      "2305843009213317121",
+      "2305843009213120513",
+      "2305843009214414849",
+      "2305843009212694529",
+      "2305843009214758913"
+    ],
+    "prefix_products": [
+      {
+        "prefix": "q0",
+        "product": "72057594037616641",
+        "half": "36028797018808320",
+        "bits": 56
+      },
+      {
+        "prefix": "q01",
+        "product": "39614075354074986593170096129",
+        "half": "19807037677037493296585048064",
+        "bits": 95
+      },
+      {
+        "prefix": "q012",
+        "product": "21778076675220807922404533978499878043649",
+        "half": "10889038337610403961202266989249939021824",
+        "bits": 135
+      },
+      {
+        "prefix": "q0123",
+        "product": "11972617131282897441815303721736261606333459719536641",
+        "half": "5986308565641448720907651860868130803166729859768320",
+        "bits": 173
+      }
+    ],
+    "modup_center_q0_max_abs": "36028797018808320"
+  },
+  "policy": {
+    "formula": "A(ell)={q0,...,q_min(ell,3)}; require strict 2B<S_Q(ell)",
+    "maintained_rows_by_level": "min(ell+1,4)",
+    "representation_by_level": {
+      "ell>=3": "q0123",
+      "ell=2": "q012",
+      "ell=1": "q01",
+      "ell=0": "q0"
+    },
+    "branchpoint_historical_representation": "q012 at ell>=2 (q0=56-bit, q1<=39-bit, q2<=40-bit); q01 at ell=1; q0 at ell=0; no q3 arithmetic"
+  },
+  "provenance": {
+    "primary_commit": "92fed7ac8030ed9c6bf35ce1f1a2ae6c3cff8ac9",
+    "secondary_branch": "fast-qprefix",
+    "secondary_commit": "636953688f33f00f3404924e3d3f519752583c6a",
+    "secondary_branch_point": "40532b4dce5c7eeae2db5b0b6f21be64801ce923",
+    "secondary_clean": true,
+    "no_secondary_files_changed": true,
+    "accepted_public_control": {
+      "command": "go run . -config /private/tmp/QPREFIX-AUDIT-001-logn13-q056.json -correctness -out /tmp/QPREFIX-AUDIT-001-public-control-q056.json",
+      "profile_q0_bits": 56,
+      "generated_secret_max_component_abs": 0.009705381393898434,
+      "zero_secret_max_component_abs": 0.009705381393898434,
+      "threshold": 0.01,
+      "generated_secret_pass": true,
+      "zero_secret_pass": true,
+      "output_metadata": {
+        "level": 1,
+        "scale_log2": 45,
+        "is_ntt": true,
+        "is_montgomery": false
+      }
+    },
+    "focused_secondary_tests": {
+      "command": "go test ./schemes/ckks/fast/... ./circuits/ckks/bootstrapping/... ./circuits/ckks/dft/... ./circuits/ckks/mod1/... ./circuits/ckks/polynomial/...",
+      "pass": true,
+      "secondary_head": "636953688f33f00f3404924e3d3f519752583c6a",
+      "secondary_worktree_clean": true
+    },
+    "inherited_artifacts": {
+      "c2s_source": "results/FIX-001-P3-DIAG-P93-PRODUCTION-C2S-FIRST-MATERIAL-DIVERGENCE-summary.json",
+      "c2s_provenance_secondary": "7d05f1f3c6f8a14dea2bcb2d3fa05246d322a797 (fast-ckks, dirty)",
+      "ps_source": "results/FIX-001-P3-DIAG-P93-POLYNOMIAL-REFERENCE-RECONCILIATION-AND-PS-REGRESSION-LOCALIZATION-summary.json",
+      "ps_provenance_secondary": "7d05f1f3c6f8a14dea2bcb2d3fa05246d322a797 (fast-ckks, dirty)",
+      "evalmod_source": "results/FIX-001-P3-DIAG-P93-EVALMOD-LOCKSTEP-LOGICAL-SEMANTICS-TRACE-summary.json",
+      "evalmod_provenance_secondary": "7d05f1f3c6f8a14dea2bcb2d3fa05246d322a797 (fast-ckks, dirty)",
+      "s2c_source": "results/FIX-001-P3-DIAG-LOGN13-S2C-ERROR-DECOMPOSITION-summary.json",
+      "s2c_provenance_secondary": "25e70430b10cd4af37ad4cf94cd994912e970e3f (fast-ckks)",
+      "double_angle_source": "results/FIX-001-P3-DESIGN-LOGN13-DA-ALL-ROUNDS-LOCAL-Q2-summary.json"
+    }
+  },
+  "capacity_evidence": {
+    "bootstrap_and_modup": {
+      "input_and_scaledown": "Accepted q0=56 public control passes; source-level Coefficients/row bounds at every ScaleDown substep are not persisted in the compact control artifact.",
+      "modup_semantics": "Center_q0(r), so |C|<=floor((q0-1)/2); exact possible maximum recorded above.",
+      "trace_and_c2s_entry": {
+        "level": 16,
+        "scale_log2": 50,
+        "max_abs_exact_coefficient": "4246320593024",
+        "q01_ratio": 2.1438443558608484e-16,
+        "evidence": "inherited old fast-ckks trace; not revalidated on fast-qprefix"
+      }
+    },
+    "c2s": {
+      "matrix_profile": {
+        "matrix_level_q": 16,
+        "level_p": 4,
+        "diagonal_counts": [
+          8,
+          15,
+          15,
+          15
+        ],
+        "restore_schedule": [
+          4,
+          2,
+          0,
+          0
+        ],
+        "source": "accepted P93 diagnostic profile"
+      },
+      "inherited_checkpoints": [
+        {
+          "checkpoint": "group0_input",
+          "level": 16,
+          "scale_log2": 50,
+          "max_abs": "4246320593024",
+          "q01_ratio": 2.1438443558608484e-16,
+          "unique": true
+        },
+        {
+          "checkpoint": "group0_after_transform",
+          "level": 15,
+          "scale_log2": 50,
+          "max_abs": "997817243296",
+          "q01_ratio": 5.037690438953322e-17,
+          "unique": true
+        },
+        {
+          "checkpoint": "group0_after_rescale",
+          "level": 15,
+          "scale_log2": 50,
+          "max_abs": "997817243296",
+          "q01_ratio": 5.037690438953322e-17,
+          "unique": true
+        },
+        {
+          "checkpoint": "group0_after_restore",
+          "level": 15,
+          "scale_log2": 50,
+          "max_abs": "997817243296",
+          "q01_ratio": 5.037690438953322e-17,
+          "unique": true
+        },
+        {
+          "checkpoint": "group1_input",
+          "level": 15,
+          "scale_log2": 50,
+          "max_abs": "997817243296",
+          "q01_ratio": 5.037690438953322e-17,
+          "unique": true
+        },
+        {
+          "checkpoint": "group1_after_transform",
+          "level": 14,
+          "scale_log2": 50,
+          "max_abs": "143479010992",
+          "q01_ratio": 7.243839958881723e-18,
+          "unique": true
+        },
+        {
+          "checkpoint": "group1_after_rescale",
+          "level": 14,
+          "scale_log2": 50,
+          "max_abs": "143479010992",
+          "q01_ratio": 7.243839958881723e-18,
+          "unique": true
+        },
+        {
+          "checkpoint": "group1_after_restore",
+          "level": 14,
+          "scale_log2": 50,
+          "max_abs": "143479010992",
+          "q01_ratio": 7.243839958881723e-18,
+          "unique": true
+        },
+        {
+          "checkpoint": "group2_input",
+          "level": 14,
+          "scale_log2": 50,
+          "max_abs": "143479010992",
+          "q01_ratio": 7.243839958881723e-18,
+          "unique": true
+        },
+        {
+          "checkpoint": "group2_after_transform",
+          "level": 13,
+          "scale_log2": 50,
+          "max_abs": "21637024898",
+          "q01_ratio": 1.0923907578104942e-18,
+          "unique": true
+        },
+        {
+          "checkpoint": "group2_after_rescale",
+          "level": 13,
+          "scale_log2": 50,
+          "max_abs": "21637024898",
+          "q01_ratio": 1.0923907578104942e-18,
+          "unique": true
+        },
+        {
+          "checkpoint": "group2_after_restore",
+          "level": 13,
+          "scale_log2": 50,
+          "max_abs": "21637024898",
+          "q01_ratio": 1.0923907578104942e-18,
+          "unique": true
+        },
+        {
+          "checkpoint": "group3_input",
+          "level": 13,
+          "scale_log2": 50,
+          "max_abs": "21637024898",
+          "q01_ratio": 1.0923907578104942e-18,
+          "unique": true
+        },
+        {
+          "checkpoint": "group3_after_transform",
+          "level": 12,
+          "scale_log2": 50,
+          "max_abs": "3076098482",
+          "q01_ratio": 1.553033084581928e-19,
+          "unique": true
+        },
+        {
+          "checkpoint": "group3_after_rescale",
+          "level": 12,
+          "scale_log2": 50,
+          "max_abs": "3076098482",
+          "q01_ratio": 1.553033084581928e-19,
+          "unique": true
+        },
+        {
+          "checkpoint": "group3_after_restore",
+          "level": 12,
+          "scale_log2": 50,
+          "max_abs": "3076098482",
+          "q01_ratio": 1.553033084581928e-19,
+          "unique": true
+        },
+        {
+          "checkpoint": "split_conjugate",
+          "level": 12,
+          "scale_log2": 50,
+          "max_abs": "4266722694",
+          "q01_ratio": 2.154144786096134e-19,
+          "unique": true
+        },
+        {
+          "checkpoint": "split_imag_sub",
+          "level": 12,
+          "scale_log2": 50,
+          "max_abs": "4089577457",
+          "q01_ratio": 2.064709283479119e-19,
+          "unique": true
+        },
+        {
+          "checkpoint": "split_imag_mul_minus_i",
+          "level": 12,
+          "scale_log2": 50,
+          "max_abs": "4089577457",
+          "q01_ratio": 2.064709283479119e-19,
+          "unique": true
+        },
+        {
+          "checkpoint": "split_real_add",
+          "level": 12,
+          "scale_log2": 50,
+          "max_abs": "4266722694",
+          "q01_ratio": 2.154144786096134e-19,
+          "unique": true
+        },
+        {
+          "checkpoint": "final_real",
+          "level": 12,
+          "scale_log2": 50,
+          "max_abs": "4266722694",
+          "q01_ratio": 2.154144786096134e-19,
+          "unique": true
+        },
+        {
+          "checkpoint": "final_imag",
+          "level": 12,
+          "scale_log2": 50,
+          "max_abs": "4089577457",
+          "q01_ratio": 2.064709283479119e-19,
+          "unique": true
+        }
+      ],
+      "caveat": "These numeric C2S checkpoints were recorded on fast-ckks@7d05... with dirty production changes. Its LinearTransform checkpoint already reports Level-1/Scale-2^50, identical to the following Rescale checkpoint; it does not establish the current fast-qprefix raw LinearTransform output before explicit Rescale.",
+      "first_unproven": {
+        "stage": "C2S group0 LinearTransform raw output before Rescale",
+        "logical_level": 16,
+        "required": "current-branch exact observed B or a proved conservative coefficient bound against S_q0123",
+        "reason": "not present in accepted deterministic artifacts; old-branch checkpoint is post-rescale/fused semantics"
+      }
+    },
+    "evalmod_ps": {
+      "checkpoints": [
+        {
+          "checkpoint": "B0-constant",
+          "level": 11,
+          "real_q012_ratio": 8.215530427838069e-20,
+          "imag_q012_ratio": 8.215530427838069e-20,
+          "real_q01_ratio": 4.5165373667282184e-8,
+          "imag_q01_ratio": 4.5165373667282184e-8,
+          "q012_unique": true
+        },
+        {
+          "checkpoint": "B0-term-2",
+          "level": 11,
+          "real_q012_ratio": 9.951099695437423e-20,
+          "imag_q012_ratio": 9.951099695992638e-20,
+          "real_q01_ratio": 5.470677031660407e-8,
+          "imag_q01_ratio": 5.47067703196564e-8,
+          "q012_unique": true
+        },
+        {
+          "checkpoint": "B1-constant",
+          "level": 10,
+          "real_q012_ratio": 1.2902558872633043e-17,
+          "imag_q012_ratio": 1.2902558872633043e-17,
+          "real_q01_ratio": 0.000007093259502416936,
+          "imag_q01_ratio": 0.000007093259502416936,
+          "q012_unique": true
+        },
+        {
+          "checkpoint": "B1-term-2",
+          "level": 10,
+          "real_q012_ratio": 1.4797821678330412e-17,
+          "imag_q012_ratio": 1.4797821678936713e-17,
+          "real_q01_ratio": 0.000008135191652372458,
+          "imag_q01_ratio": 0.000008135191652705776,
+          "q012_unique": true
+        },
+        {
+          "checkpoint": "B2-constant",
+          "level": 9,
+          "real_q012_ratio": 3.333683966014574e-14,
+          "imag_q012_ratio": 3.333683966014574e-14,
+          "real_q01_ratio": 0.01832712852033067,
+          "imag_q01_ratio": 0.01832712852033067,
+          "q012_unique": true
+        },
+        {
+          "checkpoint": "B2-term-2",
+          "level": 9,
+          "real_q012_ratio": 4.662620589981851e-14,
+          "imag_q012_ratio": 4.662620590592911e-14,
+          "real_q01_ratio": 0.025633037704019663,
+          "imag_q01_ratio": 0.025633037707379003,
+          "q012_unique": true
+        },
+        {
+          "checkpoint": "B2-term-4",
+          "level": 9,
+          "real_q012_ratio": 3.5011602169152505e-14,
+          "imag_q012_ratio": 3.501160217154755e-14,
+          "real_q01_ratio": 0.019247839303251482,
+          "imag_q01_ratio": 0.019247839304568172,
+          "q012_unique": true
+        },
+        {
+          "checkpoint": "B2-term-6",
+          "level": 9,
+          "real_q012_ratio": 3.349246050323426e-14,
+          "imag_q012_ratio": 3.349246050368349e-14,
+          "real_q01_ratio": 0.018412682016726883,
+          "imag_q01_ratio": 0.01841268201697385,
+          "q012_unique": true
+        },
+        {
+          "checkpoint": "B3-constant",
+          "level": 9,
+          "real_q012_ratio": 9.596671501414458e-14,
+          "imag_q012_ratio": 9.596671501414458e-14,
+          "real_q01_ratio": 0.05275827995899733,
+          "imag_q01_ratio": 0.05275827995899733,
+          "q012_unique": true
+        },
+        {
+          "checkpoint": "B3-term-2",
+          "level": 9,
+          "real_q012_ratio": 1.6321616550724988e-12,
+          "imag_q012_ratio": 1.6321616569370316e-12,
+          "real_q01_ratio": 0.8972907067201742,
+          "imag_q01_ratio": 0.8972907077452122,
+          "q012_unique": true
+        },
+        {
+          "checkpoint": "B3-term-4",
+          "level": 9,
+          "real_q012_ratio": 8.398281698088168e-13,
+          "imag_q012_ratio": 8.398281714198789e-13,
+          "real_q01_ratio": 0.4617005978968369,
+          "imag_q01_ratio": 0.461700598782528,
+          "q012_unique": true
+        },
+        {
+          "checkpoint": "B3-term-6",
+          "level": 9,
+          "real_q012_ratio": 1.6087409698357462e-13,
+          "imag_q012_ratio": 1.6087409772498674e-13,
+          "real_q01_ratio": 0.08844150438575865,
+          "imag_q01_ratio": 0.08844150479335443,
+          "q012_unique": true
+        },
+        {
+          "checkpoint": "B4-constant",
+          "level": 8,
+          "real_q012_ratio": 1.138425968261257e-13,
+          "imag_q012_ratio": 1.138425968261257e-13,
+          "real_q01_ratio": 0.0625856537209464,
+          "imag_q01_ratio": 0.0625856537209464,
+          "q012_unique": true
+        },
+        {
+          "checkpoint": "B4-term-2",
+          "level": 8,
+          "real_q012_ratio": 9.556898514775076e-13,
+          "imag_q012_ratio": 9.556898535422031e-13,
+          "real_q01_ratio": 0.5253962556787675,
+          "imag_q01_ratio": 0.5253962568138464,
+          "q012_unique": true
+        },
+        {
+          "checkpoint": "B4-term-4",
+          "level": 8,
+          "real_q012_ratio": 5.636546138669255e-13,
+          "imag_q012_ratio": 5.636546158062074e-13,
+          "real_q01_ratio": 0.3098725210526252,
+          "imag_q01_ratio": 0.30987252211875715,
+          "q012_unique": true
+        },
+        {
+          "checkpoint": "B4-term-6",
+          "level": 8,
+          "real_q012_ratio": 5.534277710010856e-13,
+          "imag_q012_ratio": 5.534277729272684e-13,
+          "real_q01_ratio": 0.3042502525511648,
+          "imag_q01_ratio": 0.30425025361009533,
+          "q012_unique": true
+        },
+        {
+          "checkpoint": "F0-final-rescale",
+          "level": 7,
+          "real_q012_ratio": 6.148961620305355e-31,
+          "imag_q012_ratio": 6.148961699283863e-31,
+          "real_q01_ratio": 3.380428709822828e-19,
+          "imag_q01_ratio": 3.380428753241739e-19,
+          "q012_unique": true
+        },
+        {
+          "checkpoint": "F0-root",
+          "level": 8,
+          "real_q012_ratio": 7.089270082696526e-13,
+          "imag_q012_ratio": 7.089270173703096e-13,
+          "real_q01_ratio": 0.38973689541495804,
+          "imag_q01_ratio": 0.38973690041809905,
+          "q012_unique": true
+        },
+        {
+          "checkpoint": "G0-add",
+          "level": 8,
+          "real_q012_ratio": 6.637360947565327e-13,
+          "imag_q012_ratio": 6.637361029124938e-13,
+          "real_q01_ratio": 0.36489291835086235,
+          "imag_q01_ratio": 0.3648929228346511,
+          "q012_unique": true
+        },
+        {
+          "checkpoint": "G0-multiply",
+          "level": 8,
+          "real_q012_ratio": 1.6194259462340403e-12,
+          "imag_q012_ratio": 1.6194259564546969e-12,
+          "real_q01_ratio": 0.8902891740296299,
+          "imag_q01_ratio": 0.8902891796484974,
+          "q012_unique": true
+        },
+        {
+          "checkpoint": "G0-rescale",
+          "level": 8,
+          "real_q012_ratio": 1.4156745697878487e-30,
+          "imag_q012_ratio": 1.4156745714408873e-30,
+          "real_q01_ratio": 7.782756268430367e-19,
+          "imag_q01_ratio": 7.782756277518046e-19,
+          "q012_unique": true
+        },
+        {
+          "checkpoint": "G1-add",
+          "level": 10,
+          "real_q012_ratio": 1.4897153685883238e-17,
+          "imag_q012_ratio": 1.489715368661677e-17,
+          "real_q01_ratio": 0.000008189800022186812,
+          "imag_q01_ratio": 0.000008189800022590078,
+          "q012_unique": true
+        },
+        {
+          "checkpoint": "G1-multiply",
+          "level": 10,
+          "real_q012_ratio": 9.93320075528267e-20,
+          "imag_q012_ratio": 9.933200768005783e-20,
+          "real_q01_ratio": 5.46083698143555e-8,
+          "imag_q01_ratio": 5.4608369884301567e-8,
+          "q012_unique": true
+        },
+        {
+          "checkpoint": "G1-rescale",
+          "level": 10,
+          "real_q012_ratio": 8.632534580700932e-38,
+          "imag_q012_ratio": 8.632534580700932e-38,
+          "real_q01_ratio": 4.745787912998983e-26,
+          "imag_q01_ratio": 4.745787912998983e-26,
+          "q012_unique": true
+        },
+        {
+          "checkpoint": "G2-add",
+          "level": 9,
+          "real_q012_ratio": 4.6640986845908975e-14,
+          "imag_q012_ratio": 4.664098685209561e-14,
+          "real_q01_ratio": 0.025641163618215904,
+          "imag_q01_ratio": 0.025641163621617037,
+          "q012_unique": true
+        },
+        {
+          "checkpoint": "G2-multiply",
+          "level": 9,
+          "real_q012_ratio": 1.4780946090469453e-17,
+          "imag_q012_ratio": 1.4780946166496952e-17,
+          "real_q01_ratio": 0.000008125914196238738,
+          "imag_q01_ratio": 0.000008125914238035313,
+          "q012_unique": true
+        },
+        {
+          "checkpoint": "G2-relinearize",
+          "level": 10,
+          "real_q012_ratio": 1.4897153685883238e-17,
+          "imag_q012_ratio": 1.489715368661677e-17,
+          "real_q01_ratio": 0.000008189800022186812,
+          "imag_q01_ratio": 0.000008189800022590078,
+          "q012_unique": true
+        },
+        {
+          "checkpoint": "G2-rescale",
+          "level": 9,
+          "real_q012_ratio": 1.2921251228772564e-35,
+          "imag_q012_ratio": 1.2921251228772564e-35,
+          "real_q01_ratio": 7.103535737861245e-24,
+          "imag_q01_ratio": 7.103535737861245e-24,
+          "q012_unique": true
+        },
+        {
+          "checkpoint": "G3-add",
+          "level": 8,
+          "real_q012_ratio": 7.089270082696526e-13,
+          "imag_q012_ratio": 7.089270173703096e-13,
+          "real_q01_ratio": 0.38973689541495804,
+          "imag_q01_ratio": 0.38973690041809905,
+          "q012_unique": true
+        },
+        {
+          "checkpoint": "G3-multiply",
+          "level": 8,
+          "real_q012_ratio": 4.519091351311988e-14,
+          "imag_q012_ratio": 4.5190914457815806e-14,
+          "real_q01_ratio": 0.024843977064095676,
+          "imag_q01_ratio": 0.024843977583447956,
+          "q012_unique": true
+        },
+        {
+          "checkpoint": "G3-relinearize",
+          "level": 9,
+          "real_q012_ratio": 4.6640986845908975e-14,
+          "imag_q012_ratio": 4.664098685209561e-14,
+          "real_q01_ratio": 0.025641163618215904,
+          "imag_q01_ratio": 0.025641163621617037,
+          "q012_unique": true
+        },
+        {
+          "checkpoint": "G3-rescale",
+          "level": 8,
+          "real_q012_ratio": 4.045460740812032e-32,
+          "imag_q012_ratio": 4.045460740812032e-32,
+          "real_q01_ratio": 2.2240164237718895e-20,
+          "imag_q01_ratio": 2.2240164237718895e-20,
+          "q012_unique": true
+        },
+        {
+          "checkpoint": "T16-final",
+          "level": 8,
+          "real_q012_ratio": 1.0258730069921304e-22,
+          "imag_q012_ratio": 1.0258730284375489e-22,
+          "real_q01_ratio": 5.63979868408458e-11,
+          "imag_q01_ratio": 5.6397988019820607e-11,
+          "q012_unique": true
+        },
+        {
+          "checkpoint": "T2-final",
+          "level": 11,
+          "real_q012_ratio": 1.0582739436581426e-22,
+          "imag_q012_ratio": 1.0582739439966886e-22,
+          "real_q01_ratio": 5.8179247861718774e-11,
+          "imag_q01_ratio": 5.817924788033054e-11,
+          "q012_unique": true
+        },
+        {
+          "checkpoint": "T3-final",
+          "level": 10,
+          "real_q012_ratio": 4.961467936929668e-24,
+          "imag_q012_ratio": 4.96146631349522e-24,
+          "real_q01_ratio": 2.727596900503926e-12,
+          "imag_q01_ratio": 2.727596008011054e-12,
+          "q012_unique": true
+        },
+        {
+          "checkpoint": "T4-final",
+          "level": 10,
+          "real_q012_ratio": 1.0567234846045394e-22,
+          "imag_q012_ratio": 1.056723485958062e-22,
+          "real_q01_ratio": 5.809401044080372e-11,
+          "imag_q01_ratio": 5.809401051521443e-11,
+          "q012_unique": true
+        },
+        {
+          "checkpoint": "T6-final",
+          "level": 9,
+          "real_q012_ratio": 1.0541410685941211e-22,
+          "imag_q012_ratio": 1.0541410716370681e-22,
+          "real_q01_ratio": 5.795204056423957e-11,
+          "imag_q01_ratio": 5.795204073152741e-11,
+          "q012_unique": true
+        },
+        {
+          "checkpoint": "T8-final",
+          "level": 9,
+          "real_q012_ratio": 1.0505292175173741e-22,
+          "imag_q012_ratio": 1.0505292229208922e-22,
+          "real_q01_ratio": 5.775347687447574e-11,
+          "imag_q01_ratio": 5.7753477171537405e-11,
+          "q012_unique": true
+        }
+      ],
+      "checkpoint_count": 38,
+      "max_q012_ratio": 1.6321616569370316e-12,
+      "max_q01_ratio": 0.8972907077452122,
+      "worst_q012_checkpoint": "B3-term-2",
+      "all_q012_unique": true,
+      "scope": "38 named checkpoints × real/imag; historical rows are at Levels 7–11, so the intended policy prefix is q0123 and q012 evidence is stricter; inherited provenance, not a current fast-qprefix replay."
+    },
+    "double_angle": {
+      "checkpoints": [
+        {
+          "branch": "imag",
+          "checkpoint": "polynomial_output",
+          "level": 7,
+          "max_abs": "6695627933",
+          "q01_ratio": 3.3804287355712518e-19,
+          "unique": true
+        },
+        {
+          "branch": "imag",
+          "checkpoint": "pre_double_angle_logical",
+          "level": 7,
+          "max_abs": "6695627933",
+          "q01_ratio": 3.3804287355712518e-19,
+          "unique": true
+        },
+        {
+          "branch": "imag",
+          "checkpoint": "double_angle_round_0_square",
+          "level": 7,
+          "max_abs": "44831433417169891953",
+          "q01_ratio": 2.2634093067406765e-9,
+          "unique": true
+        },
+        {
+          "branch": "imag",
+          "checkpoint": "double_angle_round_0_after_constant",
+          "level": 7,
+          "max_abs": "5779096876185837231321350667",
+          "q01_ratio": 0.2917698734367333,
+          "unique": true
+        },
+        {
+          "branch": "imag",
+          "checkpoint": "double_angle_round_0_post_rescale",
+          "level": 6,
+          "max_abs": "5012567511",
+          "q01_ratio": 2.5307002454037445e-19,
+          "unique": true
+        },
+        {
+          "branch": "imag",
+          "checkpoint": "double_angle_round_1_square",
+          "level": 6,
+          "max_abs": "25125833052333096129",
+          "q01_ratio": 1.268530583019072e-9,
+          "unique": true
+        },
+        {
+          "branch": "imag",
+          "checkpoint": "double_angle_round_1_after_constant",
+          "level": 6,
+          "max_abs": "2793731474608213740963006764",
+          "q01_ratio": 0.14104741557830305,
+          "unique": true
+        },
+        {
+          "branch": "imag",
+          "checkpoint": "double_angle_round_1_post_rescale",
+          "level": 5,
+          "max_abs": "2423175787",
+          "q01_ratio": 1.2233913150017446e-19,
+          "unique": true
+        },
+        {
+          "branch": "imag",
+          "checkpoint": "double_angle_round_2_square",
+          "level": 5,
+          "max_abs": "5871780894705030217",
+          "q01_ratio": 2.9644922125393073e-10,
+          "unique": true
+        },
+        {
+          "branch": "imag",
+          "checkpoint": "double_angle_round_2_after_constant",
+          "level": 5,
+          "max_abs": "66347569555062128640",
+          "q01_ratio": 3.3496967409709914e-9,
+          "unique": true
+        },
+        {
+          "branch": "imag",
+          "checkpoint": "double_angle_round_2_post_rescale",
+          "level": 4,
+          "max_abs": "58",
+          "q01_ratio": 2.9282521165312877e-27,
+          "unique": true
+        },
+        {
+          "branch": "imag",
+          "checkpoint": "internal_final_restore",
+          "level": 4,
+          "max_abs": "7784628224",
+          "q01_ratio": 3.9302334609202067e-19,
+          "unique": true
+        },
+        {
+          "branch": "real",
+          "checkpoint": "polynomial_output",
+          "level": 7,
+          "max_abs": "6695627942",
+          "q01_ratio": 3.3804287401150915e-19,
+          "unique": true
+        },
+        {
+          "branch": "real",
+          "checkpoint": "pre_double_angle_logical",
+          "level": 7,
+          "max_abs": "6695627942",
+          "q01_ratio": 3.3804287401150915e-19,
+          "unique": true
+        },
+        {
+          "branch": "real",
+          "checkpoint": "double_angle_round_0_square",
+          "level": 7,
+          "max_abs": "44831433537691194428",
+          "q01_ratio": 2.263409312825448e-9,
+          "unique": true
+        },
+        {
+          "branch": "real",
+          "checkpoint": "double_angle_round_0_after_constant",
+          "level": 7,
+          "max_abs": "5779096908538028018911904267",
+          "q01_ratio": 0.29176987507010177,
+          "unique": true
+        },
+        {
+          "branch": "real",
+          "checkpoint": "double_angle_round_0_post_rescale",
+          "level": 6,
+          "max_abs": "5012567539",
+          "q01_ratio": 2.5307002595401343e-19,
+          "unique": true
+        },
+        {
+          "branch": "real",
+          "checkpoint": "double_angle_round_1_square",
+          "level": 6,
+          "max_abs": "25125833333036873041",
+          "q01_ratio": 1.2685305971909932e-9,
+          "unique": true
+        },
+        {
+          "branch": "real",
+          "checkpoint": "double_angle_round_1_after_constant",
+          "level": 6,
+          "max_abs": "2793731549959060097257998636",
+          "q01_ratio": 0.1410474193825492,
+          "unique": true
+        },
+        {
+          "branch": "real",
+          "checkpoint": "double_angle_round_1_post_rescale",
+          "level": 5,
+          "max_abs": "2423175853",
+          "q01_ratio": 1.2233913483232342e-19,
+          "unique": true
+        },
+        {
+          "branch": "real",
+          "checkpoint": "double_angle_round_2_square",
+          "level": 5,
+          "max_abs": "5871781214564214729",
+          "q01_ratio": 2.9644923740269514e-10,
+          "unique": true
+        },
+        {
+          "branch": "real",
+          "checkpoint": "double_angle_round_2_after_constant",
+          "level": 5,
+          "max_abs": "66347569208243519488",
+          "q01_ratio": 3.349696723461124e-9,
+          "unique": true
+        },
+        {
+          "branch": "real",
+          "checkpoint": "double_angle_round_2_post_rescale",
+          "level": 4,
+          "max_abs": "58",
+          "q01_ratio": 2.9282521165312877e-27,
+          "unique": true
+        },
+        {
+          "branch": "real",
+          "checkpoint": "internal_final_restore",
+          "level": 4,
+          "max_abs": "7784628224",
+          "q01_ratio": 3.9302334609202067e-19,
+          "unique": true
+        }
+      ],
+      "local_q2_capacity": [
+        {
+          "round": 0,
+          "branch": "real",
+          "checkpoint": "input",
+          "max_abs": "53565023069",
+          "q012_ratio": 4.9191692974381456e-30,
+          "q01_ratio": 2.704342968514595e-18,
+          "q012_unique": true,
+          "q01_unique": true
+        },
+        {
+          "round": 0,
+          "branch": "real",
+          "checkpoint": "square",
+          "max_abs": "2869211696382644337615",
+          "q012_ratio": 2.634954168976038e-19,
+          "q01_ratio": 1.448581934949794e-7,
+          "q012_unique": true,
+          "q01_unique": true
+        },
+        {
+          "round": 0,
+          "branch": "real",
+          "checkpoint": "after_multiplier",
+          "max_abs": "96274768759876085406687559680",
+          "q012_ratio": 8.841439048602298e-12,
+          "q01_ratio": 0.8606344032701283,
+          "q012_unique": true,
+          "q01_unique": true
+        },
+        {
+          "round": 0,
+          "branch": "real",
+          "checkpoint": "after_constant",
+          "max_abs": "46232773589736173286478920118",
+          "q012_ratio": 4.24580868909696e-12,
+          "q01_ratio": 0.3341589158147719,
+          "q012_unique": true,
+          "q01_unique": true
+        },
+        {
+          "round": 0,
+          "branch": "real",
+          "checkpoint": "post_rescale",
+          "max_abs": "40100538853",
+          "q012_ratio": 3.682652003758125e-30,
+          "q01_ratio": 2.0245601339714204e-18,
+          "q012_unique": true,
+          "q01_unique": true
+        },
+        {
+          "round": 0,
+          "branch": "imag",
+          "checkpoint": "input",
+          "max_abs": "53565023757",
+          "q012_ratio": 4.9191693606209515e-30,
+          "q01_ratio": 2.7043430032497234e-18,
+          "q012_unique": true,
+          "q01_unique": true
+        },
+        {
+          "round": 0,
+          "branch": "imag",
+          "checkpoint": "square",
+          "max_abs": "2869211770088118428497",
+          "q012_ratio": 2.63495423666381e-19,
+          "q01_ratio": 1.4485819721615544e-7,
+          "q012_unique": true,
+          "q01_unique": true
+        },
+        {
+          "round": 0,
+          "branch": "imag",
+          "checkpoint": "after_multiplier",
+          "max_abs": "96274771233021403816949448704",
+          "q012_ratio": 8.841439275724772e-12,
+          "q01_ratio": 0.8606345281320769,
+          "q012_unique": true,
+          "q01_unique": true
+        },
+        {
+          "round": 0,
+          "branch": "imag",
+          "checkpoint": "after_constant",
+          "max_abs": "46232776062881491696740809142",
+          "q012_ratio": 4.245808916219433e-12,
+          "q01_ratio": 0.33415904067672036,
+          "q012_unique": true,
+          "q01_unique": true
+        },
+        {
+          "round": 0,
+          "branch": "imag",
+          "checkpoint": "post_rescale",
+          "max_abs": "40100540998",
+          "q012_ratio": 3.6826522007452175e-30,
+          "q01_ratio": 2.0245602422662617e-18,
+          "q012_unique": true,
+          "q01_unique": true
+        },
+        {
+          "round": 1,
+          "branch": "real",
+          "checkpoint": "input",
+          "max_abs": "40100538853",
+          "q012_ratio": 3.682652003758125e-30,
+          "q01_ratio": 2.0245601339714204e-18,
+          "q012_unique": true,
+          "q01_unique": true
+        },
+        {
+          "round": 1,
+          "branch": "real",
+          "checkpoint": "square",
+          "max_abs": "1608053216302344544803",
+          "q012_ratio": 1.4767632975890792e-19,
+          "q01_ratio": 8.11859523126256e-8,
+          "q012_unique": true,
+          "q01_unique": true
+        },
+        {
+          "round": 1,
+          "branch": "real",
+          "checkpoint": "after_multiplier",
+          "max_abs": "53957312298798311469163216896",
+          "q012_ratio": 4.955195364904852e-12,
+          "q01_ratio": 0.7241485162292386,
+          "q012_unique": true,
+          "q01_unique": true
+        },
+        {
+          "round": 1,
+          "branch": "real",
+          "checkpoint": "after_constant",
+          "max_abs": "22349848473585827747361994178",
+          "q012_ratio": 2.052508934272932e-12,
+          "q01_ratio": 0.8716208431563575,
+          "q012_unique": true,
+          "q01_unique": true
+        },
+        {
+          "round": 1,
+          "branch": "real",
+          "checkpoint": "post_rescale",
+          "max_abs": "19385403416",
+          "q012_ratio": 1.7802677164835954e-30,
+          "q01_ratio": 9.78712906598532e-19,
+          "q012_unique": true,
+          "q01_unique": true
+        },
+        {
+          "round": 1,
+          "branch": "imag",
+          "checkpoint": "input",
+          "max_abs": "40100540998",
+          "q012_ratio": 3.6826522007452175e-30,
+          "q01_ratio": 2.0245602422662617e-18,
+          "q012_unique": true,
+          "q01_unique": true
+        },
+        {
+          "round": 1,
+          "branch": "imag",
+          "checkpoint": "square",
+          "max_abs": "1608053388333679049396",
+          "q012_ratio": 1.4767634555748712e-19,
+          "q01_ratio": 8.118596099798973e-8,
+          "q012_unique": true,
+          "q01_unique": true
+        },
+        {
+          "round": 1,
+          "branch": "imag",
+          "checkpoint": "after_multiplier",
+          "max_abs": "53957318071212026972782723072",
+          "q012_ratio": 4.9551958950172035e-12,
+          "q01_ratio": 0.7241488076616985,
+          "q012_unique": true,
+          "q01_unique": true
+        },
+        {
+          "round": 1,
+          "branch": "imag",
+          "checkpoint": "after_constant",
+          "max_abs": "22349854245999543250981500354",
+          "q012_ratio": 2.052509464385283e-12,
+          "q01_ratio": 0.8716205517238974,
+          "q012_unique": true,
+          "q01_unique": true
+        },
+        {
+          "round": 1,
+          "branch": "imag",
+          "checkpoint": "post_rescale",
+          "max_abs": "19385408423",
+          "q012_ratio": 1.780268176303815e-30,
+          "q01_ratio": 9.78713159387469e-19,
+          "q012_unique": true,
+          "q01_unique": true
+        },
+        {
+          "round": 2,
+          "branch": "real",
+          "checkpoint": "input",
+          "max_abs": "19385403416",
+          "q012_ratio": 1.7802677164835954e-30,
+          "q01_ratio": 9.78712906598532e-19,
+          "q012_unique": true,
+          "q01_unique": true
+        },
+        {
+          "round": 2,
+          "branch": "real",
+          "checkpoint": "square",
+          "max_abs": "375793865608594163326",
+          "q012_ratio": 3.4511207873207104e-20,
+          "q01_ratio": 1.8972744523238624e-8,
+          "q012_unique": true,
+          "q01_unique": true
+        },
+        {
+          "round": 2,
+          "branch": "real",
+          "checkpoint": "after_multiplier",
+          "max_abs": "12609549709580711468919160832",
+          "q012_ratio": 1.1580039778193924e-12,
+          "q01_ratio": 0.6366196659583828,
+          "q012_unique": true,
+          "q01_unique": true
+        },
+        {
+          "round": 2,
+          "branch": "real",
+          "checkpoint": "after_constant",
+          "max_abs": "4706775999804344369152",
+          "q012_ratio": 4.3224900619068303e-19,
+          "q01_ratio": 2.3763149626665067e-7,
+          "q012_unique": true,
+          "q01_unique": true
+        },
+        {
+          "round": 2,
+          "branch": "real",
+          "checkpoint": "post_rescale",
+          "max_abs": "4082",
+          "q012_ratio": 3.748724059406511e-37,
+          "q01_ratio": 2.0608836447725373e-25,
+          "q012_unique": true,
+          "q01_unique": true
+        },
+        {
+          "round": 2,
+          "branch": "imag",
+          "checkpoint": "input",
+          "max_abs": "19385408423",
+          "q012_ratio": 1.780268176303815e-30,
+          "q01_ratio": 9.78713159387469e-19,
+          "q012_unique": true,
+          "q01_unique": true
+        },
+        {
+          "round": 2,
+          "branch": "imag",
+          "checkpoint": "square",
+          "max_abs": "375794059734148112477",
+          "q012_ratio": 3.4511225700819417e-20,
+          "q01_ratio": 1.897275432407594e-8,
+          "q012_unique": true,
+          "q01_unique": true
+        },
+        {
+          "round": 2,
+          "branch": "imag",
+          "checkpoint": "after_multiplier",
+          "max_abs": "12609556223353410918037848064",
+          "q012_ratio": 1.1580045760147975e-12,
+          "q01_ratio": 0.636619994819912,
+          "q012_unique": true,
+          "q01_unique": true
+        },
+        {
+          "round": 2,
+          "branch": "imag",
+          "checkpoint": "after_constant",
+          "max_abs": "4479107820437377122304",
+          "q012_ratio": 4.113409909639749e-19,
+          "q01_ratio": 2.2613718888564815e-7,
+          "q012_unique": true,
+          "q01_unique": true
+        },
+        {
+          "round": 2,
+          "branch": "imag",
+          "checkpoint": "post_rescale",
+          "max_abs": "3885",
+          "q012_ratio": 3.5678081751088425e-37,
+          "q01_ratio": 1.9614240470213884e-25,
+          "q012_unique": true,
+          "q01_unique": true
+        }
+      ],
+      "checkpoint_count": 24,
+      "max_local_q2_q012_ratio": 8.841439275724772e-12,
+      "max_local_q2_q01_ratio": 0.8716208431563575,
+      "all_local_q2_q012_unique": true,
+      "scope": "Three rounds; exact Level 7→4 semantic checkpoints in inherited logical trace plus local-q2 q012 capacities. No round requires q3 in those inherited observations; current-branch revalidation still absent."
+    },
+    "s2c": {
+      "matrix_profile": {
+        "matrix_level_q": 4,
+        "level_p": 4,
+        "diagonal_counts": [
+          31,
+          31,
+          16
+        ],
+        "source": "profile probe"
+      },
+      "post_rescale_q01_capacity_ratios": [
+        {
+          "group": 0,
+          "post_rescale_q01_ratio": 0.000003998283560509954
+        },
+        {
+          "group": 1,
+          "post_rescale_q01_ratio": 0.000005002817953068453
+        },
+        {
+          "group": 2,
+          "post_rescale_q01_ratio": 0.0000036834866750124484
+        }
+      ],
+      "max_ratio": 0.000005002817953068453,
+      "scope": "All three recorded groups are <1 under q01 (stronger than q-prefix at Levels 3→1), but source bounds and target-branch raw pre-Rescale states are not retained."
+    },
+    "transitions": [
+      {
+        "transition": "4->3",
+        "policy": "q0123->q0123",
+        "evidence": "policy-only; no contraction required"
+      },
+      {
+        "transition": "3->2",
+        "policy": "q0123->q012",
+        "evidence": "must prove 2B<S_q012 at the crossing; current-branch crossing state absent"
+      },
+      {
+        "transition": "2->1",
+        "policy": "q012->q01",
+        "evidence": "inherited S2C post-rescale q01 ratios pass (<1), but target-branch checkpoint absent"
+      },
+      {
+        "transition": "1->0",
+        "policy": "q01->q0",
+        "evidence": "ScaleDown uses explicit DropLevel/canonical q0 semantics; public control passes; per-step coefficient bound not retained"
+      }
+    ],
+    "rescale_audit": {
+      "rule": "B'=floor((B+(q_ell-1)/2)/q_ell)",
+      "expected_operations": "C2S factors consume q16,q15,q14,q13; EvalMod/PS and DoubleAngle rescale points; S2C factors consume q4,q3,q2.",
+      "status": "incomplete",
+      "missing": "Current fast-qprefix raw source bound, exact source logical level/divisor, and predicted post-bound are not retained for each C2S/PS/S2C Rescale. Existing artifacts give inherited output lifts/ratios, not a complete source-to-output recurrence."
+    }
+  },
+  "validation": {
+    "primary_go_test_dot": {
+      "command": "go test .",
+      "pass": false,
+      "preexisting_documented_debt": true,
+      "failing_test": "TestFIX001P3GenuineStandardPublicVsStagedConsistency",
+      "classification": "P93_GENUINE_STANDARD_BASELINE_REPLAY_CONFLICT",
+      "documentation": [
+        "docs/FIX-001-P3-LOGN13-P93-SCALE-AUDIT-FINAL.md",
+        "docs/CODEX_HANDOFF.md",
+        "specs/FIX-001-P3-DIAG-P93-GENUINE-STANDARD-VS-MATCHED-REFERENCE-RECONCILIATION.md"
+      ],
+      "task_code_path_modified": false
+    },
+    "accepted_public_control_pass": true,
+    "secondary_focused_tests_pass": true,
+    "secondary_clean_at_636953688f33f00f3404924e3d3f519752583c6a": true,
+    "json_parse_pass": true,
+    "git_diff_check_pass": true
+  },
+  "first_failure": null,
+  "evidence_gaps": [
+    "Reproduce current fast-qprefix P93 C2S from identical deterministic input, recording raw LinearTransform output before Rescale, then each Rescale and restore (Level/Scale and exact B for c0/c1).",
+    "Retain source bound, q divisor, predicted rounded post-bound, and measured post-bound for every production Rescale, including all PS and S2C factors.",
+    "Confirm the 3->2 and 2->1 same-lift contraction checkpoints against the target branch's actual ciphertext rows."
+  ],
+  "conclusion": "Existing P93 capacity observations are comfortably below q012/q01 limits in recorded checkpoints, and the q0=56 public control passes; nevertheless those stage observations are from older fast-ckks provenance, while one required current-branch C2S pre-Rescale bound is missing. This is not evidence of failure; it is insufficient evidence to claim full-profile capacity proven."
+}
