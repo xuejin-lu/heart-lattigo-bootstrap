@@ -1,25 +1,42 @@
 # Current Task
 
 Task: FAST-STORAGE-006
-Status: READY_FOR_CODEX_DIRTY_RECOVERY
+Status: COMPLETE
 
-Specification:
-`specs/FAST-STORAGE-006-PRIVATE-F-TRACE-FOUNDATION-SALVAGE.md`
+Accepted Secondary implementation:
+`532319346d8235fb42c72bfd22b57a6468675c82`
 
-Task class:
-`I — Implementation / controlled dirty-worktree recovery`
+Classification:
+`FAST_STORAGE_006_PRIVATE_F_TRACE_FOUNDATION_ACCEPTED`
 
-Decision:
-- FAST-INTEGRATION-003 production residency is rejected on performance.
-- Do not weaken the 20% gate.
-- Preserve reusable private-F scalar/normalized-Trace foundation only.
-- Restore production ModUp exactly to accepted FAST-INTEGRATION-002 semantics.
+Accepted result:
+- FAST-INTEGRATION-003 resident production wiring remains rejected and is not present in production;
+- production `FastEvaluator.ModUp` remains on the accepted FAST-INTEGRATION-002 fused path;
+- standalone `FastStorageMulInteger` is retained with exact signed integer semantics, exact bound multiplication, and transactional capacity rejection;
+- standalone `FastStorageTraceNormalized` is retained with the accepted unnormalized-sum-then-normalize theorem;
+- Trace enforces the strict intermediate capacity requirement `2*g*B < S3`;
+- q01/q012 oracle tests confirm exported private-F Trace results match the existing logical Trace;
+- immutable private-F basis tables are reused by LogN through a concurrency-safe cache;
+- no downstream Bootstrap/C2S/EvalMod/S2C/production-Rescale semantics are changed.
 
-Known Secondary state:
-- committed HEAD remains `775e8901ffdb7496b345be852af04bd0e0b03c96`;
-- FAST-INTEGRATION-003 left 7 dirty files intentionally uncommitted;
-- those known 003 changes may be reconciled under the recovery authority in the spec.
+Independent Web review:
+- implementation commit is based directly on the authorized recovery commit;
+- production `fast_modup.go` is untouched by the salvage commit;
+- no rejected private-F-resident production path is committed;
+- private-F Trace follows the same Galois schedule as existing Trace and performs final residue-wise `g^-1 mod f_i` normalization only after the complete automorphism sum;
+- the conservative post-bound remains the input bound, consistent with the accepted theorem;
+- scalar multiplication preserves Scale metadata inside the primitive;
+- no blocking correctness defect found.
 
-Codex must inspect the dirty diff, preserve only standalone foundation work, revert rejected production wiring, run the required tests, commit/push the salvaged Secondary result, and return `READY_FOR_WEB_REVIEW`.
+Reported validation:
+- focused foundation/oracle tests passed;
+- `go test ./...` passed;
+- `git diff --check` passed;
+- gofmt checks passed;
+- Secondary worktree clean.
 
-If any dirty change is unrelated to FAST-INTEGRATION-003, stop with `NEEDS_WEB_REVIEW`.
+Production performance guard:
+- LogN13 `BenchmarkFastModUpLogN13`: approximately 0.588–0.614 ms/op, 313232 B/op, 402 allocs/op;
+- this remains consistent with the accepted FAST-INTEGRATION-002 production baseline and confirms the salvage did not reintroduce the rejected resident path.
+
+FAST-STORAGE-006 is accepted as reusable research/foundation capability, not as production Trace residency.
