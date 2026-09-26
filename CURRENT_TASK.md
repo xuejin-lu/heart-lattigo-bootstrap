@@ -1,42 +1,32 @@
 # Current Task
 
-Task: FAST-STORAGE-006
-Status: COMPLETE
+Task: FAST-STORAGE-007
+Status: READY_FOR_CODEX
 
-Accepted Secondary implementation:
-`532319346d8235fb42c72bfd22b57a6468675c82`
+Specification:
+`specs/FAST-STORAGE-007-PRIVATE-F-PLAINTEXT-LINEAR-TRANSFORM.md`
 
-Classification:
-`FAST_STORAGE_006_PRIVATE_F_TRACE_FOUNDATION_ACCEPTED`
+Task class:
+`I — Implementation / feasibility foundation`
 
-Accepted result:
-- FAST-INTEGRATION-003 resident production wiring remains rejected and is not present in production;
-- production `FastEvaluator.ModUp` remains on the accepted FAST-INTEGRATION-002 fused path;
-- standalone `FastStorageMulInteger` is retained with exact signed integer semantics, exact bound multiplication, and transactional capacity rejection;
-- standalone `FastStorageTraceNormalized` is retained with the accepted unnormalized-sum-then-normalize theorem;
-- Trace enforces the strict intermediate capacity requirement `2*g*B < S3`;
-- q01/q012 oracle tests confirm exported private-F Trace results match the existing logical Trace;
-- immutable private-F basis tables are reused by LogN through a concurrency-safe cache;
-- no downstream Bootstrap/C2S/EvalMod/S2C/production-Rescale semantics are changed.
+Repositories:
+- Primary `xuejin-lu/heart-lattigo-bootstrap@main`: orchestration/spec only.
+- Secondary `xuejin-lu/lattigo@fast-ckks`: implementation target.
 
-Independent Web review:
-- implementation commit is based directly on the authorized recovery commit;
-- production `fast_modup.go` is untouched by the salvage commit;
-- no rejected private-F-resident production path is committed;
-- private-F Trace follows the same Galois schedule as existing Trace and performs final residue-wise `g^-1 mod f_i` normalization only after the complete automorphism sum;
-- the conservative post-bound remains the input bound, consistent with the accepted theorem;
-- scalar multiplication preserves Scale metadata inside the primitive;
-- no blocking correctness defect found.
+Accepted prerequisites:
+- FAST-STORAGE-006 at `532319346d8235fb42c72bfd22b57a6468675c82`.
+- Private-F plaintext mirror architecture at `22b9f07969af38705573686fe96a873e4bd001a3`.
 
-Reported validation:
-- focused foundation/oracle tests passed;
-- `go test ./...` passed;
-- `git diff --check` passed;
-- gofmt checks passed;
-- Secondary worktree clean.
+Implement only the private-F plaintext mirror + standalone linear-transform feasibility foundation:
+- exact one-time LogicalQ plaintext CRT reconstruction into authoritative integer coefficients;
+- mirror those coefficients into fixed width-3 private F;
+- private-F plaintext multiplication;
+- private-F automorphism;
+- standalone private-F LinearTransform;
+- reproducible LogN13 real-C2S factor-by-factor capacity audit using the bound `B_out <= B_in * sum_d ||P_d||_1`.
 
-Production performance guard:
-- LogN13 `BenchmarkFastModUpLogN13`: approximately 0.588–0.614 ms/op, 313232 B/op, 402 allocs/op;
-- this remains consistent with the accepted FAST-INTEGRATION-002 production baseline and confirms the salvage did not reintroduce the rejected resident path.
+Do not modify production Bootstrap/C2S, DFT matrices, restore plan, EvalMod, S2C, production Rescale, storage width, or public CKKS parameters.
 
-FAST-STORAGE-006 is accepted as reusable research/foundation capability, not as production Trace residency.
+If real LogN13 C2S capacity fails at any factor, stop with `NEEDS_WEB_REVIEW` and report the first failing factor and exact numbers; do not attempt production integration.
+
+If feasible, commit/push Secondary and report `READY_FOR_WEB_REVIEW`.
