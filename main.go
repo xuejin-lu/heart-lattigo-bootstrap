@@ -94,6 +94,7 @@ func main() {
 	fix001P3DiagP93T3BalancedVsPostProduct := flag.Bool("fix001-p3-diag-p93-t3-balanced-vs-postproduct-schedule-causal-ab", false, "run bounded P93 T3 balanced versus post-product schedule causal A/B")
 	fix001P3ProdLogN13PostProductRepair := flag.Bool("fix001-p3-prod-logn13-postproduct-schedule-repair", false, "validate the LogN13 Q012 generated-power post-product schedule repair")
 	fix001P3MeasureScaleRuntimeFacts := flag.Bool("fix001-p3-measure-logn13-p93-scale-runtime-facts", false, "measure FIX-001 LogN13/P93 runtime scale facts")
+	qprefixAudit002C2S := flag.Bool("qprefix-audit-002-c2s-raw-rescale", false, "audit current Fast C2S raw bounds and Rescale recurrence")
 	flag.Parse()
 
 	cfg, err := LoadBootstrapConfig(*configPath)
@@ -342,6 +343,9 @@ func main() {
 		selectedModes++
 	}
 	if *fix001P3MeasureScaleRuntimeFacts {
+		selectedModes++
+	}
+	if *qprefixAudit002C2S {
 		selectedModes++
 	}
 	if selectedModes > 1 {
@@ -655,6 +659,15 @@ func main() {
 		if err := runFIX001P3MeasureLogN13P93ScaleRuntimeFacts(cfg, primaryRoot, backendRoot, *outputPath); err != nil {
 			log.Fatal(err)
 		}
+	} else if *qprefixAudit002C2S {
+		result, err := RunQPREFIXAudit002(cfg, primaryRoot, backendRoot)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if err := WriteQPREFIXAudit002(result, *outputPath); err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("QPREFIX-AUDIT-002 classification: %s\n", result.Classification)
 	} else if *finalizationDiagnostic {
 		result, err := RunFinalizationBoundaryExperiment(cfg, primaryRoot, backendRoot, *standardReference)
 		if err != nil {
