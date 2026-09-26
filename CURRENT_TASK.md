@@ -1,30 +1,49 @@
 # Current Task
 
-Task: QPREFIX-ARCH-PLAN-001
+Task: QPREFIX-IMPL-001
 Status: READY_FOR_CODEX
 
+Architecture plan:
+`docs/QPREFIX-V2-PRODUCTION-MIGRATION-PLAN.md`
+
 Task class:
-`M — Architecture planning only`
+`I — Implementation`
 
-Purpose:
-Produce a top-level Q-prefix v2 production migration plan from the current pre-F branch architecture.
+Repositories:
+- Primary `xuejin-lu/heart-lattigo-bootstrap@main`: orchestration/spec only.
+- Secondary `xuejin-lu/lattigo@fast-qprefix`: implementation target.
 
-Authoritative repositories:
-- Primary: `xuejin-lu/heart-lattigo-bootstrap@main`
-- Secondary: `xuejin-lu/lattigo@fast-qprefix`
+Goal:
+Create the single authoritative Q-prefix policy and capacity contract for Q-prefix v2.
 
-Authoritative architecture:
-- `xuejin-lu/lattigo@fast-qprefix:docs/FAST_QPREFIX_SPEC.md`
+Frozen policy:
+[
+w_Q(ell)=min(ell+1,4)
+]
 
-Important decision:
-- private F is not the production direction;
-- Q-prefix v2 is the production direction;
-- do not resume `QPREFIX-AUDIT-003` unless a later Primary task explicitly re-authorizes it.
+Equivalent maintained prefixes:
+- Level >= 3: q0,q1,q2,q3
+- Level 2: q0,q1,q2
+- Level 1: q0,q1
+- Level 0: q0
 
-The user will provide the detailed architecture-planner prompt directly in Codex chat. Follow that prompt as the authoritative task instructions.
+Scope:
+- one source of truth for Level -> maintained prefix width;
+- exact prefix-product computation from actual q values;
+- per-component bound/capacity helpers;
+- strict centered-capacity predicate `2B < S_Q`;
+- explicit/recognizable transactional capacity error form;
+- tests for Level 0/1/2/3/high-Level policy and strict boundary behavior.
 
-Required repository action:
-- create only `docs/QPREFIX-V2-PRODUCTION-MIGRATION-PLAN.md` in Primary;
-- do not modify production code, tests, CURRENT_TASK, specs, parameters, or Secondary source;
-- commit and push Primary normally;
-- final chat response should be concise and report `READY_FOR_WEB_REVIEW`, commit SHA, report path, milestone count, top risks, and any `NEEDS_LOCAL_IMPLEMENTATION_INVESTIGATION` items.
+Do not yet:
+- switch constructors/Resize/scratch to the new policy;
+- widen arithmetic primitives;
+- modify Rescale/ModUp/DFT/EvalMod/Bootstrap;
+- add F;
+- add adaptive width;
+- modify `fast-ckks`;
+- run broad production migration.
+
+Capacity proof is an acceptance condition for each later milestone, not a global prerequisite for starting implementation.
+
+Commit/push Secondary `fast-qprefix`, then report `READY_FOR_WEB_REVIEW`.
