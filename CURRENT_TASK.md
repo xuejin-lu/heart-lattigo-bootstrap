@@ -1,38 +1,34 @@
 # Current Task
 
-Task: QPREFIX-AUDIT-001
+Task: QPREFIX-AUDIT-002
 Status: READY_FOR_CODEX
 
 Specification:
-`specs/QPREFIX-AUDIT-001-FULL-BOOTSTRAP-CAPACITY.md`
+`specs/QPREFIX-AUDIT-002-C2S-RAW-RESCALE.md`
 
 Task class:
-`M/E — Architecture audit + reproducible measurement`
+`M/E — Focused evidence completion`
 
 Repositories:
-- Primary `xuejin-lu/heart-lattigo-bootstrap@main`: orchestration/report.
-- Secondary `xuejin-lu/lattigo@fast-qprefix`: audit target.
+- Primary `xuejin-lu/heart-lattigo-bootstrap@main`: evidence/report.
+- Secondary `xuejin-lu/lattigo@fast-qprefix`: current-branch C2S audit target.
 
-Secondary branch point:
-`40532b4dce5c7eeae2db5b0b6f21be64801ce923`
+Accepted prerequisite:
+- QPREFIX-AUDIT-001 at `494e7b7b672cbedb4eb842887d464df2ea0cb7f9`.
 
-Authoritative Q-prefix v2 architecture:
-`docs/FAST_QPREFIX_SPEC.md` at `c9fb900314a1c82f2cd21320554d3d47fd7dbf00`.
+Close only the first audit gap:
+- reproduce current-branch C2S groups 0..3;
+- capture raw LinearTransform output before each Rescale;
+- measure exact maintained-prefix coefficient bounds;
+- record each logical divisor and predicted/observed Rescale bound;
+- record restore propagation;
+- verify strict capped Q-prefix capacity;
+- prove equivalence to the combined production C2S helper.
 
-Audit only. Do not modify production behavior.
+Do not modify production behavior, `fast-ckks`, parameters, schedules, EvalMod, or S2C.
 
-Question to answer:
-Does the current LogN13/P93 Bootstrap profile fit the capped, naturally shrinking maintained Q-prefix
-
-[
-q_0,ldots,q_{min(ell,3)}
-]
-
-at every required authoritative-lift boundary?
-
-Produce the compact JSON + markdown report required by the spec and classify:
-- `QPREFIX_V2_FULL_PROFILE_CAPACITY_PROVEN`,
-- `QPREFIX_V2_FAILS_AT_STAGE`, or
-- `QPREFIX_V2_AUDIT_EVIDENCE_INCOMPLETE`.
-
-Do not modify `fast-ckks`, introduce F primes, implement q0123 production arithmetic, retune parameters, or start optimization.
+Return one of:
+- `QPREFIX_C2S_CAPACITY_PROVEN`
+- `QPREFIX_C2S_CAPACITY_FAIL`
+- `QPREFIX_C2S_MEASUREMENT_CONFLICT`
+- `QPREFIX_C2S_EVIDENCE_INCOMPLETE`.
