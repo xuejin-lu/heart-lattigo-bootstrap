@@ -1,49 +1,49 @@
 # Current Task
 
-Task: QPREFIX-IMPL-001
+Task: QPREFIX-IMPL-002
 Status: READY_FOR_CODEX
 
 Architecture plan:
 `docs/QPREFIX-V2-PRODUCTION-MIGRATION-PLAN.md`
 
+Accepted prerequisite:
+- QPREFIX-IMPL-001 at Secondary commit `6553491f9fb9b964c8fd0d743f3a302de83d0b54`.
+
 Task class:
 `I — Implementation`
 
-Repositories:
-- Primary `xuejin-lu/heart-lattigo-bootstrap@main`: orchestration/spec only.
-- Secondary `xuejin-lu/lattigo@fast-qprefix`: implementation target.
-
 Goal:
-Create the single authoritative Q-prefix policy and capacity contract for Q-prefix v2.
+Connect compact ciphertext lifecycle and evaluator-owned storage allocation to the single Q-prefix v2 policy.
 
 Frozen policy:
 [
 w_Q(ell)=min(ell+1,4)
 ]
 
-Equivalent maintained prefixes:
-- Level >= 3: q0,q1,q2,q3
-- Level 2: q0,q1,q2
-- Level 1: q0,q1
-- Level 0: q0
-
 Scope:
-- one source of truth for Level -> maintained prefix width;
-- exact prefix-product computation from actual q values;
-- per-component bound/capacity helpers;
-- strict centered-capacity predicate `2B < S_Q`;
-- explicit/recognizable transactional capacity error form;
-- tests for Level 0/1/2/3/high-Level policy and strict boundary behavior.
+- constructors for Fast-owned ciphertexts/temporaries;
+- copy/copy-new behavior;
+- resize/degree growth where it controls physical row backing;
+- evaluator scratch/buffer allocation;
+- output allocation helpers;
+- preserve logical Level header independently from physically maintained rows;
+- dormant rows must remain unallocated/stale and must not become authoritative.
 
-Do not yet:
-- switch constructors/Resize/scratch to the new policy;
-- widen arithmetic primitives;
-- modify Rescale/ModUp/DFT/EvalMod/Bootstrap;
-- add F;
-- add adaptive width;
-- modify `fast-ckks`;
-- run broad production migration.
+Acceptance:
+- Level 0/1/2/3/high-Level Fast-owned temporaries have exactly policy-width N-sized backing rows;
+- copy/alias/degree-growth behavior preserves maintained rows exactly;
+- shrinking logical Level across 3->2, 2->1, 1->0 changes physical maintained width structurally but does not invent representative semantics;
+- no dormant-row reads/writes;
+- existing production semantics remain unchanged because arithmetic producers/consumers are not yet generalized;
+- focused lifecycle tests plus relevant fast package regressions and `go test ./...`.
 
-Capacity proof is an acceptance condition for each later milestone, not a global prerequisite for starting implementation.
+Out of scope:
+- arithmetic primitive widening;
+- Rescale semantics;
+- ModUp;
+- DFT/EvalMod/Bootstrap;
+- F;
+- adaptive width;
+- `fast-ckks`.
 
 Commit/push Secondary `fast-qprefix`, then report `READY_FOR_WEB_REVIEW`.
