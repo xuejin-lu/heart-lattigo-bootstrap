@@ -49,7 +49,13 @@ d=q_ell,
 
 even when (ell>3) and (q_ell) is not physically maintained.
 
-This task is the first production subsystem allowed to consume a fully authoritative q0123 prefix.
+This task adds a q0123-capable Rescale/Level-transition kernel, but **does not globally activate q0123 consumption in the existing production Rescale wrapper yet**.
+
+The current production graph still contains upstream producers (notably LinearTransform/DFT) that only materialize legacy q01/q012 rows. Therefore capability and activation remain separate:
+
+- explicit-width Rescale kernels may consume q0123 when the caller explicitly proves/provides four authoritative rows;
+- existing production Rescale wrappers continue selecting the legacy authoritative row count until the owning upstream subsystem is migrated;
+- later milestones activate width 4 only at boundaries whose producers are prefix-complete.
 
 Do not migrate ModUp, DFT, EvalMod, or Bootstrap orchestration yet.
 
@@ -137,24 +143,25 @@ Rows above the target prefix remain dormant/nil according to compact storage pol
 
 # 3. Source width rules
 
-For production `Rescale` after this milestone:
+The q0123-capable Rescale core must accept an **explicit authoritative row count**.
 
-- Level 0: invalid;
-- Level 1: q01 source;
-- Level 2: q012 source;
-- Level >= 3: q0123 source.
+Allowed widths are constrained by logical Level and QPrefixWidth(level).
 
-The operation must validate all source rows required by:
+Examples:
+- Level 1 may use q01;
+- Level 2 may use q01 or q012 when the caller owns that authority;
+- Level >= 3 may use q01/q012/q0123 only when the caller explicitly owns those rows.
 
-[
-QPrefixWidth(ell).
-]
+The generic q0123 tests must exercise width 4.
 
-This is a deliberate production activation boundary for Rescale only.
+However, the existing production `Rescale` / `RescaleTo` wrappers must continue to derive source width from the currently accepted legacy authority policy (`maintainedLimbCount` or equivalent) until upstream producers are migrated.
 
-Do not use legacy `maintainedLimbCount` to select Rescale source width after this task.
+Therefore, after this milestone:
+- q0123 Rescale capability exists;
+- production C2S/DFT still uses legacy q012 authority;
+- q3 backing alone is never evidence of q3 authority.
 
-Do not read rows above the Q-prefix policy.
+Do not read rows above the explicitly selected authoritative width.
 
 ---
 
@@ -388,24 +395,34 @@ Structural `Resize` must remain semantics-free.
 
 Run current LogN13/P93 Q-prefix workload tests.
 
-Specifically reproduce accepted QPREFIX-AUDIT-002 C2S Rescale checkpoints and require:
-- same Level/Scale;
-- maintained q rows exact;
-- no public correctness regression.
+The current C2S/DFT producer is still legacy q012. Therefore the production Rescale wrapper used by current C2S must remain legacy-width activated in this milestone.
 
-This task does not need to re-audit C2S capacity from scratch; reuse the accepted fixture as regression evidence.
+Require:
+- accepted QPREFIX-AUDIT-002 C2S Rescale checkpoints remain exact;
+- DFT tests pass;
+- public Bootstrap control remains unchanged;
+- q3 may be allocated but must not be consumed by current C2S Rescale.
+
+Separately test the explicit width-4 q0123 Rescale core with synthetic/oracle fixtures.
+
+This task does not activate q0123 inside C2S.
 
 ---
 
 # 13. Transitional isolation
 
-Only Rescale and explicit DropLevel helpers become Q-prefix-policy authoritative in this milestone.
+Only the **explicit-width Rescale/DropLevel kernels** become q0123-capable in this milestone.
 
-Other production wrappers may still use legacy row policy until their own milestones.
+Existing production Rescale wrappers remain on legacy authority selection until their upstream producer is migrated.
+
+Other production wrappers also remain legacy-activated.
 
 Do not globally replace `maintainedLimbCount`.
 
-Poison q3 in a legacy non-Rescale path and confirm this task does not accidentally activate it there.
+Mandatory transition tests:
+- poison q3 on a current q012 C2S/DFT state and verify production Rescale ignores q3;
+- explicitly call the width-4 Rescale core on a fully populated q0123 state and verify q3 participates;
+- prove allocated q3 backing alone never changes production semantics.
 
 ---
 
@@ -448,7 +465,7 @@ Report:
 - Secondary commit;
 - changed files;
 - q0123 fixed-width reconstruction design;
-- Rescale source-width policy;
+- explicit-width Rescale source policy and which production wrappers remain legacy-activated;
 - logical-divisor evidence for Level >3;
 - 3->2 / 2->1 / 1->0 results;
 - SameLift vs Canonical DropLevel API/semantics;
