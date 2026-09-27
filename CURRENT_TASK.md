@@ -1,56 +1,42 @@
 # Current Task
 
-Task: QPREFIX-IMPL-007-REVIEW-FIX-2
+Task: QPREFIX-IMPL-008
 Status: READY_FOR_CODEX
 
-Accepted candidate:
-Secondary `fast-qprefix` commit
-`4c6d7f207ddbaa531eb6d1010ffa6cd8ab08eace`
+Specification:
+`specs/QPREFIX-IMPL-008-PUBLIC-BOOTSTRAP-BOUNDARY.md`
 
-Review result:
-The legacy-vs-explicit polynomial/Mod1 API contract fix is correct.
+Task class:
+`I — Implementation`
 
-One final production handoff blocker remains:
+Accepted prerequisite:
+QPREFIX-IMPL-007 final production handoff at
+`74c058ad59655f2a47efcb4faf1cf38324bd6137`
 
-`bootstrapping.FastEvaluator.SlotsToCoeffs(...)` now selects `QPrefixWidth`, but the actual `bootstrapCore(...)` does not use that wrapper. It still calls:
+Review result for QPREFIX-IMPL-007:
+- PASS;
+- legacy polynomial/Mod1 wrappers preserve MaintainedLimbCount authority;
+- explicit EvalMod path carries q0123 from Level 12 to Level 4;
+- real bootstrapCore now uses q-prefix-aware S2C;
+- strict capacity, public correctness, full regression, and performance guards pass.
 
-`eval.DFTEvaluator.SlotsToCoeffsNew(ctReal, ctImag, eval.S2CDFTMatrix)`
+Goal:
+Integrate the public Bootstrap boundary:
+- packing/unpacking;
+- N1<->N2 ring-degree conversion;
+- BootstrapMany;
+- finalization/public output.
 
-and `dft.FastEvaluator.SlotsToCoeffsNew(...)` still selects legacy authority with `MaintainedLimbCount`.
+Critical rules:
+- public Residual MaxLevel remains <=1, so public authority is q0/q01;
+- internal q0123 is created only after ModUp and must not leak into or be required by public input/output;
+- ring-degree conversion must gain explicit 1..4-row capability because the current generic coefficient mapper silently caps at two rows;
+- legacy wrappers remain legacy-authority;
+- production BootstrapMany passes explicit public rows and must never infer authority from backing;
+- no full-RNS fallback.
 
-Therefore full `Bootstrap` / `BootstrapMany` still enters production S2C with legacy q012 authority, despite QPREFIX-IMPL-007 requiring q0123 activation after EvalMod proves q0123 output authority.
+Do not change circuit mathematics, schedules, parameter chains, or `fast-ckks`.
 
-Required bounded fix:
-
-1. Change the actual `bootstrapCore` EvalMod->S2C handoff to use explicit authority from the EvalMod output:
-   `rows = QPrefixWidth(ctReal.Level())`.
-
-2. Prefer one of:
-   - call the already-correct `bootstrapping.FastEvaluator.SlotsToCoeffs(ctReal, ctImag)`; or
-   - call `DFTEvaluator.SlotsToCoeffsNewQPrefixRows(..., rows)` explicitly.
-
-3. Do not globally change `dft.FastEvaluator.SlotsToCoeffsNew`; it remains a compatibility/legacy-authority wrapper.
-
-4. Add a production-core regression that exercises the real `bootstrapCore` / `Bootstrap` or `BootstrapMany` call graph and proves S2C consumes q3 after EvalMod.
-   A direct helper-only S2C test is not sufficient.
-
-5. Preserve:
-   - all existing 007 capacity evidence;
-   - legacy polynomial/Mod1 wrapper compatibility;
-   - q0123 EvalMod output contract;
-   - public generated-secret and zero-secret correctness;
-   - no q4+ reads.
-
-No mathematics or schedule changes.
-
-Validation:
-- focused real Bootstrap/BootstrapMany S2C authority regression;
-- existing QPREFIX-IMPL-007 tests;
-- `go test ./schemes/ckks/fast ./circuits/ckks/polynomial ./circuits/ckks/mod1 ./circuits/ckks/dft ./circuits/ckks/bootstrapping -count=1`;
-- `go test ./... -count=1`;
-- `git diff --check`;
-- gofmt.
+Run all validation and benchmarks required by the spec.
 
 Commit/push Secondary `fast-qprefix`, then report `READY_FOR_WEB_REVIEW`.
-
-Do not start QPREFIX-IMPL-008 yet.
