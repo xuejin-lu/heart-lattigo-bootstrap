@@ -270,11 +270,15 @@ Semantics:
 C=operatorname{Center}_{Q_{targetLevel}}(Xmod Q_{targetLevel}).
 ]
 
-For targetLevel <= 3:
+For this milestone, Canonical contraction is supported **only for targetLevel <= 3**, because only then:
 
 [
-Q_{targetLevel}=S_Q(targetLevel).
+Q_{targetLevel}=S_Q(targetLevel)
 ]
+
+is fully represented by the maintained Q-prefix.
+
+For targetLevel > 3, q0123 alone does not determine the canonical representative modulo the full logical (Q_{targetLevel}). Therefore `DropLevelCanonical` must reject explicitly rather than silently truncating/copying q0123 and claiming canonical semantics.
 
 Materialize the target prefix from (C).
 
