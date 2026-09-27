@@ -1,36 +1,40 @@
 # Current Task
 
-Task: QPREFIX-IMPL-006
+Task: QPREFIX-IMPL-007
 Status: READY_FOR_CODEX
 
 Specification:
-`specs/QPREFIX-IMPL-006-LINEARTRANSFORM-DFT-C2S-S2C.md`
+`specs/QPREFIX-IMPL-007-EVALMOD-PS-DOUBLEANGLE.md`
 
 Task class:
 `I — Implementation`
 
 Accepted prerequisite:
-QPREFIX-IMPL-005 at
-`08b36b0b730dcc57eb98466594796c10bffbfdb9`
+QPREFIX-IMPL-006 at
+`2aaec605951b4469cef6db10c28453422204595e`
 
-Review result for QPREFIX-IMPL-005:
+Review result for QPREFIX-IMPL-006:
 - PASS;
-- midpoint rule corrected;
-- ModUp materializes exact QPrefixWidth;
-- q0123 remains coherent through scale alignment, Trace, and Montgomery conversion;
-- ScaleDown remains pre-ModUp legacy-authority;
-- full regressions pass;
-- focused performance guard passes.
+- production C2S now preserves q0123 authority;
+- strict q0123 C2S capacity checkpoints pass;
+- direct and BSGS explicit-row LinearTransform paths pass;
+- S2C is q-prefix-capable but production remains on current EvalMod q012 authority;
+- full regressions and performance guard pass.
 
 Goal:
-Migrate LinearTransform and DFT/C2S to explicit Q-prefix execution.
+Migrate EvalMod, Paterson–Stockmeyer polynomial evaluation, one-bit guard, and DoubleAngle to explicit Q-prefix authority.
 
-Critical activation rule:
-- production C2S MUST now preserve q0123 from the QPREFIX-IMPL-005 ModUp boundary;
-- S2C must become q-prefix-capable, but production S2C must NOT assume q0123 until EvalMod (QPREFIX-IMPL-007) provides it;
-- capability and production activation remain separate.
+Critical rules:
+- accepted P93 EvalMod enters at Level 12 and exits at Level 4, so q0123 authority must remain continuous throughout;
+- preserve the accepted polynomial/PS/scale/DoubleAngle schedule;
+- do not interpret historical Q012 schedule names as a three-row storage requirement;
+- migrate every workspace/power/PS/guard/Rescale operation that mutates the EvalMod state;
+- collect local EvalMod/PS/DoubleAngle strict capacity evidence;
+- only after EvalMod output q0123 is proven may production S2C be activated with rows=4.
 
-Do not migrate EvalMod/PS/DoubleAngle, packing/N1-N2, parameters, or `fast-ckks`.
+Do not redesign the polynomial approximation or schedule.
+Do not modify packing/N1-N2/public boundary integration.
+Do not introduce F/full-RNS fallback or modify `fast-ckks`.
 
 Run all validation and benchmarks required by the spec.
 
