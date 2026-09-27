@@ -1,39 +1,43 @@
 # Current Task
 
-Task: QPREFIX-IMPL-004
+Task: QPREFIX-IMPL-004-REVIEW-FIX
 Status: READY_FOR_CODEX
 
-Specification:
+Accepted implementation candidate:
+Secondary `fast-qprefix` commit
+`18f4da53f03acd065d18550a8f2106725462896f`
+
+Review result:
+Most of QPREFIX-IMPL-004 is correct:
+- q0123 fixed-width CRT/Rescale capability is present;
+- public Rescale remains legacy-authority activated;
+- current C2S/DFT q3 poison regression passes;
+- SameLift, transactionality, logical q_ell divisor, and full regression all pass.
+
+One semantic blocker remains:
+
+`DropLevelCanonical` currently accepts targetLevel > 3, but q0123 does not determine
+the canonical centered representative modulo the full logical Q_target when q4+ are part
+of that modulus.
+
+Revised authoritative spec:
 `specs/QPREFIX-IMPL-004-RESCALE-LEVEL-TRANSITIONS.md`
+at Primary commit:
+`a7bf5f2c68662f66c7b955b75a566e5eff4e0816`
 
-Revision:
-Primary spec commit `87125e13570a4e88dc26343d88810c23966768f7`.
+Required fix only:
+- `DropLevelCanonical` must explicitly reject targetLevel > 3;
+- add focused regression(s), e.g. 5->4 canonical request rejects transactionally;
+- preserve existing successful 3->2, 2->1, 1->0 canonical tests;
+- do not change SameLift;
+- do not expand scope.
 
-Reason for revision:
-The first 004 attempt correctly discovered that current C2S LinearTransform still produces only legacy q012 authority, so production Rescale cannot globally consume q0123 yet.
+Validation:
+- focused level-transition tests;
+- `go test ./schemes/ckks/fast -count=1`;
+- `go test ./circuits/ckks/dft -count=1`;
+- `go test ./... `;
+- `git diff --check`;
+- gofmt.
 
-Updated rule:
-- q0123 Rescale capability must be implemented and tested;
-- explicit-width Rescale/DropLevel kernels may consume width 4;
-- existing production Rescale/RescaleTo wrappers remain legacy-authority activated until their upstream producers are migrated;
-- current C2S/DFT must continue to pass using q012 authority;
-- q3 backing alone never implies q3 authority.
-
-Controlled dirty-state continuation is authorized:
-- Secondary local uncommitted work from the stopped first attempt is expected and must be preserved;
-- do not reset, clean, or stash it away indiscriminately;
-- first sync task/spec metadata as safely as possible without discarding implementation work;
-- adapt the existing local changes to the revised spec.
-
-Accepted prerequisites remain QPREFIX-IMPL-001..003.
-
-Do not modify LinearTransform/DFT production routing in this task.
-Do not activate q0123 globally.
-Do not touch ModUp/Trace, EvalMod/PS/DA, Bootstrap orchestration, `fast-ckks`, or add F/full-RNS fallback.
-
-Required end state:
-- q0123 CRT + explicit width-4 Rescale kernels tested;
-- production C2S/DFT regression passes on legacy q012 authority;
-- full required tests pass;
-- commit/push Secondary `fast-qprefix`;
-- report `READY_FOR_WEB_REVIEW`.
+Commit/push Secondary `fast-qprefix`, then report `READY_FOR_WEB_REVIEW`.
