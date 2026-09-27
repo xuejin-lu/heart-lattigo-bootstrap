@@ -267,24 +267,44 @@ Conceptually:
 Semantics:
 
 [
-C=operatorname{Center}_{Q_{targetLevel}}(Xmod Q_{targetLevel}).
+C=operatorname{Center}_{Q_{targetLevel}}(X mod Q_{targetLevel}).
 ]
 
-For this milestone, Canonical contraction is supported **only for targetLevel <= 3**, because only then:
+Fast does not need all logical q rows in order to know X. Under the authoritative-lift invariant:
 
 [
-Q_{targetLevel}=S_Q(targetLevel)
+2B<S_Q(sourceLevel),
 ]
 
-is fully represented by the maintained Q-prefix.
+the maintained Q-prefix uniquely determines the actual centered integer lift X.
 
-For targetLevel > 3, q0123 alone does not determine the canonical representative modulo the full logical (Q_{targetLevel}). Therefore `DropLevelCanonical` must reject explicitly rather than silently truncating/copying q0123 and claiming canonical semantics.
+Therefore, when targetLevel >= 3, the valid Fast lift already satisfies:
 
-Materialize the target prefix from (C).
+[
+|X| < (q_0q_1q_2q_3)/2
+]
+
+while the full target logical modulus obeys:
+
+[
+Q_{targetLevel} >= q_0q_1q_2q_3.
+]
+
+Hence:
+
+[
+Center_{Q_{targetLevel}}(X mod Q_{targetLevel})=X.
+]
+
+So high-Level canonical contraction does not require dormant q4+ rows; for a valid authoritative Fast state it is identical to same-lift contraction.
+
+For targetLevel < 3, canonical contraction may genuinely change representative and must use the target logical/prefix modulus explicitly.
+
+Materialize only the target maintained prefix.
 
 This is an explicit representative-change boundary.
 
-Do not silently use canonical contraction where same-lift semantics are required.
+Do not silently use canonical contraction where same-lift semantics are required at a shrinking-prefix boundary.
 
 If current production has no caller for one of these APIs yet, keep it standalone and tested; later milestones select the correct owner.
 
