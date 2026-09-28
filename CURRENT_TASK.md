@@ -1,52 +1,49 @@
 # Current Task
 
-Task: QPREFIX-PERF-DIAG-003
+Task: DIAG-FRAMEWORK-001
 Status: READY_FOR_CODEX
 
 Specification:
-`specs/QPREFIX-PERF-DIAG-003-GENERATED-POWER-RESCALE-CAUSALITY.md`
+`specs/DIAG-FRAMEWORK-001-REUSABLE-TRACE.md`
 
 Task class:
-`D — Performance Diagnosis`
+`I — Diagnostic Infrastructure`
 
 Accepted parent result:
-`results/QPREFIX-PERF-DIAG-002-summary.md`
-
-Parent classification:
-`MATCHED_STAGE_ATTRIBUTION_CLOSED`
-
-Parent facts:
-- `TOP_DELTA_STAGE=EvalMod real`
-- `RESIDUAL_FRACTION=0.003343`
-- EvalMod real delta: `+34.329583 ms`
-- generated-power delta inside EvalMod real: `+20.998209 ms`
-
-Historical q0=55 baseline:
-`40532b4dce5c7eeae2db5b0b6f21be64801ce923`
-
-Q-prefix-v2 production candidate:
-`f9c7f21e65915bd3eafcd5b12590b570c22a7d6f`
-
-Goal:
-Attribute the matched q0=55 generated-power slowdown, especially the contribution of Rescale and the candidate's two-pass preflight/materialization implementation.
-
-Do not modify Secondary production code.
-Do not optimize Rescale or change transactional semantics.
-Do not change parameters, schedules, generated-power DAG, or `QPrefixWidth(Level)`.
-Do not reopen F/full-RNS fallback.
-
-Write:
 `results/QPREFIX-PERF-DIAG-003-summary.md`
 
-Return one:
-- `GENERATED_POWER_RESCALE_DOMINANT`
-- `GENERATED_POWER_MUL_RELIN_DOMINANT`
-- `GENERATED_POWER_MIXED_COST`
-- `GENERATED_POWER_CAUSALITY_UNCLOSED`
+Parent classification:
+`GENERATED_POWER_RESCALE_DOMINANT`
 
-Also report:
-- `RESCALE_DELTA_SHARE=<fraction>`
-- `PREFLIGHT_TIME_SHARE_OF_POWER_DELTA=<fraction>`
-- `GENERATED_POWER_RESIDUAL_FRACTION=<fraction>`
+Accepted facts:
+- matched generated-power Rescale delta share: `0.977205`
+- candidate preflight time share of power delta: `0.443635`
+- repeated temporary overlay instrumentation has now been used successfully at stage, power, and Rescale depth.
+
+Goal:
+Convert the proven stage/power/rescale diagnostic patterns into a reusable, opt-in, compile-time-gated framework so future debugging does not require rebuilding one-off timing overlays.
+
+This task does not optimize Rescale.
+
+Required user-facing workflow:
+- trace current checkout;
+- compare two Secondary refs;
+- select `stage`, `power`, `rescale` scopes;
+- structured JSON plus concise Markdown summary.
+
+Do not change:
+- Q-prefix arithmetic;
+- transactional Rescale semantics;
+- `QPrefixWidth(Level)`;
+- P93 schedule;
+- F/full-RNS policy.
+
+Write:
+`results/DIAG-FRAMEWORK-001-summary.md`
+
+Return one:
+- `REUSABLE_DIAGNOSTIC_FRAMEWORK_READY`
+- `DIAGNOSTIC_FRAMEWORK_NEEDS_REPAIR`
+- `DIAGNOSTIC_FRAMEWORK_BLOCKED`
 
 Then report `READY_FOR_WEB_REVIEW`.
