@@ -1,45 +1,54 @@
 # Current Task
 
-Task: QPREFIX-IMPL-009
+Task: QPREFIX-PERF-DIAG-001
 Status: READY_FOR_CODEX
 
-Authoritative specification:
-`specs/QPREFIX-IMPL-009-PERFORMANCE-RELEASE-GATE.md`
+Specification:
+`specs/QPREFIX-PERF-DIAG-001-ATTRIBUTION.md`
 
-Latest spec revision commit:
-`8db5ac41d38914ce741d272bc5a9ddf8190f2064`
+Task class:
+`D — Performance Diagnosis`
 
-Accepted production candidate:
+QPREFIX-IMPL-009 result:
+`QPREFIX_V2_PERFORMANCE_REVIEW`
+
+Recorded result:
+`results/QPREFIX-IMPL-009-PERFORMANCE-REVIEW.md`
+
+Production candidate remains:
 `f9c7f21e65915bd3eafcd5b12590b570c22a7d6f`
 
-QPREFIX-IMPL-008 re-review result:
-PASS under the original Fast Q-prefix constitution, with one clarification now made explicit in the specs.
+Historical baseline:
+`40532b4dce5c7eeae2db5b0b6f21be64801ce923`
 
-Authoritative invariant:
-`rows = QPrefixWidth(Level) = min(Level+1, 4)`
+Critical interpretation:
+- matched q0=55 historical baseline generally uses q01 at high Level because legacy `MaintainedLimbCount` selects 3 rows only for q0 bit length 56;
+- current Q-prefix v2 production uses exact constitution `rows=QPrefixWidth(Level)`, hence q0123 at Level>=3;
+- the observed ~3.8x regression is therefore a system-policy migration cost comparison, not proof of an inefficient q012->q0123 implementation.
 
-Therefore production authority is:
-- Level 0 -> q0
-- Level 1 -> q01
-- Level 2 -> q012
-- Level >=3 -> q0123
+Goal:
+Attribute the slowdown into:
+- mandatory width cost;
+- CRT/Rescale cost;
+- PS/polynomial cost;
+- guard/DoubleAngle;
+- copy/allocation/memory traffic;
+- DFT/packing/ring-degree overhead.
 
-Important:
-"internal q0123" is only shorthand for internal states whose current logical Level is >=3.
-It is NOT a fixed internal Bootstrap width.
+Do not modify production code.
+Do not narrow production authority below `QPrefixWidth(Level)`.
+Do not reopen F/full-RNS fallback or architecture.
 
-QPREFIX-IMPL-008 production BootstrapMany already derives input rows from input Level and output rows from core-output Level, so its production path conforms.
+Temporary benchmark/test instrumentation is allowed only as specified and must be removed.
 
-Low-level explicit-row helpers may still support narrower widths for legacy/transition compatibility tests. That capability is not the Q-prefix v2 production policy.
+Write:
+`results/QPREFIX-PERF-DIAG-001-summary.md`
 
-Release-gate structural validation must now prove exact equality at every production stage:
-`authoritativeRows == QPrefixWidth(logicalLevel)`
-—not merely `authoritativeRows <= 4`.
+Return one:
+- `WIDTH_COST_DOMINANT`
+- `RESCALE_COST_DOMINANT`
+- `MEMORY_COPY_COST_DOMINANT`
+- `MIXED_COST`
+- `UNEXPLAINED_PERFORMANCE_REGRESSION`
 
-Explicitly verify transitions such as:
-- 3->2: q0123 -> q012
-- 2->1: q012 -> q01
-- 1->0: q01 -> q0
-
-Continue QPREFIX-IMPL-009 using the revised spec.
-Do not change production source unless a hard release bug is found and reported first.
+Then report `READY_FOR_WEB_REVIEW`.
