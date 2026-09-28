@@ -1,40 +1,42 @@
 # Current Task
 
-Task: QPREFIX-PERF-DIAG-004
+Task: QPREFIX-PERF-DIAG-005
 Status: READY_FOR_CODEX
 
 Specification:
-`specs/QPREFIX-PERF-DIAG-004-POST-OPT-HOTSPOT-REFRESH.md`
+`specs/QPREFIX-PERF-DIAG-005-LOW-OVERHEAD-POWER-ATTRIBUTION.md`
 
 Task class:
 `D — Performance Diagnosis`
 
 Accepted parent:
-- Primary summary `results/QPREFIX-PERF-OPT-001-summary.md`
-- Secondary implementation `d50ff4db757d4a2b9922937a4e7f316fd3f286b9`
-- classification `TRANSACTIONAL_RESCALE_STAGING_READY`
+- `results/QPREFIX-PERF-DIAG-004-summary.md`
+- Primary commit `672ce1b578db1147ba9bb4cb9834ffe357a50af3`
+- Secondary production ref `d50ff4db757d4a2b9922937a4e7f316fd3f286b9`
+
+Important review finding:
+DIAG-004's stage-only ranking is accepted, but its `96.51%` Rescale share came from all-scope deep tracing with ~81% Bootstrap overhead. Enabling `rescale` scope adds per-coefficient timer work inside the outer power/rescale span.
 
 Goal:
-Refresh the current bottleneck after the successful Rescale staging repair. The old pre-opt Rescale-dominant conclusion is no longer authoritative for the post-opt candidate.
+Re-measure current generated-power category costs with `power` and `stage,power` only, leaving the deep `rescale` scope disabled.
 
-Use only the reusable fastdiag framework for supported tracing/compare. No ad-hoc overlays and no Secondary production changes.
-
-Required outputs:
-- current diagnostics-off q0=55 P93 E2E;
-- stage-only current ranking and closure;
-- current power/rescale structural trace;
-- pre-opt vs post-opt fastdiag comparison;
-- fresh current bottleneck classification.
+No Secondary production modification.
+No one-off overlays.
 
 Write:
-`results/QPREFIX-PERF-DIAG-004-summary.md`
+`results/QPREFIX-PERF-DIAG-005-summary.md`
 
 Return:
-`POST_OPT_HOTSPOT_REFRESHED`
+`POST_OPT_LOW_OVERHEAD_ATTRIBUTION_READY`
 
-plus:
-- `CURRENT_TOP_STAGE=<stage>`
-- `CURRENT_POWER_TOP_CATEGORY=<category>`
-- `CURRENT_BOTTLENECK_CLASS=<classification>`
+plus one:
+- `LOW_OVERHEAD_RESCALE_DOMINANCE_CONFIRMED`
+- `LOW_OVERHEAD_RESCALE_DOMINANCE_REJECTED`
+- `LOW_OVERHEAD_POWER_ATTRIBUTION_UNCLOSED`
+
+and:
+- `POWER_ONLY_OVERHEAD=<fraction>`
+- `POWER_ONLY_RESCALE_SHARE=<fraction>`
+- `GENERATED_POWER_SHARE_OF_EVALMOD=<fraction>`
 
 Then report `READY_FOR_WEB_REVIEW`.
