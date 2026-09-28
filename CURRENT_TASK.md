@@ -3,52 +3,47 @@
 Task: QPREFIX-IMPL-009
 Status: READY_FOR_CODEX
 
-Specification:
+Authoritative specification:
 `specs/QPREFIX-IMPL-009-PERFORMANCE-RELEASE-GATE.md`
 
-Task class:
-`V — Validation / Release Gate`
-
 Accepted production candidate:
-QPREFIX-IMPL-008 at
 `f9c7f21e65915bd3eafcd5b12590b570c22a7d6f`
 
 Historical pre-F comparison point:
 `40532b4dce5c7eeae2db5b0b6f21be64801ce923`
 
-Review result for QPREFIX-IMPL-008:
-- PASS;
-- explicit 1..4-row N1<->N2 conversion works;
-- explicit packing/unpacking preserves caller authority;
-- BootstrapMany derives input/output rows from actual Levels;
-- public Level 0/1 remains q0/q01;
-- finalization produces ordinary NTT/non-Montgomery public ciphertexts;
-- dormant-row isolation, Standard/public correctness, full regression, and structural performance guards pass.
+008 re-review result:
+- production public-boundary code remains accepted;
+- BootstrapMany derives input authority from input logical Level and output authority again from core-output logical Level;
+- explicit packing/ring-degree kernels may support narrower rows for compatibility/testing, but that is capability only;
+- the Q-prefix v2 production constitution is exact:
+  `rows = QPrefixWidth(Level) = min(Level+1,4)`;
+- "internal q0123" is valid only when current logical Level >= 3;
+- Level 2 must be q012, Level 1 q01, Level 0 q0;
+- production must neither under-maintain nor over-maintain authority relative to logical Level.
 
-Goal:
-Run the final Q-prefix v2 release gate.
+Clarified specs:
+- QPREFIX-IMPL-008 spec updated at Primary commit `a9f5e43ff4c5c968218f8a3d903f2e3d35ed3d2b`;
+- QPREFIX-IMPL-009 release gate updated at Primary commit `3ace6637ac793db1e246a1abfd9ccd2612abab1b`.
 
-Do not modify production code unless a hard release bug is found and reported first.
+Critical release-gate correction:
+Do not merely prove `rows <= 4`.
+For every production stage and every logical-Level transition prove:
+`authoritative rows == QPrefixWidth(logical Level)`.
 
-Required:
-- isolate pre-F baseline in a detached worktree;
-- run matched same-code benchmarks;
-- run a byte-identical temporary q0=55 P93 public-API benchmark on baseline and current;
-- run current q0=56 P93 Fast count1/count3 and matched Standard count1;
-- rerun semantic, capacity, structure, fallback, and public-output gates;
-- report exact performance ratios and one final release status.
+Examples:
+- L0 -> q0
+- L1 -> q01
+- L2 -> q012
+- L>=3 -> q0123
+- 3->2: q0123 -> q012
+- 2->1: q012 -> q01
+- 1->0: q01 -> q0
 
-Important:
-- q0=55 baseline and q0=56 production are not directly comparable as pure code changes;
-- preserve that distinction in the report;
-- no optimization campaign;
-- no F/full-RNS fallback;
-- no `fast-ckks` modification.
+Proceed with the final validation/performance gate under this exact invariant.
+Do not modify production source unless a hard release bug is found and reported first.
 
-Final status must be exactly one of:
+Final status must be one of:
 - `QPREFIX_V2_RELEASE_PASS`
 - `QPREFIX_V2_PERFORMANCE_REVIEW`
 - `QPREFIX_V2_RELEASE_FAIL`
-
-Commit/push only task/report artifacts if authorized by the spec; do not change production source.
-Then report `READY_FOR_WEB_REVIEW`.
