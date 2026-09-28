@@ -1,42 +1,40 @@
 # Current Task
 
-Task: QPREFIX-PERF-DIAG-005
+Task: QPREFIX-PERF-DIAG-006
 Status: READY_FOR_CODEX
 
 Specification:
-`specs/QPREFIX-PERF-DIAG-005-LOW-OVERHEAD-POWER-ATTRIBUTION.md`
+`specs/QPREFIX-PERF-DIAG-006-RESCALE-KERNEL-ATTRIBUTION.md`
 
 Task class:
 `D — Performance Diagnosis`
 
 Accepted parent:
-- `results/QPREFIX-PERF-DIAG-004-summary.md`
-- Primary commit `672ce1b578db1147ba9bb4cb9834ffe357a50af3`
-- Secondary production ref `d50ff4db757d4a2b9922937a4e7f316fd3f286b9`
+- `results/QPREFIX-PERF-DIAG-005-summary.md`
+- decision `LOW_OVERHEAD_RESCALE_DOMINANCE_CONFIRMED`
+- current production ref `d50ff4db757d4a2b9922937a4e7f316fd3f286b9`
 
-Important review finding:
-DIAG-004's stage-only ranking is accepted, but its `96.51%` Rescale share came from all-scope deep tracing with ~81% Bootstrap overhead. Enabling `rescale` scope adds per-coefficient timer work inside the outer power/rescale span.
+Accepted current facts:
+- power-only overhead about 3.73%;
+- generated-power Rescale share about 93.74%;
+- generated powers about 60.53% of combined EvalMod.
 
 Goal:
-Re-measure current generated-power category costs with `power` and `stage,power` only, leaving the deep `rescale` scope disabled.
+Attribute the remaining rows4 Q-prefix Rescale cost to production kernels using diagnostics-off focused benchmarks plus CPU profiling, without per-coefficient tracing.
 
-No Secondary production modification.
-No one-off overlays.
+No Secondary production arithmetic changes.
 
 Write:
-`results/QPREFIX-PERF-DIAG-005-summary.md`
+`results/QPREFIX-PERF-DIAG-006-summary.md`
 
 Return:
-`POST_OPT_LOW_OVERHEAD_ATTRIBUTION_READY`
+`RESCALE_KERNEL_ATTRIBUTION_READY`
 
-plus one:
-- `LOW_OVERHEAD_RESCALE_DOMINANCE_CONFIRMED`
-- `LOW_OVERHEAD_RESCALE_DOMINANCE_REJECTED`
-- `LOW_OVERHEAD_POWER_ATTRIBUTION_UNCLOSED`
-
-and:
-- `POWER_ONLY_OVERHEAD=<fraction>`
-- `POWER_ONLY_RESCALE_SHARE=<fraction>`
-- `GENERATED_POWER_SHARE_OF_EVALMOD=<fraction>`
+plus:
+- classification;
+- `TOP_RESCALE_KERNEL=...`
+- `TOP_RESCALE_SHARE=...`
+- `ROWS4_ROWS2_FULL_RATIO=...`
+- `PHASE_CLOSURE_RATIO=...`
 
 Then report `READY_FOR_WEB_REVIEW`.
