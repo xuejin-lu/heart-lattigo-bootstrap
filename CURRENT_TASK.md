@@ -1,54 +1,47 @@
 # Current Task
 
-Task: QPREFIX-PERF-DIAG-001
+Task: QPREFIX-PERF-DIAG-002
 Status: READY_FOR_CODEX
 
 Specification:
-`specs/QPREFIX-PERF-DIAG-001-ATTRIBUTION.md`
+`specs/QPREFIX-PERF-DIAG-002-MATCHED-Q55-STAGE-CLOSURE.md`
 
 Task class:
 `D — Performance Diagnosis`
 
-QPREFIX-IMPL-009 result:
-`QPREFIX_V2_PERFORMANCE_REVIEW`
+Accepted parent result:
+`results/QPREFIX-PERF-DIAG-001-summary.md`
 
-Recorded result:
-`results/QPREFIX-IMPL-009-PERFORMANCE-REVIEW.md`
-
-Production candidate remains:
-`f9c7f21e65915bd3eafcd5b12590b570c22a7d6f`
+Parent classification:
+`UNEXPLAINED_PERFORMANCE_REGRESSION`
 
 Historical baseline:
 `40532b4dce5c7eeae2db5b0b6f21be64801ce923`
 
-Critical interpretation:
-- matched q0=55 historical baseline generally uses q01 at high Level because legacy `MaintainedLimbCount` selects 3 rows only for q0 bit length 56;
-- current Q-prefix v2 production uses exact constitution `rows=QPrefixWidth(Level)`, hence q0123 at Level>=3;
-- the observed ~3.8x regression is therefore a system-policy migration cost comparison, not proof of an inefficient q012->q0123 implementation.
+Q-prefix-v2 production candidate:
+`f9c7f21e65915bd3eafcd5b12590b570c22a7d6f`
 
 Goal:
-Attribute the slowdown into:
-- mandatory width cost;
-- CRT/Rescale cost;
-- PS/polynomial cost;
-- guard/DoubleAngle;
-- copy/allocation/memory traffic;
-- DFT/packing/ring-degree overhead.
+Freshly rerun the exact matched q0=55 P93 baseline and candidate, capture non-overlapping in-context Bootstrap stage timings on both immutable SHAs, and account for the observed E2E latency delta directly.
 
-Do not modify production code.
-Do not narrow production authority below `QPrefixWidth(Level)`.
+Key rule:
+Do not infer the matched 3.79x regression from q0=56 stage microbenchmarks. Measure baseline and candidate under the same q0=55 workload.
+
+Do not modify Secondary production code.
+Do not optimize kernels.
+Do not change parameters, schedules, or `QPrefixWidth(Level)`.
 Do not reopen F/full-RNS fallback or architecture.
 
-Temporary benchmark/test instrumentation is allowed only as specified and must be removed.
-
 Write:
-`results/QPREFIX-PERF-DIAG-001-summary.md`
+`results/QPREFIX-PERF-DIAG-002-summary.md`
 
 Return one:
-- `WIDTH_COST_DOMINANT`
-- `RESCALE_COST_DOMINANT`
-- `MEMORY_COPY_COST_DOMINANT`
-- `MIXED_COST`
-- `UNEXPLAINED_PERFORMANCE_REGRESSION`
+- `MATCHED_STAGE_ATTRIBUTION_CLOSED`
+- `MATCHED_STAGE_ATTRIBUTION_UNCLOSED`
+- `MATCHED_BASELINE_REPLAY_BLOCKED`
+
+Also report:
+- `TOP_DELTA_STAGE=<stage name>`
+- `RESIDUAL_FRACTION=<value>`
 
 Then report `READY_FOR_WEB_REVIEW`.
