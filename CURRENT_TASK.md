@@ -1,49 +1,35 @@
 # Current Task
 
-Task: DIAG-FRAMEWORK-001
+Task: DIAG-FRAMEWORK-001-R1
 Status: READY_FOR_CODEX
 
 Specification:
-`specs/DIAG-FRAMEWORK-001-REUSABLE-TRACE.md`
+`specs/DIAG-FRAMEWORK-001-R1-RESCALE-EVENT-CLOSURE.md`
 
 Task class:
-`I — Diagnostic Infrastructure`
+`I — Diagnostic Infrastructure Repair`
 
-Accepted parent result:
-`results/QPREFIX-PERF-DIAG-003-summary.md`
+Parent implementation:
+- Primary `9662cd15d1a8c54e3ee618731f6f397fd45ca213`
+- Primary summary `f832b8ed1788a7b59f29dde9919e5eee3bcf774c`
+- Secondary `6312e8b9a982a405709a5124041eec569b0ae980`
 
-Parent classification:
-`GENERATED_POWER_RESCALE_DOMINANT`
-
-Accepted facts:
-- matched generated-power Rescale delta share: `0.977205`
-- candidate preflight time share of power delta: `0.443635`
-- repeated temporary overlay instrumentation has now been used successfully at stage, power, and Rescale depth.
+Independent Web review result:
+The reusable framework is broadly sound, but Rescale subphase tracing currently emits duplicate same-semantic reconstruction events and can double-count deepest child closure.
 
 Goal:
-Convert the proven stage/power/rescale diagnostic patterns into a reusable, opt-in, compile-time-gated framework so future debugging does not require rebuilding one-off timing overlays.
+Repair only the diagnostic event hierarchy so one physical interval is represented once at each accounting level and nested closure is mathematically unambiguous.
 
-This task does not optimize Rescale.
-
-Required user-facing workflow:
-- trace current checkout;
-- compare two Secondary refs;
-- select `stage`, `power`, `rescale` scopes;
-- structured JSON plus concise Markdown summary.
-
-Do not change:
-- Q-prefix arithmetic;
-- transactional Rescale semantics;
-- `QPrefixWidth(Level)`;
-- P93 schedule;
-- F/full-RNS policy.
+Do not modify Rescale arithmetic.
+Do not remove/fuse preflight.
+Do not optimize production performance.
+Do not change Q-prefix policy, generated-power schedule, or F/full-RNS architecture.
 
 Write:
-`results/DIAG-FRAMEWORK-001-summary.md`
+`results/DIAG-FRAMEWORK-001-R1-summary.md`
 
 Return one:
-- `REUSABLE_DIAGNOSTIC_FRAMEWORK_READY`
-- `DIAGNOSTIC_FRAMEWORK_NEEDS_REPAIR`
-- `DIAGNOSTIC_FRAMEWORK_BLOCKED`
+- `DIAGNOSTIC_FRAMEWORK_REPAIR_READY`
+- `DIAGNOSTIC_FRAMEWORK_REPAIR_FAILED`
 
 Then report `READY_FOR_WEB_REVIEW`.
