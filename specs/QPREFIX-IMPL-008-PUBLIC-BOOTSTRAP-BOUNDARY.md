@@ -96,6 +96,24 @@ At these levels this is also the complete logical residue set.
 
 ---
 
+# 1A. Production exact-width rule versus compatibility kernels
+
+Low-level row-parameterized helpers may support any explicit `rows <= QPrefixWidth(Level)` so legacy/transitional callers and focused kernel tests remain possible.
+
+That capability is **not** the Q-prefix v2 production policy.
+
+For every migrated production boundary in this milestone:
+
+[
+rows == QPrefixWidth(currentLogicalLevel).
+]
+
+A narrower explicit-row call at a higher logical Level represents a legacy/transitional compatibility state with dormant higher rows. It must not be described as a fully authoritative Q-prefix v2 production state.
+
+Precomputed tables may contain up to four q rows as reusable capability data; table width does not define ciphertext authority. Only the ciphertext's current logical Level defines production authority.
+
+---
+
 # 2. Ring-degree conversion explicit-row capability
 
 Current `ring_degree.go` has a structural bug:
@@ -112,10 +130,11 @@ Add explicit-row ring-degree APIs, conceptually:
 Exact names are a coding choice.
 
 Requirements:
-- support rows 1..4;
+- low-level compatibility/core capability may support rows 1..4;
 - validate:
   - equal logical Level;
   - rows <= min(Level+1, 4);
+- any **production Q-prefix v2 caller** must pass exactly `QPrefixWidth(Level)`;
   - matching q_i moduli across N1/N2 for every requested row;
   - N2 = 2*N1 for expansion;
   - distinct input/output ciphertexts;
@@ -203,7 +222,7 @@ Generalize table materialization so the table contains at least the requested Q-
 min(MaxLevel+1,4).
 ]
 
-For current public Bootstrap only q0/q01 will be consumed, but the shared table/helper must not prevent explicit width-3/4 tests.
+For current public Bootstrap only q0/q01 will be consumed. The shared table/helper may precompute width-3/4 capability for other logical Levels, but those extra table rows are not authoritative ciphertext rows and do not override `QPrefixWidth(currentLevel)`.
 
 Do not generate full-Q tables beyond q3.
 
@@ -393,8 +412,13 @@ Standard is an oracle only.
 Mandatory poison tests:
 
 ## Ring-degree explicit width
-- rows=4: q3 must propagate correctly;
+- at Level 0 use rows=1;
+- at Level 1 use rows=2;
+- at Level 2 use rows=3;
+- at Level >=3 use rows=4 for a fully authoritative Q-prefix v2 state;
+- width-4 capability: q3 must propagate correctly;
 - row 4+ poison has no effect.
+- narrower rows at high Level are compatibility-kernel tests only and must be labeled as such, not as production Q-prefix policy.
 
 ## Ring-degree legacy wrapper
 - non-authoritative q3 poison must not be promoted.
