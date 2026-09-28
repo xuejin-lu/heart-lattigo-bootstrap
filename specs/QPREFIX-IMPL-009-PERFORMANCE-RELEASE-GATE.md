@@ -38,7 +38,8 @@ Do not redesign or optimize the implementation.
 The task must answer four questions:
 
 1. **Semantic release readiness** — does the current Fast Q-prefix v2 candidate still satisfy public correctness?
-2. **Structural release readiness** — does the production path truly use at most four authoritative logical-Q rows internally and public q0/q01 externally, with no dormant/full-RNS fallback?
+2. **Structural release readiness** — does every production stage use exactly the Level-defined authoritative prefix
+`QPrefixWidth(Level)=min(Level+1,4)`, with no dormant/full-RNS fallback?
 3. **Capacity release readiness** — do the accepted C2S and EvalMod/PS/DoubleAngle strict-capacity checkpoints remain valid on the final integrated branch?
 4. **Performance result** — under matched conditions, how does the final candidate compare with:
    - the pre-F Q012 baseline;
@@ -300,13 +301,15 @@ Any concrete capacity failure is release-blocking.
 
 ---
 
-# 11. Structural row-cap gate
+# 11. Structural Level-to-authority gate
 
-Instrument or use existing tests to prove the production path never requires more than:
+Instrument or use existing tests to prove the production path obeys the exact constitution at every stage:
 
 [
-MaxQPrefixWidth=4.
+rows = QPrefixWidth(Level)=min(Level+1,4).
 ]
+
+The condition `rows <= 4` is necessary but **not sufficient**. A Level-2 production state with rows=2, or a Level-1 production state carrying q2/q3 as authoritative, is a structural failure even though it respects the cap.
 
 Required stage map:
 - public input;
@@ -329,7 +332,17 @@ For each stage record:
 - Scale.
 
 Rules:
-- internal Level >=3 authority <=4;
+- Level 0 -> rows=1 -> q0;
+- Level 1 -> rows=2 -> q01;
+- Level 2 -> rows=3 -> q012;
+- Level >=3 -> rows=4 -> q0123;
+- authority must be recomputed after every logical Level transition;
+- shrinking transitions must follow the constitution exactly:
+  - 3->2: q0123 -> q012;
+  - 2->1: q012 -> q01;
+  - 1->0: q01 -> q0;
+- no production stage may intentionally run narrower than QPrefixWidth(Level) merely because a compatibility kernel allows it;
+- no production stage may retain wider authority after Level drops;
 - q4+ never read;
 - public input/output Level <=1 authority is q0/q01;
 - no full logical-Q materialization appears in production arithmetic/packing paths.
@@ -384,7 +397,7 @@ Return exactly one overall status:
 
 ## `QPREFIX_V2_RELEASE_PASS`
 
-All semantic, capacity, structural, fallback, and public-representation hard gates pass, and Fast is not slower than Standard on the matched production P93 count-1 benchmark. No >10x matched-baseline regression.
+All semantic, capacity, structural, fallback, and public-representation hard gates pass, including the exact Level-to-authority invariant `rows=QPrefixWidth(Level)` at every production stage; Fast is not slower than Standard on the matched production P93 count-1 benchmark; and there is no >10x matched-baseline regression.
 
 ## `QPREFIX_V2_PERFORMANCE_REVIEW`
 
@@ -423,6 +436,8 @@ Report:
 
 ### Structure
 - production stage row map;
+- for every stage, assert `authoritative rows == QPrefixWidth(logical Level)`;
+- list every Level transition and corresponding authority transition;
 - maximum authoritative rows;
 - evidence of no q4+ / full-RNS fallback;
 - public input/output contract.
