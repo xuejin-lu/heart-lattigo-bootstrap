@@ -1,35 +1,48 @@
 # Current Task
 
-Task: DIAG-FRAMEWORK-001-R1
+Task: QPREFIX-PERF-OPT-001
 Status: READY_FOR_CODEX
 
 Specification:
-`specs/DIAG-FRAMEWORK-001-R1-RESCALE-EVENT-CLOSURE.md`
+`specs/QPREFIX-PERF-OPT-001-TRANSACTIONAL-RESCALE-STAGING.md`
 
 Task class:
-`I — Diagnostic Infrastructure Repair`
+`P — Performance Repair`
 
-Parent implementation:
-- Primary `9662cd15d1a8c54e3ee618731f6f397fd45ca213`
-- Primary summary `f832b8ed1788a7b59f29dde9919e5eee3bcf774c`
-- Secondary `6312e8b9a982a405709a5124041eec569b0ae980`
+Accepted framework:
+- Primary R1 summary: `3e75a8db349f7c155db82a9ee9bc94afe6d7be98`
+- Secondary R1: `4783c641cee2df5f504b8033905a62a82971da28`
+- status: `DIAGNOSTIC_FRAMEWORK_REPAIR_READY`
 
-Independent Web review result:
-The reusable framework is broadly sound, but Rescale subphase tracing currently emits duplicate same-semantic reconstruction events and can double-count deepest child closure.
+Accepted diagnosis:
+- `GENERATED_POWER_RESCALE_DOMINANT`
+- Rescale explains `97.7205%` of generated-power regression
+- candidate preflight contributes about `9.267 ms` across twelve generated-power Rescales
 
 Goal:
-Repair only the diagnostic event hierarchy so one physical interval is represented once at each accounting level and nested closure is mathematically unambiguous.
+Preserve transactional failure-before-mutation while computing exact Q-prefix Rescale results only once into evaluator-owned staging, then commit only after all components validate.
 
-Do not modify Rescale arithmetic.
-Do not remove/fuse preflight.
-Do not optimize production performance.
-Do not change Q-prefix policy, generated-power schedule, or F/full-RNS architecture.
+Do not change:
+- centered CRT / rounding semantics;
+- per-step capacity checks;
+- Q-prefix authority or `QPrefixWidth(Level)`;
+- P93/polynomial schedule;
+- NTT/Montgomery semantics;
+- F/full-RNS policy.
+
+Mandatory performance floors:
+- q0=55 P93 Count-1 E2E median >=10% faster;
+- representative rows4 Rescale median >=20% faster;
+- no material allocation regression.
+
+Use the reusable `scripts/fastdiag` framework for post-change structural attribution. No ad-hoc overlay.
 
 Write:
-`results/DIAG-FRAMEWORK-001-R1-summary.md`
+`results/QPREFIX-PERF-OPT-001-summary.md`
 
 Return one:
-- `DIAGNOSTIC_FRAMEWORK_REPAIR_READY`
-- `DIAGNOSTIC_FRAMEWORK_REPAIR_FAILED`
+- `TRANSACTIONAL_RESCALE_STAGING_READY`
+- `TRANSACTIONAL_RESCALE_STAGING_CORRECT_BUT_NO_WIN`
+- `TRANSACTIONAL_RESCALE_STAGING_BLOCKED`
 
 Then report `READY_FOR_WEB_REVIEW`.
