@@ -1,40 +1,45 @@
 # Current Task
 
-Task: QPREFIX-PERF-OPT-002
+Task: QPREFIX-PERF-DIAG-007
 Status: READY_FOR_CODEX
 
 Specification:
-`specs/QPREFIX-PERF-OPT-002-FIXED-WIDTH-DIVISION-DEDUP.md`
+`specs/QPREFIX-PERF-DIAG-007-POST-OPT002-RESCALE-REPROFILE.md`
 
 Task class:
-`P — Performance Repair`
+`D — Performance Diagnosis`
 
 Accepted parent:
-- `results/QPREFIX-PERF-DIAG-006-summary.md`
-- classification `RESCALE_MIXED_KERNELS`
-- top isolated phase: fixed-width reconstruct / round / capacity = `43.51%`
-- current production arithmetic baseline `d50ff4db757d4a2b9922937a4e7f316fd3f286b9`
+- `results/QPREFIX-PERF-OPT-002-summary.md`
+- Secondary implementation `6930cf6cb3c71ce139a1eb42eede7be335b7174c`
+- classification `FIXED_WIDTH_DIVISION_DEDUP_READY`
 
-Accepted pprof evidence:
-- `math/bits.Div64` = 27.40% flat;
-- domain transforms are also material;
-- `mod192By64`, CRT reconstruction, and signed residue work are hot.
+Accepted production effect:
+- rows4 fixed-width phase 12.23% faster;
+- full rows4 Rescale 6.75% faster;
+- q0=55 P93 Count-1 6.11% faster;
+- allocation count stable.
+
+Important:
+DIAG-006 CPU-profile shares are pre-OPT002 and are no longer authoritative.
 
 Goal:
-Perform a bounded exact-arithmetic cleanup:
-- remove provably redundant leading Div64 operations in fixed-width modular reduction;
-- review quotient/remainder duplication in roundedMagnitude192;
-- reuse already prepared invariant prefix products in the Rescale reconstruction path where exact;
-- preserve all semantics and transactionality.
+Freshly reprofile the current rows4 Rescale and determine whether remaining cost is now division-dominated, transform-dominated, or mixed.
 
-Do not introduce reciprocal approximations, unsafe, assembly, width-policy changes, or schedule changes.
+No Secondary production modification.
 
 Write:
-`results/QPREFIX-PERF-OPT-002-summary.md`
+`results/QPREFIX-PERF-DIAG-007-summary.md`
 
-Return one:
-- `FIXED_WIDTH_DIVISION_DEDUP_READY`
-- `FIXED_WIDTH_DIVISION_DEDUP_CORRECT_BUT_NO_WIN`
-- `FIXED_WIDTH_DIVISION_DEDUP_BLOCKED`
+Return:
+`POST_OPT002_RESCALE_REPROFILE_READY`
+
+plus:
+- classification;
+- `CURRENT_TOP_FLAT_SYMBOL=...`
+- `CURRENT_TOP_FLAT_SHARE=...`
+- `CURRENT_FIXEDWIDTH_SHARE=...`
+- `CURRENT_TRANSFORM_SHARE=...`
+- `CURRENT_PHASE_CLOSURE=...`
 
 Then report `READY_FOR_WEB_REVIEW`.
