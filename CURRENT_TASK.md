@@ -1,42 +1,41 @@
 # Current Task
 
-Task: FAST-STANDARD-NUMERICAL-DIAG-002
+Task: QPREFIX-PERF-MEASURE-LOGN16-001
 Status: READY_FOR_CODEX
 
-Specification:
-`specs/FAST-STANDARD-NUMERICAL-DIAG-002-CURRENT-QPREFIX-LOCKSTEP.md`
-
 Task class:
-`D — Numerical Correctness Diagnosis`
+`M — Performance Measurement`
 
-Accepted parent:
-- `results/FAST-STANDARD-NUMERICAL-001-summary.md`
-- classification `FAST_NUMERICAL_QUALITY_DEGRADED`
-- current Secondary branch `fast-qprefix`
+Temporarily suspended:
+`FAST-STANDARD-NUMERICAL-DIAG-002`
 
-Accepted numerical facts:
-- Fast complex RMSE `0.020892211083414026`
-- Standard complex RMSE median `1.1903936621664996e-9`
-- Fast median precision `5.7435154 bits`
-- Standard median precision `30.7954521 bits`
-- Fast-vs-Standard max complex diff `0.03640730397217224`
+Authoritative spec:
+`specs/QPREFIX-PERF-MEASURE-LOGN16-001-STANDARD-VS-FAST.md`
 
 Goal:
-Localize the first material numerical divergence between current Fast and genuine Standard on the canonical P93 q0=55 workload.
+Measure matched `N=2^16` / LogN16 bootstrapping timing for genuine Standard versus current Q-prefix Fast, including complete Bootstrap and per-stage timing.
 
-Required stage lockstep:
-input -> ScaleDown -> ModUp -> C2S -> EvalMod -> S2C -> final output.
+Frozen refs:
+- Primary harness: `2b1022e1820e612e9209094dd672be15d06a8d13`
+- Standard Secondary: `5dbffbdea05394de2ca3a432ed5318aa832e3f40`
+- Fast Secondary: `82601ea2517edc14784c9da250426169a1b221c7`
 
-If EvalMod is first material, bisect the current normalized/polynomial/DoubleAngle path and audit exact scales.
+Config:
+`configs/bootstrap_config.logN16.json`
 
-Important:
-- historical fast-ckks findings are reference only;
-- do not change plan scale or production arithmetic;
-- no performance optimization in this task.
+Protocol:
+- temporary detached worktrees;
+- warmup 1;
+- repetitions 7;
+- `-stages`;
+- same host;
+- no production changes.
 
-Write:
-`results/FAST-STANDARD-NUMERICAL-DIAG-002-summary.md`
+Required outputs:
+- `results/QPREFIX-PERF-MEASURE-LOGN16-001-standard.json`
+- `results/QPREFIX-PERF-MEASURE-LOGN16-001-fast.json`
+- `results/QPREFIX-PERF-MEASURE-LOGN16-001-summary.md`
 
 Return:
-`FAST_STANDARD_NUMERICAL_BISECT_READY`
-plus required classification/checkpoints, then `READY_FOR_WEB_REVIEW`.
+`LOGN16_STANDARD_FAST_TIMING_READY`
+then `READY_FOR_WEB_REVIEW`.
