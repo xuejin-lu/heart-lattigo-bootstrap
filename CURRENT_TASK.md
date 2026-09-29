@@ -47,3 +47,13 @@ Web-review amendment:
 - Standard measurement uses `go run -tags lattigo_standard . ...`.
 - Fast measurement remains untagged.
 - This tag only selects the Primary harness's built-in Standard stubs and excludes Fast-only diagnostics; it does not authorize arithmetic or config changes.
+
+
+Web-review amendment 2:
+- Supersede prior current-Primary/build-tag execution attempts.
+- Use detached measurement harness Primary commit `8186f50e7b591b7f76b39fb89b47c32ad1cc1410` for BOTH Standard and Fast.
+- Do not use `lattigo_standard`.
+- Standard Secondary remains `5dbffbdea05394de2ca3a432ed5318aa832e3f40`.
+- Fast Secondary remains `82601ea2517edc14784c9da250426169a1b221c7`.
+- Run `go test ./...` and then the existing `go run . -stages -config configs/bootstrap_config.logN16.json -warmup 1 -repetitions 7 ...` in each detached harness.
+- If current Q-prefix does not compile against this proven clean public harness without patching, stop BLOCKED.
