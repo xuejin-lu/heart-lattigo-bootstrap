@@ -1,40 +1,43 @@
 # Current Task
 
-Task: QPREFIX-PERF-OPT-004
+Task: FAST-STANDARD-NUMERICAL-001
 Status: READY_FOR_CODEX
 
 Specification:
-`specs/QPREFIX-PERF-OPT-004-BARRETT-FIXED-WIDTH-REDUCTION.md`
+`specs/FAST-STANDARD-NUMERICAL-001-P93-REFERENCE.md`
 
 Task class:
-`P — Performance Repair`
+`C — Numerical Correctness Validation`
 
-Accepted parent:
-- `results/QPREFIX-PERF-OPT-003-summary.md`
-- OPT-003 decision `SOURCE_INTT_BATCHING_CORRECT_BUT_NO_WIN`
-- accepted production implementation remains `6930cf6cb3c71ce139a1eb42eede7be335b7174c`
+Purpose:
+Pause performance work and measure numerical quality on the actual accepted P93 q0=55 / LogN13 / LogSlots12 / 4096-slot workload.
 
-Fresh current evidence:
-- `math/bits.Div64` remains largest single flat symbol at 20.55%;
-- fixed-width phase 36.55%;
-- signed residue staging 21.56%;
-- transform loop reordering showed no win.
-
-Goal:
-Evaluate exact Barrett-Horner modular reduction using Lattigo's existing Barrett primitives to reduce hot Div64 work in Rescale.
+Compare:
+- original message;
+- current Fast Bootstrap;
+- Standard Bootstrap across >=3 independent Standard key trials.
 
 Important:
-- feasibility benchmark first;
-- no production change unless mod192 improves >=15% and signed-residue or rows4 CRT improves >=8%;
-- exact equality against current helpers and BigInt;
-- no approximate reciprocal, unsafe, assembly, concurrency, width-policy or schedule changes.
+Current fastdiag only validates Fast diagnostics-on vs diagnostics-off and compares Fast git revisions. It does not yet quantify P93 Fast-vs-Standard decoded error.
+
+Required output:
+- Fast vs original metrics;
+- Standard vs original metrics;
+- Fast vs Standard metrics;
+- Standard-to-Standard variability;
+- precision-bit comparison;
+- 1e-2 threshold audit;
+- classification.
+
+Preferred reusable command:
+`./scripts/fastdiag numerical --profile p93-q55 --standard-trials 3`
+
+No production arithmetic changes.
 
 Write:
-`results/QPREFIX-PERF-OPT-004-summary.md`
+`results/FAST-STANDARD-NUMERICAL-001-summary.md`
 
-Return one:
-- `BARRETT_FIXED_WIDTH_REDUCTION_READY`
-- `BARRETT_FIXED_WIDTH_REDUCTION_CORRECT_BUT_NO_WIN`
-- `BARRETT_FIXED_WIDTH_REDUCTION_BLOCKED`
+Return:
+`FAST_STANDARD_NUMERICAL_REFERENCE_READY`
 
-Then report `READY_FOR_WEB_REVIEW`.
+plus required metrics/classification from the spec, then `READY_FOR_WEB_REVIEW`.
