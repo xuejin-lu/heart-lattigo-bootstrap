@@ -30,6 +30,15 @@ func TestParseArgsAndScopeValidation(t *testing.T) {
 	opts, err = parseArgs([]string{"compare", "--trace", "all", "--baseline", "base", "--candidate", "head"})
 	require.NoError(t, err)
 	require.Equal(t, []string{"stage", "power", "rescale"}, opts.traceScopes)
+
+	opts, err = parseArgs([]string{"numerical", "--profile", "p93-q55", "--standard-trials", "3"})
+	require.NoError(t, err)
+	require.Equal(t, 3, opts.standardTrials)
+	require.Empty(t, opts.traceScopes)
+	_, err = parseArgs([]string{"numerical", "--standard-trials", "2"})
+	require.ErrorContains(t, err, "介於 3 與 10")
+	_, err = parseArgs([]string{"trace", "--trace", "stage", "--standard-trials", "3"})
+	require.ErrorContains(t, err, "僅供 numerical")
 }
 
 func TestParseScopesRejectsEmptyAndAcceptsAll(t *testing.T) {

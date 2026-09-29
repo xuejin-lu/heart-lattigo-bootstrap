@@ -11,23 +11,24 @@ import (
 const supportedProfile = "p93-q55"
 
 type options struct {
-	mode        string
-	profile     string
-	traceScopes []string
-	baseline    string
-	candidate   string
-	output      string
-	warmup      int
-	repetitions int
+	mode           string
+	profile        string
+	traceScopes    []string
+	baseline       string
+	candidate      string
+	output         string
+	warmup         int
+	repetitions    int
+	standardTrials int
 }
 
 func parseArgs(args []string) (options, error) {
 	if len(args) == 0 {
-		return options{}, errors.New("使用方式：fastdiag trace|compare [options]")
+		return options{}, errors.New("使用方式：fastdiag trace|compare|numerical [options]")
 	}
-	opts := options{mode: args[0], profile: supportedProfile, warmup: 1, repetitions: 5}
-	if opts.mode != "trace" && opts.mode != "compare" {
-		return options{}, fmt.Errorf("未知子命令 %q；請使用 trace 或 compare", opts.mode)
+	opts := options{mode: args[0], profile: supportedProfile, warmup: 1, repetitions: 5, standardTrials: 3}
+	if opts.mode != "trace" && opts.mode != "compare" && opts.mode != "numerical" {
+		return options{}, fmt.Errorf("未知子命令 %q；請使用 trace、compare 或 numerical", opts.mode)
 	}
 	flags := flag.NewFlagSet("fastdiag "+opts.mode, flag.ContinueOnError)
 	flags.SetOutput(io.Discard)
@@ -38,6 +39,7 @@ func parseArgs(args []string) (options, error) {
 	output := flags.String("out", "", "輸出 JSON 路徑（summary 使用相同 basename）")
 	warmup := flags.Int("warmup", 1, "trace warmup 次數")
 	repetitions := flags.Int("repetitions", 5, "trace measured repetitions")
+	standardTrials := flags.Int("standard-trials", 3, "numerical mode 的獨立 Standard key/evaluation-key trials（3–10）")
 	if err := flags.Parse(args[1:]); err != nil {
 		return options{}, err
 	}
@@ -53,24 +55,43 @@ func parseArgs(args []string) (options, error) {
 	if *repetitions < 1 || *repetitions > 10 {
 		return options{}, errors.New("--repetitions 必須介於 1 與 10，以限制 raw trace 大小")
 	}
-	scopes, err := parseScopes(*trace)
-	if err != nil {
-		return options{}, err
-	}
-	if len(scopes) == 0 {
-		return options{}, errors.New("需要 --trace scope：stage、power、rescale 或 all")
-	}
-	if opts.mode == "trace" {
-		if *baseline != "" || *candidate != "" {
-			return options{}, errors.New("trace 子命令不接受 --baseline 或 --candidate")
+	standardTrialsSet := false
+	flags.Visit(func(flag *flag.Flag) {
+		if flag.Name == "standard-trials" {
+			standardTrialsSet = true
+		}
+	})
+	var scopes []string
+	if opts.mode == "numerical" {
+		if *standardTrials < 3 || *standardTrials > 10 {
+			return options{}, errors.New("--standard-trials 必須介於 3 與 10")
+		}
+		if *trace != "" || *baseline != "" || *candidate != "" {
+			return options{}, errors.New("numerical 子命令不接受 --trace、--baseline 或 --candidate")
 		}
 	} else {
-		if *baseline == "" || *candidate == "" {
+		if standardTrialsSet {
+			return options{}, errors.New("--standard-trials 僅供 numerical 子命令使用")
+		}
+		parsedScopes, parseErr := parseScopes(*trace)
+		if parseErr != nil {
+			return options{}, parseErr
+		}
+		scopes = parsedScopes
+		if len(scopes) == 0 {
+			return options{}, errors.New("需要 --trace scope：stage、power、rescale 或 all")
+		}
+		if opts.mode == "trace" {
+			if *baseline != "" || *candidate != "" {
+				return options{}, errors.New("trace 子命令不接受 --baseline 或 --candidate")
+			}
+		} else if *baseline == "" || *candidate == "" {
 			return options{}, errors.New("compare 子命令需要 --baseline 與 --candidate")
 		}
 	}
 	opts.profile, opts.traceScopes, opts.baseline, opts.candidate = *profile, scopes, *baseline, *candidate
 	opts.output, opts.warmup, opts.repetitions = *output, *warmup, *repetitions
+	opts.standardTrials = *standardTrials
 	return opts, nil
 }
 

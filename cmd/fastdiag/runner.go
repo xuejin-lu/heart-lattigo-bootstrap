@@ -45,6 +45,20 @@ func execute(args []string) error {
 	if err != nil {
 		return err
 	}
+	if opts.mode == "numerical" {
+		doc, err := numericalReference(secondaryRoot, primaryMeta, opts)
+		if err != nil {
+			return err
+		}
+		if err := writeJSON(paths.json, doc); err != nil {
+			return err
+		}
+		if err := writeNewFile(paths.markdown, []byte(renderNumericalSummary(doc)), 0o644); err != nil {
+			return err
+		}
+		fmt.Printf("Numerical JSON：%s\nNumerical 摘要：%s\n", paths.json, paths.markdown)
+		return nil
+	}
 	if opts.mode == "trace" {
 		doc, err := traceCurrent(primaryRoot, secondaryRoot, primaryMeta, opts)
 		if err != nil {
