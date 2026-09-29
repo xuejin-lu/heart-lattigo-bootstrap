@@ -140,7 +140,12 @@ git -C /Users/xuejinlu/Developer/xuejin-lu/lattigo \
 
 cd "$BASE_STD/heart-lattigo-bootstrap"
 
-go run . \
+# Standard-only compile preflight. The Primary harness intentionally uses
+# lattigo_standard to exclude Fast-only diagnostic runners while keeping
+# the ordinary Standard bootstrap measurement path unchanged.
+go test -tags lattigo_standard ./...
+
+go run -tags lattigo_standard . \
   -stages \
   -config configs/bootstrap_config.logN16.json \
   -warmup 1 \
@@ -307,3 +312,54 @@ plus:
 Then:
 
 `READY_FOR_WEB_REVIEW`.
+
+
+## Web-review amendment — Standard build tag authorization
+
+The first execution was correctly blocked before timing because the frozen Primary harness contains Fast-only diagnostic runner files guarded by:
+
+`//go:build !lattigo_standard`
+
+while `fast_diagnostics_standard_stub.go` provides the corresponding Standard stubs under:
+
+`//go:build lattigo_standard`
+
+Therefore the Standard measurement is explicitly authorized to compile with:
+
+`-tags lattigo_standard`
+
+This is a harness compile-selection tag only. It must not:
+- change Standard bootstrap arithmetic;
+- change parameters/config;
+- alter the stage measurement implementation;
+- be used for the Fast measurement.
+
+Required Standard preflight:
+
+```sh
+go test -tags lattigo_standard ./...
+```
+
+Required Standard measurement command:
+
+```sh
+go run -tags lattigo_standard . \
+  -stages \
+  -config configs/bootstrap_config.logN16.json \
+  -warmup 1 \
+  -repetitions 7 \
+  -out "$BASE_STD/standard-logN16.json"
+```
+
+Fast remains:
+
+```sh
+go run . \
+  -stages \
+  -config configs/bootstrap_config.logN16.json \
+  -warmup 1 \
+  -repetitions 7 \
+  -out "$BASE_FAST/fast-qprefix-logN16.json"
+```
+
+Before accepting results, record that Standard was built with `lattigo_standard` and Fast was built without it.
