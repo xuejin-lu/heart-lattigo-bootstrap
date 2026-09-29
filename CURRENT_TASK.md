@@ -39,3 +39,11 @@ Required outputs:
 Return:
 `LOGN16_STANDARD_FAST_TIMING_READY`
 then `READY_FOR_WEB_REVIEW`.
+
+
+Web-review amendment:
+- Standard detached harness run is explicitly authorized to use `-tags lattigo_standard`.
+- Run `go test -tags lattigo_standard ./...` before the Standard measurement.
+- Standard measurement uses `go run -tags lattigo_standard . ...`.
+- Fast measurement remains untagged.
+- This tag only selects the Primary harness's built-in Standard stubs and excludes Fast-only diagnostics; it does not authorize arithmetic or config changes.
