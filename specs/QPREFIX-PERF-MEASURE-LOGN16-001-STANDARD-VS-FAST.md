@@ -1,3 +1,108 @@
+# Web-review amendment 2 — use the proven clean EXP-002 measurement harness
+
+The previous attempts are superseded for execution purposes.
+
+Do **not** use current Primary source for the detached measurement worktrees.
+Do **not** use `lattigo_standard` build tags.
+Do **not** patch build constraints.
+
+Use the exact Primary measurement harness commit that already produced matched Standard/Fast EXP-002 stage measurements:
+
+`8186f50e7b591b7f76b39fb89b47c32ad1cc1410`
+
+Why this is authoritative for this timing task:
+
+- it already successfully measured genuine Standard against Fast using the same public bootstrap API;
+- its `configs/bootstrap_config.logN16.json` is byte-for-byte semantically the requested LogN16 configuration;
+- its `stage_runner.go` records the same required stage names and full-bootstrap call;
+- key generation/evaluator construction/warmup remain outside measured regions;
+- it has no later Fast-only diagnostic compile dependencies;
+- both compared backends therefore use exactly the same detached Primary harness source.
+
+Frozen Secondary refs remain:
+
+- Standard: `5dbffbdea05394de2ca3a432ed5318aa832e3f40`
+- current Q-prefix: `82601ea2517edc14784c9da250426169a1b221c7`
+
+The fact that the control-plane Primary currently contains newer files is irrelevant to the timing measurement. Result artifacts are copied back and committed on current Primary only after the detached measurements finish.
+
+## Revised exact detached-worktree commands
+
+### Standard
+
+```sh
+BASE_STD=$(mktemp -d /tmp/logn16-standard.XXXXXX)
+
+git -C /Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap \
+  worktree add --detach "$BASE_STD/heart-lattigo-bootstrap" \
+  8186f50e7b591b7f76b39fb89b47c32ad1cc1410
+
+git -C /Users/xuejinlu/Developer/xuejin-lu/lattigo \
+  worktree add --detach "$BASE_STD/lattigo" \
+  5dbffbdea05394de2ca3a432ed5318aa832e3f40
+
+cd "$BASE_STD/heart-lattigo-bootstrap"
+
+go test ./...
+
+go run . \
+  -stages \
+  -config configs/bootstrap_config.logN16.json \
+  -warmup 1 \
+  -repetitions 7 \
+  -out "$BASE_STD/standard-logN16.json"
+```
+
+### Current Q-prefix Fast
+
+```sh
+BASE_FAST=$(mktemp -d /tmp/logn16-fast.XXXXXX)
+
+git -C /Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap \
+  worktree add --detach "$BASE_FAST/heart-lattigo-bootstrap" \
+  8186f50e7b591b7f76b39fb89b47c32ad1cc1410
+
+git -C /Users/xuejinlu/Developer/xuejin-lu/lattigo \
+  worktree add --detach "$BASE_FAST/lattigo" \
+  82601ea2517edc14784c9da250426169a1b221c7
+
+cd "$BASE_FAST/heart-lattigo-bootstrap"
+
+go test ./...
+
+go run . \
+  -stages \
+  -config configs/bootstrap_config.logN16.json \
+  -warmup 1 \
+  -repetitions 7 \
+  -out "$BASE_FAST/fast-qprefix-logN16.json"
+```
+
+## Compatibility gate
+
+Before timing acceptance:
+
+1. both detached Primary harnesses must report commit `8186f50e...`;
+2. Standard must compile and run without Fast package dependencies;
+3. current Q-prefix must compile against the old public harness without source patching;
+4. both effective parameter metadata blocks must match exactly;
+5. all staged/full metadata checks must pass.
+
+If current Q-prefix cannot compile against this clean historical harness **without source modification**, stop as `LOGN16_STANDARD_FAST_TIMING_BLOCKED`; do not patch either backend.
+
+## Result provenance
+
+The summary must explicitly distinguish:
+
+- **measurement harness commit**: `8186f50e...`
+- **current control-plane Primary commit**: the commit that stores the results
+- **Standard Secondary commit**
+- **Fast Secondary commit**
+
+This avoids pretending the old measurement harness is the current project state.
+
+---
+
 # QPREFIX-PERF-MEASURE-LOGN16-001 — Matched Standard vs Q-prefix Bootstrap Timing
 
 ## Status
