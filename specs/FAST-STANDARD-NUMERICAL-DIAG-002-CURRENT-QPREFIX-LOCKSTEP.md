@@ -232,6 +232,235 @@ determine whether S2C is causal source or mostly an amplifier.
 
 No production mutation.
 
+## SNR instrumentation — required
+
+This diagnosis must extend the reusable numerical/debug framework with explicit decoded-domain SNR metrics.
+
+### Terminology
+
+Do not use the bare term `SNR` without naming the reference.
+
+There are two different metrics:
+
+1. **Bootstrap SNR** — within one execution mode, compare the decoded semantic vector immediately before Bootstrap with the decoded final Bootstrap output.
+2. **Stage reference SNR** — at a semantically comparable checkpoint, use genuine Standard as the reference signal and Fast-minus-Standard as the error/noise.
+
+These are numerical signal-to-distortion metrics. They are **not** RLWE security noise, remaining noise budget, or a security claim.
+
+The canonical numerical-001 workload uses plaintext-like `c0=encoded message, c1=0`. Therefore the reported Bootstrap SNR measures numerical distortion introduced by Bootstrap on this workload; it does not characterize encryption noise.
+
+### A. End-to-end Bootstrap SNR
+
+For each mode separately, decode the actual ciphertext entering Bootstrap and the final output through the mode-appropriate validated semantic recovery path.
+
+Let
+
+[
+x_i^{\mathrm{pre}}
+=
+\text{decoded slot }i\text{ immediately before Bootstrap},
+]
+
+[
+x_i^{\mathrm{post}}
+=
+\text{decoded slot }i\text{ after Bootstrap},
+]
+
+and
+
+[
+e_i=x_i^{\mathrm{post}}-x_i^{\mathrm{pre}}.
+]
+
+Define
+
+[
+P_{\mathrm{signal}}
+=
+\frac{1}{n}\sum_i |x_i^{\mathrm{pre}}|^2,
+]
+
+[
+P_{\mathrm{noise}}
+=
+\frac{1}{n}\sum_i |e_i|^2,
+]
+
+[
+\boxed{
+\mathrm{SNR}_{\mathrm{bootstrap,dB}}
+=
+10\log_{10}
+\frac{P_{\mathrm{signal}}}{P_{\mathrm{noise}}}
+}
+]
+
+or equivalently
+
+[
+\mathrm{SNR}_{\mathrm{bootstrap,dB}}
+=
+20\log_{10}
+\frac{\mathrm{RMS}(x^{\mathrm{pre}})}
+{\mathrm{RMSE}(x^{\mathrm{post}},x^{\mathrm{pre}})}.
+]
+
+Required for:
+- current Fast Q-prefix;
+- genuine Standard.
+
+Also report:
+- signal power;
+- signal RMS;
+- noise/error power;
+- noise/error RMSE;
+- Bootstrap SNR in dB;
+- pre-Bootstrap decoded-vs-canonical-original RMSE as a sanity guard.
+
+Do not silently substitute the canonical original message for the actual decoded pre-Bootstrap vector in the authoritative Bootstrap-SNR result.
+
+### B. Stage reference SNR
+
+At every semantically comparable Fast-vs-Standard checkpoint (i), let:
+- (F_i) be the decoded Fast semantic vector;
+- (S_i) be the decoded genuine-Standard semantic vector.
+
+Retain the existing divergence metric:
+
+[
+\boxed{
+D_i=\mathrm{RMSE}(F_i,S_i)
+}
+]
+
+and define the stage-to-stage raw error amplification:
+
+[
+\boxed{
+A_i=\frac{D_i}{D_{i-1}}
+}
+]
+
+when both adjacent checkpoints are comparable and (D_{i-1}>0).
+
+Define Standard-reference signal power:
+
+[
+P_i
+=
+\frac{1}{n}\sum_j |S_{i,j}|^2,
+]
+
+and normalized stage reference SNR:
+
+[
+\boxed{
+\mathrm{SNR}_{i,\mathrm{dB}}
+=
+10\log_{10}
+\frac{P_i}{D_i^2}
+}
+]
+
+because (D_i^2) is the mean squared complex Fast-minus-Standard error.
+
+Also define:
+
+[
+\boxed{
+\Delta\mathrm{SNR}_i
+=
+\mathrm{SNR}_i-\mathrm{SNR}_{i-1}
+}
+]
+
+when adjacent stage SNRs are comparable.
+
+Interpretation:
+- large (A_i): raw Fast-vs-Standard error expanded strongly at stage (i);
+- large negative (Delta\mathrm{SNR}_i): stage (i) materially worsened error relative to the signal magnitude;
+- neither metric alone proves the stage is causal; use them together with the first-observable/material-divergence rules and bounded counterfactuals.
+
+This normalized SNR view is important because decoded signal magnitude may change substantially across C2S, EvalMod, and S2C; raw RMSE amplification alone can be misleading.
+
+### C. Complex-vector convention
+
+For complex CKKS slots use:
+
+[
+|z|^2=(\Re z)^2+(\Im z)^2.
+]
+
+The primary SNR is one complex-vector SNR. Do not average separate real-SNR and imag-SNR values into a pseudo-complex SNR.
+
+Real/imag diagnostic SNRs may be emitted only as clearly secondary fields if useful.
+
+### D. Reusable metric schema
+
+Add one reusable metric type to the Primary numerical diagnostic model, conceptually containing:
+
+- `signal_power`;
+- `signal_rms`;
+- `noise_power`;
+- `noise_rmse`;
+- finite `snr_db` when defined;
+- explicit status/reason for non-finite or non-comparable cases.
+
+Required edge handling:
+- zero noise and nonzero signal => mathematically (+\infty); do not emit JSON NaN/Inf;
+- zero signal => SNR undefined;
+- non-decodable/non-semantic checkpoint => not comparable;
+- no arbitrary epsilon floor to manufacture a finite SNR.
+
+Prefer a nullable finite numeric `snr_db` plus an explicit status such as:
+- `FINITE`;
+- `POSITIVE_INFINITY`;
+- `UNDEFINED_ZERO_SIGNAL`;
+- `NOT_COMPARABLE`.
+
+### E. Required tests
+
+Add focused tests that prove:
+
+1. a synthetic known signal/error pair produces the expected dB value;
+2. scaling both signal and error by the same nonzero constant leaves SNR unchanged;
+3. `noise_rmse` equals the existing complex RMSE for the same pair;
+4. exact equality is handled without writing JSON NaN/Inf;
+5. zero-signal input is handled explicitly;
+6. existing numerical JSON remains parseable and existing RMSE/precision values are unchanged.
+
+No production arithmetic changes are authorized by this SNR instrumentation.
+
+### F. Required reporting
+
+The final numerical diagnosis summary must include:
+
+#### End-to-end table
+
+| Mode | Pre→Post RMSE | Signal RMS | Bootstrap SNR (dB) |
+|---|---:|---:|---:|
+| Standard | ... | ... | ... |
+| Fast Q-prefix | ... | ... | ... |
+
+#### Stage table
+
+For every comparable checkpoint include at least:
+
+| Checkpoint | (D_i) RMSE | (A_i) | Stage reference SNR (dB) | (Delta\mathrm{SNR}_i) (dB) | Max complex diff |
+|---|---:|---:|---:|---:|---:|
+
+Report explicitly:
+- `STANDARD_BOOTSTRAP_SNR_DB=...`
+- `FAST_BOOTSTRAP_SNR_DB=...`
+- `LARGEST_RAW_AMPLIFICATION_CHECKPOINT=...`
+- `LARGEST_RAW_AMPLIFICATION_FACTOR=...`
+- `LARGEST_SNR_DROP_CHECKPOINT=...`
+- `LARGEST_SNR_DROP_DB=...`
+
+Do not introduce an SNR pass/fail threshold in this task. SNR is diagnostic evidence, not a new acceptance criterion.
+
+
 ## Required classification
 
 Return exactly one:
