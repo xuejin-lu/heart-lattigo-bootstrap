@@ -17,6 +17,7 @@ import (
 	"github.com/tuneinsight/lattigo/v6/core/rlwe"
 	"github.com/tuneinsight/lattigo/v6/ring"
 	"github.com/tuneinsight/lattigo/v6/schemes/ckks"
+	"github.com/xuejin-lu/heart-lattigo-bootstrap/internal/numericalmetrics"
 )
 
 const (
@@ -26,8 +27,10 @@ const (
 )
 
 type decodedNumericalRun struct {
-	output NumericalOutput
-	values []complex128
+	output     NumericalOutput
+	values     []complex128
+	preValues  []complex128
+	ciphertext *rlwe.Ciphertext
 }
 
 func numericalReference(secondaryRoot string, primary RepositoryMetadata, opts options) (NumericalDocument, error) {
@@ -65,6 +68,10 @@ func numericalReference(secondaryRoot string, primary RepositoryMetadata, opts o
 	if err != nil {
 		return NumericalDocument{}, err
 	}
+	preFastDecoded, err := fastStandardDecodeFast(residual, input)
+	if err != nil {
+		return NumericalDocument{}, fmt.Errorf("decode Fast pre-Bootstrap input: %w", err)
+	}
 
 	fastEval, err := bootstrapping.NewFastEvaluator(params)
 	if err != nil {
@@ -80,16 +87,18 @@ func numericalReference(secondaryRoot string, primary RepositoryMetadata, opts o
 		if err != nil {
 			return NumericalDocument{}, fmt.Errorf("decode Fast execution %d：%w", i+1, err)
 		}
-		record, err := numericalOutput(i+1, residual, values, decoded, out, input)
+		record, err := numericalOutput(i+1, residual, values, decoded, out, input, preFastDecoded)
 		if err != nil {
 			return NumericalDocument{}, fmt.Errorf("Fast execution %d metrics：%w", i+1, err)
 		}
-		fastRuns = append(fastRuns, decodedNumericalRun{output: record, values: decoded})
+		fastRuns = append(fastRuns, decodedNumericalRun{output: record, values: decoded, preValues: preFastDecoded, ciphertext: out})
 	}
 
 	standardRuns := make([]decodedNumericalRun, 0, opts.standardTrials)
 	standardKeys := make([]*rlwe.SecretKey, 0, opts.standardTrials)
 	keyTrialEvidence := make([]NumericalKeyTrial, 0, opts.standardTrials)
+	var standardEvalForLockstep *bootstrapping.Evaluator
+	var standardSecretForLockstep *rlwe.SecretKey
 	for i := 0; i < opts.standardTrials; i++ {
 		keygen := rlwe.NewKeyGenerator(params.BootstrappingParameters)
 		sk := keygen.GenSecretKeyNew()
@@ -115,6 +124,17 @@ func numericalReference(secondaryRoot string, primary RepositoryMetadata, opts o
 		if err != nil {
 			return NumericalDocument{}, fmt.Errorf("建立 Standard evaluator for trial %d：%w", i+1, err)
 		}
+		if i == 0 {
+			standardEvalForLockstep, standardSecretForLockstep = standardEval, sk
+		}
+		prePlain := rlwe.NewDecryptor(residual, sk).DecryptNew(input)
+		preStandardDecoded := make([]complex128, residual.MaxSlots())
+		if err := ckks.NewEncoder(residual).Decode(prePlain, preStandardDecoded); err != nil {
+			return NumericalDocument{}, fmt.Errorf("decode Standard pre-Bootstrap trial %d: %w", i+1, err)
+		}
+		if err := validateNumericalVector(preStandardDecoded); err != nil {
+			return NumericalDocument{}, fmt.Errorf("Standard pre-Bootstrap trial %d decoded vector: %w", i+1, err)
+		}
 		out, err := standardEval.Bootstrap(input.CopyNew())
 		if err != nil {
 			return NumericalDocument{}, fmt.Errorf("Standard Bootstrap trial %d：%w", i+1, err)
@@ -128,16 +148,29 @@ func numericalReference(secondaryRoot string, primary RepositoryMetadata, opts o
 		if err := validateNumericalVector(decoded); err != nil {
 			return NumericalDocument{}, fmt.Errorf("Standard trial %d decoded vector：%w", i+1, err)
 		}
-		record, err := numericalOutput(i+1, residual, values, decoded, out, input)
+		record, err := numericalOutput(i+1, residual, values, decoded, out, input, preStandardDecoded)
 		if err != nil {
 			return NumericalDocument{}, fmt.Errorf("Standard trial %d metrics：%w", i+1, err)
 		}
-		standardRuns = append(standardRuns, decodedNumericalRun{output: record, values: decoded})
+		standardRuns = append(standardRuns, decodedNumericalRun{output: record, values: decoded, preValues: preStandardDecoded, ciphertext: out})
 		keyTrialEvidence = append(keyTrialEvidence, NumericalKeyTrial{
 			Index: i + 1, FreshKeyGenerator: true, FreshEvaluationKeys: true,
 			SecretKeyLevelP: sk.LevelP(), UniqueSecretKey: unique,
 			EvaluatorPath: "Standard GenEvaluationKeys with P-capable secret key",
 		})
+	}
+	if standardEvalForLockstep == nil || standardSecretForLockstep == nil {
+		return NumericalDocument{}, fmt.Errorf("Standard lockstep evaluator/key was not retained from trial 1")
+	}
+	stageLockstep, err := runNumericalStageLockstep(
+		fastEval, standardEvalForLockstep, standardSecretForLockstep,
+		params, input, values,
+		fastRuns[0].preValues, standardRuns[0].preValues,
+		fastRuns[0].values, standardRuns[0].values,
+		fastRuns[0].ciphertext, standardRuns[0].ciphertext,
+	)
+	if err != nil {
+		return NumericalDocument{}, fmt.Errorf("Fast/Standard stage lockstep: %w", err)
 	}
 
 	fastRecords := make([]NumericalOutput, len(fastRuns))
@@ -207,7 +240,8 @@ func numericalReference(secondaryRoot string, primary RepositoryMetadata, opts o
 		FastAggregate:     fastAggregate, StandardAggregate: standardAggregate,
 		FastVsOriginalThreshold: fastOriginalThreshold, StandardVsOriginalThreshold: standardOriginalThreshold,
 		FastVsStandard: pairwise, FastVsStandardThreshold: fastStandardThreshold,
-		StandardToStandardVariability: spread, Classification: classification, ClassificationChecks: checks,
+		StandardToStandardVariability: spread, StageLockstep: &stageLockstep,
+		Classification: classification, ClassificationChecks: checks,
 		Limitations: []string{
 			"Fast output is decoded directly from c0 under the current Fast zero-secret mode; each Standard output is decrypted with its trial secret key.",
 			"The diagnostic uses the canonical deterministic plaintext-like input c0=encoded message, c1=0; it does not characterize encrypted-input noise or security.",
@@ -279,11 +313,15 @@ func fastStandardDecodeFast(params ckks.Parameters, ct *rlwe.Ciphertext) ([]comp
 	return decoded, validateNumericalVector(decoded)
 }
 
-func numericalOutput(index int, residual ckks.Parameters, original, decoded []complex128, output, input *rlwe.Ciphertext) (NumericalOutput, error) {
+func numericalOutput(index int, residual ckks.Parameters, original, decoded []complex128, output, input *rlwe.Ciphertext, preBootstrapDecoded []complex128) (NumericalOutput, error) {
 	if err := validateNumericalVector(decoded); err != nil {
 		return NumericalOutput{}, err
 	}
+	if err := validateNumericalVector(preBootstrapDecoded); err != nil {
+		return NumericalOutput{}, fmt.Errorf("pre-Bootstrap decoded values: %w", err)
+	}
 	metrics, threshold := numericalComparison(original, decoded)
+	preAgainstOriginal, _ := numericalComparison(original, preBootstrapDecoded)
 	precision := numericalPrecisionBits(original, decoded)
 	helper := ckks.GetPrecisionStats(residual, ckks.NewEncoder(residual), nil, original, decoded, 0, false)
 	metadata := numericalMetadata(output)
@@ -299,12 +337,19 @@ func numericalOutput(index int, residual ckks.Parameters, original, decoded []co
 	return NumericalOutput{
 		Index: index, Metadata: metadata, PublicContract: contract, VsOriginal: metrics,
 		Threshold: threshold, PrecisionBits: precision, CKKSHelper: numericalCKKSHelper(helper),
+		BootstrapSNR: numericalmetrics.Compare(preBootstrapDecoded, decoded),
+		PreBootstrapVsCanonicalOriginalComplexRMSE: preAgainstOriginal.Complex.RMSE,
 	}, nil
 }
 
 func numericalMetadata(ct *rlwe.Ciphertext) NumericalMetadata {
+	scale := ct.Scale.Float64()
+	scaleFinite := !math.IsNaN(scale) && !math.IsInf(scale, 0)
+	if !scaleFinite {
+		scale = 0
+	}
 	return NumericalMetadata{
-		Level: ct.Level(), Degree: ct.Degree(), Scale: ct.Scale.Float64(), ScaleLog2: ct.Scale.Log2(),
+		Level: ct.Level(), Degree: ct.Degree(), Scale: scale, ScaleExact: ct.Scale.Value.Text('e', 80), ScaleFloat64Finite: scaleFinite, ScaleLog2: ct.Scale.Log2(),
 		IsNTT: ct.IsNTT, IsMontgomery: ct.IsMontgomery,
 		LogDimensions: NumericalDimensions{Rows: ct.LogDimensions.Rows, Cols: ct.LogDimensions.Cols},
 	}
@@ -777,12 +822,160 @@ func renderNumericalSummary(doc NumericalDocument) string {
 	out.WriteString("\n## Classification checks\n\n")
 	fmt.Fprintf(&out, "- Fast vs original has no coordinate above 1e-2: `%t`\n- Fast vs Standard has no coordinate above 1e-2: `%t`\n- Median precision degradation is at most 2 bits: `%t`\n- Fast complex RMSE is within 4x Standard, or Standard RMSE is within the documented near-zero floor: `%t`\n- Public Bootstrap Level/Scale/dimensions contract is respected: `%t`\n- Standard near-zero floor: `%.6e`\n", doc.ClassificationChecks.FastVsOriginalNoCoordinateExceeds, doc.ClassificationChecks.FastVsStandardNoCoordinateExceeds, doc.ClassificationChecks.MedianPrecisionDropWithinTwoBits, doc.ClassificationChecks.FastRMSEWithinFourXOrNearZero, doc.ClassificationChecks.PublicMetadataContractRespected, doc.StandardRMSENearZeroFloor)
 
+	renderNumericalStageEvidence(&out, doc)
+
 	out.WriteString("\n## Limitations\n\n")
 	for _, limitation := range doc.Limitations {
 		fmt.Fprintf(&out, "- %s\n", limitation)
 	}
 	out.WriteString("\nThe JSON artifact contains aggregate metrics and worst-slot evidence only; decoded slot arrays are intentionally not persisted.\n")
 	return out.String()
+}
+
+func renderNumericalStageEvidence(out *strings.Builder, doc NumericalDocument) {
+	if doc.StageLockstep == nil {
+		return
+	}
+	stage := doc.StageLockstep
+	out.WriteString("\n## Decoded-domain Bootstrap SNR\n\nSNR here is numerical distortion, not RLWE security noise or a noise budget. Each Bootstrap SNR uses that mode's actual decoded pre-Bootstrap vector as the signal reference and its decoded post-Bootstrap output as the observation.\n\n| Mode / trial | Signal power | Signal RMS | Error power | Pre→Post RMSE | Bootstrap SNR (dB / status) | Pre-Bootstrap vs canonical original RMSE |\n|---|---:|---:|---:|---:|---:|---:|\n")
+	for _, output := range doc.StandardTrials {
+		fmt.Fprintf(out, "| Standard %d | %s | %s | %s | %s | %s | %.6e |\n", output.Index, formatSNRMetric(output.BootstrapSNR.SignalPower), formatSNRMetric(output.BootstrapSNR.SignalRMS), formatSNRMetric(output.BootstrapSNR.NoisePower), formatSNRMetric(output.BootstrapSNR.NoiseRMSE), formatSNRDB(output.BootstrapSNR), output.PreBootstrapVsCanonicalOriginalComplexRMSE)
+	}
+	for _, output := range doc.FastTrials {
+		fmt.Fprintf(out, "| Fast Q-prefix %d | %s | %s | %s | %s | %s | %.6e |\n", output.Index, formatSNRMetric(output.BootstrapSNR.SignalPower), formatSNRMetric(output.BootstrapSNR.SignalRMS), formatSNRMetric(output.BootstrapSNR.NoisePower), formatSNRMetric(output.BootstrapSNR.NoiseRMSE), formatSNRDB(output.BootstrapSNR), output.PreBootstrapVsCanonicalOriginalComplexRMSE)
+	}
+	if len(doc.StandardTrials) > 0 {
+		fmt.Fprintf(out, "\n`STANDARD_BOOTSTRAP_SNR_DB=%s`\n", formatSNRDB(doc.StandardTrials[0].BootstrapSNR))
+	}
+	if len(doc.FastTrials) > 0 {
+		fmt.Fprintf(out, "`FAST_BOOTSTRAP_SNR_DB=%s`\n", formatSNRDB(doc.FastTrials[0].BootstrapSNR))
+	}
+
+	out.WriteString("\n## Stage reference SNR and divergence\n\nFor each comparable checkpoint, `D_i` is Fast-vs-genuine-Standard complex RMSE; `A_i=D_i/D_(i-1)` where the previous `D` is positive; stage reference SNR uses Standard as signal and Fast−Standard as error. A zero previous `D` leaves `A_i` undefined.\n\n| Checkpoint | Fast state | Standard state | D_i RMSE | A_i | Stage reference SNR (dB / status) | ΔSNR_i (dB / status) | Max complex diff |\n|---|---|---|---:|---:|---:|---:|---:|\n")
+	for _, checkpoint := range stage.Checkpoints {
+		if !checkpoint.Comparable || checkpoint.FastVsStandard == nil {
+			continue
+		}
+		fmt.Fprintf(out, "| %s | %s | %s | %s | %s (%s) | %s | %s (%s) | %.6e |\n", checkpoint.Name,
+			formatInternalState(checkpoint.Fast), formatInternalState(checkpoint.Standard), formatOptionalFloat(checkpoint.D),
+			formatOptionalFloat(checkpoint.Amplification), checkpoint.AmplificationStatus,
+			formatSNRDB(checkpoint.StageReferenceSNR), formatOptionalFloat(checkpoint.DeltaSNRDB), checkpoint.DeltaSNRStatus, checkpoint.FastVsStandard.Complex.Max)
+	}
+	fmt.Fprintf(out, "\n`LARGEST_RAW_AMPLIFICATION_CHECKPOINT=%s`\n`LARGEST_RAW_AMPLIFICATION_FACTOR=%s`\n`LARGEST_SNR_DROP_CHECKPOINT=%s`\n`LARGEST_SNR_DROP_DB=%s`\n",
+		stage.LargestRawAmplificationCheckpoint, formatOptionalFloat(stage.LargestRawAmplificationFactor), stage.LargestSNRDropCheckpoint, formatOptionalFloat(stage.LargestSNRDropDB))
+	fmt.Fprintf(out, "\n- First observable: `%s`, max complex diff `%s` (threshold `%.3e`)\n- First material: `%s`, max complex diff `%s` (threshold `%.12g`)\n- Final Fast-vs-Standard RMSE: `%.12g`\n- S2C amplification factor: `%s`\n- Current classification: `%s`\n",
+		stage.FirstObservable, formatOptionalFloat(stage.FirstObservableMaxDiff), stage.ObservableThreshold,
+		stage.FirstMaterial, formatOptionalFloat(stage.FirstMaterialMaxDiff), stage.MaterialThreshold,
+		stage.FinalFastStandardRMSE, formatOptionalFloat(stage.S2CAmplificationFactor), stage.Classification)
+	fmt.Fprintf(out, "\n`FIRST_OBSERVABLE_CHECKPOINT=%s`\n`FIRST_OBSERVABLE_MAX_DIFF=%s`\n`FIRST_MATERIAL_CHECKPOINT=%s`\n`FIRST_MATERIAL_MAX_DIFF=%s`\n`FINAL_FAST_STANDARD_RMSE=%.12g`\n`S2C_AMPLIFICATION_FACTOR=%s`\n",
+		stage.FirstObservable, formatOptionalFloat(stage.FirstObservableMaxDiff), stage.FirstMaterial, formatOptionalFloat(stage.FirstMaterialMaxDiff), stage.FinalFastStandardRMSE, formatOptionalFloat(stage.S2CAmplificationFactor))
+
+	if len(stage.EvalModInternal) > 0 {
+		out.WriteString("\n## EvalMod internal bisect\n\nStandard is decrypted with the genuine Standard secret key; Fast is decoded through the validated Q-prefix c0 path after projecting both branches to common authoritative Q rows. Replay verification compares each source-faithful replay output with the actual public EvalMod output.\n\n| Checkpoint | Fast L / log2(scale) / degree / NTT / Montgomery / rows | Standard L / log2(scale) / degree / NTT / Montgomery / rows | D_i RMSE | A_i | Stage reference SNR (dB / status) | ΔSNR_i (dB / status) | Max complex diff |\n|---|---|---|---:|---:|---:|---:|---:|---:|\n")
+		for _, checkpoint := range stage.EvalModInternal {
+			if checkpoint.Comparable && checkpoint.FastVsStandard != nil {
+				fmt.Fprintf(out, "| %s | %s | %s | %s | %s (%s) | %s | %s (%s) | %.6e |\n", checkpoint.Name,
+					formatInternalState(checkpoint.Fast), formatInternalState(checkpoint.Standard), formatOptionalFloat(checkpoint.D),
+					formatOptionalFloat(checkpoint.Amplification), checkpoint.AmplificationStatus, formatSNRDB(checkpoint.StageReferenceSNR),
+					formatOptionalFloat(checkpoint.DeltaSNRDB), checkpoint.DeltaSNRStatus, checkpoint.FastVsStandard.Complex.Max)
+			} else {
+				fmt.Fprintf(out, "| %s | — | — | — | — | NOT_COMPARABLE: %s |\n", checkpoint.Name, checkpoint.NotComparableReason)
+			}
+		}
+		out.WriteString("\nReplay verification RMSE by mode: ")
+		replayKeys := make([]string, 0, len(stage.EvalModReplayRMSE))
+		for key := range stage.EvalModReplayRMSE {
+			replayKeys = append(replayKeys, key)
+		}
+		sort.Strings(replayKeys)
+		for i, key := range replayKeys {
+			if i > 0 {
+				out.WriteString("; ")
+			}
+			fmt.Fprintf(out, "`%s=%.6e (verified=%t)`", key, stage.EvalModReplayRMSE[key], stage.EvalModReplayVerified[key])
+		}
+		out.WriteString("\n")
+	}
+
+	if stage.PolynomialPlan != nil {
+		plan := stage.PolynomialPlan
+		fmt.Fprintf(out, "\n## Polynomial plan and generated-power evidence\n\n- Fast diagnostic PS plan: degree `%d`, base `%d`, level `%d`, target scale log2 `%.6f`, exact `%s`, blocks `%d`.\n", plan.Degree, plan.Base, plan.Level, plan.ScaleLog2, plan.ScaleExact, plan.BlockCount)
+		if len(stage.GeneratedPowerEvidence) > 0 {
+			out.WriteString("\n| Power n | Level | Scale log2 | Fast maintained rows | RMSE vs reference | Max complex diff | Reference provenance |\n|---:|---:|---:|---:|---:|---:|---|\n")
+			for _, power := range stage.GeneratedPowerEvidence {
+				fmt.Fprintf(out, "| %d | %d | %.6f | %d | %.6e | %.6e | %s |\n", power.Power, power.Level, power.ScaleLog2, power.FastMaintainedRows, power.RMSE, power.MaxComplexDiff, power.ReferenceKind)
+			}
+		}
+	}
+
+	if len(stage.ScaleAudit) > 0 {
+		out.WriteString("\n## EvalMod exact-scale audit\n\nThe q0=55 path retains plan scale 2^91; these values are observed, not altered by the diagnostic. Exact scale strings are retained even when float64 projection is non-finite.\n\n| Checkpoint | Level | Scale log2 | Exact scale | Plan bits | Working bits | Target log2 / exact | kIn | multiplier | round |\n|---|---:|---:|---|---:|---:|---|---:|---:|---:|\n")
+		for _, audit := range stage.ScaleAudit {
+			if !strings.HasPrefix(audit.Checkpoint, "evalmod") && !strings.HasPrefix(audit.Checkpoint, "real/") && !strings.HasPrefix(audit.Checkpoint, "imag/") {
+				continue
+			}
+			fmt.Fprintf(out, "| %s | %d | %.6f | `%s` | %d | %d | %.6f / `%s` | %d | %d | %d |\n", audit.Checkpoint, audit.Level, audit.ScaleLog2, audit.ScaleExact, audit.PlanScaleBits, audit.WorkingScaleBits, audit.TargetScaleLog2, audit.TargetScaleExact, audit.KInExponent, audit.MultiplierExponent, audit.DoubleAngleRound)
+		}
+	}
+
+	out.WriteString("\n## S2C attribution\n\nThe first material divergence is already present at EvalMod, so S2C is not the originating stage. For this run S2C transforms the combined EvalMod reference gap by the reported amplification factor; its separate stage increment is visible in the stage table.\n\n")
+	out.WriteString("\n## Historical-reference reconciliation and next bounded counterfactual\n\n`HISTORICAL_FAST_CKKS_REFERENCE_ONLY`: older q0=56/dirty-tree diagnosis is not used to classify this current q0=55 run. Current evidence is reproduced on the synchronized current Fast Q-prefix branch; the selected plan scale remains 2^91.\n\n")
+	fmt.Fprintf(out, "Next causal experiment (exactly one; not executed): **%s**\n", numericalNextCounterfactual(*stage))
+}
+
+func formatOptionalFloat(value *float64) string {
+	if value == nil {
+		return "—"
+	}
+	return fmt.Sprintf("%.6e", *value)
+}
+
+func formatSNRMetric(value *float64) string {
+	if value == nil {
+		return "—"
+	}
+	return fmt.Sprintf("%.6e", *value)
+}
+
+func formatSNRDB(value numericalmetrics.SNR) string {
+	if value.SNRDB != nil {
+		return fmt.Sprintf("%.6f / %s", *value.SNRDB, value.Status)
+	}
+	switch value.Status {
+	case numericalmetrics.PositiveInfinity:
+		return "+Inf / POSITIVE_INFINITY"
+	case numericalmetrics.UndefinedZeroSignal:
+		return "undefined / UNDEFINED_ZERO_SIGNAL"
+	case numericalmetrics.NotComparable:
+		return "— / NOT_COMPARABLE"
+	default:
+		return "— / " + string(value.Status)
+	}
+}
+
+func formatInternalState(state NumericalStageState) string {
+	metadata := state.Metadata
+	return fmt.Sprintf("L%d / %.6f / d%d / %t / %t / %d(+%d maintained)", metadata.Level, metadata.ScaleLog2, metadata.Degree, metadata.IsNTT, metadata.IsMontgomery, state.AuthorityRows, state.MaintainedRows)
+}
+
+func numericalNextCounterfactual(stage NumericalStageLockstep) string {
+	switch stage.Classification {
+	case "CURRENT_FAST_FIRST_MATERIAL_EVALMOD_NORMALIZATION":
+		return "test-only coherent-scale exponent correction at the first diverging normalization transition, holding every other stage fixed."
+	case "CURRENT_FAST_FIRST_MATERIAL_EVALMOD_DOUBLE_ANGLE":
+		return "test-only semantic correction at the first DoubleAngle round whose checkpoint crosses the material threshold, holding all earlier stages fixed."
+	case "CURRENT_FAST_FIRST_MATERIAL_EVALMOD_POLYNOMIAL":
+		for _, power := range stage.GeneratedPowerEvidence {
+			if power.MaxComplexDiff >= stage.MaterialThreshold {
+				return fmt.Sprintf("replace only generated Chebyshev power n=%d with its labeled plaintext recurrence reference, then replay unchanged polynomial and downstream stages.", power.Power)
+			}
+		}
+		return "test-only q0=55 PS plan-scale 2^91→2^92 counterfactual with generated powers and workload held fixed; no production change."
+	case "CURRENT_FAST_FIRST_MATERIAL_S2C":
+		return "test-only S2C scale/representation alignment with actual EvalMod outputs held fixed."
+	default:
+		return "one test-only replacement of the earliest generated Chebyshev power with its labeled recurrence reference; stop if source-faithful replay does not close."
+	}
 }
 
 func writeNumericalMetadataRow(out *strings.Builder, name string, output NumericalOutput) {

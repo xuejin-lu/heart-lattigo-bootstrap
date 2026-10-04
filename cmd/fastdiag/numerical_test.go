@@ -1,10 +1,13 @@
 package main
 
 import (
+	"encoding/json"
 	"math"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"github.com/xuejin-lu/heart-lattigo-bootstrap/internal/numericalmetrics"
 )
 
 func TestFastStandardCanonicalInputFingerprint(t *testing.T) {
@@ -24,6 +27,30 @@ func TestNumericalComparisonMetricsAndThresholdCoordinates(t *testing.T) {
 	require.Equal(t, 0, threshold.ImagExceeding, "threshold uses strict greater-than")
 	require.Equal(t, 1, threshold.TotalExceeding)
 	require.InDelta(t, 1.0/6, threshold.TotalFraction, 1e-15)
+}
+
+func TestReusableSNRNoiseRMSEMatchesExistingComplexRMSE(t *testing.T) {
+	reference := []complex128{1 + 2i, -3 + 4i, 0.25 - 0.5i}
+	output := []complex128{1.1 + 1.8i, -2.5 + 3.75i, 0.25 - 0.5i}
+	metric := numericalmetrics.Compare(reference, output)
+	legacy, _ := numericalComparison(reference, output)
+	require.Equal(t, numericalmetrics.Finite, metric.Status)
+	require.NotNil(t, metric.NoiseRMSE)
+	require.InDelta(t, legacy.Complex.RMSE, *metric.NoiseRMSE, 1e-15)
+}
+
+func TestNumerical001JSONRemainsParseableAndLegacyMetricsRemainUnchanged(t *testing.T) {
+	data, err := os.ReadFile("../../results/FAST-STANDARD-NUMERICAL-001-summary.json")
+	require.NoError(t, err)
+	var doc NumericalDocument
+	require.NoError(t, json.Unmarshal(data, &doc))
+	require.Equal(t, "fastdiag.numerical.v1", doc.SchemaVersion)
+	require.NotEmpty(t, doc.FastTrials)
+	require.NotEmpty(t, doc.StandardTrials)
+	require.InDelta(t, 0.020892211083414026, doc.FastTrials[0].VsOriginal.Complex.RMSE, 1e-15)
+	require.InDelta(t, 5.743515404716076, doc.FastTrials[0].PrecisionBits.MedianBits, 1e-12)
+	require.InDelta(t, 1.1903936621664996e-9, doc.StandardTrials[0].VsOriginal.Complex.RMSE, 1e-20)
+	require.InDelta(t, 30.795452055977087, doc.StandardTrials[0].PrecisionBits.MedianBits, 1e-12)
 }
 
 func TestPairwiseWorstSlotIncludesOriginalFastAndStandard(t *testing.T) {

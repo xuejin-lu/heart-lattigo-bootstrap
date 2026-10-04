@@ -50,6 +50,9 @@ func execute(args []string) error {
 		if err != nil {
 			return err
 		}
+		if field := firstNonFiniteNumber(doc); field != "" {
+			return fmt.Errorf("numerical result contains non-finite JSON number at %s", field)
+		}
 		if err := writeJSON(paths.json, doc); err != nil {
 			return err
 		}

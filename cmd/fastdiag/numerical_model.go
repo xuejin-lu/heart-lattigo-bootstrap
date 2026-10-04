@@ -1,6 +1,10 @@
 package main
 
-import "time"
+import (
+	"time"
+
+	"github.com/xuejin-lu/heart-lattigo-bootstrap/internal/numericalmetrics"
+)
 
 type NumericalComplex struct {
 	Real float64 `json:"real"`
@@ -13,13 +17,15 @@ type NumericalDimensions struct {
 }
 
 type NumericalMetadata struct {
-	Level         int                 `json:"level"`
-	Degree        int                 `json:"degree"`
-	Scale         float64             `json:"scale"`
-	ScaleLog2     float64             `json:"scale_log2"`
-	IsNTT         bool                `json:"is_ntt"`
-	IsMontgomery  bool                `json:"is_montgomery"`
-	LogDimensions NumericalDimensions `json:"log_dimensions"`
+	Level              int                 `json:"level"`
+	Degree             int                 `json:"degree"`
+	Scale              float64             `json:"scale"`
+	ScaleExact         string              `json:"scale_exact,omitempty"`
+	ScaleFloat64Finite bool                `json:"scale_float64_finite"`
+	ScaleLog2          float64             `json:"scale_log2"`
+	IsNTT              bool                `json:"is_ntt"`
+	IsMontgomery       bool                `json:"is_montgomery"`
+	LogDimensions      NumericalDimensions `json:"log_dimensions"`
 }
 
 type NumericalPublicContract struct {
@@ -88,13 +94,100 @@ type NumericalCKKSPrecisionHelper struct {
 }
 
 type NumericalOutput struct {
-	Index          int                          `json:"index"`
-	Metadata       NumericalMetadata            `json:"metadata"`
-	PublicContract NumericalPublicContract      `json:"public_bootstrap_contract"`
-	VsOriginal     NumericalMetricSet           `json:"vs_original"`
-	Threshold      NumericalThresholdAudit      `json:"threshold_audit"`
-	PrecisionBits  NumericalPrecisionBits       `json:"precision_bits"`
-	CKKSHelper     NumericalCKKSPrecisionHelper `json:"ckks_precision_helper"`
+	Index                                      int                          `json:"index"`
+	Metadata                                   NumericalMetadata            `json:"metadata"`
+	PublicContract                             NumericalPublicContract      `json:"public_bootstrap_contract"`
+	VsOriginal                                 NumericalMetricSet           `json:"vs_original"`
+	Threshold                                  NumericalThresholdAudit      `json:"threshold_audit"`
+	PrecisionBits                              NumericalPrecisionBits       `json:"precision_bits"`
+	CKKSHelper                                 NumericalCKKSPrecisionHelper `json:"ckks_precision_helper"`
+	BootstrapSNR                               numericalmetrics.SNR         `json:"bootstrap_snr"`
+	PreBootstrapVsCanonicalOriginalComplexRMSE float64                      `json:"pre_bootstrap_vs_canonical_original_complex_rmse"`
+}
+
+type NumericalStageState struct {
+	Metadata       NumericalMetadata `json:"metadata"`
+	AuthorityRows  int               `json:"authority_rows"`
+	MaintainedRows int               `json:"maintained_rows,omitempty"`
+}
+
+type NumericalStageCheckpoint struct {
+	Name                         string                  `json:"checkpoint"`
+	Fast                         NumericalStageState     `json:"fast"`
+	Standard                     NumericalStageState     `json:"standard"`
+	Comparable                   bool                    `json:"comparable"`
+	NotComparableReason          string                  `json:"not_comparable_reason,omitempty"`
+	PrecisionVsCanonicalOriginal *NumericalPrecisionBits `json:"precision_vs_canonical_original,omitempty"`
+	FastVsStandard               *NumericalMetricSet     `json:"fast_vs_standard,omitempty"`
+	D                            *float64                `json:"d_i_rmse"`
+	Amplification                *float64                `json:"a_i"`
+	AmplificationStatus          string                  `json:"a_i_status"`
+	StageReferenceSNR            numericalmetrics.SNR    `json:"stage_reference_snr"`
+	DeltaSNRDB                   *float64                `json:"delta_snr_i_db"`
+	DeltaSNRStatus               string                  `json:"delta_snr_i_status"`
+	FirstObservable              bool                    `json:"first_observable,omitempty"`
+	FirstMaterial                bool                    `json:"first_material,omitempty"`
+}
+
+type NumericalStageLockstep struct {
+	Checkpoints                       []NumericalStageCheckpoint `json:"checkpoints"`
+	FirstObservable                   string                     `json:"first_observable_checkpoint"`
+	FirstObservableMaxDiff            *float64                   `json:"first_observable_max_diff"`
+	FirstMaterial                     string                     `json:"first_material_checkpoint"`
+	FirstMaterialMaxDiff              *float64                   `json:"first_material_max_diff"`
+	MaterialThreshold                 float64                    `json:"material_threshold"`
+	ObservableThreshold               float64                    `json:"observable_threshold"`
+	Classification                    string                     `json:"classification"`
+	FinalFastStandardRMSE             float64                    `json:"final_fast_standard_rmse"`
+	S2CAmplificationFactor            *float64                   `json:"s2c_amplification_factor"`
+	LargestRawAmplificationCheckpoint string                     `json:"largest_raw_amplification_checkpoint"`
+	LargestRawAmplificationFactor     *float64                   `json:"largest_raw_amplification_factor"`
+	LargestSNRDropCheckpoint          string                     `json:"largest_snr_drop_checkpoint"`
+	LargestSNRDropDB                  *float64                   `json:"largest_snr_drop_db"`
+	EvalModReplayVerified             map[string]bool            `json:"evalmod_replay_verified,omitempty"`
+	EvalModReplayRMSE                 map[string]float64         `json:"evalmod_replay_rmse,omitempty"`
+	EvalModInternal                   []NumericalStageCheckpoint `json:"evalmod_internal,omitempty"`
+	ScaleAudit                        []NumericalScaleAudit      `json:"scale_audit,omitempty"`
+	GeneratedPowerEvidence            []NumericalGeneratedPower  `json:"generated_power_evidence,omitempty"`
+	PolynomialPlan                    *NumericalPolynomialPlan   `json:"polynomial_plan,omitempty"`
+}
+
+type NumericalScaleAudit struct {
+	Checkpoint               string  `json:"checkpoint"`
+	Scale                    float64 `json:"scale"`
+	ScaleExact               string  `json:"scale_exact,omitempty"`
+	ScaleFloat64Finite       bool    `json:"scale_float64_finite"`
+	ScaleLog2                float64 `json:"scale_log2"`
+	PlanScaleBits            int     `json:"plan_scale_bits,omitempty"`
+	PlanScaleExact           string  `json:"plan_scale_exact,omitempty"`
+	WorkingScaleBits         int     `json:"working_scale_bits,omitempty"`
+	DoubleAngleRound         int     `json:"double_angle_round,omitempty"`
+	KInExponent              int     `json:"k_in_exponent,omitempty"`
+	MultiplierExponent       int     `json:"multiplier_exponent,omitempty"`
+	TargetScale              float64 `json:"target_scale,omitempty"`
+	TargetScaleExact         string  `json:"target_scale_exact,omitempty"`
+	TargetScaleFloat64Finite bool    `json:"target_scale_float64_finite"`
+	TargetScaleLog2          float64 `json:"target_scale_log2,omitempty"`
+	Level                    int     `json:"level"`
+}
+
+type NumericalGeneratedPower struct {
+	ReferenceKind      string  `json:"reference_kind"`
+	Power              int     `json:"power"`
+	Level              int     `json:"level"`
+	ScaleLog2          float64 `json:"scale_log2"`
+	FastMaintainedRows int     `json:"fast_maintained_rows"`
+	RMSE               float64 `json:"rmse_fast_vs_reference"`
+	MaxComplexDiff     float64 `json:"max_complex_diff_fast_vs_reference"`
+}
+
+type NumericalPolynomialPlan struct {
+	Degree     int     `json:"degree"`
+	Base       int     `json:"base"`
+	Level      int     `json:"level"`
+	ScaleLog2  float64 `json:"scale_log2"`
+	ScaleExact string  `json:"scale_exact"`
+	BlockCount int     `json:"block_count"`
 }
 
 type NumericalKeyTrial struct {
@@ -233,6 +326,7 @@ type NumericalDocument struct {
 	FastVsStandard                []NumericalPairwiseComparison `json:"fast_vs_standard_trials"`
 	FastVsStandardThreshold       NumericalThresholdAudit       `json:"fast_vs_standard_threshold_aggregate"`
 	StandardToStandardVariability NumericalStandardSpread       `json:"standard_to_standard_variability"`
+	StageLockstep                 *NumericalStageLockstep       `json:"stage_lockstep,omitempty"`
 	Classification                string                        `json:"classification"`
 	ClassificationChecks          NumericalClassificationChecks `json:"classification_checks"`
 	Limitations                   []string                      `json:"limitations"`
