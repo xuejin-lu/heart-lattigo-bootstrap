@@ -1,59 +1,48 @@
 # Current Task
 
-Task: QPREFIX-PERF-MEASURE-LOGN16-001
+Task: FAST-STANDARD-NUMERICAL-DIAG-002
 Status: READY_FOR_CODEX
 
 Task class:
-`M — Performance Measurement`
-
-Temporarily suspended:
-`FAST-STANDARD-NUMERICAL-DIAG-002`
+`D — Numerical Correctness Diagnosis`
 
 Authoritative spec:
-`specs/QPREFIX-PERF-MEASURE-LOGN16-001-STANDARD-VS-FAST.md`
+`specs/FAST-STANDARD-NUMERICAL-DIAG-002-CURRENT-QPREFIX-LOCKSTEP.md`
+
+Accepted parent:
+- `results/FAST-STANDARD-NUMERICAL-001-summary.md`
+- Primary result commit: `c338482bf4066050702622497722237746ac26ef`
+- classification: `FAST_NUMERICAL_QUALITY_DEGRADED`
 
 Goal:
-Measure matched `N=2^16` / LogN16 bootstrapping timing for genuine Standard versus current Q-prefix Fast, including complete Bootstrap and per-stage timing.
+Identify the first material numerical divergence between current Q-prefix Fast and genuine Standard along the Bootstrap pipeline.
 
-Frozen refs:
-- Primary harness: `2b1022e1820e612e9209094dd672be15d06a8d13`
-- Standard Secondary: `5dbffbdea05394de2ca3a432ed5318aa832e3f40`
-- Fast Secondary: `82601ea2517edc14784c9da250426169a1b221c7`
+Required numerical instrumentation:
+- preserve RMSE / max-diff / precision diagnostics;
+- add end-to-end decoded **Bootstrap SNR** for Standard and Fast using actual decoded pre-Bootstrap vs post-Bootstrap vectors;
+- add per-checkpoint (D_i), (A_i), Standard-reference stage SNR, and (Delta\mathrm{SNR}_i);
+- distinguish Bootstrap SNR from Fast-vs-Standard stage reference SNR;
+- do not interpret either as RLWE security noise or noise budget.
 
-Config:
-`configs/bootstrap_config.logN16.json`
+Primary diagnosis:
+- input;
+- ScaleDown;
+- ModUp;
+- C2S real/imag;
+- EvalMod real/imag;
+- S2C;
+- final public output;
+- if EvalMod is first material, continue the internal EvalMod bisect defined in the spec.
 
-Protocol:
-- temporary detached worktrees;
-- warmup 1;
-- repetitions 7;
-- `-stages`;
-- same host;
-- no production changes.
+No production repair in this task.
+No performance optimization in this task.
+Diagnostic-only reusable instrumentation is allowed and must be behavior-neutral.
 
-Required outputs:
-- `results/QPREFIX-PERF-MEASURE-LOGN16-001-standard.json`
-- `results/QPREFIX-PERF-MEASURE-LOGN16-001-fast.json`
-- `results/QPREFIX-PERF-MEASURE-LOGN16-001-summary.md`
+Required output:
+`results/FAST-STANDARD-NUMERICAL-DIAG-002-summary.md`
 
-Return:
-`LOGN16_STANDARD_FAST_TIMING_READY`
-then `READY_FOR_WEB_REVIEW`.
+Required completion token:
+`FAST_STANDARD_NUMERICAL_BISECT_READY`
 
-
-Web-review amendment:
-- Standard detached harness run is explicitly authorized to use `-tags lattigo_standard`.
-- Run `go test -tags lattigo_standard ./...` before the Standard measurement.
-- Standard measurement uses `go run -tags lattigo_standard . ...`.
-- Fast measurement remains untagged.
-- This tag only selects the Primary harness's built-in Standard stubs and excludes Fast-only diagnostics; it does not authorize arithmetic or config changes.
-
-
-Web-review amendment 2:
-- Supersede prior current-Primary/build-tag execution attempts.
-- Use detached measurement harness Primary commit `8186f50e7b591b7f76b39fb89b47c32ad1cc1410` for BOTH Standard and Fast.
-- Do not use `lattigo_standard`.
-- Standard Secondary remains `5dbffbdea05394de2ca3a432ed5318aa832e3f40`.
-- Fast Secondary remains `82601ea2517edc14784c9da250426169a1b221c7`.
-- Run `go test ./...` and then the existing `go run . -stages -config configs/bootstrap_config.logN16.json -warmup 1 -repetitions 7 ...` in each detached harness.
-- If current Q-prefix does not compile against this proven clean public harness without patching, stop BLOCKED.
+Then:
+`READY_FOR_WEB_REVIEW`
