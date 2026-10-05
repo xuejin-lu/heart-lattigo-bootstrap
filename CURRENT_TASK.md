@@ -1,38 +1,35 @@
 # Current Task
 
-Task: FAST-STANDARD-NUMERICAL-FIX-001
+Task: FAST-STANDARD-NUMERICAL-REPORT-001
 Status: READY_FOR_CODEX
 
 Task class:
-`C — Numerical Correctness Repair`
+`R — Diagnostic / Reporting Repair`
 
 Authoritative spec:
-`specs/FAST-STANDARD-NUMERICAL-FIX-001-REMOVE-NORMALIZED-EVALMOD.md`
+`specs/FAST-STANDARD-NUMERICAL-REPORT-001-CLOSE-CLASSIFIER.md`
 
-Architecture decision:
-The Fast-only normalized LogN13 EvalMod schedule is a historical workaround and must be removed from the production path.
+Accepted numerical state:
+- Secondary production commit: `5117fc57949647182f476dc5952099c706b9f869`
+- Primary accepted result commit: `88e6e6badc0973b64bb051a0ce7fc51cf3f95e75`
+- top-level classification: `FAST_STANDARD_NUMERICAL_CLOSE`
+- final Fast-vs-Standard RMSE: `1.44680895443e-10`
+- Standard Bootstrap SNR: `144.713390 dB`
+- Fast Bootstrap SNR: `144.710750 dB`
+- no first observable/material checkpoint;
+- all 56 Q-prefix capacity checks pass.
 
-Fast Q-prefix EvalMod should follow genuine Standard Mod1 mathematics and Scale/Level progression, while using Fast Q-prefix storage/arithmetic primitives.
+Goal:
+Fix only the legacy stage-lockstep classifier so a healthy run with no observable divergence does not retain `CURRENT_FAST_NUMERICAL_DIVERGENCE_UNCLOSED`.
 
-Do not:
-- tune the normalized exponents;
-- run another semantic-alignment diagnosis to preserve the normalized algorithm;
-- reintroduce full-RNS/Standard fallback;
-- remove retained sampled error/noise;
-- change Standard production arithmetic.
+Expected accepted stage classification:
+`CURRENT_FAST_NO_OBSERVABLE_DIVERGENCE`
 
-Current key semantics must be described correctly:
-- the large `a` mask contribution is removed/elided;
-- the public-key target is approximately `(e_pk, 0)`;
-- sampled error is retained.
-
-Use existing Q0123 capacity checks as assertions. If the Standard-equivalent schedule actually violates `2B < S_Q`, stop and report the exact first capacity deficit; do not invent a new workaround.
-
-Required output:
-`results/FAST-STANDARD-NUMERICAL-FIX-001-summary.md`
+Do not modify Secondary or production arithmetic.
+Do not change thresholds or accepted measurements.
 
 Required completion token:
-`FAST_STANDARD_EVALMOD_FIX_READY`
+`FAST_STANDARD_NUMERICAL_REPORT_FIX_READY`
 
 Then:
 `READY_FOR_WEB_REVIEW`.
