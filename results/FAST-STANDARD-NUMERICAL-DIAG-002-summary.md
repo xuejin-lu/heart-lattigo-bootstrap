@@ -1,11 +1,11 @@
 # Fast vs Standard numerical reference — p93-q55
 
 - Classification: **FAST_NUMERICAL_QUALITY_DEGRADED**
-- Timestamp: `2026-10-04T22:48:06Z`
+- Timestamp: `2026-10-05T10:29:36Z`
 - Threshold: `0.01`
-- Primary: `18165e8cd0a92ee107acd4a687d012b13d90929e` (`main`, dirty=true)
+- Primary: `4fd11a5aa557a9e91c0473c94f76b9bfc41a9e36` (`main`, dirty=false)
 - Secondary: `97c1c6174e0d7ef781de6d8dadce5c2869a53496` (`fast-qprefix`, dirty=false)
-- Environment: `go1.26.4`, `darwin/arm64`, CPU `arm64`, NumCPU `10`, GOMAXPROCS `10`
+- Environment: `go1.26.4`, `darwin/arm64`, CPU `Apple M4`, NumCPU `10`, GOMAXPROCS `10`
 
 ## Canonical workload
 
@@ -171,29 +171,30 @@ SNR here is numerical distortion, not RLWE security noise or a noise budget. Eac
 
 ## Stage reference SNR and divergence
 
-For each comparable checkpoint, `D_i` is Fast-vs-genuine-Standard complex RMSE; `A_i=D_i/D_(i-1)` where the previous `D` is positive; stage reference SNR uses Standard as signal and Fast−Standard as error. A zero previous `D` leaves `A_i` undefined.
+`D_i` is Fast-vs-genuine-Standard complex RMSE. Amplification and SNR deltas follow the explicit stage topology, not table adjacency: C2S real/imag are parallel children of ModUp; each EvalMod branch uses its matching C2S branch; S2C uses a joint EvalMod real+imag reference; final public output may use S2C.
 
-| Checkpoint | Fast state | Standard state | D_i RMSE | A_i | Stage reference SNR (dB / status) | ΔSNR_i (dB / status) | Max complex diff |
-|---|---|---|---:|---:|---:|---:|---:|
-| input | L0 / 45.000000 / d1 / true / false / 1(+1 maintained) | L0 / 45.000000 / d1 / true / false / 1(+0 maintained) | 0.000000e+00 | — (NOT_COMPARABLE) | +Inf / POSITIVE_INFINITY | — (NOT_COMPARABLE) | 0.000000e+00 |
-| scale_down | L0 / 45.000000 / d1 / true / false / 1(+1 maintained) | L0 / 45.000000 / d1 / true / false / 1(+0 maintained) | 0.000000e+00 | — (UNDEFINED_ZERO_OVER_ZERO) | +Inf / POSITIVE_INFINITY | — (UNDEFINED_INFINITY_MINUS_INFINITY) | 0.000000e+00 |
-| mod_up | L16 / 50.000000 / d1 / true / true / 4(+4 maintained) | L16 / 50.000000 / d1 / true / false / 17(+0 maintained) | 0.000000e+00 | — (UNDEFINED_ZERO_OVER_ZERO) | +Inf / POSITIVE_INFINITY | — (UNDEFINED_INFINITY_MINUS_INFINITY) | 0.000000e+00 |
-| c2s_real | L12 / 50.000000 / d1 / true / true / 4(+4 maintained) | L12 / 50.000000 / d1 / true / false / 13(+0 maintained) | 2.396436e-14 | — (UNDEFINED_ZERO_PREVIOUS_D) | 175.432910 / FINITE | — (NEGATIVE_INFINITY) | 9.185075e-14 |
-| c2s_imag | L12 / 50.000000 / d1 / true / true / 4(+4 maintained) | L12 / 50.000000 / d1 / true / false / 13(+0 maintained) | 2.409568e-14 | 1.005479e+00 (FINITE) | 175.358744 / FINITE | -7.416581e-02 (FINITE) | 9.768351e-14 |
-| evalmod_real | L4 / 45.000000 / d1 / true / true / 4(+4 maintained) | L4 / 45.000000 / d1 / true / false / 5(+0 maintained) | 7.422415e-03 | 3.080393e+11 (FINITE) | -0.201277 / FINITE | -1.755600e+02 (FINITE) | 2.033136e-02 |
-| evalmod_imag | L4 / 45.000000 / d1 / true / true / 4(+4 maintained) | L4 / 45.000000 / d1 / true / false / 5(+0 maintained) | 7.350434e-03 | 9.903022e-01 (FINITE) | -0.143334 / FINITE | 5.794320e-02 (FINITE) | 2.259150e-02 |
-| s2c | L1 / 45.000000 / d1 / true / true / 2(+2 maintained) | L1 / 45.000000 / d1 / true / false / 2(+0 maintained) | 2.089221e-02 | 2.842310e+00 (FINITE) | -0.172491 / FINITE | -2.915729e-02 (FINITE) | 3.640730e-02 |
-| final_public_output | L1 / 45.000000 / d1 / true / false / 2(+2 maintained) | L1 / 45.000000 / d1 / true / false / 2(+0 maintained) | 2.089221e-02 | 1.000000e+00 (FINITE) | -0.172491 / FINITE | 0.000000e+00 (FINITE) | 3.640730e-02 |
+| Checkpoint | Fast state | Standard state | D_i RMSE | A_i parent | A_i | Stage reference SNR (dB / status) | ΔSNR_i parent | ΔSNR_i (dB / status) | Max complex diff |
+|---|---|---|---:|---|---:|---:|---|---:|---:|
+| input | L0 / 45.000000 / d1 / true / false / 1(+1 maintained) | L0 / 45.000000 / d1 / true / false / 1(+0 maintained) | 0.000000e+00 | — | — (NOT_COMPARABLE) | +Inf / POSITIVE_INFINITY | — | — (NOT_COMPARABLE) | 0.000000e+00 |
+| scale_down | L0 / 45.000000 / d1 / true / false / 1(+1 maintained) | L0 / 45.000000 / d1 / true / false / 1(+0 maintained) | 0.000000e+00 | input | — (UNDEFINED_ZERO_OVER_ZERO) | +Inf / POSITIVE_INFINITY | input | — (UNDEFINED_INFINITY_MINUS_INFINITY) | 0.000000e+00 |
+| mod_up | L16 / 50.000000 / d1 / true / true / 4(+4 maintained) | L16 / 50.000000 / d1 / true / false / 17(+0 maintained) | 0.000000e+00 | scale_down | — (UNDEFINED_ZERO_OVER_ZERO) | +Inf / POSITIVE_INFINITY | scale_down | — (UNDEFINED_INFINITY_MINUS_INFINITY) | 0.000000e+00 |
+| c2s_real | L12 / 50.000000 / d1 / true / true / 4(+4 maintained) | L12 / 50.000000 / d1 / true / false / 13(+0 maintained) | 2.396436e-14 | mod_up | — (UNDEFINED_ZERO_PREVIOUS_D) | 175.432910 / FINITE | mod_up | — (NEGATIVE_INFINITY) | 9.185075e-14 |
+| c2s_imag | L12 / 50.000000 / d1 / true / true / 4(+4 maintained) | L12 / 50.000000 / d1 / true / false / 13(+0 maintained) | 2.409568e-14 | mod_up | — (UNDEFINED_ZERO_PREVIOUS_D) | 175.358744 / FINITE | mod_up | — (NEGATIVE_INFINITY) | 9.768351e-14 |
+| evalmod_real | L4 / 45.000000 / d1 / true / true / 4(+4 maintained) | L4 / 45.000000 / d1 / true / false / 5(+0 maintained) | 7.422415e-03 | c2s_real | 3.097272e+11 (FINITE) | -0.201277 / FINITE | c2s_real | -1.756342e+02 (FINITE) | 2.033136e-02 |
+| evalmod_imag | L4 / 45.000000 / d1 / true / true / 4(+4 maintained) | L4 / 45.000000 / d1 / true / false / 5(+0 maintained) | 7.350434e-03 | c2s_imag | 3.050520e+11 (FINITE) | -0.143334 / FINITE | c2s_imag | -1.755021e+02 (FINITE) | 2.259150e-02 |
+| s2c | L1 / 45.000000 / d1 / true / true / 2(+2 maintained) | L1 / 45.000000 / d1 / true / false / 2(+0 maintained) | 2.089221e-02 | — | n/a (combined branches) (NOT_APPLICABLE_COMBINED_BRANCH) | -0.172491 / FINITE | evalmod_real+evalmod_imag (joint) | 9.742762e-13 (FINITE) | 3.640730e-02 |
+| final_public_output | L1 / 45.000000 / d1 / true / false / 2(+2 maintained) | L1 / 45.000000 / d1 / true / false / 2(+0 maintained) | 2.089221e-02 | s2c | 1.000000e+00 (FINITE) | -0.172491 / FINITE | s2c | 0.000000e+00 (FINITE) | 3.640730e-02 |
 
 `LARGEST_RAW_AMPLIFICATION_CHECKPOINT=evalmod_real`
-`LARGEST_RAW_AMPLIFICATION_FACTOR=3.080393e+11`
+`LARGEST_RAW_AMPLIFICATION_FACTOR=3.097272e+11`
 `LARGEST_SNR_DROP_CHECKPOINT=evalmod_real`
-`LARGEST_SNR_DROP_DB=-1.755600e+02`
+`LARGEST_SNR_DROP_DB=-1.756342e+02`
 
 - First observable: `evalmod_real`, max complex diff `2.033136e-02` (threshold `1.000e-08`)
 - First material: `evalmod_real`, max complex diff `2.033136e-02` (threshold `0.00364073039722`)
 - Final Fast-vs-Standard RMSE: `0.0208922110696`
-- S2C amplification factor: `2.828427e+00`
+- Combined-branch EvalMod error RMSE: `7.386512e-03`
+- Combined-branch S2C amplification: `2.828427e+00` (status `FINITE`; `D_s2c / RMSE(concat(EvalMod real, EvalMod imag))`)
 - Current classification: `CURRENT_FAST_FIRST_MATERIAL_EVALMOD_NORMALIZATION`
 
 `FIRST_OBSERVABLE_CHECKPOINT=evalmod_real`
@@ -201,7 +202,8 @@ For each comparable checkpoint, `D_i` is Fast-vs-genuine-Standard complex RMSE; 
 `FIRST_MATERIAL_CHECKPOINT=evalmod_real`
 `FIRST_MATERIAL_MAX_DIFF=2.033136e-02`
 `FINAL_FAST_STANDARD_RMSE=0.0208922110696`
-`S2C_AMPLIFICATION_FACTOR=2.828427e+00`
+`COMBINED_BRANCH_S2C_AMPLIFICATION_FACTOR=2.828427e+00`
+`S2C_AMPLIFICATION_FACTOR=2.828427e+00 (combined-branch compatibility alias)`
 
 ## EvalMod internal bisect
 
@@ -301,7 +303,7 @@ The q0=55 path retains plan scale 2^91; these values are observed, not altered b
 
 ## S2C attribution
 
-The first material divergence is already present at EvalMod, so S2C is not the originating stage. For this run S2C transforms the combined EvalMod reference gap by the reported amplification factor; its separate stage increment is visible in the stage table.
+The first material divergence is already present at EvalMod, so S2C is not the originating stage. The S2C amplification is reported separately as a combined-branch metric: the S2C error RMSE divided by the joint RMSE of concatenated EvalMod real and imag semantic errors. It is not an ordinary sequential `A_i`. The S2C ΔSNR parent is the joint EvalMod real+imag reference, not the preceding table row.
 
 
 ## Historical-reference reconciliation and next bounded counterfactual

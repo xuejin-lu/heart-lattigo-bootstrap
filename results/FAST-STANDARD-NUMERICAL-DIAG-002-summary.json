@@ -1,12 +1,12 @@
 {
   "schema_version": "fastdiag.numerical.v1",
-  "timestamp": "2026-10-04T22:48:06.501915Z",
+  "timestamp": "2026-10-05T10:29:36.344141Z",
   "profile": "p93-q55",
   "primary_repository": {
     "path": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap",
-    "commit": "18165e8cd0a92ee107acd4a687d012b13d90929e",
+    "commit": "4fd11a5aa557a9e91c0473c94f76b9bfc41a9e36",
     "ref": "main",
-    "dirty": true
+    "dirty": false
   },
   "secondary_repository": {
     "path": "/Users/xuejinlu/Developer/xuejin-lu/lattigo",
@@ -18,7 +18,7 @@
     "go_version": "go1.26.4",
     "os": "darwin",
     "arch": "arm64",
-    "cpu": "arm64",
+    "cpu": "Apple M4",
     "num_cpu": 10,
     "gomaxprocs": 10
   },
@@ -1653,6 +1653,7 @@
         "d_i_rmse": 0,
         "a_i": null,
         "a_i_status": "UNDEFINED_ZERO_OVER_ZERO",
+        "a_i_parent_checkpoint": "input",
         "stage_reference_snr": {
           "signal_power": 0.00041948817670322045,
           "signal_rms": 0.020481410515470373,
@@ -1662,7 +1663,8 @@
           "status": "POSITIVE_INFINITY"
         },
         "delta_snr_i_db": null,
-        "delta_snr_i_status": "UNDEFINED_INFINITY_MINUS_INFINITY"
+        "delta_snr_i_status": "UNDEFINED_INFINITY_MINUS_INFINITY",
+        "delta_snr_i_parent_checkpoint": "input"
       },
       {
         "checkpoint": "mod_up",
@@ -1770,6 +1772,7 @@
         "d_i_rmse": 0,
         "a_i": null,
         "a_i_status": "UNDEFINED_ZERO_OVER_ZERO",
+        "a_i_parent_checkpoint": "scale_down",
         "stage_reference_snr": {
           "signal_power": 0.00041948817670322045,
           "signal_rms": 0.020481410515470373,
@@ -1779,7 +1782,8 @@
           "status": "POSITIVE_INFINITY"
         },
         "delta_snr_i_db": null,
-        "delta_snr_i_status": "UNDEFINED_INFINITY_MINUS_INFINITY"
+        "delta_snr_i_status": "UNDEFINED_INFINITY_MINUS_INFINITY",
+        "delta_snr_i_parent_checkpoint": "scale_down"
       },
       {
         "checkpoint": "c2s_real",
@@ -1887,6 +1891,7 @@
         "d_i_rmse": 2.3964363961731316e-14,
         "a_i": null,
         "a_i_status": "UNDEFINED_ZERO_PREVIOUS_D",
+        "a_i_parent_checkpoint": "mod_up",
         "stage_reference_snr": {
           "signal_power": 2.0064245721793082e-10,
           "signal_rms": 0.00001416483170453962,
@@ -1896,7 +1901,8 @@
           "status": "FINITE"
         },
         "delta_snr_i_db": null,
-        "delta_snr_i_status": "NEGATIVE_INFINITY"
+        "delta_snr_i_status": "NEGATIVE_INFINITY",
+        "delta_snr_i_parent_checkpoint": "mod_up"
       },
       {
         "checkpoint": "c2s_imag",
@@ -2002,8 +2008,9 @@
           }
         },
         "d_i_rmse": 2.4095676473593568e-14,
-        "a_i": 1.0054794908002542,
-        "a_i_status": "FINITE",
+        "a_i": null,
+        "a_i_status": "UNDEFINED_ZERO_PREVIOUS_D",
+        "a_i_parent_checkpoint": "mod_up",
         "stage_reference_snr": {
           "signal_power": 1.994126429355694e-10,
           "signal_rms": 0.000014121354146666297,
@@ -2012,8 +2019,9 @@
           "snr_db": 175.35874442697173,
           "status": "FINITE"
         },
-        "delta_snr_i_db": -0.07416581443010273,
-        "delta_snr_i_status": "FINITE"
+        "delta_snr_i_db": null,
+        "delta_snr_i_status": "NEGATIVE_INFINITY",
+        "delta_snr_i_parent_checkpoint": "mod_up"
       },
       {
         "checkpoint": "evalmod_real",
@@ -2119,8 +2127,9 @@
           }
         },
         "d_i_rmse": 0.007422414748058106,
-        "a_i": 308039276514.70276,
+        "a_i": 309727174896.48206,
         "a_i_status": "FINITE",
+        "a_i_parent_checkpoint": "c2s_real",
         "stage_reference_snr": {
           "signal_power": 0.0000525972163698548,
           "signal_rms": 0.00725239383719988,
@@ -2129,8 +2138,9 @@
           "snr_db": -0.201276758379441,
           "status": "FINITE"
         },
-        "delta_snr_i_db": -175.56002118535116,
+        "delta_snr_i_db": -175.63418699978126,
         "delta_snr_i_status": "FINITE",
+        "delta_snr_i_parent_checkpoint": "c2s_real",
         "first_observable": true,
         "first_material": true
       },
@@ -2238,8 +2248,9 @@
           }
         },
         "d_i_rmse": 0.007350434011122211,
-        "a_i": 0.9903022480716633,
+        "a_i": 305051988026.87885,
         "a_i_status": "FINITE",
+        "a_i_parent_checkpoint": "c2s_imag",
         "stage_reference_snr": {
           "signal_power": 0.000052274827686231484,
           "signal_rms": 0.007230133310405244,
@@ -2248,8 +2259,9 @@
           "snr_db": -0.14333356153708754,
           "status": "FINITE"
         },
-        "delta_snr_i_db": 0.05794319684235347,
-        "delta_snr_i_status": "FINITE"
+        "delta_snr_i_db": -175.5020779885088,
+        "delta_snr_i_status": "FINITE",
+        "delta_snr_i_parent_checkpoint": "c2s_imag"
       },
       {
         "checkpoint": "s2c",
@@ -2355,8 +2367,8 @@
           }
         },
         "d_i_rmse": 0.02089221106956351,
-        "a_i": 2.842309860608331,
-        "a_i_status": "FINITE",
+        "a_i": null,
+        "a_i_status": "NOT_APPLICABLE_COMBINED_BRANCH",
         "stage_reference_snr": {
           "signal_power": 0.00041948817622346283,
           "signal_rms": 0.02048141050375835,
@@ -2365,8 +2377,9 @@
           "snr_db": -0.1724908531650432,
           "status": "FINITE"
         },
-        "delta_snr_i_db": -0.02915729162795566,
-        "delta_snr_i_status": "FINITE"
+        "delta_snr_i_db": 9.742762152598061e-13,
+        "delta_snr_i_status": "FINITE",
+        "delta_snr_i_parent_checkpoint": "evalmod_real+evalmod_imag (joint)"
       },
       {
         "checkpoint": "final_public_output",
@@ -2483,6 +2496,7 @@
         "d_i_rmse": 0.02089221106956351,
         "a_i": 1,
         "a_i_status": "FINITE",
+        "a_i_parent_checkpoint": "s2c",
         "stage_reference_snr": {
           "signal_power": 0.00041948817622346283,
           "signal_rms": 0.02048141050375835,
@@ -2492,7 +2506,8 @@
           "status": "FINITE"
         },
         "delta_snr_i_db": 0,
-        "delta_snr_i_status": "FINITE"
+        "delta_snr_i_status": "FINITE",
+        "delta_snr_i_parent_checkpoint": "s2c"
       }
     ],
     "first_observable_checkpoint": "evalmod_real",
@@ -2503,11 +2518,13 @@
     "observable_threshold": 1e-8,
     "classification": "CURRENT_FAST_FIRST_MATERIAL_EVALMOD_NORMALIZATION",
     "final_fast_standard_rmse": 0.02089221106956351,
-    "s2c_amplification_factor": 2.8284271247428943,
+    "combined_branch_evalmod_error_rmse": 0.0073865120606431125,
+    "combined_branch_s2c_amplification_factor": 2.8284271247428943,
+    "combined_branch_s2c_amplification_status": "FINITE",
     "largest_raw_amplification_checkpoint": "evalmod_real",
-    "largest_raw_amplification_factor": 308039276514.70276,
+    "largest_raw_amplification_factor": 309727174896.48206,
     "largest_snr_drop_checkpoint": "evalmod_real",
-    "largest_snr_drop_db": -175.56002118535116,
+    "largest_snr_drop_db": -175.63418699978126,
     "evalmod_replay_verified": {
       "real.fast": true,
       "real.standard": true
@@ -2740,6 +2757,7 @@
         "d_i_rmse": 2.3402699181378238e-17,
         "a_i": 0.0009765625,
         "a_i_status": "FINITE",
+        "a_i_parent_checkpoint": "real/input_before_normalization",
         "stage_reference_snr": {
           "signal_power": 1.9134755822938044e-16,
           "signal_rms": 1.3832843461464473e-8,
@@ -2749,7 +2767,8 @@
           "status": "FINITE"
         },
         "delta_snr_i_db": 0,
-        "delta_snr_i_status": "FINITE"
+        "delta_snr_i_status": "FINITE",
+        "delta_snr_i_parent_checkpoint": "real/input_before_normalization"
       },
       {
         "checkpoint": "real/after_chebyshev_offset",
@@ -2857,6 +2876,7 @@
         "d_i_rmse": 2.3674383648915485e-17,
         "a_i": 1.0116091082242953,
         "a_i_status": "FINITE",
+        "a_i_parent_checkpoint": "real/after_normalization",
         "stage_reference_snr": {
           "signal_power": 0.0002441406402307281,
           "signal_rms": 0.01562500048738329,
@@ -2866,7 +2886,8 @@
           "status": "FINITE"
         },
         "delta_snr_i_db": 120.95791692632531,
-        "delta_snr_i_status": "FINITE"
+        "delta_snr_i_status": "FINITE",
+        "delta_snr_i_parent_checkpoint": "real/after_normalization"
       },
       {
         "checkpoint": "real/polynomial_input",
@@ -2974,6 +2995,7 @@
         "d_i_rmse": 2.3674383648915485e-17,
         "a_i": 1,
         "a_i_status": "FINITE",
+        "a_i_parent_checkpoint": "real/after_chebyshev_offset",
         "stage_reference_snr": {
           "signal_power": 0.0002441406402307281,
           "signal_rms": 0.01562500048738329,
@@ -2983,7 +3005,8 @@
           "status": "FINITE"
         },
         "delta_snr_i_db": 0,
-        "delta_snr_i_status": "FINITE"
+        "delta_snr_i_status": "FINITE",
+        "delta_snr_i_parent_checkpoint": "real/after_chebyshev_offset"
       },
       {
         "checkpoint": "real/generated_power_polynomial_output",
@@ -3091,6 +3114,7 @@
         "d_i_rmse": 2.760407663772555e-8,
         "a_i": 1165989241.6667025,
         "a_i_status": "FINITE",
+        "a_i_parent_checkpoint": "real/polynomial_input",
         "stage_reference_snr": {
           "signal_power": 0.6075792179460241,
           "signal_rms": 0.7794736800854947,
@@ -3100,7 +3124,8 @@
           "status": "FINITE"
         },
         "delta_snr_i_db": -147.37426255184002,
-        "delta_snr_i_status": "FINITE"
+        "delta_snr_i_status": "FINITE",
+        "delta_snr_i_parent_checkpoint": "real/polynomial_input"
       },
       {
         "checkpoint": "real/before_coherent_scale_transition",
@@ -3208,6 +3233,7 @@
         "d_i_rmse": 2.760407663772555e-8,
         "a_i": 1,
         "a_i_status": "FINITE",
+        "a_i_parent_checkpoint": "real/generated_power_polynomial_output",
         "stage_reference_snr": {
           "signal_power": 0.6075792179460241,
           "signal_rms": 0.7794736800854947,
@@ -3217,7 +3243,8 @@
           "status": "FINITE"
         },
         "delta_snr_i_db": 0,
-        "delta_snr_i_status": "FINITE"
+        "delta_snr_i_status": "FINITE",
+        "delta_snr_i_parent_checkpoint": "real/generated_power_polynomial_output"
       },
       {
         "checkpoint": "real/after_coherent_scale_transition",
@@ -3325,6 +3352,7 @@
         "d_i_rmse": 0.7794736786336114,
         "a_i": 28237629.132225033,
         "a_i_status": "FINITE",
+        "a_i_parent_checkpoint": "real/before_coherent_scale_transition",
         "stage_reference_snr": {
           "signal_power": 0.6075792179460241,
           "signal_rms": 0.7794736800854947,
@@ -3334,7 +3362,8 @@
           "status": "FINITE"
         },
         "delta_snr_i_db": -149.01656459970837,
-        "delta_snr_i_status": "FINITE"
+        "delta_snr_i_status": "FINITE",
+        "delta_snr_i_parent_checkpoint": "real/before_coherent_scale_transition"
       },
       {
         "checkpoint": "real/before_double_angle_round_0",
@@ -3442,6 +3471,7 @@
         "d_i_rmse": 0.7794736786336114,
         "a_i": 1,
         "a_i_status": "FINITE",
+        "a_i_parent_checkpoint": "real/after_coherent_scale_transition",
         "stage_reference_snr": {
           "signal_power": 0.6075792179460241,
           "signal_rms": 0.7794736800854947,
@@ -3451,7 +3481,8 @@
           "status": "FINITE"
         },
         "delta_snr_i_db": 0,
-        "delta_snr_i_status": "FINITE"
+        "delta_snr_i_status": "FINITE",
+        "delta_snr_i_parent_checkpoint": "real/after_coherent_scale_transition"
       },
       {
         "checkpoint": "real/double_angle_round_0_after_multiply",
@@ -3559,6 +3590,7 @@
         "d_i_rmse": 0.6075792179460255,
         "a_i": 0.7794736815373798,
         "a_i_status": "FINITE",
+        "a_i_parent_checkpoint": "real/before_double_angle_round_0",
         "stage_reference_snr": {
           "signal_power": 0.36915250607990396,
           "signal_rms": 0.6075792179460255,
@@ -3568,7 +3600,8 @@
           "status": "FINITE"
         },
         "delta_snr_i_db": -1.6178734992599354e-8,
-        "delta_snr_i_status": "FINITE"
+        "delta_snr_i_status": "FINITE",
+        "delta_snr_i_parent_checkpoint": "real/before_double_angle_round_0"
       },
       {
         "checkpoint": "real/double_angle_round_0_after_constant",
@@ -3676,6 +3709,7 @@
         "d_i_rmse": 0.5835396570604267,
         "a_i": 0.9604338657815409,
         "a_i_status": "FINITE",
+        "a_i_parent_checkpoint": "real/double_angle_round_0_after_multiply",
         "stage_reference_snr": {
           "signal_power": 0.34051853263073073,
           "signal_rms": 0.583539658147354,
@@ -3685,7 +3719,8 @@
           "status": "FINITE"
         },
         "delta_snr_i_db": 1.6178729206634576e-8,
-        "delta_snr_i_status": "FINITE"
+        "delta_snr_i_status": "FINITE",
+        "delta_snr_i_parent_checkpoint": "real/double_angle_round_0_after_multiply"
       },
       {
         "checkpoint": "real/double_angle_round_0_after_rescale",
@@ -3793,6 +3828,7 @@
         "d_i_rmse": 0.5835396570604267,
         "a_i": 1,
         "a_i_status": "FINITE",
+        "a_i_parent_checkpoint": "real/double_angle_round_0_after_constant",
         "stage_reference_snr": {
           "signal_power": 0.34051853263073073,
           "signal_rms": 0.583539658147354,
@@ -3802,7 +3838,8 @@
           "status": "FINITE"
         },
         "delta_snr_i_db": 0,
-        "delta_snr_i_status": "FINITE"
+        "delta_snr_i_status": "FINITE",
+        "delta_snr_i_parent_checkpoint": "real/double_angle_round_0_after_constant"
       },
       {
         "checkpoint": "real/double_angle_round_1_after_multiply",
@@ -3910,6 +3947,7 @@
         "d_i_rmse": 0.3405185326307454,
         "a_i": 0.5835396592343064,
         "a_i_status": "FINITE",
+        "a_i_parent_checkpoint": "real/double_angle_round_0_after_rescale",
         "stage_reference_snr": {
           "signal_power": 0.115952871064996,
           "signal_rms": 0.3405185326307454,
@@ -3919,7 +3957,8 @@
           "status": "FINITE"
         },
         "delta_snr_i_db": -1.6178729206634576e-8,
-        "delta_snr_i_status": "FINITE"
+        "delta_snr_i_status": "FINITE",
+        "delta_snr_i_parent_checkpoint": "real/double_angle_round_0_after_rescale"
       },
       {
         "checkpoint": "real/double_angle_round_1_after_constant",
@@ -4027,6 +4066,7 @@
         "d_i_rmse": 0.282094784336379,
         "a_i": 0.8284271113146126,
         "a_i_status": "FINITE",
+        "a_i_parent_checkpoint": "real/double_angle_round_1_after_multiply",
         "stage_reference_snr": {
           "signal_power": 0.07957746764623688,
           "signal_rms": 0.28209478486182066,
@@ -4036,7 +4076,8 @@
           "status": "FINITE"
         },
         "delta_snr_i_db": 1.6178705098448003e-8,
-        "delta_snr_i_status": "FINITE"
+        "delta_snr_i_status": "FINITE",
+        "delta_snr_i_parent_checkpoint": "real/double_angle_round_1_after_multiply"
       },
       {
         "checkpoint": "real/double_angle_round_1_after_rescale",
@@ -4144,6 +4185,7 @@
         "d_i_rmse": 0.282094784336379,
         "a_i": 1,
         "a_i_status": "FINITE",
+        "a_i_parent_checkpoint": "real/double_angle_round_1_after_constant",
         "stage_reference_snr": {
           "signal_power": 0.07957746764623691,
           "signal_rms": 0.2820947848618207,
@@ -4153,7 +4195,8 @@
           "status": "FINITE"
         },
         "delta_snr_i_db": 9.64327462516785e-16,
-        "delta_snr_i_status": "FINITE"
+        "delta_snr_i_status": "FINITE",
+        "delta_snr_i_parent_checkpoint": "real/double_angle_round_1_after_constant"
       },
       {
         "checkpoint": "real/double_angle_round_2_after_multiply",
@@ -4261,6 +4304,7 @@
         "d_i_rmse": 0.07957746764631399,
         "a_i": 0.28209478538753563,
         "a_i_status": "FINITE",
+        "a_i_parent_checkpoint": "real/double_angle_round_1_after_rescale",
         "stage_reference_snr": {
           "signal_power": 0.006332573357000149,
           "signal_rms": 0.07957746764631399,
@@ -4270,7 +4314,8 @@
           "status": "FINITE"
         },
         "delta_snr_i_db": -1.6178706062775466e-8,
-        "delta_snr_i_status": "FINITE"
+        "delta_snr_i_status": "FINITE",
+        "delta_snr_i_parent_checkpoint": "real/double_angle_round_1_after_rescale"
       },
       {
         "checkpoint": "real/double_angle_round_2_after_constant",
@@ -4378,6 +4423,7 @@
         "d_i_rmse": 2.2132549552753085e-7,
         "a_i": 0.0000027812583394991033,
         "a_i_status": "FINITE",
+        "a_i_parent_checkpoint": "real/double_angle_round_2_after_multiply",
         "stage_reference_snr": {
           "signal_power": 4.898497496704533e-14,
           "signal_rms": 2.2132549551971035e-7,
@@ -4387,7 +4433,8 @@
           "status": "FINITE"
         },
         "delta_snr_i_db": -3.069136098083597e-10,
-        "delta_snr_i_status": "FINITE"
+        "delta_snr_i_status": "FINITE",
+        "delta_snr_i_parent_checkpoint": "real/double_angle_round_2_after_multiply"
       },
       {
         "checkpoint": "real/double_angle_round_2_after_rescale",
@@ -4495,6 +4542,7 @@
         "d_i_rmse": 2.2132549552792382e-7,
         "a_i": 1.0000000000017755,
         "a_i_status": "FINITE",
+        "a_i_parent_checkpoint": "real/double_angle_round_2_after_constant",
         "stage_reference_snr": {
           "signal_power": 4.898497496718056e-14,
           "signal_rms": 2.2132549552001587e-7,
@@ -4504,7 +4552,8 @@
           "status": "FINITE"
         },
         "delta_snr_i_db": -3.433005781173658e-12,
-        "delta_snr_i_status": "FINITE"
+        "delta_snr_i_status": "FINITE",
+        "delta_snr_i_parent_checkpoint": "real/double_angle_round_2_after_constant"
       },
       {
         "checkpoint": "real/evalmod_output_before_public_scale_reset",
@@ -4612,6 +4661,7 @@
         "d_i_rmse": 0.00023195046087681582,
         "a_i": 1048.0060614957551,
         "a_i_status": "FINITE",
+        "a_i_parent_checkpoint": "real/double_angle_round_2_after_rescale",
         "stage_reference_snr": {
           "signal_power": 5.1364469111186326e-8,
           "signal_rms": 0.00022663730741249625,
@@ -4621,7 +4671,8 @@
           "status": "FINITE"
         },
         "delta_snr_i_db": -0.2012767580690944,
-        "delta_snr_i_status": "FINITE"
+        "delta_snr_i_status": "FINITE",
+        "delta_snr_i_parent_checkpoint": "real/double_angle_round_2_after_rescale"
       },
       {
         "checkpoint": "real/evalmod_output_after_public_scale_reset",
@@ -4729,6 +4780,7 @@
         "d_i_rmse": 0.007422414748058106,
         "a_i": 32,
         "a_i_status": "FINITE",
+        "a_i_parent_checkpoint": "real/evalmod_output_before_public_scale_reset",
         "stage_reference_snr": {
           "signal_power": 0.0000525972163698548,
           "signal_rms": 0.00725239383719988,
@@ -4738,7 +4790,8 @@
           "status": "FINITE"
         },
         "delta_snr_i_db": 0,
-        "delta_snr_i_status": "FINITE"
+        "delta_snr_i_status": "FINITE",
+        "delta_snr_i_parent_checkpoint": "real/evalmod_output_before_public_scale_reset"
       }
     ],
     "scale_audit": [
