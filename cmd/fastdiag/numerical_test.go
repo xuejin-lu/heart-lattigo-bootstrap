@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"math"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -157,6 +158,21 @@ func TestCombinedBranchS2CAmplificationUsesJointEvalModError(t *testing.T) {
 	encodedS2C := encodedCheckpoints[0].(map[string]any)
 	require.Nil(t, encodedS2C["a_i"])
 	require.Equal(t, "NOT_APPLICABLE_COMBINED_BRANCH", encodedS2C["a_i_status"])
+}
+
+func TestNumericalSummaryRendersEvalModCapacityAudit(t *testing.T) {
+	stage := NumericalStageLockstep{EvalModCapacityAudit: []NumericalQPrefixCapacity{{
+		Checkpoint: "real/evalmod-entry", Level: 12, Rows: 4, PrefixProduct: "12345",
+		Degree: 1, MaxAbs: []string{"10", "0"}, StrictFit: true,
+	}}}
+	var output strings.Builder
+	renderNumericalStageEvidence(&output, NumericalDocument{StageLockstep: &stage})
+
+	require.Contains(t, output.String(), "Standard-equivalent Fast EvalMod Q-prefix capacity audit")
+	require.Contains(t, output.String(), "real/evalmod-entry")
+	require.Contains(t, output.String(), "12345")
+	require.Contains(t, output.String(), "`[10 0]`")
+	require.Contains(t, output.String(), "true")
 }
 
 func syntheticStageCheckpoint(name string, distance, snrDB float64) NumericalStageCheckpoint {

@@ -151,6 +151,7 @@ type NumericalStageLockstep struct {
 	EvalModReplayVerified                map[string]bool            `json:"evalmod_replay_verified,omitempty"`
 	EvalModReplayRMSE                    map[string]float64         `json:"evalmod_replay_rmse,omitempty"`
 	EvalModInternal                      []NumericalStageCheckpoint `json:"evalmod_internal,omitempty"`
+	EvalModCapacityAudit                 []NumericalQPrefixCapacity `json:"evalmod_qprefix_capacity_audit,omitempty"`
 	ScaleAudit                           []NumericalScaleAudit      `json:"scale_audit,omitempty"`
 	GeneratedPowerEvidence               []NumericalGeneratedPower  `json:"generated_power_evidence,omitempty"`
 	PolynomialPlan                       *NumericalPolynomialPlan   `json:"polynomial_plan,omitempty"`
@@ -176,6 +177,7 @@ type NumericalScaleAudit struct {
 }
 
 type NumericalGeneratedPower struct {
+	Branch             string  `json:"branch"`
 	ReferenceKind      string  `json:"reference_kind"`
 	Power              int     `json:"power"`
 	Level              int     `json:"level"`
@@ -186,12 +188,24 @@ type NumericalGeneratedPower struct {
 }
 
 type NumericalPolynomialPlan struct {
+	Branch     string  `json:"branch,omitempty"`
 	Degree     int     `json:"degree"`
 	Base       int     `json:"base"`
 	Level      int     `json:"level"`
 	ScaleLog2  float64 `json:"scale_log2"`
 	ScaleExact string  `json:"scale_exact"`
 	BlockCount int     `json:"block_count"`
+}
+
+type NumericalQPrefixCapacity struct {
+	Checkpoint    string   `json:"checkpoint"`
+	Level         int      `json:"logical_level"`
+	Rows          int      `json:"active_qprefix_rows"`
+	Scale         string   `json:"scale_exact"`
+	Degree        int      `json:"degree"`
+	MaxAbs        []string `json:"max_abs_per_component"`
+	PrefixProduct string   `json:"exact_prefix_product"`
+	StrictFit     bool     `json:"strict_2b_lt_sq"`
 }
 
 type NumericalKeyTrial struct {

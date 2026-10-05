@@ -878,7 +878,7 @@ func renderNumericalStageEvidence(out *strings.Builder, doc NumericalDocument) {
 		formatOptionalFloat(stage.CombinedBranchS2CAmplification), formatOptionalFloat(stage.CombinedBranchS2CAmplification))
 
 	if len(stage.EvalModInternal) > 0 {
-		out.WriteString("\n## EvalMod internal bisect\n\nStandard is decrypted with the genuine Standard secret key; Fast is decoded through the validated Q-prefix c0 path after projecting both branches to common authoritative Q rows. Replay verification compares each source-faithful replay output with the actual public EvalMod output.\n\n| Checkpoint | Fast L / log2(scale) / degree / NTT / Montgomery / rows | Standard L / log2(scale) / degree / NTT / Montgomery / rows | D_i RMSE | A_i | Stage reference SNR (dB / status) | ΔSNR_i (dB / status) | Max complex diff |\n|---|---|---|---:|---:|---:|---:|---:|---:|\n")
+		out.WriteString("\n## EvalMod direct stage-equivalence replay\n\nEach Fast checkpoint is decoded from authoritative Q-prefix rows; Standard is decrypted with the genuine Standard secret key. Comparisons use the same mathematical scale directly, with no representation-specific power-of-two alignment. Replay verification compares the manual stage sequence with each actual public EvalMod output.\n\n| Checkpoint | Fast L / log2(scale) / degree / NTT / Montgomery / rows | Standard L / log2(scale) / degree / NTT / Montgomery / rows | D_i RMSE | A_i | Stage reference SNR (dB / status) | ΔSNR_i (dB / status) | Max complex diff |\n|---|---|---|---:|---:|---:|---:|---:|---:|\n")
 		for _, checkpoint := range stage.EvalModInternal {
 			if checkpoint.Comparable && checkpoint.FastVsStandard != nil {
 				fmt.Fprintf(out, "| %s | %s | %s | %s | %s (%s) | %s | %s (%s) | %.6e |\n", checkpoint.Name,
@@ -903,31 +903,35 @@ func renderNumericalStageEvidence(out *strings.Builder, doc NumericalDocument) {
 		}
 		out.WriteString("\n")
 	}
+	if len(stage.EvalModCapacityAudit) > 0 {
+		out.WriteString("\n## Standard-equivalent Fast EvalMod Q-prefix capacity audit\n\nBounds are exact observed centered coefficient maxima by ciphertext component. Every checkpoint requires strict `2B < S_Q`; execution stops at the first failed guard.\n\n| Checkpoint | Level | Rows | Exact prefix product S_Q | Degree | MaxAbs by component | Strict `2B < S_Q` |\n|---|---:|---:|---|---:|---|---:|\n")
+		for _, audit := range stage.EvalModCapacityAudit {
+			fmt.Fprintf(out, "| %s | %d | %d | `%s` | %d | `%v` | %t |\n", audit.Checkpoint, audit.Level, audit.Rows, audit.PrefixProduct, audit.Degree, audit.MaxAbs, audit.StrictFit)
+		}
+	}
 
 	if stage.PolynomialPlan != nil {
 		plan := stage.PolynomialPlan
-		fmt.Fprintf(out, "\n## Polynomial plan and generated-power evidence\n\n- Fast diagnostic PS plan: degree `%d`, base `%d`, level `%d`, target scale log2 `%.6f`, exact `%s`, blocks `%d`.\n", plan.Degree, plan.Base, plan.Level, plan.ScaleLog2, plan.ScaleExact, plan.BlockCount)
+		fmt.Fprintf(out, "\n## Polynomial plan and generated-power evidence\n\n- Fast diagnostic PS plan (%s branch): degree `%d`, base `%d`, level `%d`, target scale log2 `%.6f`, exact `%s`, blocks `%d`.\n", plan.Branch, plan.Degree, plan.Base, plan.Level, plan.ScaleLog2, plan.ScaleExact, plan.BlockCount)
 		if len(stage.GeneratedPowerEvidence) > 0 {
-			out.WriteString("\n| Power n | Level | Scale log2 | Fast maintained rows | RMSE vs reference | Max complex diff | Reference provenance |\n|---:|---:|---:|---:|---:|---:|---|\n")
+			out.WriteString("\n| Branch | Power n | Level | Scale log2 | Fast maintained rows | RMSE vs reference | Max complex diff | Reference provenance |\n|---|---:|---:|---:|---:|---:|---:|---|\n")
 			for _, power := range stage.GeneratedPowerEvidence {
-				fmt.Fprintf(out, "| %d | %d | %.6f | %d | %.6e | %.6e | %s |\n", power.Power, power.Level, power.ScaleLog2, power.FastMaintainedRows, power.RMSE, power.MaxComplexDiff, power.ReferenceKind)
+				fmt.Fprintf(out, "| %s | %d | %d | %.6f | %d | %.6e | %.6e | %s |\n", power.Branch, power.Power, power.Level, power.ScaleLog2, power.FastMaintainedRows, power.RMSE, power.MaxComplexDiff, power.ReferenceKind)
 			}
 		}
 	}
 
 	if len(stage.ScaleAudit) > 0 {
-		out.WriteString("\n## EvalMod exact-scale audit\n\nThe q0=55 path retains plan scale 2^91; these values are observed, not altered by the diagnostic. Exact scale strings are retained even when float64 projection is non-finite.\n\n| Checkpoint | Level | Scale log2 | Exact scale | Plan bits | Working bits | Target log2 / exact | kIn | multiplier | round |\n|---|---:|---:|---|---:|---:|---|---:|---:|---:|\n")
+		out.WriteString("\n## EvalMod exact-scale audit\n\nExact scale strings are retained alongside the observed logical Level at each direct Standard/Fast replay checkpoint. The target scale follows the Standard Mod1 Q schedule.\n\n| Checkpoint | Level | Scale log2 | Exact scale | Target log2 / exact | DoubleAngle round |\n|---|---:|---:|---|---|---:|\n")
 		for _, audit := range stage.ScaleAudit {
 			if !strings.HasPrefix(audit.Checkpoint, "evalmod") && !strings.HasPrefix(audit.Checkpoint, "real/") && !strings.HasPrefix(audit.Checkpoint, "imag/") {
 				continue
 			}
-			fmt.Fprintf(out, "| %s | %d | %.6f | `%s` | %d | %d | %.6f / `%s` | %d | %d | %d |\n", audit.Checkpoint, audit.Level, audit.ScaleLog2, audit.ScaleExact, audit.PlanScaleBits, audit.WorkingScaleBits, audit.TargetScaleLog2, audit.TargetScaleExact, audit.KInExponent, audit.MultiplierExponent, audit.DoubleAngleRound)
+			fmt.Fprintf(out, "| %s | %d | %.6f | `%s` | %.6f / `%s` | %d |\n", audit.Checkpoint, audit.Level, audit.ScaleLog2, audit.ScaleExact, audit.TargetScaleLog2, audit.TargetScaleExact, audit.DoubleAngleRound)
 		}
 	}
 
-	out.WriteString("\n## S2C attribution\n\nThe first material divergence is already present at EvalMod, so S2C is not the originating stage. The S2C amplification is reported separately as a combined-branch metric: the S2C error RMSE divided by the joint RMSE of concatenated EvalMod real and imag semantic errors. It is not an ordinary sequential `A_i`. The S2C ΔSNR parent is the joint EvalMod real+imag reference, not the preceding table row.\n\n")
-	out.WriteString("\n## Historical-reference reconciliation and next bounded counterfactual\n\n`HISTORICAL_FAST_CKKS_REFERENCE_ONLY`: older q0=56/dirty-tree diagnosis is not used to classify this current q0=55 run. Current evidence is reproduced on the synchronized current Fast Q-prefix branch; the selected plan scale remains 2^91.\n\n")
-	fmt.Fprintf(out, "Next causal experiment (exactly one; not executed): **%s**\n", numericalNextCounterfactual(*stage))
+	out.WriteString("\n## S2C attribution\n\nThe S2C amplification is reported separately as a combined-branch metric: the S2C error RMSE divided by the joint RMSE of concatenated EvalMod real and imag semantic errors. It is not an ordinary sequential `A_i`. The S2C ΔSNR parent is the joint EvalMod real+imag reference, not the preceding table row.\n\n")
 }
 
 func formatOptionalFloat(value *float64) string {
@@ -970,26 +974,6 @@ func formatSNRDB(value numericalmetrics.SNR) string {
 func formatInternalState(state NumericalStageState) string {
 	metadata := state.Metadata
 	return fmt.Sprintf("L%d / %.6f / d%d / %t / %t / %d(+%d maintained)", metadata.Level, metadata.ScaleLog2, metadata.Degree, metadata.IsNTT, metadata.IsMontgomery, state.AuthorityRows, state.MaintainedRows)
-}
-
-func numericalNextCounterfactual(stage NumericalStageLockstep) string {
-	switch stage.Classification {
-	case "CURRENT_FAST_FIRST_MATERIAL_EVALMOD_NORMALIZATION":
-		return "test-only coherent-scale exponent correction at the first diverging normalization transition, holding every other stage fixed."
-	case "CURRENT_FAST_FIRST_MATERIAL_EVALMOD_DOUBLE_ANGLE":
-		return "test-only semantic correction at the first DoubleAngle round whose checkpoint crosses the material threshold, holding all earlier stages fixed."
-	case "CURRENT_FAST_FIRST_MATERIAL_EVALMOD_POLYNOMIAL":
-		for _, power := range stage.GeneratedPowerEvidence {
-			if power.MaxComplexDiff >= stage.MaterialThreshold {
-				return fmt.Sprintf("replace only generated Chebyshev power n=%d with its labeled plaintext recurrence reference, then replay unchanged polynomial and downstream stages.", power.Power)
-			}
-		}
-		return "test-only q0=55 PS plan-scale 2^91→2^92 counterfactual with generated powers and workload held fixed; no production change."
-	case "CURRENT_FAST_FIRST_MATERIAL_S2C":
-		return "test-only S2C scale/representation alignment with actual EvalMod outputs held fixed."
-	default:
-		return "one test-only replacement of the earliest generated Chebyshev power with its labeled recurrence reference; stop if source-faithful replay does not close."
-	}
 }
 
 func writeNumericalMetadataRow(out *strings.Builder, name string, output NumericalOutput) {

@@ -65,14 +65,16 @@ func runNumericalStageLockstep(
 
 	result := summarizeNumericalStageLockstep(pairs, original)
 	result.ScaleAudit = numericalScaleAudit(fastEval, standardEval, btp.BootstrappingParameters, pairs)
-	if result.FirstMaterial == "evalmod_real" || result.FirstMaterial == "evalmod_imag" {
-		branch := strings.TrimPrefix(result.FirstMaterial, "evalmod_")
+	result.EvalModReplayVerified = make(map[string]bool)
+	result.EvalModReplayRMSE = make(map[string]float64)
+	tracedBranches := 0
+	for _, branch := range []string{"real", "imag"} {
 		inputPair, okInput := numericalPairByName(pairs, "c2s_"+branch)
 		outputPair, okOutput := numericalPairByName(pairs, "evalmod_"+branch)
-		if !okInput || !okOutput {
-			return NumericalStageLockstep{}, fmt.Errorf("first material %s checkpoint is missing its C2S input or EvalMod output", result.FirstMaterial)
+		if !okInput || !okOutput || inputPair.fast.ciphertext == nil || inputPair.standard.ciphertext == nil {
+			continue
 		}
-		trace, err := runNumericalEvalModBisect(
+		trace, err := runNumericalEvalModStageReplay(
 			branch,
 			inputPair.fast.ciphertext,
 			inputPair.standard.ciphertext,
@@ -84,21 +86,27 @@ func runNumericalStageLockstep(
 			btp.BootstrappingParameters,
 		)
 		if err != nil {
-			return NumericalStageLockstep{}, fmt.Errorf("EvalMod %s internal bisect: %w", branch, err)
+			return NumericalStageLockstep{}, fmt.Errorf("EvalMod %s stage-equivalence replay: %w", branch, err)
 		}
-		result.EvalModReplayVerified = map[string]bool{
-			branch + ".fast":     trace.fastReplayVerified,
-			branch + ".standard": trace.standardReplayVerified,
-		}
-		result.EvalModReplayRMSE = map[string]float64{
-			branch + ".fast":     trace.fastReplayRMSE,
-			branch + ".standard": trace.standardReplayRMSE,
-		}
-		result.EvalModInternal = trace.checkpoints
+		result.EvalModReplayVerified[branch+".fast"] = trace.fastReplayVerified
+		result.EvalModReplayVerified[branch+".standard"] = trace.standardReplayVerified
+		result.EvalModReplayRMSE[branch+".fast"] = trace.fastReplayRMSE
+		result.EvalModReplayRMSE[branch+".standard"] = trace.standardReplayRMSE
+		result.EvalModInternal = append(result.EvalModInternal, trace.checkpoints...)
+		result.EvalModCapacityAudit = append(result.EvalModCapacityAudit, trace.capacityAudit...)
 		result.ScaleAudit = append(result.ScaleAudit, trace.scaleAudit...)
-		result.GeneratedPowerEvidence = trace.powers
-		result.PolynomialPlan = &trace.plan
-		result.Classification = numericalEvalModClassification(trace)
+		result.GeneratedPowerEvidence = append(result.GeneratedPowerEvidence, trace.powers...)
+		if branch == "real" || result.PolynomialPlan == nil {
+			plan := trace.plan
+			result.PolynomialPlan = &plan
+		}
+		if result.FirstMaterial == "evalmod_"+branch {
+			result.Classification = numericalEvalModClassification(trace)
+		}
+		tracedBranches++
+	}
+	if tracedBranches == 0 {
+		return NumericalStageLockstep{}, fmt.Errorf("no comparable EvalMod branch was available for direct Standard/Fast replay")
 	}
 	return result, nil
 }
@@ -121,25 +129,25 @@ func numericalEvalModClassification(trace numericalEvalModTrace) string {
 		maxDiff := checkpoint.FastVsStandard.Complex.Max
 		if previousMax < numericalMaterialThreshold && maxDiff >= numericalMaterialThreshold {
 			switch {
-			case strings.Contains(checkpoint.Name, "normalization"), strings.Contains(checkpoint.Name, "offset"), strings.Contains(checkpoint.Name, "coherent_scale"):
-				return "CURRENT_FAST_FIRST_MATERIAL_EVALMOD_NORMALIZATION"
+			case strings.Contains(checkpoint.Name, "normalization"), strings.Contains(checkpoint.Name, "offset"):
+				return "FAST_STANDARD_FIRST_MATERIAL_EVALMOD_INPUT"
 			case strings.Contains(checkpoint.Name, "double_angle"), strings.Contains(checkpoint.Name, "evalmod_output"):
-				return "CURRENT_FAST_FIRST_MATERIAL_EVALMOD_DOUBLE_ANGLE"
+				return "FAST_STANDARD_FIRST_MATERIAL_EVALMOD_DOUBLE_ANGLE"
 			default:
-				return "CURRENT_FAST_FIRST_MATERIAL_EVALMOD_POLYNOMIAL"
+				return "FAST_STANDARD_FIRST_MATERIAL_EVALMOD_POLYNOMIAL"
 			}
 		}
 		previousMax = maxDiff
 	}
 	for _, power := range trace.powers {
 		if power.MaxComplexDiff >= numericalMaterialThreshold {
-			return "CURRENT_FAST_FIRST_MATERIAL_EVALMOD_POLYNOMIAL"
+			return "FAST_STANDARD_FIRST_MATERIAL_EVALMOD_POLYNOMIAL"
 		}
 	}
 	if !trace.fastReplayVerified || !trace.standardReplayVerified {
-		return "CURRENT_FAST_NUMERICAL_DIVERGENCE_UNCLOSED"
+		return "FAST_STANDARD_EVALMOD_REPLAY_UNCLOSED"
 	}
-	return "CURRENT_FAST_FIRST_MATERIAL_EVALMOD_POLYNOMIAL"
+	return "FAST_STANDARD_EVALMOD_REPLAY_CLOSED"
 }
 
 func runFastNumericalStages(eval *bootstrapping.FastEvaluator, input *rlwe.Ciphertext, pre []complex128, finalCT *rlwe.Ciphertext, final []complex128) ([]numericalStageSample, error) {
@@ -655,18 +663,16 @@ func numericalScaleAudit(fastEval *bootstrapping.FastEvaluator, standardEval *bo
 		target = target.Mul(rlwe.NewScale(params.Q()[index]))
 		target.Value.Sqrt(&target.Value)
 	}
-	planBits := 91
-	workingBits := 31
 	targetFloat := target.Float64()
 	targetFloatFinite := !math.IsNaN(targetFloat) && !math.IsInf(targetFloat, 0)
 	if !targetFloatFinite {
 		targetFloat = 0
 	}
 	audit = append(audit, NumericalScaleAudit{
-		Checkpoint: "evalmod/fixed_q0_55_normalized_plan",
+		Checkpoint: "evalmod/standard_target_scale",
 		Scale:      targetFloat, ScaleExact: target.Value.Text('e', 80), ScaleFloat64Finite: targetFloatFinite, ScaleLog2: target.Log2(),
 		TargetScale: targetFloat, TargetScaleExact: target.Value.Text('e', 80), TargetScaleFloat64Finite: targetFloatFinite, TargetScaleLog2: target.Log2(),
-		PlanScaleBits: planBits, WorkingScaleBits: workingBits, Level: inputLevel,
+		Level: inputLevel,
 	})
 	return audit
 }

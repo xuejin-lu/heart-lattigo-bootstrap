@@ -16,6 +16,7 @@ import (
 
 type numericalEvalModTrace struct {
 	checkpoints            []NumericalStageCheckpoint
+	capacityAudit          []NumericalQPrefixCapacity
 	scaleAudit             []NumericalScaleAudit
 	powers                 []NumericalGeneratedPower
 	plan                   NumericalPolynomialPlan
@@ -25,7 +26,7 @@ type numericalEvalModTrace struct {
 	standardReplayVerified bool
 }
 
-func runNumericalEvalModBisect(
+func runNumericalEvalModStageReplay(
 	branch string,
 	fastInput, standardInput *rlwe.Ciphertext,
 	actualFast, actualStandard []complex128,
@@ -35,7 +36,7 @@ func runNumericalEvalModBisect(
 	params ckks.Parameters,
 ) (numericalEvalModTrace, error) {
 	if fastInput == nil || standardInput == nil || fastEval == nil || standardEval == nil || standardSK == nil {
-		return numericalEvalModTrace{}, fmt.Errorf("%s EvalMod bisect requires both inputs/evaluators and a Standard key", branch)
+		return numericalEvalModTrace{}, fmt.Errorf("%s EvalMod stage replay requires both inputs/evaluators and a Standard key", branch)
 	}
 	if fastEval.Mod1Evaluator == nil || standardEval.Mod1Evaluator == nil {
 		return numericalEvalModTrace{}, fmt.Errorf("%s EvalMod evaluator is unavailable", branch)
@@ -43,13 +44,22 @@ func runNumericalEvalModBisect(
 	fastParams := fastEval.Mod1Evaluator.Parameters
 	standardParams := standardEval.Mod1Evaluator.Parameters
 	if fastParams.Mod1Type != mod1.CosDiscrete || standardParams.Mod1Type != mod1.CosDiscrete || fastParams.Mod1InvPoly != nil || standardParams.Mod1InvPoly != nil {
-		return numericalEvalModTrace{}, fmt.Errorf("%s EvalMod source replay only supports the canonical CosDiscrete/no-inverse path", branch)
+		return numericalEvalModTrace{}, fmt.Errorf("%s EvalMod replay only supports the canonical CosDiscrete/no-inverse path", branch)
 	}
 	if fastInput.Level() != fastParams.LevelQ || standardInput.Level() != standardParams.LevelQ {
 		return numericalEvalModTrace{}, fmt.Errorf("%s EvalMod level does not match Mod1 parameters", branch)
 	}
 
 	trace := numericalEvalModTrace{}
+	fastEval.FastCKKS.SetQPrefixCapacityObserver(func(snapshot fastckks.QPrefixCapacitySnapshot) error {
+		trace.capacityAudit = append(trace.capacityAudit, NumericalQPrefixCapacity{
+			Checkpoint: branch + "/" + snapshot.Name, Level: snapshot.Level, Rows: snapshot.Rows,
+			Scale: snapshot.Scale, Degree: snapshot.Degree, MaxAbs: append([]string(nil), snapshot.MaxAbs...),
+			PrefixProduct: snapshot.PrefixProduct, StrictFit: snapshot.StrictFit,
+		})
+		return nil
+	})
+	defer fastEval.FastCKKS.SetQPrefixCapacityObserver(nil)
 	var previousInternal *NumericalStageCheckpoint
 	add := func(name string, fastCT, standardCT *rlwe.Ciphertext) (numericalStagePair, error) {
 		fastSample := numericalStageSampleFromCiphertext(branch+"/"+name, fastCT, true)
@@ -95,6 +105,13 @@ func runNumericalEvalModBisect(
 	inputScale := fastInput.Scale
 	fastRes := fastInput.CopyNew()
 	standardRes := standardInput.CopyNew()
+	fastRows, err := fastckks.QPrefixWidth(fastRes.Level())
+	if err != nil {
+		return trace, err
+	}
+	if err := fastEval.FastCKKS.ObserveQPrefixCapacity("evalmod-entry", fastRes, fastRows); err != nil {
+		return trace, fmt.Errorf("%s Fast EvalMod input capacity: %w", branch, err)
+	}
 	fastRes.Scale = fastParams.ScalingFactor()
 	standardRes.Scale = standardParams.ScalingFactor()
 	if _, err := add("after_normalization", fastRes, standardRes); err != nil {
@@ -105,10 +122,6 @@ func runNumericalEvalModBisect(
 		return trace, err
 	}
 	offset := numericalEvalModOffset(fastParams)
-	fastRows, err := fastckks.QPrefixWidth(fastRes.Level())
-	if err != nil {
-		return trace, err
-	}
 	if err := fastEval.FastCKKS.AddScalarQPrefixRows(fastRes, offset, fastRows, fastRes); err != nil {
 		return trace, fmt.Errorf("%s Fast Chebyshev offset replay: %w", branch, err)
 	}
@@ -126,17 +139,15 @@ func runNumericalEvalModBisect(
 		return trace, fmt.Errorf("%s polynomial input is not semantically comparable", branch)
 	}
 
-	planBits := 91
-	planScale := rlwe.NewScale(new(big.Int).Lsh(big.NewInt(1), uint(planBits)))
 	powers, plan, err := fastEval.PolynomialEvaluator.DiagnosticGeneratePowers(fastRes, fastParams.Mod1Poly, targetScale)
 	if err != nil {
 		return trace, fmt.Errorf("%s DiagnosticGeneratePowers: %w", branch, err)
 	}
 	trace.plan = NumericalPolynomialPlan{
-		Degree: plan.Degree, Base: plan.Base, Level: plan.Level,
+		Branch: branch, Degree: plan.Degree, Base: plan.Base, Level: plan.Level,
 		ScaleLog2: plan.Scale.Log2(), ScaleExact: plan.Scale.Value.Text('e', 80), BlockCount: len(plan.Blocks),
 	}
-	trace.powers, err = numericalGeneratedPowerEvidence(powers, polynomialInputPair.standard.values, params)
+	trace.powers, err = numericalGeneratedPowerEvidence(branch, powers, polynomialInputPair.standard.values, params)
 	if err != nil {
 		return trace, fmt.Errorf("%s generated-power semantic inspection: %w", branch, err)
 	}
@@ -147,45 +158,17 @@ func runNumericalEvalModBisect(
 	if err != nil {
 		return trace, fmt.Errorf("%s Standard polynomial replay: %w", branch, err)
 	}
-	fastPolyOut, err := fastEval.PolynomialEvaluator.EvaluateWithPlanScaleQPrefixRows(fastRes.CopyNew(), fastParams.Mod1Poly, targetScale, planScale, fastRows)
+	fastPolyOut, err := fastEval.PolynomialEvaluator.EvaluateQPrefixRows(fastRes.CopyNew(), fastParams.Mod1Poly, targetScale, fastRows)
 	if err != nil {
 		return trace, fmt.Errorf("%s Fast polynomial replay: %w", branch, err)
 	}
-	if _, err := add("generated_power_polynomial_output", fastPolyOut, standardPolyOut); err != nil {
+	if err := fastEval.FastCKKS.ObserveQPrefixCapacity("evalmod-polynomial-output", fastPolyOut, fastRows); err != nil {
+		return trace, fmt.Errorf("%s Fast polynomial output capacity: %w", branch, err)
+	}
+	if _, err := add("polynomial_output", fastPolyOut, standardPolyOut); err != nil {
 		return trace, err
-	}
-	if _, err := add("before_coherent_scale_transition", fastPolyOut.CopyNew(), standardPolyOut.CopyNew()); err != nil {
-		return trace, err
-	}
-	workingExponent, kExponent, multiplierExponent := 31, 29, 30
-	workingScale := rlwe.NewScale(new(big.Int).Lsh(big.NewInt(1), uint(workingExponent)))
-	if fastPolyOut.Level() != 7 || fastPolyOut.Degree() != 1 || !fastPolyOut.IsNTT || !fastPolyOut.IsMontgomery || !fastPolyOut.Scale.InDelta(workingScale, 32) {
-		return trace, fmt.Errorf("%s Fast polynomial output does not match source normalized-path invariant: level=%d scale=%s NTT=%t Montgomery=%t", branch, fastPolyOut.Level(), fastPolyOut.Scale.Value.Text('e', 20), fastPolyOut.IsNTT, fastPolyOut.IsMontgomery)
-	}
-	kIn, err := numericalNearestScaleExponent(targetScale.Div(fastPolyOut.Scale))
-	if err != nil {
-		return trace, err
-	}
-	if kIn != kExponent {
-		return trace, fmt.Errorf("%s normalized coherent-scale kIn=%d, expected source value %d", branch, kIn, kExponent)
-	}
-	kValue := new(big.Int).Lsh(big.NewInt(1), uint(kIn))
-	coherentScale := fastPolyOut.Scale.Mul(rlwe.NewScale(kValue))
-	if !coherentScale.InDelta(targetScale, 32) {
-		return trace, fmt.Errorf("%s normalized coherent scale is outside target tolerance", branch)
 	}
 	fastRes = fastPolyOut.CopyNew()
-	fastRes.Scale = coherentScale
-	trace.scaleAudit = append(trace.scaleAudit, NumericalScaleAudit{
-		Checkpoint: branch + "/normalized_coherent_scale_transition",
-		Scale:      coherentScale.Float64(), ScaleExact: coherentScale.Value.Text('e', 80), ScaleFloat64Finite: true, ScaleLog2: coherentScale.Log2(),
-		PlanScaleBits: planBits, PlanScaleExact: planScale.Value.Text('e', 80), WorkingScaleBits: workingExponent,
-		TargetScale: targetScale.Float64(), TargetScaleExact: targetScale.Value.Text('e', 80), TargetScaleFloat64Finite: true, TargetScaleLog2: targetScale.Log2(),
-		Level: fastRes.Level(), KInExponent: kIn, MultiplierExponent: multiplierExponent,
-	})
-	if _, err := add("after_coherent_scale_transition", fastRes.CopyNew(), standardPolyOut.CopyNew()); err != nil {
-		return trace, err
-	}
 	if _, err := add("before_double_angle_round_0", fastRes.CopyNew(), standardPolyOut.CopyNew()); err != nil {
 		return trace, err
 	}
@@ -193,7 +176,6 @@ func runNumericalEvalModBisect(
 	standardRes = standardPolyOut.CopyNew()
 	standardSqrt2Pi := standardParams.Sqrt2Pi
 	fastSqrt2Pi := fastParams.Sqrt2Pi
-	currentExponent := kIn
 	for round := 0; round < fastParams.DoubleAngle; round++ {
 		beforeLevel := fastRes.Level()
 		if beforeLevel < 1 || beforeLevel != standardRes.Level() {
@@ -203,14 +185,8 @@ func runNumericalEvalModBisect(
 		if err != nil {
 			return trace, err
 		}
-		nextScale := fastRes.Scale.Mul(fastRes.Scale).Div(rlwe.NewScale(params.Q()[beforeLevel]))
-		nextExponent, err := numericalNearestScaleExponent(nextScale.Div(workingScale))
-		if err != nil {
-			return trace, err
-		}
-		aExponent := 1 + 2*currentExponent - nextExponent
-		if nextExponent != kExponent || aExponent != multiplierExponent {
-			return trace, fmt.Errorf("%s DoubleAngle round %d source scale exponents changed: k=%d multiplier=%d", branch, round, nextExponent, aExponent)
+		if err := fastEval.FastCKKS.ObserveQPrefixCapacity(fmt.Sprintf("double-angle-%d-before", round), fastRes, rows); err != nil {
+			return trace, fmt.Errorf("%s Fast DoubleAngle round %d input capacity: %w", branch, round, err)
 		}
 		standardSqrt2Pi *= standardSqrt2Pi
 		fastSqrt2Pi *= fastSqrt2Pi
@@ -223,18 +199,17 @@ func runNumericalEvalModBisect(
 		if _, err := add(fmt.Sprintf("double_angle_round_%d_after_multiply", round), fastRes.CopyNew(), standardRes.CopyNew()); err != nil {
 			return trace, err
 		}
-		factor := new(big.Int).Lsh(big.NewInt(1), uint(aExponent))
-		constant := new(big.Float).SetPrec(256).SetFloat64(fastSqrt2Pi)
-		constant.Quo(constant, new(big.Float).SetInt(new(big.Int).Lsh(big.NewInt(1), uint(nextExponent))))
-		fastConstant, _ := constant.Float64()
-		if err := fastEval.FastCKKS.MulIntegerQPrefixRows(fastRes, factor, rows, fastRes); err != nil {
-			return trace, fmt.Errorf("%s Fast DoubleAngle round %d scale multiplier: %w", branch, round, err)
-		}
-		if err := fastEval.FastCKKS.AddScalarQPrefixRows(fastRes, -fastConstant, rows, fastRes); err != nil {
-			return trace, fmt.Errorf("%s Fast DoubleAngle round %d constant: %w", branch, round, err)
+		if err := fastEval.FastCKKS.AddQPrefixRows(fastRes, fastRes, fastRes, rows); err != nil {
+			return trace, fmt.Errorf("%s Fast DoubleAngle round %d doubling: %w", branch, round, err)
 		}
 		if err := standardEval.Evaluator.Add(standardRes, standardRes, standardRes); err != nil {
 			return trace, fmt.Errorf("%s Standard DoubleAngle round %d doubling: %w", branch, round, err)
+		}
+		if _, err := add(fmt.Sprintf("double_angle_round_%d_after_add", round), fastRes.CopyNew(), standardRes.CopyNew()); err != nil {
+			return trace, err
+		}
+		if err := fastEval.FastCKKS.AddScalarQPrefixRows(fastRes, -fastSqrt2Pi, rows, fastRes); err != nil {
+			return trace, fmt.Errorf("%s Fast DoubleAngle round %d constant: %w", branch, round, err)
 		}
 		if err := standardEval.Evaluator.Add(standardRes, -complex(standardSqrt2Pi, 0), standardRes); err != nil {
 			return trace, fmt.Errorf("%s Standard DoubleAngle round %d constant: %w", branch, round, err)
@@ -248,30 +223,28 @@ func runNumericalEvalModBisect(
 		if err := standardEval.Evaluator.Rescale(standardRes, standardRes); err != nil {
 			return trace, fmt.Errorf("%s Standard DoubleAngle round %d Rescale: %w", branch, round, err)
 		}
+		rows, err = fastckks.QPrefixWidth(fastRes.Level())
+		if err != nil {
+			return trace, err
+		}
+		if err := fastEval.FastCKKS.ObserveQPrefixCapacity(fmt.Sprintf("double-angle-%d-after-rescale", round), fastRes, rows); err != nil {
+			return trace, fmt.Errorf("%s Fast DoubleAngle round %d output capacity: %w", branch, round, err)
+		}
 		if _, err := add(fmt.Sprintf("double_angle_round_%d_after_rescale", round), fastRes.CopyNew(), standardRes.CopyNew()); err != nil {
 			return trace, err
 		}
 		trace.scaleAudit = append(trace.scaleAudit, numericalScaleAuditForCT(fmt.Sprintf("%s/double_angle_round_%d_fast", branch, round), fastRes))
 		trace.scaleAudit[len(trace.scaleAudit)-1].DoubleAngleRound = round
-		trace.scaleAudit[len(trace.scaleAudit)-1].PlanScaleBits = planBits
-		trace.scaleAudit[len(trace.scaleAudit)-1].PlanScaleExact = planScale.Value.Text('e', 80)
-		trace.scaleAudit[len(trace.scaleAudit)-1].WorkingScaleBits = workingExponent
-		trace.scaleAudit[len(trace.scaleAudit)-1].KInExponent = nextExponent
-		trace.scaleAudit[len(trace.scaleAudit)-1].MultiplierExponent = aExponent
-		currentExponent = nextExponent
-	}
-	if currentExponent != kExponent || fastRes.Level() != 4 {
-		return trace, fmt.Errorf("%s Fast DoubleAngle final recurrence state differs from source invariant", branch)
-	}
-	rows, err := fastckks.QPrefixWidth(fastRes.Level())
-	if err != nil {
-		return trace, err
-	}
-	if err := fastEval.FastCKKS.MulIntegerQPrefixRows(fastRes, new(big.Int).Lsh(big.NewInt(1), uint(currentExponent)), rows, fastRes); err != nil {
-		return trace, fmt.Errorf("%s Fast final normalized restore: %w", branch, err)
 	}
 	fastRes.Scale = inputScale
 	standardRes.Scale = standardInput.Scale
+	outputRows, err := fastckks.QPrefixWidth(fastRes.Level())
+	if err != nil {
+		return trace, err
+	}
+	if err := fastEval.FastCKKS.ObserveQPrefixCapacity("evalmod-output", fastRes, outputRows); err != nil {
+		return trace, fmt.Errorf("%s Fast EvalMod output capacity: %w", branch, err)
+	}
 	if _, err := add("evalmod_output_before_public_scale_reset", fastRes, standardRes); err != nil {
 		return trace, err
 	}
@@ -344,19 +317,7 @@ func numericalEvalModOffset(params mod1.Parameters) *big.Float {
 	return offset.Quo(new(big.Float).SetFloat64(-0.5), offset)
 }
 
-func numericalNearestScaleExponent(scale rlwe.Scale) (int, error) {
-	if scale.Value.Sign() <= 0 {
-		return 0, fmt.Errorf("scale ratio must be positive")
-	}
-	mantissa := new(big.Float).SetPrec(256)
-	exponent := scale.Value.MantExp(mantissa)
-	if mantissa.Cmp(new(big.Float).SetPrec(256).SetFloat64(0.75)) >= 0 {
-		return exponent, nil
-	}
-	return exponent - 1, nil
-}
-
-func numericalGeneratedPowerEvidence(powers []ckkspolynomial.DiagnosticPower, referenceInput []complex128, params ckks.Parameters) ([]NumericalGeneratedPower, error) {
+func numericalGeneratedPowerEvidence(branch string, powers []ckkspolynomial.DiagnosticPower, referenceInput []complex128, params ckks.Parameters) ([]NumericalGeneratedPower, error) {
 	out := make([]NumericalGeneratedPower, 0, len(powers))
 	for _, power := range powers {
 		if power.Ciphertext == nil || power.N < 1 {
@@ -383,6 +344,7 @@ func numericalGeneratedPowerEvidence(powers []ckkspolynomial.DiagnosticPower, re
 			return nil, fmt.Errorf("generated power %d comparison overflowed at %s", power.N, field)
 		}
 		out = append(out, NumericalGeneratedPower{
+			Branch:             branch,
 			ReferenceKind:      "plaintext Chebyshev recurrence from genuine Standard polynomial-input decode; not Standard ciphertext power",
 			Power:              power.N,
 			Level:              power.Ciphertext.Level(),
