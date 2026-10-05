@@ -160,11 +160,20 @@ func TestCombinedBranchS2CAmplificationUsesJointEvalModError(t *testing.T) {
 	require.Equal(t, "NOT_APPLICABLE_COMBINED_BRANCH", encodedS2C["a_i_status"])
 }
 
-func TestNumericalSummaryRendersEvalModCapacityAudit(t *testing.T) {
-	stage := NumericalStageLockstep{EvalModCapacityAudit: []NumericalQPrefixCapacity{{
-		Checkpoint: "real/evalmod-entry", Level: 12, Rows: 4, PrefixProduct: "12345",
-		Degree: 1, MaxAbs: []string{"10", "0"}, StrictFit: true,
-	}}}
+func TestNumericalSummaryRendersCapacityAndGenuineStandardPowerEvidence(t *testing.T) {
+	stage := NumericalStageLockstep{
+		PolynomialPlan: &NumericalPolynomialPlan{Branch: "real", Degree: 30, Base: 4, Level: 12, ScaleLog2: 60, ScaleExact: "2^60"},
+		GeneratedPowerEvidence: []NumericalGeneratedPower{{
+			Branch: "real", ReferenceKind: "genuine Standard PowerBasis.GenPower", Power: 2,
+			FastLevel: 11, FastScaleLog2: 60, FastMaintainedRows: 4,
+			StandardLevel: 11, StandardScaleLog2: 60, StandardAuthorityRows: 12,
+			LevelScaleMatch: true, RMSEFastStandard: 1e-8, MaxComplexDiffFastStandard: 1e-7,
+		}},
+		EvalModCapacityAudit: []NumericalQPrefixCapacity{{
+			Checkpoint: "real/evalmod-entry", Level: 12, Rows: 4, PrefixProduct: "12345",
+			Degree: 1, MaxAbs: []string{"10", "0"}, StrictFit: true,
+		}},
+	}
 	var output strings.Builder
 	renderNumericalStageEvidence(&output, NumericalDocument{StageLockstep: &stage})
 
@@ -173,6 +182,10 @@ func TestNumericalSummaryRendersEvalModCapacityAudit(t *testing.T) {
 	require.Contains(t, output.String(), "12345")
 	require.Contains(t, output.String(), "`[10 0]`")
 	require.Contains(t, output.String(), "true")
+	require.Contains(t, output.String(), "genuine Standard `PowerBasis.GenPower`")
+	require.Contains(t, output.String(), "11 / 60.000000")
+	require.Contains(t, output.String(), "Complex RMSE Fast-vs-Standard")
+	require.Contains(t, output.String(), "1.000000e-08")
 }
 
 func syntheticStageCheckpoint(name string, distance, snrDB float64) NumericalStageCheckpoint {

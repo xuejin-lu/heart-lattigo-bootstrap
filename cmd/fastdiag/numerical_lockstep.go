@@ -140,7 +140,7 @@ func numericalEvalModClassification(trace numericalEvalModTrace) string {
 		previousMax = maxDiff
 	}
 	for _, power := range trace.powers {
-		if power.MaxComplexDiff >= numericalMaterialThreshold {
+		if power.MaxComplexDiffFastStandard >= numericalMaterialThreshold {
 			return "FAST_STANDARD_FIRST_MATERIAL_EVALMOD_POLYNOMIAL"
 		}
 	}

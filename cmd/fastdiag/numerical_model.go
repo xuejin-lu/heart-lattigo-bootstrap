@@ -177,14 +177,20 @@ type NumericalScaleAudit struct {
 }
 
 type NumericalGeneratedPower struct {
-	Branch             string  `json:"branch"`
-	ReferenceKind      string  `json:"reference_kind"`
-	Power              int     `json:"power"`
-	Level              int     `json:"level"`
-	ScaleLog2          float64 `json:"scale_log2"`
-	FastMaintainedRows int     `json:"fast_maintained_rows"`
-	RMSE               float64 `json:"rmse_fast_vs_reference"`
-	MaxComplexDiff     float64 `json:"max_complex_diff_fast_vs_reference"`
+	Branch                     string  `json:"branch"`
+	ReferenceKind              string  `json:"reference_kind"`
+	Power                      int     `json:"power"`
+	FastLevel                  int     `json:"fast_level"`
+	FastScaleLog2              float64 `json:"fast_scale_log2"`
+	FastScaleExact             string  `json:"fast_scale_exact"`
+	FastMaintainedRows         int     `json:"fast_maintained_rows"`
+	StandardLevel              int     `json:"standard_level"`
+	StandardScaleLog2          float64 `json:"standard_scale_log2"`
+	StandardScaleExact         string  `json:"standard_scale_exact"`
+	StandardAuthorityRows      int     `json:"standard_authority_rows"`
+	LevelScaleMatch            bool    `json:"level_scale_match"`
+	RMSEFastStandard           float64 `json:"rmse_fast_vs_standard"`
+	MaxComplexDiffFastStandard float64 `json:"max_complex_diff_fast_vs_standard"`
 }
 
 type NumericalPolynomialPlan struct {

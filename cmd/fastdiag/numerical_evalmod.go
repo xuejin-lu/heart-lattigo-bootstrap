@@ -4,13 +4,16 @@ import (
 	"fmt"
 	"math"
 	"math/big"
+	"math/bits"
 
 	"github.com/tuneinsight/lattigo/v6/circuits/ckks/bootstrapping"
 	"github.com/tuneinsight/lattigo/v6/circuits/ckks/mod1"
 	ckkspolynomial "github.com/tuneinsight/lattigo/v6/circuits/ckks/polynomial"
+	commonpolynomial "github.com/tuneinsight/lattigo/v6/circuits/common/polynomial"
 	"github.com/tuneinsight/lattigo/v6/core/rlwe"
 	"github.com/tuneinsight/lattigo/v6/schemes/ckks"
 	fastckks "github.com/tuneinsight/lattigo/v6/schemes/ckks/fast"
+	"github.com/tuneinsight/lattigo/v6/utils/bignum"
 	"github.com/xuejin-lu/heart-lattigo-bootstrap/internal/numericalmetrics"
 )
 
@@ -147,9 +150,13 @@ func runNumericalEvalModStageReplay(
 		Branch: branch, Degree: plan.Degree, Base: plan.Base, Level: plan.Level,
 		ScaleLog2: plan.Scale.Log2(), ScaleExact: plan.Scale.Value.Text('e', 80), BlockCount: len(plan.Blocks),
 	}
-	trace.powers, err = numericalGeneratedPowerEvidence(branch, powers, polynomialInputPair.standard.values, params)
+	standardPowers, err := numericalStandardGeneratedPowers(standardRes, standardParams.Mod1Poly, powers, standardEval.Evaluator)
 	if err != nil {
-		return trace, fmt.Errorf("%s generated-power semantic inspection: %w", branch, err)
+		return trace, fmt.Errorf("%s genuine Standard generated powers: %w", branch, err)
+	}
+	trace.powers, err = numericalGeneratedPowerEvidence(branch, powers, standardPowers, standardSK, params)
+	if err != nil {
+		return trace, fmt.Errorf("%s generated-power Standard/Fast comparison: %w", branch, err)
 	}
 	standardPolynomial := standardParams.Mod1Poly.Clone()
 	// EvaluateNew calls EvaluateAndScaleNew(ct, 1); with no inverse polynomial,
@@ -317,67 +324,85 @@ func numericalEvalModOffset(params mod1.Parameters) *big.Float {
 	return offset.Quo(new(big.Float).SetFloat64(-0.5), offset)
 }
 
-func numericalGeneratedPowerEvidence(branch string, powers []ckkspolynomial.DiagnosticPower, referenceInput []complex128, params ckks.Parameters) ([]NumericalGeneratedPower, error) {
+func numericalStandardGeneratedPowers(input *rlwe.Ciphertext, polynomial bignum.Polynomial, fastPowers []ckkspolynomial.DiagnosticPower, eval *ckks.Evaluator) (map[int]*rlwe.Ciphertext, error) {
+	if input == nil || eval == nil || len(polynomial.Coeffs) == 0 {
+		return nil, fmt.Errorf("Standard power replay requires an input, evaluator, and non-empty polynomial")
+	}
+	standardPolynomial := commonpolynomial.NewPolynomial(polynomial)
+	logDegree := bits.Len64(uint64(standardPolynomial.Degree()))
+	if logDegree == 0 {
+		return nil, fmt.Errorf("Standard power replay requires positive polynomial degree")
+	}
+	powerBasis := commonpolynomial.NewPowerBasis(input, polynomial.Basis)
+	if err := powerBasis.GenPower(1<<(logDegree-1), false, eval); err != nil {
+		return nil, fmt.Errorf("Standard power %d: %w", 1<<(logDegree-1), err)
+	}
+	logSplit := bignum.OptimalSplit(logDegree)
+	for n := (1 << logSplit) - 1; n > 2; n-- {
+		if !(standardPolynomial.IsEven || standardPolynomial.IsOdd) ||
+			(n&1 == 0 && standardPolynomial.IsEven) || (n&1 == 1 && standardPolynomial.IsOdd) {
+			if err := powerBasis.GenPower(n, standardPolynomial.Lazy, eval); err != nil {
+				return nil, fmt.Errorf("Standard power %d: %w", n, err)
+			}
+		}
+	}
+
+	standardPowers := make(map[int]*rlwe.Ciphertext, len(fastPowers))
+	for _, fastPower := range fastPowers {
+		if fastPower.N < 1 || fastPower.Ciphertext == nil {
+			return nil, fmt.Errorf("Fast diagnostic power %d is invalid", fastPower.N)
+		}
+		standardPower := powerBasis.Value[fastPower.N]
+		if standardPower == nil {
+			return nil, fmt.Errorf("Standard PowerBasis did not generate required power T%d", fastPower.N)
+		}
+		standardPowers[fastPower.N] = standardPower
+	}
+	return standardPowers, nil
+}
+
+func numericalGeneratedPowerEvidence(branch string, powers []ckkspolynomial.DiagnosticPower, standardPowers map[int]*rlwe.Ciphertext, standardSK *rlwe.SecretKey, params ckks.Parameters) ([]NumericalGeneratedPower, error) {
 	out := make([]NumericalGeneratedPower, 0, len(powers))
 	for _, power := range powers {
 		if power.Ciphertext == nil || power.N < 1 {
 			return nil, fmt.Errorf("generated power %d has invalid ciphertext or power number", power.N)
 		}
+		standardPower := standardPowers[power.N]
+		if standardPower == nil {
+			return nil, fmt.Errorf("generated power T%d is missing its Standard ciphertext", power.N)
+		}
 		rows, err := fastckks.QPrefixWidth(power.Ciphertext.Level())
 		if err != nil {
 			return nil, fmt.Errorf("generated power %d Q-prefix: %w", power.N, err)
 		}
-		projected, err := projectNumericalStageCiphertext(params, power.Ciphertext, min(rows, power.Ciphertext.Level()+1)-1)
-		if err != nil {
-			return nil, fmt.Errorf("generated power %d projection: %w", power.N, err)
+		pair := numericalStagePair{
+			fast:     numericalStageSampleFromCiphertext(branch+fmt.Sprintf("/T%d", power.N), power.Ciphertext, true),
+			standard: numericalStageSampleFromCiphertext(branch+fmt.Sprintf("/T%d", power.N), standardPower, false),
 		}
-		fastValues, err := fastStandardDecodeFast(params, projected)
-		if err != nil {
-			return nil, fmt.Errorf("generated power %d Fast semantic decode: %w", power.N, err)
+		decodeNumericalStagePair(&pair, params, standardSK)
+		if !pair.fast.comparable || !pair.standard.comparable {
+			return nil, fmt.Errorf("generated power T%d is not comparable: Fast=%s Standard=%s", power.N, pair.fast.reason, pair.standard.reason)
 		}
-		reference, err := numericalChebyshevPower(referenceInput, power.N)
-		if err != nil {
-			return nil, fmt.Errorf("generated power %d reference: %w", power.N, err)
-		}
-		metrics, _ := numericalComparison(reference, fastValues)
+		metrics, _ := numericalComparison(pair.standard.values, pair.fast.values)
 		if field := firstNonFiniteNumber(metrics); field != "" {
 			return nil, fmt.Errorf("generated power %d comparison overflowed at %s", power.N, field)
 		}
 		out = append(out, NumericalGeneratedPower{
-			Branch:             branch,
-			ReferenceKind:      "plaintext Chebyshev recurrence from genuine Standard polynomial-input decode; not Standard ciphertext power",
-			Power:              power.N,
-			Level:              power.Ciphertext.Level(),
-			ScaleLog2:          power.Ciphertext.Scale.Log2(),
-			FastMaintainedRows: rows,
-			RMSE:               metrics.Complex.RMSE,
-			MaxComplexDiff:     metrics.Complex.Max,
+			Branch:                     branch,
+			ReferenceKind:              "genuine Standard PowerBasis.GenPower using Standard CKKS Evaluator",
+			Power:                      power.N,
+			FastLevel:                  power.Ciphertext.Level(),
+			FastScaleLog2:              power.Ciphertext.Scale.Log2(),
+			FastScaleExact:             power.Ciphertext.Scale.Value.Text('e', 80),
+			FastMaintainedRows:         rows,
+			StandardLevel:              standardPower.Level(),
+			StandardScaleLog2:          standardPower.Scale.Log2(),
+			StandardScaleExact:         standardPower.Scale.Value.Text('e', 80),
+			StandardAuthorityRows:      standardPower.Level() + 1,
+			LevelScaleMatch:            power.Ciphertext.Level() == standardPower.Level() && power.Ciphertext.Scale.Equal(standardPower.Scale),
+			RMSEFastStandard:           metrics.Complex.RMSE,
+			MaxComplexDiffFastStandard: metrics.Complex.Max,
 		})
 	}
 	return out, nil
-}
-
-func numericalChebyshevPower(input []complex128, power int) ([]complex128, error) {
-	if power < 1 || len(input) == 0 {
-		return nil, fmt.Errorf("Chebyshev reference requires a positive power and non-empty input")
-	}
-	previous := make([]complex128, len(input))
-	for i := range previous {
-		previous[i] = 1
-	}
-	current := append([]complex128(nil), input...)
-	if power == 1 {
-		return current, validateNumericalVector(current)
-	}
-	for n := 2; n <= power; n++ {
-		next := make([]complex128, len(input))
-		for i, value := range input {
-			next[i] = 2*value*current[i] - previous[i]
-		}
-		previous, current = current, next
-	}
-	if err := validateNumericalVector(current); err != nil {
-		return nil, err
-	}
-	return current, nil
 }
