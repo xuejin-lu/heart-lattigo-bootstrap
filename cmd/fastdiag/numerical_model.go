@@ -122,34 +122,38 @@ type NumericalStageCheckpoint struct {
 	D                            *float64                `json:"d_i_rmse"`
 	Amplification                *float64                `json:"a_i"`
 	AmplificationStatus          string                  `json:"a_i_status"`
+	AmplificationParent          string                  `json:"a_i_parent_checkpoint,omitempty"`
 	StageReferenceSNR            numericalmetrics.SNR    `json:"stage_reference_snr"`
 	DeltaSNRDB                   *float64                `json:"delta_snr_i_db"`
 	DeltaSNRStatus               string                  `json:"delta_snr_i_status"`
+	DeltaSNRParent               string                  `json:"delta_snr_i_parent_checkpoint,omitempty"`
 	FirstObservable              bool                    `json:"first_observable,omitempty"`
 	FirstMaterial                bool                    `json:"first_material,omitempty"`
 }
 
 type NumericalStageLockstep struct {
-	Checkpoints                       []NumericalStageCheckpoint `json:"checkpoints"`
-	FirstObservable                   string                     `json:"first_observable_checkpoint"`
-	FirstObservableMaxDiff            *float64                   `json:"first_observable_max_diff"`
-	FirstMaterial                     string                     `json:"first_material_checkpoint"`
-	FirstMaterialMaxDiff              *float64                   `json:"first_material_max_diff"`
-	MaterialThreshold                 float64                    `json:"material_threshold"`
-	ObservableThreshold               float64                    `json:"observable_threshold"`
-	Classification                    string                     `json:"classification"`
-	FinalFastStandardRMSE             float64                    `json:"final_fast_standard_rmse"`
-	S2CAmplificationFactor            *float64                   `json:"s2c_amplification_factor"`
-	LargestRawAmplificationCheckpoint string                     `json:"largest_raw_amplification_checkpoint"`
-	LargestRawAmplificationFactor     *float64                   `json:"largest_raw_amplification_factor"`
-	LargestSNRDropCheckpoint          string                     `json:"largest_snr_drop_checkpoint"`
-	LargestSNRDropDB                  *float64                   `json:"largest_snr_drop_db"`
-	EvalModReplayVerified             map[string]bool            `json:"evalmod_replay_verified,omitempty"`
-	EvalModReplayRMSE                 map[string]float64         `json:"evalmod_replay_rmse,omitempty"`
-	EvalModInternal                   []NumericalStageCheckpoint `json:"evalmod_internal,omitempty"`
-	ScaleAudit                        []NumericalScaleAudit      `json:"scale_audit,omitempty"`
-	GeneratedPowerEvidence            []NumericalGeneratedPower  `json:"generated_power_evidence,omitempty"`
-	PolynomialPlan                    *NumericalPolynomialPlan   `json:"polynomial_plan,omitempty"`
+	Checkpoints                          []NumericalStageCheckpoint `json:"checkpoints"`
+	FirstObservable                      string                     `json:"first_observable_checkpoint"`
+	FirstObservableMaxDiff               *float64                   `json:"first_observable_max_diff"`
+	FirstMaterial                        string                     `json:"first_material_checkpoint"`
+	FirstMaterialMaxDiff                 *float64                   `json:"first_material_max_diff"`
+	MaterialThreshold                    float64                    `json:"material_threshold"`
+	ObservableThreshold                  float64                    `json:"observable_threshold"`
+	Classification                       string                     `json:"classification"`
+	FinalFastStandardRMSE                float64                    `json:"final_fast_standard_rmse"`
+	CombinedBranchEvalModErrorRMSE       *float64                   `json:"combined_branch_evalmod_error_rmse,omitempty"`
+	CombinedBranchS2CAmplification       *float64                   `json:"combined_branch_s2c_amplification_factor,omitempty"`
+	CombinedBranchS2CAmplificationStatus string                     `json:"combined_branch_s2c_amplification_status,omitempty"`
+	LargestRawAmplificationCheckpoint    string                     `json:"largest_raw_amplification_checkpoint"`
+	LargestRawAmplificationFactor        *float64                   `json:"largest_raw_amplification_factor"`
+	LargestSNRDropCheckpoint             string                     `json:"largest_snr_drop_checkpoint"`
+	LargestSNRDropDB                     *float64                   `json:"largest_snr_drop_db"`
+	EvalModReplayVerified                map[string]bool            `json:"evalmod_replay_verified,omitempty"`
+	EvalModReplayRMSE                    map[string]float64         `json:"evalmod_replay_rmse,omitempty"`
+	EvalModInternal                      []NumericalStageCheckpoint `json:"evalmod_internal,omitempty"`
+	ScaleAudit                           []NumericalScaleAudit      `json:"scale_audit,omitempty"`
+	GeneratedPowerEvidence               []NumericalGeneratedPower  `json:"generated_power_evidence,omitempty"`
+	PolynomialPlan                       *NumericalPolynomialPlan   `json:"polynomial_plan,omitempty"`
 }
 
 type NumericalScaleAudit struct {

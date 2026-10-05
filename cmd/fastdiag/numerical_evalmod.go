@@ -61,6 +61,8 @@ func runNumericalEvalModBisect(
 			checkpoint.AmplificationStatus = "NO_PREVIOUS_CHECKPOINT"
 			checkpoint.DeltaSNRStatus = "NO_PREVIOUS_CHECKPOINT"
 			if previousInternal != nil && previousInternal.D != nil && checkpoint.D != nil {
+				checkpoint.AmplificationParent = previousInternal.Name
+				checkpoint.DeltaSNRParent = previousInternal.Name
 				if *previousInternal.D > 0 {
 					factor := *checkpoint.D / *previousInternal.D
 					if math.IsInf(factor, 0) || math.IsNaN(factor) {

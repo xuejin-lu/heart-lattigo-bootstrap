@@ -388,12 +388,12 @@ func summarizeNumericalStageLockstep(pairs []numericalStagePair, original []comp
 	result := NumericalStageLockstep{
 		Checkpoints:       make([]NumericalStageCheckpoint, 0, len(pairs)),
 		MaterialThreshold: numericalMaterialThreshold, ObservableThreshold: numericalObservableThreshold,
-		Classification: "CURRENT_FAST_NUMERICAL_DIVERGENCE_UNCLOSED",
+		Classification:                       "CURRENT_FAST_NUMERICAL_DIVERGENCE_UNCLOSED",
+		CombinedBranchS2CAmplificationStatus: "NOT_COMPARABLE",
 	}
-	var previous *NumericalStageCheckpoint
 	var previousMax *float64
-	var largestRaw, largestDrop *float64
 	evalModFast, evalModStandard := make([]complex128, 0), make([]complex128, 0)
+	evalModBranches := map[string]bool{}
 	for _, pair := range pairs {
 		checkpoint := NumericalStageCheckpoint{
 			Name: pair.fast.name, Fast: pair.fast.state, Standard: pair.standard.state,
@@ -406,7 +406,7 @@ func summarizeNumericalStageLockstep(pairs []numericalStagePair, original []comp
 				checkpoint.NotComparableReason += "; " + pair.standard.reason
 			}
 			result.Checkpoints = append(result.Checkpoints, checkpoint)
-			previous = nil
+			previousMax = nil
 			continue
 		}
 		metrics, _ := numericalComparison(pair.standard.values, pair.fast.values)
@@ -415,7 +415,7 @@ func summarizeNumericalStageLockstep(pairs []numericalStagePair, original []comp
 			checkpoint.NotComparableReason = "complex comparison overflowed at " + field
 			checkpoint.StageReferenceSNR = numericalmetrics.Unavailable(checkpoint.NotComparableReason)
 			result.Checkpoints = append(result.Checkpoints, checkpoint)
-			previous = nil
+			previousMax = nil
 			continue
 		}
 		checkpoint.Comparable = true
@@ -426,22 +426,6 @@ func summarizeNumericalStageLockstep(pairs []numericalStagePair, original []comp
 		if pair.fast.name == "input" || pair.fast.name == "final_public_output" {
 			precision := numericalPrecisionBits(original, pair.fast.values)
 			checkpoint.PrecisionVsCanonicalOriginal = &precision
-		}
-		if previous != nil {
-			switch {
-			case previous.D != nil && *previous.D > 0:
-				factor := *checkpoint.D / *previous.D
-				if math.IsInf(factor, 0) || math.IsNaN(factor) {
-					checkpoint.AmplificationStatus = "POSITIVE_INFINITY"
-				} else {
-					checkpoint.Amplification, checkpoint.AmplificationStatus = &factor, "FINITE"
-				}
-			case *checkpoint.D > 0:
-				checkpoint.AmplificationStatus = "UNDEFINED_ZERO_PREVIOUS_D"
-			default:
-				checkpoint.AmplificationStatus = "UNDEFINED_ZERO_OVER_ZERO"
-			}
-			checkpoint.DeltaSNRDB, checkpoint.DeltaSNRStatus = numericalSNRDelta(checkpoint.StageReferenceSNR, previous.StageReferenceSNR)
 		}
 		if result.FirstObservable == "" && maxDiff >= numericalObservableThreshold {
 			result.FirstObservable = checkpoint.Name
@@ -454,24 +438,13 @@ func summarizeNumericalStageLockstep(pairs []numericalStagePair, original []comp
 			checkpoint.FirstMaterial = true
 			result.Classification = numericalClassificationForCheckpoint(checkpoint.Name)
 		}
-		if checkpoint.Amplification != nil && (largestRaw == nil || *checkpoint.Amplification > *largestRaw) {
-			copyFactor := *checkpoint.Amplification
-			largestRaw = &copyFactor
-			result.LargestRawAmplificationCheckpoint = checkpoint.Name
-		}
-		if checkpoint.DeltaSNRDB != nil && *checkpoint.DeltaSNRDB < 0 && (largestDrop == nil || *checkpoint.DeltaSNRDB < *largestDrop) {
-			copyDrop := *checkpoint.DeltaSNRDB
-			largestDrop = &copyDrop
-			result.LargestSNRDropCheckpoint = checkpoint.Name
-		}
 		if checkpoint.Name == "evalmod_real" || checkpoint.Name == "evalmod_imag" {
 			evalModFast = append(evalModFast, pair.fast.values...)
 			evalModStandard = append(evalModStandard, pair.standard.values...)
+			evalModBranches[strings.TrimPrefix(checkpoint.Name, "evalmod_")] = true
 		}
 		copyMax := maxDiff
 		previousMax = &copyMax
-		previousCopy := checkpoint
-		previous = &previousCopy
 		result.Checkpoints = append(result.Checkpoints, checkpoint)
 	}
 	if len(result.Checkpoints) > 0 {
@@ -484,31 +457,140 @@ func summarizeNumericalStageLockstep(pairs []numericalStagePair, original []comp
 			}
 		}
 	}
-	if largestRaw != nil {
-		result.LargestRawAmplificationFactor = largestRaw
+	var combinedEvalModSNR *numericalmetrics.SNR
+	if evalModBranches["real"] && evalModBranches["imag"] && len(evalModFast) > 0 && len(evalModFast) == len(evalModStandard) {
+		combinedEvalModSNR = setCombinedBranchS2CMetrics(&result, evalModStandard, evalModFast)
 	}
-	if largestDrop != nil {
-		result.LargestSNRDropDB = largestDrop
-	}
-	if len(evalModFast) > 0 && len(evalModFast) == len(evalModStandard) {
-		var s2cD float64
-		for _, checkpoint := range result.Checkpoints {
-			if checkpoint.Name == "s2c" {
-				if checkpoint.D != nil {
-					s2cD = *checkpoint.D
-				}
-				break
-			}
-		}
-		evalModMetrics, _ := numericalComparison(evalModStandard, evalModFast)
-		if evalModMetrics.Complex.RMSE > 0 {
-			factor := s2cD / evalModMetrics.Complex.RMSE
-			if !math.IsNaN(factor) && !math.IsInf(factor, 0) {
-				result.S2CAmplificationFactor = &factor
-			}
-		}
-	}
+	applyNumericalStageTopology(&result, combinedEvalModSNR)
 	return result
+}
+
+func setCombinedBranchS2CMetrics(result *NumericalStageLockstep, evalModStandard, evalModFast []complex128) *numericalmetrics.SNR {
+	if result == nil || len(evalModStandard) == 0 || len(evalModStandard) != len(evalModFast) {
+		return nil
+	}
+	combined := numericalmetrics.Compare(evalModStandard, evalModFast)
+	if combined.Status == numericalmetrics.NotComparable {
+		return nil
+	}
+	combinedMetrics, _ := numericalComparison(evalModStandard, evalModFast)
+	if firstNonFiniteNumber(combinedMetrics) != "" {
+		return nil
+	}
+	jointD := combinedMetrics.Complex.RMSE
+	result.CombinedBranchEvalModErrorRMSE = &jointD
+	if s2c := numericalStageCheckpointByName(result, "s2c"); s2c != nil && s2c.D != nil {
+		switch {
+		case jointD > 0:
+			factor := *s2c.D / jointD
+			if math.IsNaN(factor) || math.IsInf(factor, 0) {
+				result.CombinedBranchS2CAmplificationStatus = "NON_FINITE"
+			} else {
+				result.CombinedBranchS2CAmplification = &factor
+				result.CombinedBranchS2CAmplificationStatus = "FINITE"
+			}
+		case *s2c.D > 0:
+			result.CombinedBranchS2CAmplificationStatus = "POSITIVE_INFINITY"
+		default:
+			result.CombinedBranchS2CAmplificationStatus = "UNDEFINED_ZERO_OVER_ZERO"
+		}
+	}
+	return &combined
+}
+
+func applyNumericalStageTopology(result *NumericalStageLockstep, combinedEvalModSNR *numericalmetrics.SNR) {
+	if result == nil {
+		return
+	}
+	result.LargestRawAmplificationCheckpoint = ""
+	result.LargestRawAmplificationFactor = nil
+	result.LargestSNRDropCheckpoint = ""
+	result.LargestSNRDropDB = nil
+	for i := range result.Checkpoints {
+		checkpoint := &result.Checkpoints[i]
+		checkpoint.Amplification = nil
+		checkpoint.AmplificationStatus = "NOT_COMPARABLE"
+		checkpoint.AmplificationParent = ""
+		checkpoint.DeltaSNRDB = nil
+		checkpoint.DeltaSNRStatus = "NOT_COMPARABLE"
+		checkpoint.DeltaSNRParent = ""
+	}
+
+	parents := []struct{ child, parent string }{
+		{"scale_down", "input"},
+		{"mod_up", "scale_down"},
+		{"c2s_real", "mod_up"},
+		{"c2s_imag", "mod_up"},
+		{"evalmod_real", "c2s_real"},
+		{"evalmod_imag", "c2s_imag"},
+		{"final_public_output", "s2c"},
+	}
+	for _, relation := range parents {
+		child := numericalStageCheckpointByName(result, relation.child)
+		parent := numericalStageCheckpointByName(result, relation.parent)
+		if child == nil {
+			continue
+		}
+		child.AmplificationParent = relation.parent
+		child.DeltaSNRParent = relation.parent
+		if parent == nil || !child.Comparable || !parent.Comparable || child.D == nil || parent.D == nil {
+			continue
+		}
+		child.Amplification, child.AmplificationStatus = numericalErrorAmplification(*child.D, *parent.D)
+		child.DeltaSNRDB, child.DeltaSNRStatus = numericalSNRDelta(child.StageReferenceSNR, parent.StageReferenceSNR)
+	}
+
+	if s2c := numericalStageCheckpointByName(result, "s2c"); s2c != nil {
+		s2c.AmplificationStatus = "NOT_APPLICABLE_COMBINED_BRANCH"
+		s2c.DeltaSNRParent = "evalmod_real+evalmod_imag (joint)"
+		if combinedEvalModSNR != nil && s2c.Comparable {
+			s2c.DeltaSNRDB, s2c.DeltaSNRStatus = numericalSNRDelta(s2c.StageReferenceSNR, *combinedEvalModSNR)
+		}
+	}
+
+	var largestRaw, largestDrop *float64
+	for i := range result.Checkpoints {
+		checkpoint := &result.Checkpoints[i]
+		if checkpoint.Amplification != nil && (largestRaw == nil || *checkpoint.Amplification > *largestRaw) {
+			factor := *checkpoint.Amplification
+			largestRaw = &factor
+			result.LargestRawAmplificationCheckpoint = checkpoint.Name
+		}
+		if checkpoint.DeltaSNRDB != nil && *checkpoint.DeltaSNRDB < 0 && (largestDrop == nil || *checkpoint.DeltaSNRDB < *largestDrop) {
+			drop := *checkpoint.DeltaSNRDB
+			largestDrop = &drop
+			result.LargestSNRDropCheckpoint = checkpoint.Name
+		}
+	}
+	result.LargestRawAmplificationFactor = largestRaw
+	result.LargestSNRDropDB = largestDrop
+}
+
+func numericalStageCheckpointByName(result *NumericalStageLockstep, name string) *NumericalStageCheckpoint {
+	if result == nil {
+		return nil
+	}
+	for i := range result.Checkpoints {
+		if result.Checkpoints[i].Name == name {
+			return &result.Checkpoints[i]
+		}
+	}
+	return nil
+}
+
+func numericalErrorAmplification(currentD, parentD float64) (*float64, string) {
+	switch {
+	case parentD > 0:
+		factor := currentD / parentD
+		if math.IsNaN(factor) || math.IsInf(factor, 0) {
+			return nil, "POSITIVE_INFINITY"
+		}
+		return &factor, "FINITE"
+	case currentD > 0:
+		return nil, "UNDEFINED_ZERO_PREVIOUS_D"
+	default:
+		return nil, "UNDEFINED_ZERO_OVER_ZERO"
+	}
 }
 
 func numericalSNRDelta(current, previous numericalmetrics.SNR) (*float64, string) {

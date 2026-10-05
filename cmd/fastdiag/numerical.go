@@ -851,24 +851,31 @@ func renderNumericalStageEvidence(out *strings.Builder, doc NumericalDocument) {
 		fmt.Fprintf(out, "`FAST_BOOTSTRAP_SNR_DB=%s`\n", formatSNRDB(doc.FastTrials[0].BootstrapSNR))
 	}
 
-	out.WriteString("\n## Stage reference SNR and divergence\n\nFor each comparable checkpoint, `D_i` is Fast-vs-genuine-Standard complex RMSE; `A_i=D_i/D_(i-1)` where the previous `D` is positive; stage reference SNR uses Standard as signal and Fast−Standard as error. A zero previous `D` leaves `A_i` undefined.\n\n| Checkpoint | Fast state | Standard state | D_i RMSE | A_i | Stage reference SNR (dB / status) | ΔSNR_i (dB / status) | Max complex diff |\n|---|---|---|---:|---:|---:|---:|---:|\n")
+	out.WriteString("\n## Stage reference SNR and divergence\n\n`D_i` is Fast-vs-genuine-Standard complex RMSE. Amplification and SNR deltas follow the explicit stage topology, not table adjacency: C2S real/imag are parallel children of ModUp; each EvalMod branch uses its matching C2S branch; S2C uses a joint EvalMod real+imag reference; final public output may use S2C.\n\n| Checkpoint | Fast state | Standard state | D_i RMSE | A_i parent | A_i | Stage reference SNR (dB / status) | ΔSNR_i parent | ΔSNR_i (dB / status) | Max complex diff |\n|---|---|---|---:|---|---:|---:|---|---:|---:|\n")
 	for _, checkpoint := range stage.Checkpoints {
 		if !checkpoint.Comparable || checkpoint.FastVsStandard == nil {
 			continue
 		}
-		fmt.Fprintf(out, "| %s | %s | %s | %s | %s (%s) | %s | %s (%s) | %.6e |\n", checkpoint.Name,
+		aValue := formatOptionalFloat(checkpoint.Amplification)
+		if checkpoint.AmplificationStatus == "NOT_APPLICABLE_COMBINED_BRANCH" {
+			aValue = "n/a (combined branches)"
+		}
+		fmt.Fprintf(out, "| %s | %s | %s | %s | %s | %s (%s) | %s | %s | %s (%s) | %.6e |\n", checkpoint.Name,
 			formatInternalState(checkpoint.Fast), formatInternalState(checkpoint.Standard), formatOptionalFloat(checkpoint.D),
-			formatOptionalFloat(checkpoint.Amplification), checkpoint.AmplificationStatus,
-			formatSNRDB(checkpoint.StageReferenceSNR), formatOptionalFloat(checkpoint.DeltaSNRDB), checkpoint.DeltaSNRStatus, checkpoint.FastVsStandard.Complex.Max)
+			formatMetricParent(checkpoint.AmplificationParent), aValue, checkpoint.AmplificationStatus,
+			formatSNRDB(checkpoint.StageReferenceSNR), formatMetricParent(checkpoint.DeltaSNRParent),
+			formatOptionalFloat(checkpoint.DeltaSNRDB), checkpoint.DeltaSNRStatus, checkpoint.FastVsStandard.Complex.Max)
 	}
 	fmt.Fprintf(out, "\n`LARGEST_RAW_AMPLIFICATION_CHECKPOINT=%s`\n`LARGEST_RAW_AMPLIFICATION_FACTOR=%s`\n`LARGEST_SNR_DROP_CHECKPOINT=%s`\n`LARGEST_SNR_DROP_DB=%s`\n",
 		stage.LargestRawAmplificationCheckpoint, formatOptionalFloat(stage.LargestRawAmplificationFactor), stage.LargestSNRDropCheckpoint, formatOptionalFloat(stage.LargestSNRDropDB))
-	fmt.Fprintf(out, "\n- First observable: `%s`, max complex diff `%s` (threshold `%.3e`)\n- First material: `%s`, max complex diff `%s` (threshold `%.12g`)\n- Final Fast-vs-Standard RMSE: `%.12g`\n- S2C amplification factor: `%s`\n- Current classification: `%s`\n",
+	fmt.Fprintf(out, "\n- First observable: `%s`, max complex diff `%s` (threshold `%.3e`)\n- First material: `%s`, max complex diff `%s` (threshold `%.12g`)\n- Final Fast-vs-Standard RMSE: `%.12g`\n- Combined-branch EvalMod error RMSE: `%s`\n- Combined-branch S2C amplification: `%s` (status `%s`; `D_s2c / RMSE(concat(EvalMod real, EvalMod imag))`)\n- Current classification: `%s`\n",
 		stage.FirstObservable, formatOptionalFloat(stage.FirstObservableMaxDiff), stage.ObservableThreshold,
 		stage.FirstMaterial, formatOptionalFloat(stage.FirstMaterialMaxDiff), stage.MaterialThreshold,
-		stage.FinalFastStandardRMSE, formatOptionalFloat(stage.S2CAmplificationFactor), stage.Classification)
-	fmt.Fprintf(out, "\n`FIRST_OBSERVABLE_CHECKPOINT=%s`\n`FIRST_OBSERVABLE_MAX_DIFF=%s`\n`FIRST_MATERIAL_CHECKPOINT=%s`\n`FIRST_MATERIAL_MAX_DIFF=%s`\n`FINAL_FAST_STANDARD_RMSE=%.12g`\n`S2C_AMPLIFICATION_FACTOR=%s`\n",
-		stage.FirstObservable, formatOptionalFloat(stage.FirstObservableMaxDiff), stage.FirstMaterial, formatOptionalFloat(stage.FirstMaterialMaxDiff), stage.FinalFastStandardRMSE, formatOptionalFloat(stage.S2CAmplificationFactor))
+		stage.FinalFastStandardRMSE, formatOptionalFloat(stage.CombinedBranchEvalModErrorRMSE),
+		formatOptionalFloat(stage.CombinedBranchS2CAmplification), stage.CombinedBranchS2CAmplificationStatus, stage.Classification)
+	fmt.Fprintf(out, "\n`FIRST_OBSERVABLE_CHECKPOINT=%s`\n`FIRST_OBSERVABLE_MAX_DIFF=%s`\n`FIRST_MATERIAL_CHECKPOINT=%s`\n`FIRST_MATERIAL_MAX_DIFF=%s`\n`FINAL_FAST_STANDARD_RMSE=%.12g`\n`COMBINED_BRANCH_S2C_AMPLIFICATION_FACTOR=%s`\n`S2C_AMPLIFICATION_FACTOR=%s (combined-branch compatibility alias)`\n",
+		stage.FirstObservable, formatOptionalFloat(stage.FirstObservableMaxDiff), stage.FirstMaterial, formatOptionalFloat(stage.FirstMaterialMaxDiff), stage.FinalFastStandardRMSE,
+		formatOptionalFloat(stage.CombinedBranchS2CAmplification), formatOptionalFloat(stage.CombinedBranchS2CAmplification))
 
 	if len(stage.EvalModInternal) > 0 {
 		out.WriteString("\n## EvalMod internal bisect\n\nStandard is decrypted with the genuine Standard secret key; Fast is decoded through the validated Q-prefix c0 path after projecting both branches to common authoritative Q rows. Replay verification compares each source-faithful replay output with the actual public EvalMod output.\n\n| Checkpoint | Fast L / log2(scale) / degree / NTT / Montgomery / rows | Standard L / log2(scale) / degree / NTT / Montgomery / rows | D_i RMSE | A_i | Stage reference SNR (dB / status) | ΔSNR_i (dB / status) | Max complex diff |\n|---|---|---|---:|---:|---:|---:|---:|---:|\n")
@@ -918,7 +925,7 @@ func renderNumericalStageEvidence(out *strings.Builder, doc NumericalDocument) {
 		}
 	}
 
-	out.WriteString("\n## S2C attribution\n\nThe first material divergence is already present at EvalMod, so S2C is not the originating stage. For this run S2C transforms the combined EvalMod reference gap by the reported amplification factor; its separate stage increment is visible in the stage table.\n\n")
+	out.WriteString("\n## S2C attribution\n\nThe first material divergence is already present at EvalMod, so S2C is not the originating stage. The S2C amplification is reported separately as a combined-branch metric: the S2C error RMSE divided by the joint RMSE of concatenated EvalMod real and imag semantic errors. It is not an ordinary sequential `A_i`. The S2C ΔSNR parent is the joint EvalMod real+imag reference, not the preceding table row.\n\n")
 	out.WriteString("\n## Historical-reference reconciliation and next bounded counterfactual\n\n`HISTORICAL_FAST_CKKS_REFERENCE_ONLY`: older q0=56/dirty-tree diagnosis is not used to classify this current q0=55 run. Current evidence is reproduced on the synchronized current Fast Q-prefix branch; the selected plan scale remains 2^91.\n\n")
 	fmt.Fprintf(out, "Next causal experiment (exactly one; not executed): **%s**\n", numericalNextCounterfactual(*stage))
 }
@@ -928,6 +935,13 @@ func formatOptionalFloat(value *float64) string {
 		return "—"
 	}
 	return fmt.Sprintf("%.6e", *value)
+}
+
+func formatMetricParent(value string) string {
+	if value == "" {
+		return "—"
+	}
+	return value
 }
 
 func formatSNRMetric(value *float64) string {

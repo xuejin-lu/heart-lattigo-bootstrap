@@ -93,3 +93,86 @@ func TestNumericalStandardSpreadTracksPerSlotMeans(t *testing.T) {
 	require.Zero(t, identical.RMSComplexSpread)
 	require.Zero(t, identical.MaxComplexSpread)
 }
+
+func TestStageMetricsFollowBranchTopology(t *testing.T) {
+	checkpoints := []NumericalStageCheckpoint{
+		syntheticStageCheckpoint("input", 0.5, 90),
+		syntheticStageCheckpoint("scale_down", 1, 80),
+		syntheticStageCheckpoint("mod_up", 2, 70),
+		syntheticStageCheckpoint("c2s_real", 4, 60),
+		syntheticStageCheckpoint("c2s_imag", 8, 50),
+		syntheticStageCheckpoint("evalmod_real", 40, 40),
+		syntheticStageCheckpoint("evalmod_imag", 80, 30),
+		syntheticStageCheckpoint("s2c", 60, 20),
+		syntheticStageCheckpoint("final_public_output", 120, 15),
+	}
+	jointSNR := syntheticSNR(35)
+	result := NumericalStageLockstep{Checkpoints: checkpoints}
+	applyNumericalStageTopology(&result, &jointSNR)
+
+	require.Equal(t, "mod_up", stageCheckpoint(t, &result, "c2s_real").AmplificationParent)
+	require.Equal(t, "mod_up", stageCheckpoint(t, &result, "c2s_imag").AmplificationParent)
+	require.InDelta(t, 2, *stageCheckpoint(t, &result, "c2s_real").Amplification, 1e-15)
+	require.InDelta(t, 4, *stageCheckpoint(t, &result, "c2s_imag").Amplification, 1e-15)
+	require.Equal(t, "c2s_real", stageCheckpoint(t, &result, "evalmod_real").AmplificationParent)
+	require.Equal(t, "c2s_imag", stageCheckpoint(t, &result, "evalmod_imag").AmplificationParent)
+	require.InDelta(t, 10, *stageCheckpoint(t, &result, "evalmod_real").Amplification, 1e-15)
+	require.InDelta(t, 10, *stageCheckpoint(t, &result, "evalmod_imag").Amplification, 1e-15)
+
+	s2c := stageCheckpoint(t, &result, "s2c")
+	require.Nil(t, s2c.Amplification)
+	require.Equal(t, "NOT_APPLICABLE_COMBINED_BRANCH", s2c.AmplificationStatus)
+	require.Equal(t, "evalmod_real+evalmod_imag (joint)", s2c.DeltaSNRParent)
+	require.InDelta(t, -15, *s2c.DeltaSNRDB, 1e-15)
+	require.Equal(t, "s2c", stageCheckpoint(t, &result, "final_public_output").AmplificationParent)
+	require.InDelta(t, 2, *stageCheckpoint(t, &result, "final_public_output").Amplification, 1e-15)
+	require.Equal(t, "evalmod_real", result.LargestRawAmplificationCheckpoint)
+	require.InDelta(t, 10, *result.LargestRawAmplificationFactor, 1e-15)
+}
+
+func TestCombinedBranchS2CAmplificationUsesJointEvalModError(t *testing.T) {
+	s2cD := 10.0
+	result := NumericalStageLockstep{Checkpoints: []NumericalStageCheckpoint{{
+		Name: "s2c", Comparable: true, D: &s2cD,
+	}}}
+	combinedSNR := setCombinedBranchS2CMetrics(
+		&result,
+		[]complex128{2, 4},
+		[]complex128{3, 7},
+	)
+	require.NotNil(t, combinedSNR)
+	applyNumericalStageTopology(&result, combinedSNR)
+	require.Equal(t, numericalmetrics.Finite, combinedSNR.Status)
+	require.InDelta(t, math.Sqrt(5), *result.CombinedBranchEvalModErrorRMSE, 1e-15)
+	require.InDelta(t, 10/math.Sqrt(5), *result.CombinedBranchS2CAmplification, 1e-15)
+	require.Equal(t, "FINITE", result.CombinedBranchS2CAmplificationStatus)
+
+	data, err := json.Marshal(result)
+	require.NoError(t, err)
+	var encoded map[string]any
+	require.NoError(t, json.Unmarshal(data, &encoded))
+	require.Contains(t, encoded, "combined_branch_s2c_amplification_factor")
+	require.NotContains(t, encoded, "s2c_amplification_factor")
+	encodedCheckpoints := encoded["checkpoints"].([]any)
+	encodedS2C := encodedCheckpoints[0].(map[string]any)
+	require.Nil(t, encodedS2C["a_i"])
+	require.Equal(t, "NOT_APPLICABLE_COMBINED_BRANCH", encodedS2C["a_i_status"])
+}
+
+func syntheticStageCheckpoint(name string, distance, snrDB float64) NumericalStageCheckpoint {
+	return NumericalStageCheckpoint{
+		Name: name, Comparable: true, D: &distance,
+		StageReferenceSNR: syntheticSNR(snrDB),
+	}
+}
+
+func syntheticSNR(snrDB float64) numericalmetrics.SNR {
+	return numericalmetrics.SNR{Status: numericalmetrics.Finite, SNRDB: &snrDB}
+}
+
+func stageCheckpoint(t *testing.T, result *NumericalStageLockstep, name string) *NumericalStageCheckpoint {
+	t.Helper()
+	checkpoint := numericalStageCheckpointByName(result, name)
+	require.NotNil(t, checkpoint)
+	return checkpoint
+}
