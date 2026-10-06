@@ -4,15 +4,49 @@ import (
 	"encoding/json"
 	"math"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 	"github.com/xuejin-lu/heart-lattigo-bootstrap/internal/numericalmetrics"
+	"github.com/xuejin-lu/heart-lattigo-bootstrap/internal/perfmeasure"
 )
 
 func TestFastStandardCanonicalInputFingerprint(t *testing.T) {
 	require.Equal(t, fastStandardInputSHA256, fastStandardInputFingerprint(fastStandardP93Values()))
+}
+
+func TestNumericalProfilesUseCanonicalEffectiveParameters(t *testing.T) {
+	root := filepath.Join("..", "..")
+	p93, p93Residual, err := fastStandardP93Parameters()
+	require.NoError(t, err)
+	sharedP93, sharedResidual, p93Values, p93Effective, p93Config, p93ConfigHash, err := numericalProfile(supportedProfile, root)
+	require.NoError(t, err)
+	require.Equal(t, p93.BootstrappingParameters.Q(), sharedP93.BootstrappingParameters.Q())
+	require.Equal(t, p93.BootstrappingParameters.P(), sharedP93.BootstrappingParameters.P())
+	require.True(t, p93Residual.Equal(&sharedResidual), "LogN13 config profile must reproduce the canonical P93 residual parameters")
+	require.Equal(t, p93.BootstrappingParameters.LogN(), sharedP93.BootstrappingParameters.LogN())
+	require.Equal(t, p93.BootstrappingParameters.MaxLevel(), sharedP93.BootstrappingParameters.MaxLevel())
+	require.Equal(t, p93.BootstrappingParameters.DefaultScale(), sharedP93.BootstrappingParameters.DefaultScale())
+	require.Equal(t, p93.CoeffsToSlotsParameters, sharedP93.CoeffsToSlotsParameters)
+	require.Equal(t, p93.SlotsToCoeffsParameters, sharedP93.SlotsToCoeffsParameters)
+	require.Equal(t, p93.Mod1ParametersLiteral, sharedP93.Mod1ParametersLiteral)
+	require.Equal(t, p93.CircuitOrder, sharedP93.CircuitOrder)
+	require.Equal(t, fastStandardInputSHA256, perfmeasure.Fingerprint(p93Values))
+	require.Equal(t, 55, p93Effective.Q0Bits)
+	require.Equal(t, "configs/bootstrap_config.logN13.json", p93Config)
+	require.NotEmpty(t, p93ConfigHash)
+	require.Equal(t, fastStandardP93Values(), p93Values)
+
+	logN16, _, logN16Values, logN16Effective, config, configHash, err := numericalProfile(logN16Profile, root)
+	require.NoError(t, err)
+	require.Equal(t, 16, logN16.BootstrappingParameters.LogN())
+	require.Equal(t, 15, logN16.CoeffsToSlotsParameters.LogSlots)
+	require.Len(t, logN16Values, 1<<15)
+	require.Equal(t, 56, logN16Effective.Q0Bits, "report the generated prime bit length, not the requested config scale")
+	require.Equal(t, "configs/bootstrap_config.logN16.json", config)
+	require.NotEmpty(t, configHash)
 }
 
 func TestNumericalComparisonMetricsAndThresholdCoordinates(t *testing.T) {

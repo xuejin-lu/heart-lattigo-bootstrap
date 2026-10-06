@@ -8,6 +8,7 @@ import (
 	"math"
 	"math/bits"
 	"math/cmplx"
+	"path/filepath"
 	"runtime"
 	"sort"
 	"strings"
@@ -18,10 +19,12 @@ import (
 	"github.com/tuneinsight/lattigo/v6/ring"
 	"github.com/tuneinsight/lattigo/v6/schemes/ckks"
 	"github.com/xuejin-lu/heart-lattigo-bootstrap/internal/numericalmetrics"
+	"github.com/xuejin-lu/heart-lattigo-bootstrap/internal/perfmeasure"
 )
 
 const (
 	fastStandardInputSHA256 = "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285"
+	correctedFastCommitSHA  = "5117fc57949647182f476dc5952099c706b9f869"
 	numericalThresholdValue = 1e-2
 	precisionErrorFloor     = 1e-30
 )
@@ -38,13 +41,21 @@ func numericalReference(secondaryRoot string, primary RepositoryMetadata, opts o
 	if err != nil {
 		return NumericalDocument{}, err
 	}
-	if branch != "fast-qprefix" {
-		return NumericalDocument{}, fmt.Errorf("numerical mode 要求 authoritative Secondary branch fast-qprefix，目前是 %q", branch)
+	commit, err := gitOutput(secondaryRoot, "rev-parse", "HEAD")
+	if err != nil {
+		return NumericalDocument{}, err
+	}
+	if commit != correctedFastCommitSHA || (branch != "fast-qprefix" && branch != "") {
+		return NumericalDocument{}, fmt.Errorf("numerical mode 要求 pinned Fast fast-qprefix commit %s；目前 branch=%q HEAD=%s", correctedFastCommitSHA, branch, commit)
 	}
 	if err := requireCleanWorktree(secondaryRoot); err != nil {
 		return NumericalDocument{}, err
 	}
-	secondary, err := repositoryMetadata(secondaryRoot, "")
+	secondaryRef := branch
+	if secondaryRef == "" {
+		secondaryRef = "fast-qprefix (detached)"
+	}
+	secondary, err := repositoryMetadata(secondaryRoot, secondaryRef)
 	if err != nil {
 		return NumericalDocument{}, err
 	}
@@ -52,17 +63,19 @@ func numericalReference(secondaryRoot string, primary RepositoryMetadata, opts o
 		return NumericalDocument{}, fmt.Errorf("Secondary 在 provenance 擷取後變為 dirty，拒絕執行 numerical comparison")
 	}
 
-	params, residual, err := fastStandardP93Parameters()
+	params, residual, values, effective, configPath, configHash, err := numericalProfile(opts.profile, primary.Path)
 	if err != nil {
 		return NumericalDocument{}, err
 	}
-	values := fastStandardP93Values()
 	inputHash := fastStandardInputFingerprint(values)
-	if inputHash != fastStandardInputSHA256 {
+	if opts.profile == supportedProfile && inputHash != fastStandardInputSHA256 {
 		return NumericalDocument{}, fmt.Errorf("canonical P93 input fingerprint 不符：%s", inputHash)
 	}
-	if len(values) != 4096 || params.BootstrappingParameters.LogN() != 13 || params.CoeffsToSlotsParameters.LogSlots != 12 || bits.Len64(params.BootstrappingParameters.Q()[0]) != 55 {
-		return NumericalDocument{}, fmt.Errorf("canonical P93 parameters 不符：slots=%d LogN=%d LogSlots=%d q0bits=%d", len(values), params.BootstrappingParameters.LogN(), params.CoeffsToSlotsParameters.LogSlots, bits.Len64(params.BootstrappingParameters.Q()[0]))
+	if len(values) != effective.InputSlots || params.BootstrappingParameters.LogN() != effective.LogN || params.CoeffsToSlotsParameters.LogSlots != effective.LogSlots {
+		return NumericalDocument{}, fmt.Errorf("%s effective profile mismatch: slots=%d LogN=%d LogSlots=%d", opts.profile, len(values), params.BootstrappingParameters.LogN(), params.CoeffsToSlotsParameters.LogSlots)
+	}
+	if opts.profile == supportedProfile && effective.Q0Bits != 55 {
+		return NumericalDocument{}, fmt.Errorf("canonical P93 effective q0 changed: q0bits=%d", effective.Q0Bits)
 	}
 	input, err := fastStandardEncodedInput(residual, params.CoeffsToSlotsParameters.LogSlots, values)
 	if err != nil {
@@ -225,10 +238,12 @@ func numericalReference(secondaryRoot string, primary RepositoryMetadata, opts o
 		Environment: EnvironmentMetadata{GoVersion: runtime.Version(), OS: runtime.GOOS, Arch: runtime.GOARCH,
 			CPU: cpuModel(), NumCPU: runtime.NumCPU(), GOMAXPROCS: runtime.GOMAXPROCS(0)},
 		Workload: NumericalWorkload{
-			FingerprintSHA256: inputHash, InputSlots: len(values), LogN: params.BootstrappingParameters.LogN(),
-			LogSlots:   params.CoeffsToSlotsParameters.LogSlots,
-			QChainBits: numericalPrimeBits(params.BootstrappingParameters.Q()), PBits: numericalPrimeBits(params.BootstrappingParameters.P()),
-			Q0Bits: bits.Len64(params.BootstrappingParameters.Q()[0]), PolynomialDegree: params.Mod1ParametersLiteral.Mod1Degree,
+			FingerprintSHA256: inputHash, ConfigPath: configPath, ConfigSHA256: configHash,
+			InputSlots: len(values), LogN: effective.LogN, LogSlots: effective.LogSlots,
+			RingN: effective.RingN, ResidualRingN: effective.ResidualRingN, DefaultScale: effective.DefaultScale,
+			Q0ConfigScale: effective.Q0Target, QChainBits: effective.QChainBits, QPrimes: effective.QPrimes,
+			PBits: effective.PBits, PPrimes: effective.PPrimes,
+			Q0Bits: effective.Q0Bits, PolynomialDegree: params.Mod1ParametersLiteral.Mod1Degree,
 			DoubleAngle: params.Mod1ParametersLiteral.DoubleAngle, EvalModLogScale: params.Mod1ParametersLiteral.LogScale,
 			LogMessageRatio: params.Mod1ParametersLiteral.LogMessageRatio,
 		},
@@ -273,6 +288,41 @@ func fastStandardP93Parameters() (bootstrapping.Parameters, ckks.Parameters, err
 	params.CircuitOrder = bootstrapping.ModUpThenEncode
 	params.ResidualParameters = residual
 	return params, residual, nil
+}
+
+func numericalProfile(profile, primaryRoot string) (bootstrapping.Parameters, ckks.Parameters, []complex128, perfmeasure.EffectiveParameters, string, string, error) {
+	configName := ""
+	switch profile {
+	case supportedProfile:
+		configName = "bootstrap_config.logN13.json"
+	case logN16Profile:
+		configName = "bootstrap_config.logN16.json"
+	default:
+		return bootstrapping.Parameters{}, ckks.Parameters{}, nil, perfmeasure.EffectiveParameters{}, "", "", fmt.Errorf("unsupported numerical profile %q", profile)
+	}
+	configPath := filepath.Join(primaryRoot, "configs", configName)
+	cfg, configSum, err := perfmeasure.LoadConfig(configPath)
+	if err != nil {
+		return bootstrapping.Parameters{}, ckks.Parameters{}, nil, perfmeasure.EffectiveParameters{}, "", "", fmt.Errorf("load %s config: %w", profile, err)
+	}
+	residual, params, effective, err := perfmeasure.ParametersFromConfig(cfg)
+	if err != nil {
+		return bootstrapping.Parameters{}, ckks.Parameters{}, nil, perfmeasure.EffectiveParameters{}, "", "", err
+	}
+	if profile == supportedProfile {
+		if effective.LogN != 13 || effective.LogSlots != 12 || effective.InputSlots != 1<<12 || effective.Q0Bits != 55 {
+			return bootstrapping.Parameters{}, ckks.Parameters{}, nil, perfmeasure.EffectiveParameters{}, "", "", fmt.Errorf("canonical LogN13 config produced unexpected effective parameters: %+v", effective)
+		}
+		values := fastStandardP93Values()
+		if perfmeasure.Fingerprint(values) != fastStandardInputSHA256 {
+			return bootstrapping.Parameters{}, ckks.Parameters{}, nil, perfmeasure.EffectiveParameters{}, "", "", fmt.Errorf("canonical LogN13 input fingerprint mismatch")
+		}
+		return params, residual, values, effective, filepath.Join("configs", configName), hex.EncodeToString(configSum[:]), nil
+	}
+	if effective.LogN != 16 || effective.LogSlots != 15 || effective.InputSlots != 1<<15 || effective.Q0Bits != 56 || cfg.Mod1Degree != 30 || cfg.Mod1DoubleAngle != 3 || cfg.Mod1K != 16 || cfg.LogMessageRatio != 10 {
+		return bootstrapping.Parameters{}, ckks.Parameters{}, nil, perfmeasure.EffectiveParameters{}, "", "", fmt.Errorf("LogN16 effective config contract mismatch: %+v", effective)
+	}
+	return params, residual, perfmeasure.DeterministicInput(effective.InputSlots), effective, filepath.Join("configs", configName), hex.EncodeToString(configSum[:]), nil
 }
 
 func fastStandardP93Values() []complex128 {
@@ -748,7 +798,7 @@ func renderNumericalSummary(doc NumericalDocument) string {
 	fmt.Fprintf(&out, "- Environment: `%s`, `%s/%s`, CPU `%s`, NumCPU `%d`, GOMAXPROCS `%d`\n", doc.Environment.GoVersion, doc.Environment.OS, doc.Environment.Arch, doc.Environment.CPU, doc.Environment.NumCPU, doc.Environment.GOMAXPROCS)
 
 	out.WriteString("\n## Canonical workload\n\n| Field | Value |\n|---|---:|\n")
-	fmt.Fprintf(&out, "| Input SHA-256 | `%s` |\n| Slots | %d |\n| LogN / LogSlots | %d / %d |\n| q0 bits | %d |\n| Q-chain bits | `%v` |\n| P bits | `%v` |\n| Mod1 degree / DoubleAngle | %d / %d |\n| EvalMod log scale / LogMessageRatio | %d / %d |\n| Fast executions / effective numerical trials / Standard key trials | %d / %d / %d |\n", doc.Workload.FingerprintSHA256, doc.Workload.InputSlots, doc.Workload.LogN, doc.Workload.LogSlots, doc.Workload.Q0Bits, doc.Workload.QChainBits, doc.Workload.PBits, doc.Workload.PolynomialDegree, doc.Workload.DoubleAngle, doc.Workload.EvalModLogScale, doc.Workload.LogMessageRatio, doc.Execution["fast_executions"], doc.Execution["fast_effective_numerical_trials"], doc.Execution["standard_key_trials"])
+	fmt.Fprintf(&out, "| Input SHA-256 | `%s` |\n| Config path / SHA-256 | `%s` / `%s` |\n| Slots | %d |\n| LogN / LogSlots | %d / %d |\n| Ring N / residual N | %d / %d |\n| q0 target / effective bits | %d / %d |\n| Default scale | `%s` |\n| Q-chain bits | `%v` |\n| Q primes | `%v` |\n| P bits | `%v` |\n| P primes | `%v` |\n| Mod1 degree / DoubleAngle | %d / %d |\n| EvalMod log scale / LogMessageRatio | %d / %d |\n| Fast executions / effective numerical trials / Standard key trials | %d / %d / %d |\n", doc.Workload.FingerprintSHA256, doc.Workload.ConfigPath, doc.Workload.ConfigSHA256, doc.Workload.InputSlots, doc.Workload.LogN, doc.Workload.LogSlots, doc.Workload.RingN, doc.Workload.ResidualRingN, doc.Workload.Q0ConfigScale, doc.Workload.Q0Bits, doc.Workload.DefaultScale, doc.Workload.QChainBits, doc.Workload.QPrimes, doc.Workload.PBits, doc.Workload.PPrimes, doc.Workload.PolynomialDegree, doc.Workload.DoubleAngle, doc.Workload.EvalModLogScale, doc.Workload.LogMessageRatio, doc.Execution["fast_executions"], doc.Execution["fast_effective_numerical_trials"], doc.Execution["standard_key_trials"])
 	out.WriteString("\nInput is the existing deterministic plaintext-like construction `c0=encoded message, c1=0`; both Fast and every Standard trial receive the same encoded ciphertext coefficients.\n")
 
 	out.WriteString("\n## Output metadata\n\n| Output | Level | Degree | Scale (log2) | IsNTT | IsMontgomery | LogDimensions | Public contract |\n|---|---:|---:|---:|---|---|---|---|\n")

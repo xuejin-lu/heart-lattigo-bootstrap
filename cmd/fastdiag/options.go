@@ -9,6 +9,7 @@ import (
 )
 
 const supportedProfile = "p93-q55"
+const logN16Profile = "logn16-q55"
 
 type options struct {
 	mode           string
@@ -46,8 +47,8 @@ func parseArgs(args []string) (options, error) {
 	if flags.NArg() != 0 {
 		return options{}, fmt.Errorf("不預期的位置參數：%s", strings.Join(flags.Args(), " "))
 	}
-	if *profile != supportedProfile {
-		return options{}, fmt.Errorf("不支援 profile %q；目前只支援 %s", *profile, supportedProfile)
+	if *profile != supportedProfile && *profile != logN16Profile {
+		return options{}, fmt.Errorf("不支援 profile %q；允許 %s 或 %s", *profile, supportedProfile, logN16Profile)
 	}
 	if *warmup < 0 || *warmup > 100 {
 		return options{}, errors.New("--warmup 必須介於 0 與 100")

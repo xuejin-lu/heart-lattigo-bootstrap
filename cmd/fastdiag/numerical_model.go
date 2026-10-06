@@ -314,17 +314,25 @@ type NumericalClassificationChecks struct {
 }
 
 type NumericalWorkload struct {
-	FingerprintSHA256 string `json:"fingerprint_sha256"`
-	InputSlots        int    `json:"input_slots"`
-	LogN              int    `json:"log_n"`
-	LogSlots          int    `json:"log_slots"`
-	QChainBits        []int  `json:"q_chain_bits"`
-	PBits             []int  `json:"p_bits"`
-	Q0Bits            int    `json:"q0_bits"`
-	PolynomialDegree  int    `json:"polynomial_degree"`
-	DoubleAngle       int    `json:"double_angle"`
-	EvalModLogScale   int    `json:"eval_mod_log_scale"`
-	LogMessageRatio   int    `json:"log_message_ratio"`
+	FingerprintSHA256 string   `json:"fingerprint_sha256"`
+	ConfigPath        string   `json:"config_path"`
+	ConfigSHA256      string   `json:"config_sha256"`
+	InputSlots        int      `json:"input_slots"`
+	LogN              int      `json:"log_n"`
+	LogSlots          int      `json:"log_slots"`
+	RingN             int      `json:"ring_n"`
+	ResidualRingN     int      `json:"residual_ring_n"`
+	DefaultScale      string   `json:"default_scale"`
+	Q0ConfigScale     int      `json:"q0_config_target_bits"`
+	QChainBits        []int    `json:"q_chain_bits"`
+	QPrimes           []string `json:"q_primes"`
+	PBits             []int    `json:"p_bits"`
+	PPrimes           []string `json:"p_primes"`
+	Q0Bits            int      `json:"q0_bits"`
+	PolynomialDegree  int      `json:"polynomial_degree"`
+	DoubleAngle       int      `json:"double_angle"`
+	EvalModLogScale   int      `json:"eval_mod_log_scale"`
+	LogMessageRatio   int      `json:"log_message_ratio"`
 }
 
 type NumericalDocument struct {
