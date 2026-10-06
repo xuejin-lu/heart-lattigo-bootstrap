@@ -57,14 +57,50 @@ func (b *fastBackend) decodeWithParameters(ct *rlwe.Ciphertext, params ckks.Para
 }
 
 func (b *fastBackend) DecodeStage(ct *rlwe.Ciphertext, name string) ([]complex128, string, error) {
+	params := b.bootstrappingParams
 	switch name {
 	case "input", "scale_down", "final_public_output":
-		values, err := b.decodeWithParameters(ct, b.residual)
-		return values, "fast-c0-decode-residual-parameters", err
-	default:
-		values, err := b.decodeWithParameters(ct, b.bootstrappingParams)
-		return values, "fast-c0-decode-bootstrapping-parameters", err
+		params = b.residual
 	}
+	projected, err := b.projectStageCiphertext(ct, params)
+	if err != nil {
+		return nil, "fast-c0-decode-common-q-prefix", err
+	}
+	values, err := b.decodeWithParameters(projected, params)
+	return values, "fast-c0-decode-common-q-prefix", err
+}
+
+func (b *fastBackend) projectStageCiphertext(ct *rlwe.Ciphertext, params ckks.Parameters) (*rlwe.Ciphertext, error) {
+	if ct == nil {
+		return nil, fmt.Errorf("nil Fast stage ciphertext")
+	}
+	rows, err := fastckks.QPrefixWidth(ct.Level())
+	if err != nil {
+		return nil, err
+	}
+	level := rows - 1
+	if rows < 1 || level > params.MaxLevel() {
+		return nil, fmt.Errorf("Fast Q-prefix rows=%d cannot be projected into parameter level %d", rows, params.MaxLevel())
+	}
+	projected := ckks.NewCiphertext(params, ct.Degree(), level)
+	*projected.MetaData = *ct.MetaData
+	projected.IsNTT, projected.IsMontgomery = ct.IsNTT, false
+	ringQ := params.RingQ()
+	for component := 0; component <= ct.Degree(); component++ {
+		if component >= len(ct.Value) || component >= len(projected.Value) {
+			return nil, fmt.Errorf("Fast ciphertext component %d is unavailable", component)
+		}
+		for limb := 0; limb < rows; limb++ {
+			if limb >= len(ct.Value[component].Coeffs) || limb >= len(projected.Value[component].Coeffs) {
+				return nil, fmt.Errorf("Fast ciphertext component %d Q row %d is unavailable", component, limb)
+			}
+			copy(projected.Value[component].Coeffs[limb], ct.Value[component].Coeffs[limb])
+			if ct.IsMontgomery {
+				ringQ.SubRings[limb].IMForm(projected.Value[component].Coeffs[limb], projected.Value[component].Coeffs[limb])
+			}
+		}
+	}
+	return projected, nil
 }
 
 func (b *fastBackend) PrefixRows(ct *rlwe.Ciphertext) (int, error) {

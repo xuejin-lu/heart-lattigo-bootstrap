@@ -135,6 +135,13 @@ type cliOptions struct {
 }
 
 func main() {
+	if len(os.Args) > 1 && os.Args[1] == "compare" {
+		if err := runCompare(os.Args[2:]); err != nil {
+			fmt.Fprintln(os.Stderr, "perfprobe compare:", err)
+			os.Exit(1)
+		}
+		return
+	}
 	if err := run(); err != nil {
 		fmt.Fprintln(os.Stderr, "perfprobe:", err)
 		os.Exit(1)
