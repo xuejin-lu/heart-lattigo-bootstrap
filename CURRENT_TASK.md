@@ -1,20 +1,15 @@
 # Current Task
 
-Task: FAST-QPREFIX-CHEBYSHEV-ORDER-002
+Task: FAST-STANDARD-PERF-REBASELINE-003
 Status: READY_FOR_CODEX
-Task class: I — Direct Secondary correctness repair
+Task class: E — Post-Chebyshev matched performance and independent Standard numerical confirmation
 
-Authoritative executable spec:
-`specs/FAST-QPREFIX-CHEBYSHEV-ORDER-002.md`
+**Executable spec**: `specs/FAST-STANDARD-PERF-REBASELINE-003-POST-CHEBYSHEV.md`
 
-**Direct user decision**: LogN13 and LogN16 Q-prefix Chebyshev/EvalMod generated powers must share **multiply → recurrence correction → Rescale**, not historical balanced/pre-scale. The LogN-specific selector is unconstitutional: Q-prefix width affects representation/capacity, not mathematical CKKS schedule. **Implement directly, NO preliminary A/B study.**
+Prior `FAST-QPREFIX-CHEBYSHEV-ORDER-002` is Web-reviewed as **production Chebyshev order restored in both LogN13 and LogN16 for the existing deterministic zero-a numerical protocol**; Secondary repaired and pushed `75ef5dbe7bbf7d3947fb2b9fb232c4a56f05c948` and Primary summary `results/FAST-QPREFIX-CHEBYSHEV-ORDER-002-summary.md`.
 
-Supersedes `specs/FAST-LOGN16-EVALMOD-ROOTCAUSE-001.md` (unexecuted diagnostic proposal; historical only).
+**What remains**: remeasure latency / allocations + verify paired numerical output against an **independently built genuine Standard** from `5dbffbdea05394de2ca3a432ed5318aa832e3f40`, in BOTH LogN13 and LogN16. The earlier `fastdiag` Standard evaluator is Standard API compiled from the Fast tree, not the independent historical Standard commit. Do not mislabel; do not infer new speedups from pre-repair 4.3755x/5.6701x.
 
-Secondary `xuejin-lu/lattigo` `fast-qprefix` production edits and ordinary push are authorized. Retain q0123 capacity safeguards and prove failure if any, not a new pre-scale fallback. No rerun of 7x timing benchmarking. Run only necessary LogN13 regression + LogN16 final numerical correctness against original genuine Standard.
+Reuse the frozen `cmd/perfprobe` and `internal/perfmeasure` implementation, `perf_fast`/`perf_standard` tags, existing `cmd/fastdiag` checkpoints and `internal/numericalmetrics` SNR. Same effective parameters / input within each profile. One untimed warmup + 7 full Bootstrap timing runs per backend/profile, fresh numerical trial pairs, compact reports. **No Secondary production modifications, no new harness, no speculative algorithm changes, no thresholds weakening.**
 
-Prior committed evidence:
-- LogN13 PASS: Fast-Standard RMSE 1.44681e-10.
-- LogN16 FAIL at Secondary `5117fc57949647182f476dc5952099c706b9f869`: Fast-Standard RMSE 0.0204855, decoded SNR Standard/Fast 130.947666/-0.000462 dB.
-
-Codex: safe-sync both repositories; read both AGENTS and the new spec; edit Secondary narrowly, validate both profiles, commit/push per standing safety rules, report classification + SHAs then `READY_FOR_WEB_REVIEW`.
+Codex must safe-sync per AGENTS, perform bounded cycle, push authorized Primary results if checks pass and end with one spec-defined classification then `READY_FOR_WEB_REVIEW`.
