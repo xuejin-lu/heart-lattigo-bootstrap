@@ -1,35 +1,21 @@
 # Current Task
 
-Task: FAST-STANDARD-NUMERICAL-REPORT-001
+Task: FAST-STANDARD-PERF-REBASELINE-001
 Status: READY_FOR_CODEX
-
-Task class:
-`R — Diagnostic / Reporting Repair`
+Task class: M — Matched Performance Measurement
 
 Authoritative spec:
-`specs/FAST-STANDARD-NUMERICAL-REPORT-001-CLOSE-CLASSIFIER.md`
+`specs/FAST-STANDARD-PERF-REBASELINE-001-LOGN13.md`
 
-Accepted numerical state:
-- Secondary production commit: `5117fc57949647182f476dc5952099c706b9f869`
-- Primary accepted result commit: `88e6e6badc0973b64bb051a0ce7fc51cf3f95e75`
-- top-level classification: `FAST_STANDARD_NUMERICAL_CLOSE`
-- final Fast-vs-Standard RMSE: `1.44680895443e-10`
-- Standard Bootstrap SNR: `144.713390 dB`
-- Fast Bootstrap SNR: `144.710750 dB`
-- no first observable/material checkpoint;
-- all 56 Q-prefix capacity checks pass.
+Completed and accepted:
+- `FAST-STANDARD-NUMERICAL-FIX-001` — `FAST_STANDARD_NUMERICAL_CLOSE`
+- `FAST-STANDARD-NUMERICAL-REPORT-001` — `CURRENT_FAST_NO_OBSERVABLE_DIVERGENCE`
+- Primary report fix: `fd759d96144d20c4725febb367a8828b8c069e08`
+- Fast Secondary: `5117fc57949647182f476dc5952099c706b9f869`
 
-Goal:
-Fix only the legacy stage-lockstep classifier so a healthy run with no observable divergence does not retain `CURRENT_FAST_NUMERICAL_DIVERGENCE_UNCLOSED`.
+Next goal:
+Benchmark corrected Fast vs genuine Standard **LogN13/q0=55** under an identical frozen measurement harness and effective parameters, preserving numerical checks and recording raw stage/full timing. Do not infer anything from historical pre-fix LogN16 timings. No production arithmetic changes permitted.
 
-Expected accepted stage classification:
-`CURRENT_FAST_NO_OBSERVABLE_DIVERGENCE`
+Required terminal token: `LOGN13_CORRECTED_PERF_REBASELINE_READY`, `LOGN13_CORRECTED_PERF_REBASELINE_BLOCKED`, or `LOGN13_CORRECTED_PERF_REBASELINE_NUMERICAL_FAIL`
 
-Do not modify Secondary or production arithmetic.
-Do not change thresholds or accepted measurements.
-
-Required completion token:
-`FAST_STANDARD_NUMERICAL_REPORT_FIX_READY`
-
-Then:
-`READY_FOR_WEB_REVIEW`.
+Then `READY_FOR_WEB_REVIEW`.
