@@ -1,18 +1,20 @@
 # Current Task
 
-Task: FAST-LOGN16-EVALMOD-ROOTCAUSE-001
+Task: FAST-QPREFIX-CHEBYSHEV-ORDER-002
 Status: READY_FOR_CODEX
-Task class: E/M — bounded LogN16 numerical root-cause diagnosis
+Task class: I — Direct Secondary correctness repair
 
-**Authoritative executable spec**:
-`specs/FAST-LOGN16-EVALMOD-ROOTCAUSE-001.md`
+Authoritative executable spec:
+`specs/FAST-QPREFIX-CHEBYSHEV-ORDER-002.md`
 
-## Prior result accepted as measurement, NOT numerical correctness
-`FAST-STANDARD-PERF-REBASELINE-002` completed, Primary report commit `d24396a76ce7773c8b70200ee0d7633de48f8126`; outcome `DUAL_LOGN13_LOGN16_PERF_SNR_NUMERICAL_FAIL`.
-- LogN13 PASS: 4.3755x, Fast-vs-Standard RMSE 1.44681e-10.
-- LogN16 FAIL: measured 5.6701x **on numerically invalid output**; Standard/Fast SNR 130.947666/-0.000462 dB, RMSE 0.0204855. First public material checkpoint `evalmod_real`, but internal Chebyshev T2 has earlier nonzero difference.
-- Full provenance and SNR: `results/FAST-STANDARD-PERF-REBASELINE-002-comparison.md`, profile reports, raw fastdiag and paired numerical JSON.
+**Direct user decision**: LogN13 and LogN16 Q-prefix Chebyshev/EvalMod generated powers must share **multiply → recurrence correction → Rescale**, not historical balanced/pre-scale. The LogN-specific selector is unconstitutional: Q-prefix width affects representation/capacity, not mathematical CKKS schedule. **Implement directly, NO preliminary A/B study.**
 
-**Scope**: trace earliest LogN16 generated-power T2 multiplication/recurrence/Rescale discrepancy using existing diagnostics; verify representation and exact-scale comparability, including genuine Standard vs fast-tree Standard API. No Secondary production changes, no speculative repair, no full 7x timing reruns, no threshold/parameter relaxation. Preserve canonical LogN13 passing result. Web retains mathematical repair authority.
+Supersedes `specs/FAST-LOGN16-EVALMOD-ROOTCAUSE-001.md` (unexecuted diagnostic proposal; historical only).
 
-Codex must safe-sync Primary/Secondary per both `AGENTS.md`, read the spec, execute bounded self-review, push only authorized changes and report one spec-defined outcome then `READY_FOR_WEB_REVIEW`.
+Secondary `xuejin-lu/lattigo` `fast-qprefix` production edits and ordinary push are authorized. Retain q0123 capacity safeguards and prove failure if any, not a new pre-scale fallback. No rerun of 7x timing benchmarking. Run only necessary LogN13 regression + LogN16 final numerical correctness against original genuine Standard.
+
+Prior committed evidence:
+- LogN13 PASS: Fast-Standard RMSE 1.44681e-10.
+- LogN16 FAIL at Secondary `5117fc57949647182f476dc5952099c706b9f869`: Fast-Standard RMSE 0.0204855, decoded SNR Standard/Fast 130.947666/-0.000462 dB.
+
+Codex: safe-sync both repositories; read both AGENTS and the new spec; edit Secondary narrowly, validate both profiles, commit/push per standing safety rules, report classification + SHAs then `READY_FOR_WEB_REVIEW`.
