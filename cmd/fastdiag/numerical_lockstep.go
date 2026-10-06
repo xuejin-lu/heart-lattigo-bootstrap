@@ -465,12 +465,34 @@ func summarizeNumericalStageLockstep(pairs []numericalStagePair, original []comp
 			}
 		}
 	}
+	finalizeNumericalStageClassification(&result)
 	var combinedEvalModSNR *numericalmetrics.SNR
 	if evalModBranches["real"] && evalModBranches["imag"] && len(evalModFast) > 0 && len(evalModFast) == len(evalModStandard) {
 		combinedEvalModSNR = setCombinedBranchS2CMetrics(&result, evalModStandard, evalModFast)
 	}
 	applyNumericalStageTopology(&result, combinedEvalModSNR)
 	return result
+}
+
+func finalizeNumericalStageClassification(result *NumericalStageLockstep) {
+	if result == nil || result.FirstMaterial != "" {
+		return
+	}
+	if result.FirstObservable != "" {
+		result.Classification = "CURRENT_FAST_OBSERVABLE_NON_MATERIAL_DIVERGENCE"
+		return
+	}
+
+	final := numericalStageCheckpointByName(result, "final_public_output")
+	if final == nil || !final.Comparable || final.FastVsStandard == nil || final.D == nil {
+		return
+	}
+	if firstNonFiniteNumber(final.FastVsStandard) != "" || firstNonFiniteNumber(*final.D) != "" {
+		return
+	}
+	if final.FastVsStandard.Complex.Max < result.ObservableThreshold {
+		result.Classification = "CURRENT_FAST_NO_OBSERVABLE_DIVERGENCE"
+	}
 }
 
 func setCombinedBranchS2CMetrics(result *NumericalStageLockstep, evalModStandard, evalModFast []complex128) *numericalmetrics.SNR {

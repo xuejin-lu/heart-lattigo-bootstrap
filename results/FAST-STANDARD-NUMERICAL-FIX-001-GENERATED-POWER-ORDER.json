@@ -2514,7 +2514,7 @@
     "first_material_max_diff": null,
     "material_threshold": 0.003640730397217224,
     "observable_threshold": 1e-8,
-    "classification": "CURRENT_FAST_NUMERICAL_DIVERGENCE_UNCLOSED",
+    "classification": "CURRENT_FAST_NO_OBSERVABLE_DIVERGENCE",
     "final_fast_standard_rmse": 1.4468089544345387e-10,
     "combined_branch_evalmod_error_rmse": 5.1154158167771675e-11,
     "combined_branch_s2c_amplification_factor": 2.8283310805143156,

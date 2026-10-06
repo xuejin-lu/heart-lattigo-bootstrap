@@ -195,7 +195,7 @@ SNR here is numerical distortion, not RLWE security noise or a noise budget. Eac
 - Final Fast-vs-Standard RMSE: `1.44680895443e-10`
 - Combined-branch EvalMod error RMSE: `5.115416e-11`
 - Combined-branch S2C amplification: `2.828331e+00` (status `FINITE`; `D_s2c / RMSE(concat(EvalMod real, EvalMod imag))`)
-- Current classification: `CURRENT_FAST_NUMERICAL_DIVERGENCE_UNCLOSED`
+- Current classification: `CURRENT_FAST_NO_OBSERVABLE_DIVERGENCE`
 
 `FIRST_OBSERVABLE_CHECKPOINT=`
 `FIRST_OBSERVABLE_MAX_DIFF=—`

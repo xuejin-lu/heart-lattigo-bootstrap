@@ -160,6 +160,98 @@ func TestCombinedBranchS2CAmplificationUsesJointEvalModError(t *testing.T) {
 	require.Equal(t, "NOT_APPLICABLE_COMBINED_BRANCH", encodedS2C["a_i_status"])
 }
 
+func TestStageLockstepHealthyTerminalClassification(t *testing.T) {
+	pairs := []numericalStagePair{
+		numericalStagePairForTest("input", []complex128{1}, []complex128{1}, true),
+		numericalStagePairForTest("final_public_output", []complex128{1}, []complex128{1 + 5e-9}, true),
+	}
+
+	result := summarizeNumericalStageLockstep(pairs, []complex128{1})
+
+	require.Empty(t, result.FirstObservable)
+	require.Empty(t, result.FirstMaterial)
+	require.Equal(t, "CURRENT_FAST_NO_OBSERVABLE_DIVERGENCE", result.Classification)
+}
+
+func TestStageLockstepObservableButNonMaterialClassification(t *testing.T) {
+	pairs := []numericalStagePair{
+		numericalStagePairForTest("input", []complex128{1}, []complex128{1}, true),
+		numericalStagePairForTest("final_public_output", []complex128{1}, []complex128{1 + 5e-8}, true),
+	}
+
+	result := summarizeNumericalStageLockstep(pairs, []complex128{1})
+
+	require.Equal(t, "final_public_output", result.FirstObservable)
+	require.Empty(t, result.FirstMaterial)
+	require.Equal(t, "CURRENT_FAST_OBSERVABLE_NON_MATERIAL_DIVERGENCE", result.Classification)
+}
+
+func TestStageLockstepFirstMaterialEvalModClassificationIsPreserved(t *testing.T) {
+	pairs := []numericalStagePair{
+		numericalStagePairForTest("input", []complex128{1}, []complex128{1}, true),
+		numericalStagePairForTest("evalmod_real", []complex128{1}, []complex128{1 + 0.01}, true),
+	}
+
+	result := summarizeNumericalStageLockstep(pairs, []complex128{1})
+
+	require.Equal(t, "evalmod_real", result.FirstMaterial)
+	require.Equal(t, "CURRENT_FAST_FIRST_MATERIAL_EVALMOD_POLYNOMIAL", result.Classification)
+}
+
+func TestStageLockstepRequiresComparableFiniteFinalOutputForHealthyClassification(t *testing.T) {
+	t.Run("missing final output", func(t *testing.T) {
+		result := summarizeNumericalStageLockstep([]numericalStagePair{
+			numericalStagePairForTest("input", []complex128{1}, []complex128{1}, true),
+		}, []complex128{1})
+
+		require.Equal(t, "CURRENT_FAST_NUMERICAL_DIVERGENCE_UNCLOSED", result.Classification)
+	})
+
+	t.Run("non-comparable final output", func(t *testing.T) {
+		result := summarizeNumericalStageLockstep([]numericalStagePair{
+			numericalStagePairForTest("input", []complex128{1}, []complex128{1}, true),
+			numericalStagePairForTest("final_public_output", nil, nil, false),
+		}, []complex128{1})
+
+		require.False(t, stageCheckpoint(t, &result, "final_public_output").Comparable)
+		require.Equal(t, "CURRENT_FAST_NUMERICAL_DIVERGENCE_UNCLOSED", result.Classification)
+	})
+
+	t.Run("non-finite final metrics", func(t *testing.T) {
+		result := summarizeNumericalStageLockstep([]numericalStagePair{
+			numericalStagePairForTest("input", []complex128{1}, []complex128{1}, true),
+			numericalStagePairForTest("final_public_output", []complex128{1}, []complex128{complex(math.NaN(), 0)}, true),
+		}, []complex128{1})
+
+		require.Equal(t, "CURRENT_FAST_NUMERICAL_DIVERGENCE_UNCLOSED", result.Classification)
+	})
+}
+
+func TestAcceptedCanonicalResultRendersConsistentStageClassification(t *testing.T) {
+	data, err := os.ReadFile("../../results/FAST-STANDARD-NUMERICAL-FIX-001-GENERATED-POWER-ORDER.json")
+	require.NoError(t, err)
+	var doc NumericalDocument
+	require.NoError(t, json.Unmarshal(data, &doc))
+	require.NotNil(t, doc.StageLockstep)
+	require.Equal(t, "FAST_STANDARD_NUMERICAL_CLOSE", doc.Classification)
+	require.Equal(t, "CURRENT_FAST_NO_OBSERVABLE_DIVERGENCE", doc.StageLockstep.Classification)
+	require.InDelta(t, 1.4468089544345387e-10, doc.StageLockstep.FinalFastStandardRMSE, 1e-20)
+	require.NotEmpty(t, doc.FastTrials)
+	require.NotNil(t, doc.FastTrials[0].BootstrapSNR.SNRDB)
+	require.InDelta(t, 144.71074997463654, *doc.FastTrials[0].BootstrapSNR.SNRDB, 1e-12)
+
+	rendered := renderNumericalSummary(doc)
+	require.Contains(t, rendered, "Current classification: `CURRENT_FAST_NO_OBSERVABLE_DIVERGENCE`")
+	require.NotContains(t, rendered, "CURRENT_FAST_NUMERICAL_DIVERGENCE_UNCLOSED")
+}
+
+func numericalStagePairForTest(name string, standard, fast []complex128, comparable bool) numericalStagePair {
+	return numericalStagePair{
+		fast:     numericalStageSample{name: name, values: fast, comparable: comparable},
+		standard: numericalStageSample{name: name, values: standard, comparable: comparable},
+	}
+}
+
 func TestNumericalSummaryRendersCapacityAndGenuineStandardPowerEvidence(t *testing.T) {
 	stage := NumericalStageLockstep{
 		PolynomialPlan: &NumericalPolynomialPlan{Branch: "real", Degree: 30, Base: 4, Level: 12, ScaleLog2: 60, ScaleExact: "2^60"},
