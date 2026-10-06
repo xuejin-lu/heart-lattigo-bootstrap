@@ -24,7 +24,7 @@ import (
 
 const (
 	fastStandardInputSHA256 = "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285"
-	correctedFastCommitSHA  = "75ef5dbe7bbf7d3947fb2b9fb232c4a56f05c948"
+	correctedFastCommitSHA  = "5feb44917fca40c93abec6def6f26bc81a82c536"
 	numericalThresholdValue = 1e-2
 	precisionErrorFloor     = 1e-30
 )
