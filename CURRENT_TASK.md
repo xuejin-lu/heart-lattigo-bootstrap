@@ -16,6 +16,9 @@ Completed and accepted:
 Next goal:
 Benchmark corrected Fast vs genuine Standard **LogN13/q0=55** under an identical frozen measurement harness and effective parameters, preserving numerical checks and recording raw stage/full timing. Do not infer anything from historical pre-fix LogN16 timings. No production arithmetic changes permitted.
 
+MANDATORY Web-review amendment:
+Use existing `cmd/fastdiag/numerical.go` and `internal/numericalmetrics/snr.go` to freshly measure Fast/Standard decoded-domain Bootstrap SNR, complex RMSE, precision bits, and stage diagnostics on corrected code. SNR outside timed region. Pin and verify parameters/input fingerprints; do not imply canonical SNR corresponds to a different timing workload. Both matched timing and fresh numerical SNR required for READY. Read top amendment in spec before starting.
+
 Required terminal token: `LOGN13_CORRECTED_PERF_REBASELINE_READY`, `LOGN13_CORRECTED_PERF_REBASELINE_BLOCKED`, or `LOGN13_CORRECTED_PERF_REBASELINE_NUMERICAL_FAIL`
 
 Then `READY_FOR_WEB_REVIEW`.
