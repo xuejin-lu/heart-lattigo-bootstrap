@@ -1,0 +1,373 @@
+{
+  "schema_version": "fast-standard-perfprobe.v1",
+  "timestamp": "2026-10-06T12:19:41.261225Z",
+  "profile": "logn13",
+  "backend": "fast",
+  "backend_commit": "5117fc57949647182f476dc5952099c706b9f869",
+  "primary_path": "/private/tmp/fast-standard-rebaseline-002/fast/heart-lattigo-bootstrap-v5",
+  "primary_commit": "68558a82af6faffd304fa0f14bbc4c82fa190176",
+  "primary_dirty": false,
+  "secondary_dirty": false,
+  "secondary_path": "/private/tmp/fast-standard-rebaseline-002/fast/lattigo",
+  "secondary_ref": "fast-qprefix@5117fc57949647182f476dc5952099c706b9f869",
+  "config_sha256": "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98",
+  "config_path": "configs/bootstrap_config.logN13.json",
+  "go_version": "go1.26.4",
+  "os": "darwin",
+  "arch": "arm64",
+  "cpu": "arm64",
+  "num_cpu": 10,
+  "gomaxprocs": 10,
+  "input_sha256": "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285",
+  "input_metadata_sha256": "9171dac4a79b97f7f916001d0ea5805f6137711527d364f8dfcd8e71ed2764f6",
+  "input_ciphertext_state": {
+    "level": 0,
+    "degree": 1,
+    "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+    "scale_log2": 45,
+    "log_rows": 0,
+    "log_cols": 12,
+    "q_prefix_rows": 1,
+    "prefix_q": "36028797018652673"
+  },
+  "input_kind": "c0=encoded-message,c1=0; specialized zero-a plaintext-like comparator",
+  "effective_parameters": {
+    "log_n": 13,
+    "log_slots": 12,
+    "input_slots": 4096,
+    "ring_n": 8192,
+    "residual_ring_n": 8192,
+    "q0_config_target_bits": 55,
+    "q0_bits": 55,
+    "q_chain_bits": [
+      55,
+      39,
+      40,
+      39,
+      40,
+      60,
+      60,
+      61,
+      60,
+      60,
+      60,
+      61,
+      61,
+      56,
+      57,
+      56,
+      56
+    ],
+    "p_bits": [
+      61,
+      61,
+      62,
+      61,
+      62
+    ],
+    "q_primes": [
+      "36028797018652673",
+      "549755731969",
+      "549756026881",
+      "549755486209",
+      "549756174337",
+      "1152921504606830593",
+      "1152921504606748673",
+      "1152921504606994433",
+      "1152921504606683137",
+      "1152921504606601217",
+      "1152921504606584833",
+      "1152921504607191041",
+      "1152921504607223809",
+      "72057594037616641",
+      "72057594038321153",
+      "72057594037370881",
+      "72057594037338113"
+    ],
+    "p_primes": [
+      "2305843009213317121",
+      "2305843009213120513",
+      "2305843009214414849",
+      "2305843009212694529",
+      "2305843009214758913"
+    ],
+    "default_scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+    "mod1_log_scale": 60,
+    "mod1_degree": 30,
+    "double_angle": 3,
+    "k": 16,
+    "log_message_ratio": 10,
+    "q_prefix_rows_at_max_level": 4
+  },
+  "full_bootstrap_timing": {
+    "warmup": 1,
+    "repetitions": 7,
+    "samples_ns": [
+      67877250,
+      67903250,
+      68646875,
+      67754125,
+      67706292,
+      67656042,
+      67630042
+    ],
+    "median_ns": 67754125,
+    "mean_ns": 67881982.28571428,
+    "min_ns": 67630042,
+    "max_ns": 68646875,
+    "bytes_per_op": 7499173,
+    "allocs_per_op": 7903,
+    "measured_at": "2026-10-06T12:19:41.03534Z"
+  },
+  "separate_stage_timing": [
+    {
+      "stage": "pack_and_switch",
+      "elapsed_ns": 5667,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "stage": "scale_down",
+      "elapsed_ns": 10833,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "stage": "mod_up",
+      "elapsed_ns": 434250,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "stage": "coeffs_to_slots",
+      "elapsed_ns": 10156667,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "stage": "evalmod_real",
+      "elapsed_ns": 24177750,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "stage": "evalmod_imag",
+      "elapsed_ns": 24128791,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "stage": "slots_to_coeffs",
+      "elapsed_ns": 8820958,
+      "samples": 1,
+      "available": true
+    }
+  ],
+  "numerical_trials": [
+    {
+      "index": 1,
+      "bootstrap_snr": {
+        "signal_power": 0.00041948817670322045,
+        "signal_rms": 0.020481410515470373,
+        "noise_power": 1.417897142451275e-18,
+        "noise_rmse": 1.1907548624512414e-9,
+        "snr_db": 144.71074997463654,
+        "status": "FINITE"
+      },
+      "fresh_key_trial": false,
+      "secret_key_level_p": -1,
+      "evaluator_path": "bootstrapping.NewFastEvaluator",
+      "output": {
+        "level": 1,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 2,
+        "prefix_q": "19807037676951925191293403137"
+      },
+      "original_sha256": "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285",
+      "pre_decoded_sha256": "d107a20b1606f9d73a65b21299ead4d24f177adf74edcecb65dc7648aa4bdc5f",
+      "post_decoded_sha256": "b6e6c903382544adb9ee73b04d5b44eed26ef66925c1bcc310fb7c39f717b755"
+    },
+    {
+      "index": 2,
+      "bootstrap_snr": {
+        "signal_power": 0.00041948817670322045,
+        "signal_rms": 0.020481410515470373,
+        "noise_power": 1.417897142451275e-18,
+        "noise_rmse": 1.1907548624512414e-9,
+        "snr_db": 144.71074997463654,
+        "status": "FINITE"
+      },
+      "fresh_key_trial": false,
+      "secret_key_level_p": -1,
+      "evaluator_path": "bootstrapping.NewFastEvaluator",
+      "output": {
+        "level": 1,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 2,
+        "prefix_q": "19807037676951925191293403137"
+      },
+      "original_sha256": "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285",
+      "pre_decoded_sha256": "d107a20b1606f9d73a65b21299ead4d24f177adf74edcecb65dc7648aa4bdc5f",
+      "post_decoded_sha256": "b6e6c903382544adb9ee73b04d5b44eed26ef66925c1bcc310fb7c39f717b755"
+    }
+  ],
+  "stage_checkpoints": [
+    {
+      "name": "input",
+      "state": {
+        "level": 0,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 1,
+        "prefix_q": "36028797018652673"
+      },
+      "decoded_sha256": "d107a20b1606f9d73a65b21299ead4d24f177adf74edcecb65dc7648aa4bdc5f",
+      "decode_method": "fast-c0-decode-common-q-prefix",
+      "semantically_valid": true
+    },
+    {
+      "name": "scale_down",
+      "state": {
+        "level": 0,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 1,
+        "prefix_q": "36028797018652673"
+      },
+      "decoded_sha256": "d107a20b1606f9d73a65b21299ead4d24f177adf74edcecb65dc7648aa4bdc5f",
+      "decode_method": "fast-c0-decode-common-q-prefix",
+      "semantically_valid": true
+    },
+    {
+      "name": "mod_up",
+      "state": {
+        "level": 16,
+        "degree": 1,
+        "scale": "1.12589990684262400000000000000000000000000000000000000000000000000000000000000000e+15",
+        "scale_log2": 50,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "decoded_sha256": "d107a20b1606f9d73a65b21299ead4d24f177adf74edcecb65dc7648aa4bdc5f",
+      "decode_method": "fast-c0-decode-common-q-prefix",
+      "semantically_valid": true
+    },
+    {
+      "name": "c2s_real",
+      "state": {
+        "level": 12,
+        "degree": 1,
+        "scale": "1.12589990684262400000000000000000000000000000000000000000000000000000000000000000e+15",
+        "scale_log2": 50,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "decoded_sha256": "c9cd0604ee19da27e352cfa3397e9e9506e3d4db96796498b4c89df5586b69ff",
+      "decode_method": "fast-c0-decode-common-q-prefix",
+      "semantically_valid": true
+    },
+    {
+      "name": "c2s_imag",
+      "state": {
+        "level": 12,
+        "degree": 1,
+        "scale": "1.12589990684262400000000000000000000000000000000000000000000000000000000000000000e+15",
+        "scale_log2": 50,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "decoded_sha256": "c4e5374535e3c4ca704cbdcdaee7ec176da955e9c775be81e30577f36a166717",
+      "decode_method": "fast-c0-decode-common-q-prefix",
+      "semantically_valid": true
+    },
+    {
+      "name": "evalmod_real",
+      "state": {
+        "level": 4,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "decoded_sha256": "43cccb396e6bbe48ab91e38dcfaf3cdf498797b126382dc08de112c94078027a",
+      "decode_method": "fast-c0-decode-common-q-prefix",
+      "semantically_valid": true
+    },
+    {
+      "name": "evalmod_imag",
+      "state": {
+        "level": 4,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "decoded_sha256": "e1879f5bb482afc09c3b4bb6b176f2d79734dc3018a0d9a4638c75f44a7dd2b2",
+      "decode_method": "fast-c0-decode-common-q-prefix",
+      "semantically_valid": true
+    },
+    {
+      "name": "s2c",
+      "state": {
+        "level": 1,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 2,
+        "prefix_q": "19807037676951925191293403137"
+      },
+      "decoded_sha256": "b6e6c903382544adb9ee73b04d5b44eed26ef66925c1bcc310fb7c39f717b755",
+      "decode_method": "fast-c0-decode-common-q-prefix",
+      "semantically_valid": true
+    },
+    {
+      "name": "final_public_output",
+      "state": {
+        "level": 1,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 2,
+        "prefix_q": "19807037676951925191293403137"
+      },
+      "decoded_sha256": "b6e6c903382544adb9ee73b04d5b44eed26ef66925c1bcc310fb7c39f717b755",
+      "decode_method": "fast-c0-decode-common-q-prefix",
+      "semantically_valid": true
+    }
+  ],
+  "limitations": [
+    "Timing samples cover only the public Bootstrap call; key generation, setup, encoding, decoding, and analysis are outside the timed region.",
+    "Stage checkpoints are a separate public-stage replay and are not summed to estimate total Bootstrap time.",
+    "The input has c1=0 and does not represent an encrypted-input security or RLWE-noise experiment."
+  ]
+}

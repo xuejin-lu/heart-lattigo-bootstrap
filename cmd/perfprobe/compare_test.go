@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"math"
 	"testing"
 )
@@ -60,5 +61,15 @@ func TestStageTopologyKeepsParallelBranchesAndJointS2CParent(t *testing.T) {
 	}
 	if byName["final_public_output"].Parent != "s2c" {
 		t.Fatalf("final output parent=%q, want s2c", byName["final_public_output"].Parent)
+	}
+}
+
+func TestFastdiagCapacityAuditReadsStrictTwoBLessThanSQ(t *testing.T) {
+	var evidence fastdiagCapacityEvidence
+	if err := json.Unmarshal([]byte(`{"evalmod_qprefix_capacity_audit":[{"checkpoint":"real/evalmod-entry","strict_2b_lt_sq":true}]}`), &evidence); err != nil {
+		t.Fatal(err)
+	}
+	if len(evidence.EvalModCapacityAudit) != 1 || !evidence.EvalModCapacityAudit[0].StrictFit {
+		t.Fatalf("capacity evidence=%+v, want strict capacity pass", evidence.EvalModCapacityAudit)
 	}
 }
