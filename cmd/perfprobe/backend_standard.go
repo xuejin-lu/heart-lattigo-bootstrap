@@ -14,7 +14,6 @@ type standardBackend struct {
 	eval     *bootstrapping.Evaluator
 	residual ckks.Parameters
 	secret   *rlwe.SecretKey
-	maxLevel int
 }
 
 func newBackend(params bootstrapping.Parameters, residual ckks.Parameters) (backendAdapter, error) {
@@ -28,7 +27,7 @@ func newBackend(params bootstrapping.Parameters, residual ckks.Parameters) (back
 	if err != nil {
 		return nil, fmt.Errorf("construct Standard evaluator: %w", err)
 	}
-	return &standardBackend{eval: eval, residual: residual, secret: secret, maxLevel: params.BootstrappingParameters.MaxLevel()}, nil
+	return &standardBackend{eval: eval, residual: residual, secret: secret}, nil
 }
 
 func (b *standardBackend) Name() string { return "standard" }
@@ -58,7 +57,7 @@ func (b *standardBackend) Decode(ct *rlwe.Ciphertext) ([]complex128, error) {
 }
 
 func (b *standardBackend) PrefixRows(ct *rlwe.Ciphertext) (int, error) {
-	if ct == nil || ct.Level() < 0 || ct.Level() > b.maxLevel {
+	if ct == nil || ct.Level() < 0 {
 		return 0, fmt.Errorf("invalid Standard ciphertext level")
 	}
 	return ct.Level() + 1, nil
