@@ -333,7 +333,7 @@ func decodeNumericalStagePair(pair *numericalStagePair, params ckks.Parameters, 
 		pair.standard.comparable, pair.standard.reason = false, "Standard common-Q decode: "+err.Error()
 		return
 	}
-	if err := validateNumericalVector(pair.standard.values); err != nil {
+	if err := validateNumericalVector(pair.standard.values, params.MaxSlots()); err != nil {
 		pair.standard.comparable, pair.standard.reason = false, "Standard decoded vector: "+err.Error()
 		return
 	}

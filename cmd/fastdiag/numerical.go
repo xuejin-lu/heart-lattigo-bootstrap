@@ -145,7 +145,7 @@ func numericalReference(secondaryRoot string, primary RepositoryMetadata, opts o
 		if err := ckks.NewEncoder(residual).Decode(prePlain, preStandardDecoded); err != nil {
 			return NumericalDocument{}, fmt.Errorf("decode Standard pre-Bootstrap trial %d: %w", i+1, err)
 		}
-		if err := validateNumericalVector(preStandardDecoded); err != nil {
+		if err := validateNumericalVector(preStandardDecoded, len(values)); err != nil {
 			return NumericalDocument{}, fmt.Errorf("Standard pre-Bootstrap trial %d decoded vector: %w", i+1, err)
 		}
 		out, err := standardEval.Bootstrap(input.CopyNew())
@@ -158,7 +158,7 @@ func numericalReference(secondaryRoot string, primary RepositoryMetadata, opts o
 		if err := ckks.NewEncoder(residual).Decode(plain, decoded); err != nil {
 			return NumericalDocument{}, fmt.Errorf("decode Standard trial %d：%w", i+1, err)
 		}
-		if err := validateNumericalVector(decoded); err != nil {
+		if err := validateNumericalVector(decoded, len(values)); err != nil {
 			return NumericalDocument{}, fmt.Errorf("Standard trial %d decoded vector：%w", i+1, err)
 		}
 		record, err := numericalOutput(i+1, residual, values, decoded, out, input, preStandardDecoded)
@@ -360,14 +360,14 @@ func fastStandardDecodeFast(params ckks.Parameters, ct *rlwe.Ciphertext) ([]comp
 	if err := ckks.NewEncoder(params).Decode(pt, decoded); err != nil {
 		return nil, err
 	}
-	return decoded, validateNumericalVector(decoded)
+	return decoded, validateNumericalVector(decoded, params.MaxSlots())
 }
 
 func numericalOutput(index int, residual ckks.Parameters, original, decoded []complex128, output, input *rlwe.Ciphertext, preBootstrapDecoded []complex128) (NumericalOutput, error) {
-	if err := validateNumericalVector(decoded); err != nil {
+	if err := validateNumericalVector(decoded, len(original)); err != nil {
 		return NumericalOutput{}, err
 	}
-	if err := validateNumericalVector(preBootstrapDecoded); err != nil {
+	if err := validateNumericalVector(preBootstrapDecoded, len(original)); err != nil {
 		return NumericalOutput{}, fmt.Errorf("pre-Bootstrap decoded values: %w", err)
 	}
 	metrics, threshold := numericalComparison(original, decoded)
@@ -761,9 +761,9 @@ func maxMagnitude(values []complex128) float64 {
 	return maximum
 }
 
-func validateNumericalVector(values []complex128) error {
-	if len(values) != 4096 {
-		return fmt.Errorf("decoded slot count is %d, want 4096", len(values))
+func validateNumericalVector(values []complex128, expectedSlots int) error {
+	if len(values) != expectedSlots {
+		return fmt.Errorf("decoded slot count is %d, want %d", len(values), expectedSlots)
 	}
 	for i, value := range values {
 		if math.IsNaN(real(value)) || math.IsNaN(imag(value)) || math.IsInf(real(value), 0) || math.IsInf(imag(value), 0) {

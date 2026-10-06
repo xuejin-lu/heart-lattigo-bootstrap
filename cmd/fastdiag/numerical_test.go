@@ -17,6 +17,12 @@ func TestFastStandardCanonicalInputFingerprint(t *testing.T) {
 	require.Equal(t, fastStandardInputSHA256, fastStandardInputFingerprint(fastStandardP93Values()))
 }
 
+func TestValidateNumericalVectorUsesEffectiveProfileSlotCount(t *testing.T) {
+	values := make([]complex128, 1<<15)
+	require.NoError(t, validateNumericalVector(values, 1<<15))
+	require.ErrorContains(t, validateNumericalVector(values, 1<<12), "want 4096")
+}
+
 func TestNumericalProfilesUseCanonicalEffectiveParameters(t *testing.T) {
 	root := filepath.Join("..", "..")
 	p93, p93Residual, err := fastStandardP93Parameters()
