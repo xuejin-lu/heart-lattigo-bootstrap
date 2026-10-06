@@ -11,9 +11,10 @@ import (
 )
 
 type standardBackend struct {
-	eval     *bootstrapping.Evaluator
-	residual ckks.Parameters
-	secret   *rlwe.SecretKey
+	eval                *bootstrapping.Evaluator
+	residual            ckks.Parameters
+	bootstrappingParams ckks.Parameters
+	secret              *rlwe.SecretKey
 }
 
 func newBackend(params bootstrapping.Parameters, residual ckks.Parameters) (backendAdapter, error) {
@@ -27,7 +28,7 @@ func newBackend(params bootstrapping.Parameters, residual ckks.Parameters) (back
 	if err != nil {
 		return nil, fmt.Errorf("construct Standard evaluator: %w", err)
 	}
-	return &standardBackend{eval: eval, residual: residual, secret: secret}, nil
+	return &standardBackend{eval: eval, residual: residual, bootstrappingParams: params.BootstrappingParameters, secret: secret}, nil
 }
 
 func (b *standardBackend) Name() string { return "standard" }
@@ -45,12 +46,27 @@ func (b *standardBackend) Bootstrap(ct *rlwe.Ciphertext) (*rlwe.Ciphertext, erro
 }
 
 func (b *standardBackend) Decode(ct *rlwe.Ciphertext) ([]complex128, error) {
-	if ct == nil || ct.Level() < 0 || ct.Level() > b.residual.MaxLevel() {
+	return b.decodeWithParameters(ct, b.residual)
+}
+
+func (b *standardBackend) DecodeStage(ct *rlwe.Ciphertext, name string) ([]complex128, string, error) {
+	switch name {
+	case "input", "scale_down", "final_public_output":
+		values, err := b.decodeWithParameters(ct, b.residual)
+		return values, "standard-decrypt-decode-residual-parameters", err
+	default:
+		values, err := b.decodeWithParameters(ct, b.bootstrappingParams)
+		return values, "standard-decrypt-decode-bootstrapping-parameters", err
+	}
+}
+
+func (b *standardBackend) decodeWithParameters(ct *rlwe.Ciphertext, params ckks.Parameters) ([]complex128, error) {
+	if ct == nil || ct.Level() < 0 || ct.Level() > params.MaxLevel() {
 		return nil, fmt.Errorf("invalid Standard ciphertext level")
 	}
-	plain := rlwe.NewDecryptor(b.residual, b.secret).DecryptNew(ct)
-	values := make([]complex128, b.residual.MaxSlots())
-	if err := ckks.NewEncoder(b.residual).Decode(plain, values); err != nil {
+	plain := rlwe.NewDecryptor(params, b.secret).DecryptNew(ct)
+	values := make([]complex128, params.MaxSlots())
+	if err := ckks.NewEncoder(params).Decode(plain, values); err != nil {
 		return nil, err
 	}
 	return values, nil

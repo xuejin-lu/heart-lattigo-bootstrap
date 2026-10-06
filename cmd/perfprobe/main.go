@@ -329,6 +329,7 @@ type backendAdapter interface {
 	SecretKeyForTrial() *rlwe.SecretKey
 	Bootstrap(*rlwe.Ciphertext) (*rlwe.Ciphertext, error)
 	Decode(*rlwe.Ciphertext) ([]complex128, error)
+	DecodeStage(*rlwe.Ciphertext, string) ([]complex128, string, error)
 	PrefixRows(*rlwe.Ciphertext) (int, error)
 	Pack([]rlwe.Ciphertext) ([]rlwe.Ciphertext, error)
 	ScaleDown(*rlwe.Ciphertext) (*rlwe.Ciphertext, error)
@@ -389,7 +390,7 @@ func runStages(backend backendAdapter, input, final *rlwe.Ciphertext, q []uint64
 			checkpoints = append(checkpoints, checkpoint{Name: name, SemanticallyValid: false, DecodeMethod: backend.Name() + "-decode"})
 			return nil
 		}
-		decoded, err := backend.Decode(ct)
+		decoded, decodeMethod, err := backend.DecodeStage(ct, name)
 		if err != nil {
 			return fmt.Errorf("decode %s: %w", name, err)
 		}
@@ -397,7 +398,7 @@ func runStages(backend backendAdapter, input, final *rlwe.Ciphertext, q []uint64
 		if err != nil {
 			return fmt.Errorf("inspect %s metadata: %w", name, err)
 		}
-		checkpoints = append(checkpoints, checkpoint{Name: name, State: state, DecodedSHA256: perfmeasure.Fingerprint(decoded), DecodeMethod: backend.Name() + "-decode", SemanticallyValid: true})
+		checkpoints = append(checkpoints, checkpoint{Name: name, State: state, DecodedSHA256: perfmeasure.Fingerprint(decoded), DecodeMethod: decodeMethod, SemanticallyValid: true})
 		if _, exists := vectorsByName[name]; !exists {
 			vectorsByName[name] = encodeVector(decoded)
 		}
