@@ -124,6 +124,7 @@ type vectors struct {
 
 type cliOptions struct {
 	inputSmoke              bool
+	outputSmoke             bool
 	fastBootstrapAcceptance bool
 	profile                 string
 	config                  string
@@ -154,6 +155,7 @@ func main() {
 func run() error {
 	var opts cliOptions
 	flag.BoolVar(&opts.inputSmoke, "input-smoke", false, "bounded input-origin preflight only; no Bootstrap or timing")
+	flag.BoolVar(&opts.outputSmoke, "output-smoke", false, "one public Bootstrap and decoded-output preflight; no timing campaign")
 	flag.BoolVar(&opts.fastBootstrapAcceptance, "fast-bootstrap-acceptance", false, "input smoke only: at most one Fast public Bootstrap acceptance call")
 	flag.StringVar(&opts.profile, "profile", "", "logn13 or logn16")
 	flag.StringVar(&opts.config, "config", "", "bootstrap config JSON")
@@ -172,14 +174,17 @@ func run() error {
 	if opts.config == "" || opts.out == "" || opts.backendCommit == "" || opts.secondaryRoot == "" || opts.backendRef == "" {
 		return errors.New("--config, --out, --backend-commit, --backend-ref, and --secondary-root are required")
 	}
-	if !opts.inputSmoke && opts.vectorsOut == "" {
+	if opts.inputSmoke && opts.outputSmoke {
+		return errors.New("--input-smoke and --output-smoke are mutually exclusive")
+	}
+	if !opts.inputSmoke && !opts.outputSmoke && opts.vectorsOut == "" {
 		return errors.New("measurement requires --vectors-out")
 	}
-	if opts.fastBootstrapAcceptance && !opts.inputSmoke {
+	if opts.fastBootstrapAcceptance && (!opts.inputSmoke || opts.outputSmoke) {
 		return errors.New("--fast-bootstrap-acceptance requires --input-smoke")
 	}
-	if !opts.inputSmoke && (opts.warmup < 1 || opts.repetitions < 7 || opts.standardTrials < 3) {
-		return errors.New("measurement requires warmup >= 1, repetitions >= 7, and standard-trials >= 3")
+	if err := validateExecutionLimits(opts); err != nil {
+		return err
 	}
 	cfg, configSum, err := perfmeasure.LoadConfig(opts.config)
 	if err != nil {
@@ -204,6 +209,9 @@ func run() error {
 	}
 	if opts.inputSmoke {
 		return runInputSmoke(opts, configHash, residual, params, effective, values)
+	}
+	if opts.outputSmoke {
+		return runOutputSmoke(opts, configHash, residual, params, effective, values)
 	}
 	if err := verifyCompiledBackendSource(opts.secondaryRoot); err != nil {
 		return err
@@ -347,12 +355,23 @@ func run() error {
 	return nil
 }
 
+func validateExecutionLimits(opts cliOptions) error {
+	if opts.inputSmoke || opts.outputSmoke {
+		return nil
+	}
+	if opts.warmup < 1 || opts.repetitions < 7 || opts.standardTrials < 3 {
+		return errors.New("measurement requires warmup >= 1, repetitions >= 7, and standard-trials >= 3")
+	}
+	return nil
+}
+
 type backendAdapter interface {
 	Name() string
 	InputKind() string
 	InputConstructor() string
 	PrepareInput([]complex128, int) (*rlwe.Ciphertext, error)
 	EvaluatorPath() string
+	DecodePath() string
 	KeyTrialEvidence() (bool, int)
 	SecretKeyForTrial() *rlwe.SecretKey
 	Bootstrap(*rlwe.Ciphertext) (*rlwe.Ciphertext, error)

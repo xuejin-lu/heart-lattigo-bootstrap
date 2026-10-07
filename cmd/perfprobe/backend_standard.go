@@ -62,6 +62,10 @@ func (b *standardBackend) EvaluatorPath() string {
 	return "fresh GenSecretKey + GenEvaluationKeys + bootstrapping.NewEvaluator"
 }
 
+func (b *standardBackend) DecodePath() string {
+	return "rlwe.NewDecryptor(matching generated Standard secret).DecryptNew -> ckks.NewEncoder.Decode"
+}
+
 func (b *standardBackend) KeyTrialEvidence() (bool, int) { return true, b.secret.LevelP() }
 
 func (b *standardBackend) SecretKeyForTrial() *rlwe.SecretKey { return b.secret }

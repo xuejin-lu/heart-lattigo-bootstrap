@@ -59,6 +59,10 @@ func (b *fastBackend) PrepareInput(values []complex128, logSlots int) (*rlwe.Cip
 
 func (b *fastBackend) EvaluatorPath() string { return "bootstrapping.NewFastEvaluator" }
 
+func (b *fastBackend) DecodePath() string {
+	return "Fast c0 copied into CKKS plaintext -> ckks.NewEncoder.Decode (zero-secret simulation)"
+}
+
 func (b *fastBackend) KeyTrialEvidence() (bool, int) { return false, -1 }
 
 func (b *fastBackend) SecretKeyForTrial() *rlwe.SecretKey { return nil }
