@@ -8,6 +8,7 @@ import (
 	"github.com/tuneinsight/lattigo/v6/circuits/ckks/bootstrapping"
 	"github.com/tuneinsight/lattigo/v6/core/rlwe"
 	"github.com/tuneinsight/lattigo/v6/schemes/ckks"
+	"github.com/xuejin-lu/heart-lattigo-bootstrap/internal/perfmeasure"
 )
 
 type standardBackend struct {
@@ -18,9 +19,12 @@ type standardBackend struct {
 }
 
 func newBackend(params bootstrapping.Parameters, residual ckks.Parameters) (backendAdapter, error) {
-	keygen := rlwe.NewKeyGenerator(params.BootstrappingParameters)
-	secret := keygen.GenSecretKeyNew()
-	keys, _, err := params.GenEvaluationKeys(secret)
+	inputBackend, err := newInputBackend(params, residual)
+	if err != nil {
+		return nil, err
+	}
+	backend := inputBackend.(*standardBackend)
+	keys, _, err := params.GenEvaluationKeys(backend.secret)
 	if err != nil {
 		return nil, fmt.Errorf("generate Standard evaluation keys: %w", err)
 	}
@@ -28,10 +32,31 @@ func newBackend(params bootstrapping.Parameters, residual ckks.Parameters) (back
 	if err != nil {
 		return nil, fmt.Errorf("construct Standard evaluator: %w", err)
 	}
-	return &standardBackend{eval: eval, residual: residual, bootstrappingParams: params.BootstrappingParameters, secret: secret}, nil
+	backend.eval = eval
+	return backend, nil
+}
+
+func newInputBackend(params bootstrapping.Parameters, residual ckks.Parameters) (backendAdapter, error) {
+	keygen := rlwe.NewKeyGenerator(params.BootstrappingParameters)
+	secret := keygen.GenSecretKeyNew()
+	return &standardBackend{residual: residual, bootstrappingParams: params.BootstrappingParameters, secret: secret}, nil
 }
 
 func (b *standardBackend) Name() string { return "standard" }
+
+func (b *standardBackend) InputKind() string { return standardNativeInputKind }
+
+func (b *standardBackend) InputConstructor() string {
+	return standardNativeConstructor
+}
+
+func (b *standardBackend) PrepareInput(values []complex128, logSlots int) (*rlwe.Ciphertext, error) {
+	plain, err := perfmeasure.EncodeInputPlaintext(b.residual, logSlots, values)
+	if err != nil {
+		return nil, err
+	}
+	return rlwe.NewEncryptor(b.residual, b.secret).EncryptNew(plain)
+}
 
 func (b *standardBackend) EvaluatorPath() string {
 	return "fresh GenSecretKey + GenEvaluationKeys + bootstrapping.NewEvaluator"

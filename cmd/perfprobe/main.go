@@ -1,7 +1,6 @@
 package main
 
 import (
-	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
@@ -53,6 +52,7 @@ type trial struct {
 	OriginalSHA256    string               `json:"original_sha256"`
 	PreDecodedSHA256  string               `json:"pre_decoded_sha256"`
 	PostDecodedSHA256 string               `json:"post_decoded_sha256"`
+	InputEvidence     inputRecord          `json:"input_evidence"`
 }
 
 type timingResult struct {
@@ -100,6 +100,7 @@ type document struct {
 	InputMetadataSHA256 string              `json:"input_metadata_sha256"`
 	InputState          ciphertextState     `json:"input_ciphertext_state"`
 	InputKind           string              `json:"input_kind"`
+	InputEvidence       inputRecord         `json:"input_evidence"`
 	Parameters          effectiveParameters `json:"effective_parameters"`
 	Timing              timingResult        `json:"full_bootstrap_timing"`
 	StageTimings        []stageTiming       `json:"separate_stage_timing"`
@@ -122,16 +123,18 @@ type vectors struct {
 }
 
 type cliOptions struct {
-	profile        string
-	config         string
-	out            string
-	vectorsOut     string
-	backendCommit  string
-	backendRef     string
-	secondaryRoot  string
-	warmup         int
-	repetitions    int
-	standardTrials int
+	inputSmoke              bool
+	fastBootstrapAcceptance bool
+	profile                 string
+	config                  string
+	out                     string
+	vectorsOut              string
+	backendCommit           string
+	backendRef              string
+	secondaryRoot           string
+	warmup                  int
+	repetitions             int
+	standardTrials          int
 }
 
 func main() {
@@ -150,6 +153,8 @@ func main() {
 
 func run() error {
 	var opts cliOptions
+	flag.BoolVar(&opts.inputSmoke, "input-smoke", false, "bounded input-origin preflight only; no Bootstrap or timing")
+	flag.BoolVar(&opts.fastBootstrapAcceptance, "fast-bootstrap-acceptance", false, "input smoke only: at most one Fast public Bootstrap acceptance call")
 	flag.StringVar(&opts.profile, "profile", "", "logn13 or logn16")
 	flag.StringVar(&opts.config, "config", "", "bootstrap config JSON")
 	flag.StringVar(&opts.out, "out", "", "compact result JSON")
@@ -164,10 +169,16 @@ func run() error {
 	if opts.profile != "logn13" && opts.profile != "logn16" {
 		return fmt.Errorf("--profile must be logn13 or logn16")
 	}
-	if opts.config == "" || opts.out == "" || opts.vectorsOut == "" || opts.backendCommit == "" || opts.secondaryRoot == "" || opts.backendRef == "" {
-		return errors.New("--config, --out, --vectors-out, --backend-commit, --backend-ref, and --secondary-root are required")
+	if opts.config == "" || opts.out == "" || opts.backendCommit == "" || opts.secondaryRoot == "" || opts.backendRef == "" {
+		return errors.New("--config, --out, --backend-commit, --backend-ref, and --secondary-root are required")
 	}
-	if opts.warmup < 1 || opts.repetitions < 7 || opts.standardTrials < 3 {
+	if !opts.inputSmoke && opts.vectorsOut == "" {
+		return errors.New("measurement requires --vectors-out")
+	}
+	if opts.fastBootstrapAcceptance && !opts.inputSmoke {
+		return errors.New("--fast-bootstrap-acceptance requires --input-smoke")
+	}
+	if !opts.inputSmoke && (opts.warmup < 1 || opts.repetitions < 7 || opts.standardTrials < 3) {
 		return errors.New("measurement requires warmup >= 1, repetitions >= 7, and standard-trials >= 3")
 	}
 	cfg, configSum, err := perfmeasure.LoadConfig(opts.config)
@@ -191,26 +202,22 @@ func run() error {
 	if opts.profile == "logn13" && inputHash != canonicalLogN13InputSHA256 {
 		return fmt.Errorf("canonical LogN13 input fingerprint mismatch: %s", inputHash)
 	}
-	input, err := perfmeasure.EncodePlaintextLikeInput(residual, effective.LogSlots, values)
-	if err != nil {
+	if opts.inputSmoke {
+		return runInputSmoke(opts, configHash, residual, params, effective, values)
+	}
+	if err := verifyCompiledBackendSource(opts.secondaryRoot); err != nil {
 		return err
 	}
 	backend, err := newBackend(params, residual)
 	if err != nil {
 		return err
 	}
-	inputState, err := backendStateOf(backend, input, params.BootstrappingParameters.Q())
-	if err != nil {
-		return fmt.Errorf("inspect input ciphertext metadata: %w", err)
+	if err := validatePinnedBackend(backend.Name(), opts.backendCommit); err != nil {
+		return err
 	}
-	inputMetadata, err := json.Marshal(inputState)
+	input, preDecoded, inputEvidence, err := prepareAndValidateInput(backend, residual, params, values, effective.LogSlots)
 	if err != nil {
-		return fmt.Errorf("marshal input ciphertext metadata: %w", err)
-	}
-	inputMetadataHash := sha256.Sum256(inputMetadata)
-	preDecoded, err := backend.Decode(input)
-	if err != nil {
-		return fmt.Errorf("decode pre-Bootstrap: %w", err)
+		return err
 	}
 	primaryRoot, primaryCommit, err := cleanRepositoryState(".")
 	if err != nil {
@@ -228,6 +235,7 @@ func run() error {
 	if err != nil {
 		return err
 	}
+	stageBackend := backend // Stage replay must use the secret/evaluator matching the timed first input.
 	numericalTrials := make([]trial, 0, max(opts.standardTrials, 2))
 	trialVectors := make([][]complexValue, 0, cap(numericalTrials))
 	preTrialVectors := make([][]complexValue, 0, cap(numericalTrials))
@@ -247,6 +255,7 @@ func run() error {
 			if err != nil {
 				return fmt.Errorf("Fast trial %d metadata: %w", i+1, err)
 			}
+			record.InputEvidence = inputEvidence
 			numericalTrials = append(numericalTrials, record)
 			preTrialVectors = append(preTrialVectors, encodeVector(preDecoded))
 			trialVectors = append(trialVectors, encodeVector(decoded))
@@ -256,10 +265,15 @@ func run() error {
 		}
 	} else {
 		for i := 0; i < opts.standardTrials; i++ {
+			trialInput, trialPreDecoded, trialInputEvidence := input, preDecoded, inputEvidence
 			if i > 0 {
 				backend, err = newBackend(params, residual)
 				if err != nil {
 					return fmt.Errorf("create independent Standard trial %d: %w", i+1, err)
+				}
+				trialInput, trialPreDecoded, trialInputEvidence, err = prepareAndValidateInput(backend, residual, params, values, effective.LogSlots)
+				if err != nil {
+					return fmt.Errorf("prepare independent Standard trial %d: %w", i+1, err)
 				}
 			}
 			secret := backend.SecretKeyForTrial()
@@ -272,11 +286,12 @@ func run() error {
 				}
 			}
 			standardKeys = append(standardKeys, secret)
-			trialPreDecoded, err := backend.Decode(input)
-			if err != nil {
-				return fmt.Errorf("decode Standard pre-Bootstrap trial %d: %w", i+1, err)
+			for priorIndex := 0; priorIndex < i; priorIndex++ {
+				if trialInputEvidence.C1SHA256 == numericalTrials[priorIndex].InputEvidence.C1SHA256 {
+					return fmt.Errorf("Standard trial %d c1 repeats trial %d", i+1, priorIndex+1)
+				}
 			}
-			out, err := backend.Bootstrap(input.CopyNew())
+			out, err := backend.Bootstrap(trialInput.CopyNew())
 			if err != nil {
 				return fmt.Errorf("Standard numerical trial %d: %w", i+1, err)
 			}
@@ -288,31 +303,34 @@ func run() error {
 			if err != nil {
 				return fmt.Errorf("Standard trial %d metadata: %w", i+1, err)
 			}
+			record.InputEvidence = trialInputEvidence
 			numericalTrials = append(numericalTrials, record)
 			preTrialVectors = append(preTrialVectors, encodeVector(trialPreDecoded))
 			trialVectors = append(trialVectors, encodeVector(decoded))
-			representativeOutput = out.CopyNew()
+			if representativeOutput == nil {
+				representativeOutput = out.CopyNew()
+			}
 		}
 	}
-	stages, stageVectors, stageTimings, err := runStages(backend, input, representativeOutput, params.BootstrappingParameters.Q())
+	stages, stageVectors, stageTimings, err := runStages(stageBackend, input, representativeOutput, params.BootstrappingParameters.Q())
 	if err != nil {
 		return fmt.Errorf("stage replay: %w", err)
 	}
 
 	doc := document{
-		SchemaVersion: "fast-standard-perfprobe.v1", Timestamp: time.Now().UTC(),
+		SchemaVersion: "fast-standard-perfprobe.v2", Timestamp: time.Now().UTC(),
 		Profile: opts.profile, Backend: backend.Name(), BackendCommit: opts.backendCommit,
 		PrimaryPath: primaryRoot, PrimaryCommit: primaryCommit, PrimaryDirty: false, SecondaryDirty: false,
 		SecondaryPath: secondaryRoot, SecondaryRef: opts.backendRef, ConfigSHA256: configHash, ConfigPath: opts.config,
 		GoVersion: runtime.Version(), OS: runtime.GOOS, Arch: runtime.GOARCH,
 		CPU: cpuModel(), NumCPU: runtime.NumCPU(), GOMAXPROCS: runtime.GOMAXPROCS(0),
-		InputSHA256: inputHash, InputMetadataSHA256: hex.EncodeToString(inputMetadataHash[:]), InputState: inputState,
-		InputKind:  "c0=encoded-message,c1=0; specialized zero-a plaintext-like comparator",
+		InputSHA256: inputHash, InputMetadataSHA256: inputEvidence.MetadataSHA256, InputState: inputEvidence.State,
+		InputKind: inputEvidence.Kind, InputEvidence: inputEvidence,
 		Parameters: effective, Timing: measured, StageTimings: stageTimings, Trials: numericalTrials, Checkpoints: stages,
 		Limitations: []string{
 			"Timing samples cover only the public Bootstrap call; key generation, setup, encoding, decoding, and analysis are outside the timed region.",
 			"Stage checkpoints are a separate public-stage replay and are not summed to estimate total Bootstrap time.",
-			"The input has c1=0 and does not represent an encrypted-input security or RLWE-noise experiment.",
+			"Standard input is native RLWE encryption; Fast input is intentionally insecure direct-encoded zero-a simulation. These inputs are not security-equivalent.",
 		},
 	}
 	if err := writeExclusiveJSON(opts.out, doc); err != nil {
@@ -331,6 +349,9 @@ func run() error {
 
 type backendAdapter interface {
 	Name() string
+	InputKind() string
+	InputConstructor() string
+	PrepareInput([]complex128, int) (*rlwe.Ciphertext, error)
 	EvaluatorPath() string
 	KeyTrialEvidence() (bool, int)
 	SecretKeyForTrial() *rlwe.SecretKey

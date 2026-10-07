@@ -61,6 +61,7 @@ type EffectiveParameters struct {
 	DoubleAngle      int      `json:"double_angle"`
 	K                int      `json:"k"`
 	LogMessageRatio  int      `json:"log_message_ratio"`
+	CircuitOrder     int      `json:"circuit_order"`
 	QPrefixRowsAtMax int      `json:"q_prefix_rows_at_max_level"`
 }
 
@@ -126,6 +127,7 @@ func ParametersFromConfig(cfg Config) (ckks.Parameters, bootstrapping.Parameters
 		Q0Target: cfg.Q0[0], Q0Bits: bits.Len64(q[0]), QChainBits: primeBits(q), PBits: primeBits(p), QPrimes: primeStrings(q), PPrimes: primeStrings(p),
 		DefaultScale: defaultScale.Value.Text('e', 80), Mod1Scale: cfg.Mod1LogScale, Mod1Degree: cfg.Mod1Degree,
 		DoubleAngle: cfg.Mod1DoubleAngle, K: cfg.Mod1K, LogMessageRatio: cfg.LogMessageRatio,
+		CircuitOrder:     int(params.CircuitOrder),
 		QPrefixRowsAtMax: min(params.BootstrappingParameters.MaxLevel()+1, 4),
 	}
 	return residual, params, effective, nil
@@ -150,19 +152,16 @@ func Fingerprint(values []complex128) string {
 	return hex.EncodeToString(hash.Sum(nil))
 }
 
-func EncodePlaintextLikeInput(params ckks.Parameters, logSlots int, values []complex128) (*rlwe.Ciphertext, error) {
+// EncodeInputPlaintext only encodes the shared message. Ciphertext construction
+// belongs to the selected research backend adapter, never to this package.
+func EncodeInputPlaintext(params ckks.Parameters, logSlots int, values []complex128) (*rlwe.Plaintext, error) {
 	plain := ckks.NewPlaintext(params, 0)
 	plain.IsNTT, plain.IsMontgomery = true, false
 	plain.LogDimensions = ring.Dimensions{Cols: logSlots}
 	if err := ckks.NewEncoder(params).Encode(values, plain); err != nil {
 		return nil, err
 	}
-	ct := ckks.NewCiphertext(params, 1, 0)
-	*ct.MetaData = *plain.MetaData
-	ct.Value[0].Copy(plain.Value)
-	ct.Value[1].Zero()
-	ct.IsNTT, ct.IsMontgomery = plain.IsNTT, plain.IsMontgomery
-	return ct, nil
+	return plain, nil
 }
 
 func factorization(depths, scales []int) ([][]int, error) {

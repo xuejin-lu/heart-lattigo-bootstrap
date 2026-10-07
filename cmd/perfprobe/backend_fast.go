@@ -9,6 +9,7 @@ import (
 	"github.com/tuneinsight/lattigo/v6/core/rlwe"
 	"github.com/tuneinsight/lattigo/v6/schemes/ckks"
 	fastckks "github.com/tuneinsight/lattigo/v6/schemes/ckks/fast"
+	"github.com/xuejin-lu/heart-lattigo-bootstrap/internal/perfmeasure"
 )
 
 type fastBackend struct {
@@ -18,14 +19,43 @@ type fastBackend struct {
 }
 
 func newBackend(params bootstrapping.Parameters, residual ckks.Parameters) (backendAdapter, error) {
+	inputBackend, err := newInputBackend(params, residual)
+	if err != nil {
+		return nil, err
+	}
+	backend := inputBackend.(*fastBackend)
 	eval, err := bootstrapping.NewFastEvaluator(params)
 	if err != nil {
 		return nil, err
 	}
-	return &fastBackend{eval: eval, residual: residual, bootstrappingParams: params.BootstrappingParameters}, nil
+	backend.eval = eval
+	return backend, nil
+}
+
+func newInputBackend(params bootstrapping.Parameters, residual ckks.Parameters) (backendAdapter, error) {
+	return &fastBackend{residual: residual, bootstrappingParams: params.BootstrappingParameters}, nil
 }
 
 func (b *fastBackend) Name() string { return "fast" }
+
+func (b *fastBackend) InputKind() string { return fastDirectInputKind }
+
+func (b *fastBackend) InputConstructor() string {
+	return fastDirectConstructor
+}
+
+func (b *fastBackend) PrepareInput(values []complex128, logSlots int) (*rlwe.Ciphertext, error) {
+	plain, err := perfmeasure.EncodeInputPlaintext(b.residual, logSlots, values)
+	if err != nil {
+		return nil, err
+	}
+	ct := ckks.NewCiphertext(b.residual, 1, 0)
+	*ct.MetaData = *plain.MetaData
+	ct.Value[0].Copy(plain.Value)
+	ct.Value[1].Zero()
+	ct.IsNTT, ct.IsMontgomery = plain.IsNTT, plain.IsMontgomery
+	return ct, nil
+}
 
 func (b *fastBackend) EvaluatorPath() string { return "bootstrapping.NewFastEvaluator" }
 

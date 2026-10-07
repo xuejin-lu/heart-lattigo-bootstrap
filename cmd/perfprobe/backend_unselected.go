@@ -12,3 +12,7 @@ import (
 func newBackend(bootstrapping.Parameters, ckks.Parameters) (backendAdapter, error) {
 	return nil, errors.New("build perfprobe with exactly one of -tags=perf_fast or -tags=perf_standard")
 }
+
+func newInputBackend(bootstrapping.Parameters, ckks.Parameters) (backendAdapter, error) {
+	return nil, errors.New("build perfprobe with exactly one of -tags=perf_fast or -tags=perf_standard")
+}

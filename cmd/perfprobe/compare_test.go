@@ -4,7 +4,68 @@ import (
 	"encoding/json"
 	"math"
 	"testing"
+
+	"github.com/xuejin-lu/heart-lattigo-bootstrap/internal/perfmeasure"
 )
+
+func TestFormalPairAllowsDistinctCiphertextMetadataButRejectsLegacyOrigins(t *testing.T) {
+	original := []complexValue{{Real: 0.125}}
+	inputHash := perfmeasure.Fingerprint([]complex128{0.125})
+	makeDocument := func(backend, kind, metadata string, c1Nonzero bool, trials int) document {
+		state := ciphertextState{Level: 0, Degree: 1, LogCols: 0}
+		constructor := fastDirectConstructor
+		if backend == "standard" {
+			constructor = standardNativeConstructor
+		}
+		evidence := inputRecord{Kind: kind, Constructor: constructor, State: state, MetadataSHA256: metadata,
+			C1SHA256: "c1-0", C1Nonzero: c1Nonzero, PreDecodedSHA256: inputHash, InputQualityLimit: inputQualityLimit}
+		commit := pinnedFastSHA
+		if backend == "standard" {
+			commit = pinnedStandardSHA
+		}
+		doc := document{SchemaVersion: "fast-standard-perfprobe.v2", Backend: backend, BackendCommit: commit, Profile: "test", PrimaryCommit: "same",
+			ConfigPath: "same", ConfigSHA256: "same", InputSHA256: inputHash, InputMetadataSHA256: metadata,
+			InputState: state, InputKind: kind, InputEvidence: evidence,
+			Parameters: effectiveParameters{InputSlots: 1}, Trials: make([]trial, trials)}
+		for i := range doc.Trials {
+			trialEvidence := evidence
+			if c1Nonzero {
+				trialEvidence.C1SHA256 = string(rune('a' + i))
+			}
+			doc.Trials[i] = trial{FreshKeyTrial: c1Nonzero, PreDecodedSHA256: inputHash, InputEvidence: trialEvidence}
+		}
+		doc.InputEvidence = doc.Trials[0].InputEvidence
+		return doc
+	}
+	standard := makeDocument("standard", standardNativeInputKind, "standard-metadata", true, 3)
+	fast := makeDocument("fast", fastDirectInputKind, "fast-metadata", false, 2)
+	standardVectors := probeVectors{Original: original, Trials: make([][]complexValue, 3), PreTrials: make([][]complexValue, 3)}
+	fastVectors := probeVectors{Original: original, Trials: make([][]complexValue, 2), PreTrials: make([][]complexValue, 2)}
+	for i := range standardVectors.PreTrials {
+		standardVectors.PreTrials[i] = original
+	}
+	for i := range fastVectors.PreTrials {
+		fastVectors.PreTrials[i] = original
+	}
+	if err := validatePairedInputs(standard, fast, standardVectors, fastVectors); err != nil {
+		t.Fatalf("distinct ciphertext metadata should be valid: %v", err)
+	}
+	legacy := standard
+	legacy.InputKind = "c0=encoded-message,c1=0"
+	if err := validatePairedInputs(legacy, fast, standardVectors, fastVectors); err == nil {
+		t.Fatal("formal comparison accepted legacy synthetic Standard input")
+	}
+	legacy = standard
+	legacy.SchemaVersion = "fast-standard-perfprobe.v1"
+	if err := validatePairedInputs(legacy, fast, standardVectors, fastVectors); err == nil {
+		t.Fatal("formal comparison accepted legacy schema")
+	}
+	legacy = standard
+	legacy.Trials[0].InputEvidence.C1Nonzero = false
+	if err := validatePairedInputs(legacy, fast, standardVectors, fastVectors); err == nil {
+		t.Fatal("formal comparison accepted zero-c1 Standard trial")
+	}
+}
 
 func TestCompareVectorsCountsComponentThresholds(t *testing.T) {
 	metric := compareVectors([]complex128{0}, []complex128{0.02 + 0.03i}, 0.01)

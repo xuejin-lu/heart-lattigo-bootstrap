@@ -174,57 +174,59 @@ type stageComparison struct {
 }
 
 type pairedNumericalDocument struct {
-	SchemaVersion              string                  `json:"schema_version"`
-	GeneratedAt                time.Time               `json:"generated_at"`
-	Profile                    string                  `json:"profile"`
-	MeasurementPrimaryCommit   string                  `json:"measurement_primary_commit"`
-	FastBackendCommit          string                  `json:"fast_backend_commit"`
-	StandardBackendCommit      string                  `json:"standard_backend_commit"`
-	FastBackendPath            string                  `json:"fast_evaluator_path"`
-	StandardBackendPath        string                  `json:"standard_evaluator_path"`
-	ConfigPath                 string                  `json:"config_path"`
-	ConfigSHA256               string                  `json:"config_sha256"`
-	InputSHA256                string                  `json:"input_sha256"`
-	InputMetadataSHA256        string                  `json:"input_metadata_sha256"`
-	InputKind                  string                  `json:"input_kind"`
-	Parameters                 effectiveParameters     `json:"effective_parameters"`
-	GoVersion                  string                  `json:"go_version"`
-	OS                         string                  `json:"os"`
-	Arch                       string                  `json:"arch"`
-	CPU                        string                  `json:"cpu"`
-	MatchedEnvironment         bool                    `json:"matched_environment"`
-	MatchedParameters          bool                    `json:"matched_parameters"`
-	NumericalThreshold         float64                 `json:"numerical_threshold"`
-	StandardTiming             timingResult            `json:"standard_full_bootstrap_timing"`
-	FastTiming                 timingResult            `json:"fast_full_bootstrap_timing"`
-	StandardStageTimings       []stageTiming           `json:"standard_stage_timings"`
-	FastStageTimings           []stageTiming           `json:"fast_stage_timings"`
-	MedianSpeedup              float64                 `json:"fast_speedup_median"`
-	FastOriginalRMSE           []vectorMetrics         `json:"fast_vs_original_trials"`
-	StandardOriginalRMSE       []vectorMetrics         `json:"standard_vs_original_trials"`
-	FastBootstrapSNR           []numericalmetrics.SNR  `json:"fast_bootstrap_snr_trials"`
-	StandardBootstrapSNR       []numericalmetrics.SNR  `json:"standard_bootstrap_snr_trials"`
-	TrialComparisons           []trialComparison       `json:"fast_standard_trial_comparisons"`
-	MedianFastStandardRMSE     float64                 `json:"median_fast_standard_complex_rmse"`
-	MaxFastStandardDifference  float64                 `json:"max_fast_standard_complex_difference"`
-	MaxRealComponentDifference float64                 `json:"max_fast_standard_real_difference"`
-	MaxImagComponentDifference float64                 `json:"max_fast_standard_imag_difference"`
-	RealThresholdViolations    int                     `json:"real_threshold_violations"`
-	ImagThresholdViolations    int                     `json:"imag_threshold_violations"`
-	StageComparisons           []stageComparison       `json:"stage_comparisons"`
-	FastdiagClassification     string                  `json:"fastdiag_classification"`
-	FastdiagPrimaryCommit      string                  `json:"fastdiag_primary_commit"`
-	FastdiagPrimaryDirty       bool                    `json:"fastdiag_primary_dirty"`
-	FastdiagSecondaryCommit    string                  `json:"fastdiag_secondary_commit"`
-	FastdiagSecondaryDirty     bool                    `json:"fastdiag_secondary_dirty"`
-	FastdiagStageLockstep      fastdiagLockstepSummary `json:"fastdiag_stage_lockstep"`
-	FastdiagSHA256             string                  `json:"fastdiag_sha256"`
-	FastdiagRawArtifact        string                  `json:"fastdiag_raw_artifact"`
-	CapacityCheckpointCount    int                     `json:"capacity_checkpoint_count"`
-	CapacityFailureCount       int                     `json:"capacity_failure_count"`
-	FirstCapacityFailure       string                  `json:"first_capacity_failure,omitempty"`
-	StageCoverage              string                  `json:"stage_coverage_note"`
-	SecurityCaveat             string                  `json:"security_caveat"`
+	SchemaVersion               string                  `json:"schema_version"`
+	GeneratedAt                 time.Time               `json:"generated_at"`
+	Profile                     string                  `json:"profile"`
+	MeasurementPrimaryCommit    string                  `json:"measurement_primary_commit"`
+	FastBackendCommit           string                  `json:"fast_backend_commit"`
+	StandardBackendCommit       string                  `json:"standard_backend_commit"`
+	FastBackendPath             string                  `json:"fast_evaluator_path"`
+	StandardBackendPath         string                  `json:"standard_evaluator_path"`
+	ConfigPath                  string                  `json:"config_path"`
+	ConfigSHA256                string                  `json:"config_sha256"`
+	InputSHA256                 string                  `json:"input_sha256"`
+	StandardInputMetadataSHA256 string                  `json:"standard_input_metadata_sha256"`
+	FastInputMetadataSHA256     string                  `json:"fast_input_metadata_sha256"`
+	StandardInputKind           string                  `json:"standard_input_kind"`
+	FastInputKind               string                  `json:"fast_input_kind"`
+	Parameters                  effectiveParameters     `json:"effective_parameters"`
+	GoVersion                   string                  `json:"go_version"`
+	OS                          string                  `json:"os"`
+	Arch                        string                  `json:"arch"`
+	CPU                         string                  `json:"cpu"`
+	MatchedEnvironment          bool                    `json:"matched_environment"`
+	MatchedParameters           bool                    `json:"matched_parameters"`
+	NumericalThreshold          float64                 `json:"numerical_threshold"`
+	StandardTiming              timingResult            `json:"standard_full_bootstrap_timing"`
+	FastTiming                  timingResult            `json:"fast_full_bootstrap_timing"`
+	StandardStageTimings        []stageTiming           `json:"standard_stage_timings"`
+	FastStageTimings            []stageTiming           `json:"fast_stage_timings"`
+	MedianSpeedup               float64                 `json:"fast_speedup_median"`
+	FastOriginalRMSE            []vectorMetrics         `json:"fast_vs_original_trials"`
+	StandardOriginalRMSE        []vectorMetrics         `json:"standard_vs_original_trials"`
+	FastBootstrapSNR            []numericalmetrics.SNR  `json:"fast_bootstrap_snr_trials"`
+	StandardBootstrapSNR        []numericalmetrics.SNR  `json:"standard_bootstrap_snr_trials"`
+	TrialComparisons            []trialComparison       `json:"fast_standard_trial_comparisons"`
+	MedianFastStandardRMSE      float64                 `json:"median_fast_standard_complex_rmse"`
+	MaxFastStandardDifference   float64                 `json:"max_fast_standard_complex_difference"`
+	MaxRealComponentDifference  float64                 `json:"max_fast_standard_real_difference"`
+	MaxImagComponentDifference  float64                 `json:"max_fast_standard_imag_difference"`
+	RealThresholdViolations     int                     `json:"real_threshold_violations"`
+	ImagThresholdViolations     int                     `json:"imag_threshold_violations"`
+	StageComparisons            []stageComparison       `json:"stage_comparisons"`
+	FastdiagClassification      string                  `json:"fastdiag_classification"`
+	FastdiagPrimaryCommit       string                  `json:"fastdiag_primary_commit"`
+	FastdiagPrimaryDirty        bool                    `json:"fastdiag_primary_dirty"`
+	FastdiagSecondaryCommit     string                  `json:"fastdiag_secondary_commit"`
+	FastdiagSecondaryDirty      bool                    `json:"fastdiag_secondary_dirty"`
+	FastdiagStageLockstep       fastdiagLockstepSummary `json:"fastdiag_stage_lockstep"`
+	FastdiagSHA256              string                  `json:"fastdiag_sha256"`
+	FastdiagRawArtifact         string                  `json:"fastdiag_raw_artifact"`
+	CapacityCheckpointCount     int                     `json:"capacity_checkpoint_count"`
+	CapacityFailureCount        int                     `json:"capacity_failure_count"`
+	FirstCapacityFailure        string                  `json:"first_capacity_failure,omitempty"`
+	StageCoverage               string                  `json:"stage_coverage_note"`
+	SecurityCaveat              string                  `json:"security_caveat"`
 }
 
 func runCompare(args []string) error {
@@ -309,8 +311,17 @@ func runCompare(args []string) error {
 }
 
 func validatePairedInputs(standard, fast document, standardVectors, fastVectors probeVectors) error {
+	if standard.SchemaVersion != "fast-standard-perfprobe.v2" || fast.SchemaVersion != "fast-standard-perfprobe.v2" {
+		return errors.New("formal comparison requires v2 input provenance; historical/unknown probe records are diagnostic only")
+	}
 	if standard.Backend != "standard" || fast.Backend != "fast" {
 		return fmt.Errorf("backend pair mismatch: Standard=%q Fast=%q", standard.Backend, fast.Backend)
+	}
+	if err := validatePinnedBackend(standard.Backend, standard.BackendCommit); err != nil {
+		return err
+	}
+	if err := validatePinnedBackend(fast.Backend, fast.BackendCommit); err != nil {
+		return err
 	}
 	if standard.Profile != fast.Profile || standard.PrimaryCommit != fast.PrimaryCommit {
 		return fmt.Errorf("profile or Primary harness mismatch: standard=(%s,%s) fast=(%s,%s)", standard.Profile, standard.PrimaryCommit, fast.Profile, fast.PrimaryCommit)
@@ -318,8 +329,14 @@ func validatePairedInputs(standard, fast document, standardVectors, fastVectors 
 	if standard.PrimaryDirty || fast.PrimaryDirty || standard.SecondaryDirty || fast.SecondaryDirty {
 		return errors.New("probe provenance reports a dirty Primary or Secondary worktree")
 	}
-	if standard.ConfigSHA256 != fast.ConfigSHA256 || standard.ConfigPath != fast.ConfigPath || standard.InputSHA256 != fast.InputSHA256 || standard.InputMetadataSHA256 != fast.InputMetadataSHA256 {
-		return errors.New("Standard/Fast config, input vector, or ciphertext metadata fingerprint differs")
+	if standard.ConfigSHA256 != fast.ConfigSHA256 || standard.ConfigPath != fast.ConfigPath || standard.InputSHA256 != fast.InputSHA256 {
+		return errors.New("Standard/Fast config or original input vector fingerprint differs")
+	}
+	if err := validateFormalInputProvenance(standard, standardNativeInputKind, true); err != nil {
+		return fmt.Errorf("Standard input provenance: %w", err)
+	}
+	if err := validateFormalInputProvenance(fast, fastDirectInputKind, false); err != nil {
+		return fmt.Errorf("Fast input provenance: %w", err)
 	}
 	if !equalEffectiveParameters(standard.Parameters, fast.Parameters) {
 		return errors.New("Standard/Fast effective Q/P/profile parameters differ")
@@ -330,6 +347,19 @@ func validatePairedInputs(standard, fast document, standardVectors, fastVectors 
 	if len(standard.Trials) < 3 || len(fast.Trials) < 2 || len(standardVectors.Trials) != len(standard.Trials) || len(fastVectors.Trials) != len(fast.Trials) {
 		return fmt.Errorf("insufficient trial/vector counts: Standard trials/vectors=%d/%d Fast=%d/%d", len(standard.Trials), len(standardVectors.Trials), len(fast.Trials), len(fastVectors.Trials))
 	}
+	if len(standardVectors.PreTrials) != len(standard.Trials) || len(fastVectors.PreTrials) != len(fast.Trials) {
+		return errors.New("pre-Bootstrap vector trial counts do not match input provenance")
+	}
+	for i, record := range standard.Trials {
+		if vectorFingerprint(toComplex(standardVectors.PreTrials[i])) != record.PreDecodedSHA256 {
+			return fmt.Errorf("Standard pre-Bootstrap trial %d vector hash differs from input provenance", i+1)
+		}
+	}
+	for i, record := range fast.Trials {
+		if vectorFingerprint(toComplex(fastVectors.PreTrials[i])) != record.PreDecodedSHA256 {
+			return fmt.Errorf("Fast pre-Bootstrap trial %d vector hash differs from input provenance", i+1)
+		}
+	}
 	if len(standardVectors.Original) == 0 || len(standardVectors.Original) != len(fastVectors.Original) || len(standardVectors.Original) != standard.Parameters.InputSlots {
 		return fmt.Errorf("original input vector lengths do not match effective slots: Standard=%d Fast=%d effective=%d", len(standardVectors.Original), len(fastVectors.Original), standard.Parameters.InputSlots)
 	}
@@ -339,18 +369,52 @@ func validatePairedInputs(standard, fast document, standardVectors, fastVectors 
 	return nil
 }
 
+func validateFormalInputProvenance(doc document, requiredKind string, requireNonzeroC1 bool) error {
+	if len(doc.Trials) == 0 || doc.InputEvidence != doc.Trials[0].InputEvidence {
+		return errors.New("representative input provenance differs from first trial")
+	}
+	requiredConstructor := fastDirectConstructor
+	if requiredKind == standardNativeInputKind {
+		requiredConstructor = standardNativeConstructor
+	}
+	if doc.InputKind != requiredKind || doc.InputEvidence.Kind != requiredKind || doc.InputEvidence.C1Nonzero != requireNonzeroC1 || doc.InputEvidence.Constructor != requiredConstructor {
+		return fmt.Errorf("expected input kind %q with c1_nonzero=%t and a constructor path", requiredKind, requireNonzeroC1)
+	}
+	if doc.InputEvidence.MetadataSHA256 == "" || doc.InputEvidence.MetadataSHA256 != doc.InputMetadataSHA256 || doc.InputEvidence.State != doc.InputState || doc.InputEvidence.C1SHA256 == "" {
+		return errors.New("representative input evidence does not match probe metadata")
+	}
+	seenC1 := make(map[string]bool, len(doc.Trials))
+	for i, trial := range doc.Trials {
+		evidence := trial.InputEvidence
+		if evidence.Kind != requiredKind || evidence.Constructor != doc.InputEvidence.Constructor || evidence.C1Nonzero != requireNonzeroC1 || evidence.C1SHA256 == "" || evidence.PreDecodedSHA256 != trial.PreDecodedSHA256 {
+			return fmt.Errorf("trial %d lacks matching input-origin evidence", i+1)
+		}
+		if evidence.State.Level != 0 || evidence.State.Degree != 1 || evidence.State.LogCols != doc.Parameters.LogSlots || evidence.MaxComplexDeviation < 0 || evidence.MaxComplexDeviation > inputQualityLimit || evidence.InputQualityLimit != inputQualityLimit {
+			return fmt.Errorf("trial %d failed input metadata/quality preflight", i+1)
+		}
+		if requireNonzeroC1 {
+			if !trial.FreshKeyTrial || seenC1[evidence.C1SHA256] {
+				return fmt.Errorf("Standard trial %d has no independent-key/c1 evidence", i+1)
+			}
+			seenC1[evidence.C1SHA256] = true
+		}
+	}
+	return nil
+}
+
 func buildPairedNumericalDocument(standard, fast document, standardVectors, fastVectors probeVectors, diagnostic fastdiagEvidence, capacity fastdiagCapacityEvidence, lockstep fastdiagLockstepReport, diagnosticHash string, threshold float64) (pairedNumericalDocument, error) {
 	if len(standardVectors.PreTrials) != len(standard.Trials) || len(fastVectors.PreTrials) != len(fast.Trials) {
 		return pairedNumericalDocument{}, errors.New("pre-Bootstrap vector trial counts do not match probe records")
 	}
 	output := pairedNumericalDocument{
-		SchemaVersion: "fast-standard-perfprobe-comparison.v1", GeneratedAt: time.Now().UTC(),
+		SchemaVersion: "fast-standard-perfprobe-comparison.v2", GeneratedAt: time.Now().UTC(),
 		Profile: fast.Profile, MeasurementPrimaryCommit: fast.PrimaryCommit,
 		FastBackendCommit: fast.BackendCommit, StandardBackendCommit: standard.BackendCommit,
 		FastBackendPath: fast.Trials[0].EvaluatorPath, StandardBackendPath: standard.Trials[0].EvaluatorPath,
 		ConfigPath: fast.ConfigPath, ConfigSHA256: fast.ConfigSHA256,
-		InputSHA256: fast.InputSHA256, InputMetadataSHA256: fast.InputMetadataSHA256,
-		InputKind: fast.InputKind, Parameters: fast.Parameters,
+		InputSHA256:                 fast.InputSHA256,
+		StandardInputMetadataSHA256: standard.InputMetadataSHA256, FastInputMetadataSHA256: fast.InputMetadataSHA256,
+		StandardInputKind: standard.InputKind, FastInputKind: fast.InputKind, Parameters: fast.Parameters,
 		GoVersion: fast.GoVersion, OS: fast.OS, Arch: fast.Arch, CPU: fast.CPU,
 		MatchedEnvironment: true, MatchedParameters: true, NumericalThreshold: threshold,
 		StandardTiming: standard.Timing, FastTiming: fast.Timing,
@@ -363,7 +427,7 @@ func buildPairedNumericalDocument(standard, fast document, standardVectors, fast
 		FastdiagSHA256:        diagnosticHash,
 		FastdiagRawArtifact:   "results/FAST-STANDARD-PERF-REBASELINE-002-" + profileArtifactName(fast.Profile) + "-fastdiag-raw.json",
 		StageCoverage:         "Both exact pinned worktrees recorded nine public checkpoint states/vectors. Direct decoded-vector comparisons are emitted only when the representation uses the same maintained Q-prefix rows; high-level internal EvalMod/PS/DoubleAngle comparisons use fastdiag's explicit common-Q projection and are retained separately. Its Standard replay evaluator is the Standard API in the pinned Fast source tree, not a second build from the genuine-Standard SHA.",
-		SecurityCaveat:        "Input is c0=encoded-message,c1=0. Standard outputs are decrypted with fresh Standard keys; Fast outputs use current direct-c0 zero-a semantics. This is a specialized numerical/performance comparator, not a security-equivalent encrypted-input or RLWE-noise experiment.",
+		SecurityCaveat:        "Standard inputs use genuine RLWE encryption under matching generated secrets. Fast inputs use intentionally insecure direct-encoded zero-secret/zero-a simulation, not native Fast public-key encryption. Input noise/security are not equivalent.",
 	}
 	output.CapacityCheckpointCount = len(capacity.EvalModCapacityAudit)
 	for _, checkpoint := range capacity.EvalModCapacityAudit {
@@ -732,13 +796,14 @@ func writeExclusiveText(path, contents string) error {
 func renderPairedReport(doc pairedNumericalDocument) string {
 	var out strings.Builder
 	profileName := profileArtifactName(doc.Profile)
-	fmt.Fprintf(&out, "# FAST-STANDARD-PERF-REBASELINE-002 — %s\n\n", profileName)
-	fmt.Fprintf(&out, "- Classification: `%s`\n- Measurement Primary SHA: `%s`\n- Fast SHA: `%s`\n- Genuine Standard SHA: `%s`\n- Config: `%s` (`%s`)\n- Input: `%s`; metadata SHA `%s`\n- Effective LogN / LogSlots / slots: %d / %d / %d\n- q0 target / actual prime bits: %d / %d (prime `%s`)\n- Threshold: `%.3g` per real/imag component\n- Environment: `%s`, `%s/%s`, CPU `%s`\n\n",
+	fmt.Fprintf(&out, "# Fast/Standard perfprobe — %s\n\n", profileName)
+	fmt.Fprintf(&out, "- Classification: `%s`\n- Measurement Primary SHA: `%s`\n- Fast SHA: `%s`\n- Genuine Standard SHA: `%s`\n- Config: `%s` (`%s`)\n- Original input: `%s`\n- Standard input: `%s`; metadata SHA `%s`\n- Fast input: `%s`; metadata SHA `%s`\n- Effective LogN / LogSlots / slots: %d / %d / %d\n- q0 target / actual prime bits: %d / %d (prime `%s`)\n- Threshold: `%.3g` per real/imag component\n- Environment: `%s`, `%s/%s`, CPU `%s`\n\n",
 		doc.FastdiagClassification, doc.MeasurementPrimaryCommit, doc.FastBackendCommit, doc.StandardBackendCommit,
-		doc.ConfigPath, doc.ConfigSHA256, doc.InputSHA256, doc.InputMetadataSHA256,
+		doc.ConfigPath, doc.ConfigSHA256, doc.InputSHA256,
+		doc.StandardInputKind, doc.StandardInputMetadataSHA256, doc.FastInputKind, doc.FastInputMetadataSHA256,
 		doc.Parameters.LogN, doc.Parameters.LogSlots, doc.Parameters.InputSlots, doc.Parameters.Q0Target, doc.Parameters.Q0Bits,
 		doc.Parameters.QPrimes[0], doc.NumericalThreshold, doc.GoVersion, doc.OS, doc.Arch, doc.CPU)
-	out.WriteString("## Genuine Standard / Fast bootstrap SNR\n\nSNR uses the reusable `numericalmetrics.Compare(preDecoded, postDecoded)` implementation. Each Standard trial uses a fresh secret/evaluation key pair and decrypts both pre/post values; Fast uses its current c0-direct path.\n\n| Backend | Trial | Status | SNR dB | Noise RMSE |\n|---|---:|---|---:|---:|\n")
+	out.WriteString("## Genuine Standard / Fast bootstrap SNR\n\nSNR uses the reusable `numericalmetrics.Compare(preDecoded, postDecoded)` implementation. Each Standard trial uses a fresh secret/evaluation key pair and fresh native encryption, and decrypts both pre/post values; Fast uses its current c0-direct simulation.\n\n| Backend | Trial | Status | SNR dB | Noise RMSE |\n|---|---:|---|---:|---:|\n")
 	for i, metric := range doc.StandardBootstrapSNR {
 		fmt.Fprintf(&out, "| Standard | %d | %s | %s | %s |\n", i+1, metric.Status, formatOptional(metric.SNRDB), formatOptional(metric.NoiseRMSE))
 	}
