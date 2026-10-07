@@ -1,7 +1,7 @@
 # Current Task
 
 Task: FAST-STANDARD-PERF-REBASELINE-003
-Status: READY_FOR_CODEX
+Status: BLOCKED_BY_BASELINE_CONTRACT
 Task class: E — clean-source independent-Standard paired performance + SNR
 
 **Authoritative executable spec:** `specs/FAST-STANDARD-PERF-REBASELINE-003-POST-CHEBYSHEV.md`
@@ -16,9 +16,12 @@ Existing post-cleanup zero-a numerical gates:
 - 80/80 capacity strict fit per profile, no `1e-2` coordinate violations.
 - These are **not** independent historical-Standard-SHA result confirmations and **not** updated performance results.
 
-## Execute now
-Use unchanged existing Primary `cmd/perfprobe`, `internal/perfmeasure`, `cmd/fastdiag` and `internal/numericalmetrics`. Compare clean detached Fast `5feb44917...` against clean detached genuine Standard `5dbffbdea05394de2ca3a432ed5318aa832e3f40`, same frozen committed Primary source/config/input per profile, both LogN13 and LogN16. Seven full-Bootstrap timing samples each backend/profile, allocation metrics, fresh independent-build SNR/RMSE/precision, stage/capacity evidence and concise joint report. No production edits, harness rewrites, speculative fixes, or reuse of obsolete speedups.
+## Blocked — do not execute
 
-**Secondary's `CURRENT_TASK.md` is a known stale legacy pointer** to FIX-001; follow the newly synced authoritative Primary spec and do not touch Secondary files/HEAD during this campaign. Report genuine conflict if found.
+The referenced REBASELINE-003 specification and current `cmd/perfprobe` / numerical harness reuse a plaintext-like Standard input with manually constructed ciphertext components (`c0=encoded-message, c1=0`). That path conflicts with the current Formal Standard baseline contract in `AGENTS.md`, which requires native Standard key generation, encryption, measured operation, and decryption/decoding for any formal Standard numerical-quality or performance baseline.
 
-Return one classification defined in the spec and `READY_FOR_WEB_REVIEW`. Primary-only reporting commit and normal push once validated.
+Do **not** execute REBASELINE-003, do not run its benchmark campaign, and do not treat its existing zero-a results as formal Standard baseline evidence.
+
+This task remains blocked until Web review provides a replacement or amended experiment specification that satisfies the durable baseline contract. Do not improvise a substitute input path or silently weaken that contract.
+
+The Secondary `CURRENT_TASK.md` is also known stale legacy state; do not use it to resume historical FIX-001 work.
