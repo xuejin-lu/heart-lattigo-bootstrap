@@ -2,8 +2,6 @@ package main
 
 import (
 	"bytes"
-	"crypto/sha256"
-	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"flag"
@@ -27,116 +25,6 @@ type probeVectors struct {
 	PreTrials   [][]complexValue          `json:"pre_bootstrap_trials"`
 	Trials      [][]complexValue          `json:"bootstrap_trials"`
 	Checkpoints map[string][]complexValue `json:"checkpoints"`
-}
-
-type fastdiagEvidence struct {
-	Classification    string `json:"classification"`
-	PrimaryRepository struct {
-		Commit string `json:"commit"`
-		Dirty  bool   `json:"dirty"`
-	} `json:"primary_repository"`
-	SecondaryRepository struct {
-		Commit string `json:"commit"`
-		Dirty  bool   `json:"dirty"`
-	} `json:"secondary_repository"`
-	StageLockstep json.RawMessage `json:"stage_lockstep"`
-}
-
-type fastdiagCapacityEvidence struct {
-	EvalModCapacityAudit []struct {
-		Checkpoint string `json:"checkpoint"`
-		StrictFit  bool   `json:"strict_2b_lt_sq"`
-	} `json:"evalmod_qprefix_capacity_audit"`
-}
-
-type fastdiagInternalCheckpoint struct {
-	Checkpoint string `json:"checkpoint"`
-	Comparable bool   `json:"comparable"`
-	Fast       struct {
-		Metadata struct {
-			Level     int     `json:"level"`
-			ScaleLog2 float64 `json:"scale_log2"`
-		} `json:"metadata"`
-		MaintainedRows int `json:"maintained_rows"`
-	} `json:"fast"`
-	Standard struct {
-		Metadata struct {
-			Level     int     `json:"level"`
-			ScaleLog2 float64 `json:"scale_log2"`
-		} `json:"metadata"`
-		AuthorityRows int `json:"authority_rows"`
-	} `json:"standard"`
-	FastVsStandard struct {
-		Real struct {
-			RMSE float64 `json:"rmse"`
-		} `json:"real"`
-		Imag struct {
-			RMSE float64 `json:"rmse"`
-		} `json:"imag"`
-		Complex struct {
-			RMSE float64 `json:"rmse"`
-		} `json:"complex"`
-	} `json:"fast_vs_standard"`
-	DIRMSE              float64  `json:"d_i_rmse"`
-	Amplification       *float64 `json:"a_i"`
-	AmplificationStatus string   `json:"a_i_status"`
-	StageReferenceSNR   struct {
-		SNRDB  *float64 `json:"snr_db"`
-		Status string   `json:"status"`
-	} `json:"stage_reference_snr"`
-	DeltaSNRDB     *float64 `json:"delta_snr_i_db"`
-	DeltaSNRStatus string   `json:"delta_snr_i_status"`
-}
-
-type fastdiagGeneratedPower struct {
-	Branch               string  `json:"branch"`
-	Power                int     `json:"power"`
-	FastLevel            int     `json:"fast_level"`
-	FastScaleLog2        float64 `json:"fast_scale_log2"`
-	StandardLevel        int     `json:"standard_level"`
-	StandardScaleLog2    float64 `json:"standard_scale_log2"`
-	LevelScaleMatch      bool    `json:"level_scale_match"`
-	RMSE                 float64 `json:"rmse_fast_vs_standard"`
-	MaxComplexDifference float64 `json:"max_complex_diff_fast_vs_standard"`
-}
-
-type fastdiagPolynomialPlan struct {
-	Degree     int     `json:"degree"`
-	Base       int     `json:"base"`
-	Level      int     `json:"level"`
-	ScaleLog2  float64 `json:"scale_log2"`
-	BlockCount int     `json:"block_count"`
-}
-
-type fastdiagLockstepReport struct {
-	Checkpoints             []fastdiagInternalCheckpoint `json:"checkpoints"`
-	GeneratedPowerEvidence  []fastdiagGeneratedPower     `json:"generated_power_evidence"`
-	EvalModInternal         []fastdiagInternalCheckpoint `json:"evalmod_internal"`
-	EvalModReplayRMSE       map[string]float64           `json:"evalmod_replay_rmse"`
-	FinalFastStandardRMSE   float64                      `json:"final_fast_standard_rmse"`
-	Classification          string                       `json:"classification"`
-	FirstMaterialCheckpoint string                       `json:"first_material_checkpoint"`
-	FirstMaterialMaxDiff    *float64                     `json:"first_material_max_diff"`
-	MaterialThreshold       *float64                     `json:"material_threshold"`
-	ObservableThreshold     *float64                     `json:"observable_threshold"`
-	PolynomialPlan          fastdiagPolynomialPlan       `json:"polynomial_plan"`
-}
-
-type fastdiagLockstepSummary struct {
-	Classification          string                       `json:"classification"`
-	FirstMaterialCheckpoint string                       `json:"first_material_checkpoint,omitempty"`
-	FirstMaterialMaxDiff    *float64                     `json:"first_material_max_diff,omitempty"`
-	MaterialThreshold       *float64                     `json:"material_threshold,omitempty"`
-	ObservableThreshold     *float64                     `json:"observable_threshold,omitempty"`
-	FinalFastStandardRMSE   float64                      `json:"final_fast_standard_rmse"`
-	EvalModReplayRMSE       map[string]float64           `json:"evalmod_replay_rmse,omitempty"`
-	PolynomialPlan          fastdiagPolynomialPlan       `json:"polynomial_plan,omitempty"`
-	GeneratedPowerEvidence  []fastdiagGeneratedPower     `json:"generated_power_evidence,omitempty"`
-	Checkpoints             []fastdiagInternalCheckpoint `json:"checkpoints,omitempty"`
-	EvalModInternal         []fastdiagInternalCheckpoint `json:"evalmod_internal_checkpoints,omitempty"`
-	CapacityCheckpointCount int                          `json:"capacity_checkpoint_count"`
-	CapacityFailureCount    int                          `json:"capacity_failure_count"`
-	FirstCapacityFailure    string                       `json:"first_capacity_failure,omitempty"`
 }
 
 type vectorMetrics struct {
@@ -174,59 +62,52 @@ type stageComparison struct {
 }
 
 type pairedNumericalDocument struct {
-	SchemaVersion               string                  `json:"schema_version"`
-	GeneratedAt                 time.Time               `json:"generated_at"`
-	Profile                     string                  `json:"profile"`
-	MeasurementPrimaryCommit    string                  `json:"measurement_primary_commit"`
-	FastBackendCommit           string                  `json:"fast_backend_commit"`
-	StandardBackendCommit       string                  `json:"standard_backend_commit"`
-	FastBackendPath             string                  `json:"fast_evaluator_path"`
-	StandardBackendPath         string                  `json:"standard_evaluator_path"`
-	ConfigPath                  string                  `json:"config_path"`
-	ConfigSHA256                string                  `json:"config_sha256"`
-	InputSHA256                 string                  `json:"input_sha256"`
-	StandardInputMetadataSHA256 string                  `json:"standard_input_metadata_sha256"`
-	FastInputMetadataSHA256     string                  `json:"fast_input_metadata_sha256"`
-	StandardInputKind           string                  `json:"standard_input_kind"`
-	FastInputKind               string                  `json:"fast_input_kind"`
-	Parameters                  effectiveParameters     `json:"effective_parameters"`
-	GoVersion                   string                  `json:"go_version"`
-	OS                          string                  `json:"os"`
-	Arch                        string                  `json:"arch"`
-	CPU                         string                  `json:"cpu"`
-	MatchedEnvironment          bool                    `json:"matched_environment"`
-	MatchedParameters           bool                    `json:"matched_parameters"`
-	NumericalThreshold          float64                 `json:"numerical_threshold"`
-	StandardTiming              timingResult            `json:"standard_full_bootstrap_timing"`
-	FastTiming                  timingResult            `json:"fast_full_bootstrap_timing"`
-	StandardStageTimings        []stageTiming           `json:"standard_stage_timings"`
-	FastStageTimings            []stageTiming           `json:"fast_stage_timings"`
-	MedianSpeedup               float64                 `json:"fast_speedup_median"`
-	FastOriginalRMSE            []vectorMetrics         `json:"fast_vs_original_trials"`
-	StandardOriginalRMSE        []vectorMetrics         `json:"standard_vs_original_trials"`
-	FastBootstrapSNR            []numericalmetrics.SNR  `json:"fast_bootstrap_snr_trials"`
-	StandardBootstrapSNR        []numericalmetrics.SNR  `json:"standard_bootstrap_snr_trials"`
-	TrialComparisons            []trialComparison       `json:"fast_standard_trial_comparisons"`
-	MedianFastStandardRMSE      float64                 `json:"median_fast_standard_complex_rmse"`
-	MaxFastStandardDifference   float64                 `json:"max_fast_standard_complex_difference"`
-	MaxRealComponentDifference  float64                 `json:"max_fast_standard_real_difference"`
-	MaxImagComponentDifference  float64                 `json:"max_fast_standard_imag_difference"`
-	RealThresholdViolations     int                     `json:"real_threshold_violations"`
-	ImagThresholdViolations     int                     `json:"imag_threshold_violations"`
-	StageComparisons            []stageComparison       `json:"stage_comparisons"`
-	FastdiagClassification      string                  `json:"fastdiag_classification"`
-	FastdiagPrimaryCommit       string                  `json:"fastdiag_primary_commit"`
-	FastdiagPrimaryDirty        bool                    `json:"fastdiag_primary_dirty"`
-	FastdiagSecondaryCommit     string                  `json:"fastdiag_secondary_commit"`
-	FastdiagSecondaryDirty      bool                    `json:"fastdiag_secondary_dirty"`
-	FastdiagStageLockstep       fastdiagLockstepSummary `json:"fastdiag_stage_lockstep"`
-	FastdiagSHA256              string                  `json:"fastdiag_sha256"`
-	FastdiagRawArtifact         string                  `json:"fastdiag_raw_artifact"`
-	CapacityCheckpointCount     int                     `json:"capacity_checkpoint_count"`
-	CapacityFailureCount        int                     `json:"capacity_failure_count"`
-	FirstCapacityFailure        string                  `json:"first_capacity_failure,omitempty"`
-	StageCoverage               string                  `json:"stage_coverage_note"`
-	SecurityCaveat              string                  `json:"security_caveat"`
+	SchemaVersion                 string                 `json:"schema_version"`
+	GeneratedAt                   time.Time              `json:"generated_at"`
+	Profile                       string                 `json:"profile"`
+	MeasurementPrimaryCommit      string                 `json:"measurement_primary_commit"`
+	FastBackendCommit             string                 `json:"fast_backend_commit"`
+	StandardBackendCommit         string                 `json:"standard_backend_commit"`
+	FastBackendPath               string                 `json:"fast_evaluator_path"`
+	StandardBackendPath           string                 `json:"standard_evaluator_path"`
+	ConfigPath                    string                 `json:"config_path"`
+	ConfigSHA256                  string                 `json:"config_sha256"`
+	InputSHA256                   string                 `json:"input_sha256"`
+	StandardInputMetadataSHA256   string                 `json:"standard_input_metadata_sha256"`
+	FastInputMetadataSHA256       string                 `json:"fast_input_metadata_sha256"`
+	StandardInputKind             string                 `json:"standard_input_kind"`
+	FastInputKind                 string                 `json:"fast_input_kind"`
+	Parameters                    effectiveParameters    `json:"effective_parameters"`
+	GoVersion                     string                 `json:"go_version"`
+	OS                            string                 `json:"os"`
+	Arch                          string                 `json:"arch"`
+	CPU                           string                 `json:"cpu"`
+	MatchedEnvironment            bool                   `json:"matched_environment"`
+	MatchedParameters             bool                   `json:"matched_parameters"`
+	DescriptiveComponentThreshold float64                `json:"descriptive_component_threshold"`
+	FormalEvidenceStatus          string                 `json:"formal_evidence_status"`
+	QualityAssessment             string                 `json:"quality_assessment"`
+	ReviewStatus                  string                 `json:"review_status"`
+	QualityAssessmentReason       string                 `json:"quality_assessment_reason"`
+	StandardTiming                timingResult           `json:"standard_full_bootstrap_timing"`
+	FastTiming                    timingResult           `json:"fast_full_bootstrap_timing"`
+	StandardStageTimings          []stageTiming          `json:"standard_stage_timings"`
+	FastStageTimings              []stageTiming          `json:"fast_stage_timings"`
+	MedianSpeedup                 float64                `json:"fast_speedup_median"`
+	FastOriginalRMSE              []vectorMetrics        `json:"fast_vs_original_trials"`
+	StandardOriginalRMSE          []vectorMetrics        `json:"standard_vs_original_trials"`
+	FastBootstrapSNR              []numericalmetrics.SNR `json:"fast_bootstrap_snr_trials"`
+	StandardBootstrapSNR          []numericalmetrics.SNR `json:"standard_bootstrap_snr_trials"`
+	TrialComparisons              []trialComparison      `json:"fast_standard_trial_comparisons"`
+	MedianFastStandardRMSE        float64                `json:"median_fast_standard_complex_rmse"`
+	MaxFastStandardDifference     float64                `json:"max_fast_standard_complex_difference"`
+	MaxRealComponentDifference    float64                `json:"max_fast_standard_real_difference"`
+	MaxImagComponentDifference    float64                `json:"max_fast_standard_imag_difference"`
+	RealThresholdViolations       int                    `json:"real_threshold_violations"`
+	ImagThresholdViolations       int                    `json:"imag_threshold_violations"`
+	StageComparisons              []stageComparison      `json:"stage_comparisons"`
+	StageCoverage                 string                 `json:"stage_coverage_note"`
+	SecurityCaveat                string                 `json:"security_caveat"`
 }
 
 func runCompare(args []string) error {
@@ -235,15 +116,14 @@ func runCompare(args []string) error {
 	fastPath := flags.String("fast", "", "pinned Fast probe JSON")
 	standardVectorsPath := flags.String("standard-vectors", "", "ephemeral Standard vector JSON")
 	fastVectorsPath := flags.String("fast-vectors", "", "ephemeral Fast vector JSON")
-	fastdiagPath := flags.String("fastdiag", "", "fastdiag numerical JSON with PS/DoubleAngle/capacity evidence")
 	outputPath := flags.String("out", "", "paired numerical JSON output")
 	reportPath := flags.String("report", "", "human-readable profile report output")
-	threshold := flags.Float64("threshold", defaultComparisonThreshold, "per-component absolute numerical threshold")
+	threshold := flags.Float64("threshold", defaultComparisonThreshold, "descriptive per-component cutoff for metric counts; not a pass/fail gate")
 	if err := flags.Parse(args); err != nil {
 		return err
 	}
-	if flags.NArg() != 0 || *standardPath == "" || *fastPath == "" || *standardVectorsPath == "" || *fastVectorsPath == "" || *fastdiagPath == "" || *outputPath == "" || *reportPath == "" {
-		return errors.New("--standard, --fast, --standard-vectors, --fast-vectors, --fastdiag, --out, and --report are required")
+	if flags.NArg() != 0 || *standardPath == "" || *fastPath == "" || *standardVectorsPath == "" || *fastVectorsPath == "" || *outputPath == "" || *reportPath == "" {
+		return errors.New("--standard, --fast, --standard-vectors, --fast-vectors, --out, and --report are required")
 	}
 	if *threshold <= 0 || math.IsNaN(*threshold) || math.IsInf(*threshold, 0) {
 		return errors.New("--threshold must be finite and positive")
@@ -263,37 +143,10 @@ func runCompare(args []string) error {
 	if err := readJSON(*fastVectorsPath, &fastVectors); err != nil {
 		return fmt.Errorf("read Fast vectors: %w", err)
 	}
-	var diagnostic fastdiagEvidence
-	if err := readJSON(*fastdiagPath, &diagnostic); err != nil {
-		return fmt.Errorf("read detailed fastdiag evidence: %w", err)
-	}
-	fastdiagData, err := os.ReadFile(*fastdiagPath)
-	if err != nil {
-		return err
-	}
-	diagnosticSum := sha256.Sum256(fastdiagData)
 	if err := validatePairedInputs(standard, fast, standardVectors, fastVectors); err != nil {
 		return err
 	}
-	if len(diagnostic.StageLockstep) == 0 || string(diagnostic.StageLockstep) == "null" {
-		return errors.New("fastdiag numerical result has no stage_lockstep evidence")
-	}
-	if diagnostic.PrimaryRepository.Commit == "" || diagnostic.PrimaryRepository.Dirty {
-		return errors.New("fastdiag provenance is missing a clean Primary commit")
-	}
-	if diagnostic.SecondaryRepository.Commit != fast.BackendCommit || diagnostic.SecondaryRepository.Dirty {
-		return fmt.Errorf("fastdiag provenance Secondary=(%s, dirty=%t) does not match the clean pinned Fast commit %s", diagnostic.SecondaryRepository.Commit, diagnostic.SecondaryRepository.Dirty, fast.BackendCommit)
-	}
-	var capacity fastdiagCapacityEvidence
-	if err := json.Unmarshal(diagnostic.StageLockstep, &capacity); err != nil {
-		return fmt.Errorf("decode fastdiag capacity evidence: %w", err)
-	}
-	var lockstep fastdiagLockstepReport
-	if err := json.Unmarshal(diagnostic.StageLockstep, &lockstep); err != nil {
-		return fmt.Errorf("decode fastdiag stage summaries: %w", err)
-	}
-
-	comparison, err := buildPairedNumericalDocument(standard, fast, standardVectors, fastVectors, diagnostic, capacity, lockstep, hex.EncodeToString(diagnosticSum[:]), *threshold)
+	comparison, err := buildPairedNumericalDocument(standard, fast, standardVectors, fastVectors, *threshold)
 	if err != nil {
 		return err
 	}
@@ -306,7 +159,7 @@ func runCompare(args []string) error {
 	if err := writeExclusiveText(*reportPath, renderPairedReport(comparison)); err != nil {
 		return err
 	}
-	fmt.Printf("%s paired numerical=%s report=%s median Fast-vs-Standard RMSE=%.9g\n", comparison.Profile, *outputPath, *reportPath, comparison.MedianFastStandardRMSE)
+	fmt.Printf("%s paired evidence=%s report=%s quality=%s review=%s\n", comparison.Profile, *outputPath, *reportPath, comparison.QualityAssessment, comparison.ReviewStatus)
 	return nil
 }
 
@@ -350,21 +203,45 @@ func validatePairedInputs(standard, fast document, standardVectors, fastVectors 
 	if len(standardVectors.PreTrials) != len(standard.Trials) || len(fastVectors.PreTrials) != len(fast.Trials) {
 		return errors.New("pre-Bootstrap vector trial counts do not match input provenance")
 	}
-	for i, record := range standard.Trials {
-		if vectorFingerprint(toComplex(standardVectors.PreTrials[i])) != record.PreDecodedSHA256 {
-			return fmt.Errorf("Standard pre-Bootstrap trial %d vector hash differs from input provenance", i+1)
-		}
-	}
-	for i, record := range fast.Trials {
-		if vectorFingerprint(toComplex(fastVectors.PreTrials[i])) != record.PreDecodedSHA256 {
-			return fmt.Errorf("Fast pre-Bootstrap trial %d vector hash differs from input provenance", i+1)
-		}
-	}
 	if len(standardVectors.Original) == 0 || len(standardVectors.Original) != len(fastVectors.Original) || len(standardVectors.Original) != standard.Parameters.InputSlots {
 		return fmt.Errorf("original input vector lengths do not match effective slots: Standard=%d Fast=%d effective=%d", len(standardVectors.Original), len(fastVectors.Original), standard.Parameters.InputSlots)
 	}
 	if vectorFingerprint(toComplex(standardVectors.Original)) != standard.InputSHA256 || vectorFingerprint(toComplex(fastVectors.Original)) != fast.InputSHA256 {
 		return errors.New("vector artifact contents do not match the recorded input SHA-256")
+	}
+	if !allFinite(toComplex(standardVectors.Original)) || !allFinite(toComplex(fastVectors.Original)) {
+		return errors.New("original input vectors contain non-finite values")
+	}
+	if err := validateBackendTrialVectors(standard, standardVectors); err != nil {
+		return fmt.Errorf("Standard trial vectors: %w", err)
+	}
+	if err := validateBackendTrialVectors(fast, fastVectors); err != nil {
+		return fmt.Errorf("Fast trial vectors: %w", err)
+	}
+	return nil
+}
+
+func validateBackendTrialVectors(doc document, vectors probeVectors) error {
+	original := toComplex(vectors.Original)
+	for i, record := range doc.Trials {
+		pre, post := toComplex(vectors.PreTrials[i]), toComplex(vectors.Trials[i])
+		if len(pre) != len(original) || len(post) != len(original) || !allFinite(pre) || !allFinite(post) {
+			return fmt.Errorf("trial %d input/output vector has invalid length or non-finite values", i+1)
+		}
+		preHash, postHash := vectorFingerprint(pre), vectorFingerprint(post)
+		if preHash != record.PreDecodedSHA256 || preHash != record.InputEvidence.PreDecodedSHA256 {
+			return fmt.Errorf("trial %d pre-Bootstrap vector hash contradicts its provenance", i+1)
+		}
+		if postHash != record.PostDecodedSHA256 || record.OriginalSHA256 != doc.InputSHA256 {
+			return fmt.Errorf("trial %d output/original vector hash contradicts its probe record", i+1)
+		}
+		var maxDeviation float64
+		for slot := range original {
+			maxDeviation = math.Max(maxDeviation, cmplx.Abs(pre[slot]-original[slot]))
+		}
+		if maxDeviation > inputQualityLimit || math.Abs(maxDeviation-record.InputEvidence.MaxComplexDeviation) > 1e-15 {
+			return fmt.Errorf("trial %d pre-Bootstrap input deviation %.9g contradicts the accepted %.9g input gate/evidence", i+1, maxDeviation, record.InputEvidence.MaxComplexDeviation)
+		}
 	}
 	return nil
 }
@@ -402,12 +279,12 @@ func validateFormalInputProvenance(doc document, requiredKind string, requireNon
 	return nil
 }
 
-func buildPairedNumericalDocument(standard, fast document, standardVectors, fastVectors probeVectors, diagnostic fastdiagEvidence, capacity fastdiagCapacityEvidence, lockstep fastdiagLockstepReport, diagnosticHash string, threshold float64) (pairedNumericalDocument, error) {
+func buildPairedNumericalDocument(standard, fast document, standardVectors, fastVectors probeVectors, threshold float64) (pairedNumericalDocument, error) {
 	if len(standardVectors.PreTrials) != len(standard.Trials) || len(fastVectors.PreTrials) != len(fast.Trials) {
 		return pairedNumericalDocument{}, errors.New("pre-Bootstrap vector trial counts do not match probe records")
 	}
 	output := pairedNumericalDocument{
-		SchemaVersion: "fast-standard-perfprobe-comparison.v2", GeneratedAt: time.Now().UTC(),
+		SchemaVersion: "fast-standard-perfprobe-comparison.v3", GeneratedAt: time.Now().UTC(),
 		Profile: fast.Profile, MeasurementPrimaryCommit: fast.PrimaryCommit,
 		FastBackendCommit: fast.BackendCommit, StandardBackendCommit: standard.BackendCommit,
 		FastBackendPath: fast.Trials[0].EvaluatorPath, StandardBackendPath: standard.Trials[0].EvaluatorPath,
@@ -416,27 +293,16 @@ func buildPairedNumericalDocument(standard, fast document, standardVectors, fast
 		StandardInputMetadataSHA256: standard.InputMetadataSHA256, FastInputMetadataSHA256: fast.InputMetadataSHA256,
 		StandardInputKind: standard.InputKind, FastInputKind: fast.InputKind, Parameters: fast.Parameters,
 		GoVersion: fast.GoVersion, OS: fast.OS, Arch: fast.Arch, CPU: fast.CPU,
-		MatchedEnvironment: true, MatchedParameters: true, NumericalThreshold: threshold,
-		StandardTiming: standard.Timing, FastTiming: fast.Timing,
+		MatchedEnvironment: true, MatchedParameters: true, DescriptiveComponentThreshold: threshold,
+		FormalEvidenceStatus:    "VALIDATED_V2_PAIRED_PROVENANCE",
+		QualityAssessment:       "UNASSESSED",
+		ReviewStatus:            "REQUIRES_WEB_REVIEW",
+		QualityAssessmentReason: "No accepted formal output-quality pass/fail threshold is defined here; the component cutoff is descriptive only.",
+		StandardTiming:          standard.Timing, FastTiming: fast.Timing,
 		StandardStageTimings: standard.StageTimings, FastStageTimings: fast.StageTimings,
-		MedianSpeedup:          standard.Timing.MedianNS / fast.Timing.MedianNS,
-		FastdiagClassification: diagnostic.Classification,
-		FastdiagPrimaryCommit:  diagnostic.PrimaryRepository.Commit, FastdiagPrimaryDirty: diagnostic.PrimaryRepository.Dirty,
-		FastdiagSecondaryCommit: diagnostic.SecondaryRepository.Commit, FastdiagSecondaryDirty: diagnostic.SecondaryRepository.Dirty,
-		FastdiagStageLockstep: summarizeFastdiagLockstep(lockstep, capacity),
-		FastdiagSHA256:        diagnosticHash,
-		FastdiagRawArtifact:   "results/FAST-STANDARD-PERF-REBASELINE-002-" + profileArtifactName(fast.Profile) + "-fastdiag-raw.json",
-		StageCoverage:         "Both exact pinned worktrees recorded nine public checkpoint states/vectors. Direct decoded-vector comparisons are emitted only when the representation uses the same maintained Q-prefix rows; high-level internal EvalMod/PS/DoubleAngle comparisons use fastdiag's explicit common-Q projection and are retained separately. Its Standard replay evaluator is the Standard API in the pinned Fast source tree, not a second build from the genuine-Standard SHA.",
-		SecurityCaveat:        "Standard inputs use genuine RLWE encryption under matching generated secrets. Fast inputs use intentionally insecure direct-encoded zero-secret/zero-a simulation, not native Fast public-key encryption. Input noise/security are not equivalent.",
-	}
-	output.CapacityCheckpointCount = len(capacity.EvalModCapacityAudit)
-	for _, checkpoint := range capacity.EvalModCapacityAudit {
-		if !checkpoint.StrictFit {
-			output.CapacityFailureCount++
-			if output.FirstCapacityFailure == "" {
-				output.FirstCapacityFailure = checkpoint.Checkpoint
-			}
-		}
+		MedianSpeedup:  standard.Timing.MedianNS / fast.Timing.MedianNS,
+		StageCoverage:  "Public checkpoint comparisons use each probe's own backend-native decoded values and provenance. Internal PS/DoubleAngle stage replay is outside this formal paired artifact.",
+		SecurityCaveat: "Standard inputs use genuine RLWE encryption under matching generated secrets. Fast inputs use intentionally insecure direct-encoded zero-secret/zero-a simulation, not native Fast public-key encryption. Input noise/security are not equivalent.",
 	}
 	output.FastBootstrapSNR = make([]numericalmetrics.SNR, len(fast.Trials))
 	output.FastOriginalRMSE = make([]vectorMetrics, len(fast.Trials))
@@ -484,33 +350,6 @@ func buildPairedNumericalDocument(standard, fast document, standardVectors, fast
 	output.MedianFastStandardRMSE = medianSorted(pairwiseRMSE)
 	output.StageComparisons = buildStageComparisons(standard, fast, standardVectors, fastVectors, threshold)
 	return output, nil
-}
-
-func summarizeFastdiagLockstep(raw fastdiagLockstepReport, capacity fastdiagCapacityEvidence) fastdiagLockstepSummary {
-	internal := make([]fastdiagInternalCheckpoint, 0, len(raw.EvalModInternal))
-	for _, checkpoint := range raw.EvalModInternal {
-		if includeInternalReportCheckpoint(checkpoint.Checkpoint) {
-			internal = append(internal, checkpoint)
-		}
-	}
-	result := fastdiagLockstepSummary{
-		Classification: raw.Classification, FirstMaterialCheckpoint: raw.FirstMaterialCheckpoint,
-		FirstMaterialMaxDiff: raw.FirstMaterialMaxDiff, MaterialThreshold: raw.MaterialThreshold,
-		ObservableThreshold: raw.ObservableThreshold, FinalFastStandardRMSE: raw.FinalFastStandardRMSE,
-		EvalModReplayRMSE: raw.EvalModReplayRMSE, PolynomialPlan: raw.PolynomialPlan,
-		GeneratedPowerEvidence: raw.GeneratedPowerEvidence, Checkpoints: raw.Checkpoints,
-		EvalModInternal: internal, CapacityCheckpointCount: len(capacity.EvalModCapacityAudit),
-		FirstCapacityFailure: "",
-	}
-	for _, checkpoint := range capacity.EvalModCapacityAudit {
-		if !checkpoint.StrictFit {
-			result.CapacityFailureCount++
-			if result.FirstCapacityFailure == "" {
-				result.FirstCapacityFailure = checkpoint.Checkpoint
-			}
-		}
-	}
-	return result
 }
 
 func buildStageComparisons(standard, fast document, standardVectors, fastVectors probeVectors, threshold float64) []stageComparison {
@@ -797,13 +636,20 @@ func renderPairedReport(doc pairedNumericalDocument) string {
 	var out strings.Builder
 	profileName := profileArtifactName(doc.Profile)
 	fmt.Fprintf(&out, "# Fast/Standard perfprobe — %s\n\n", profileName)
-	fmt.Fprintf(&out, "- Classification: `%s`\n- Measurement Primary SHA: `%s`\n- Fast SHA: `%s`\n- Genuine Standard SHA: `%s`\n- Config: `%s` (`%s`)\n- Original input: `%s`\n- Standard input: `%s`; metadata SHA `%s`\n- Fast input: `%s`; metadata SHA `%s`\n- Effective LogN / LogSlots / slots: %d / %d / %d\n- q0 target / actual prime bits: %d / %d (prime `%s`)\n- Threshold: `%.3g` per real/imag component\n- Environment: `%s`, `%s/%s`, CPU `%s`\n\n",
-		doc.FastdiagClassification, doc.MeasurementPrimaryCommit, doc.FastBackendCommit, doc.StandardBackendCommit,
+	fmt.Fprintf(&out, "- Formal evidence status: `%s`\n- Quality assessment: `%s`\n- Review status: `%s`\n- Measurement Primary SHA: `%s`\n- Fast SHA: `%s`\n- Pinned Standard SHA: `%s`\n- Config: `%s` (`%s`)\n- Original input: `%s`\n- Standard input: `%s`; metadata SHA `%s`\n- Fast input: `%s`; metadata SHA `%s`\n- Effective LogN / LogSlots / slots: %d / %d / %d\n- q0 target / actual prime bits: %d / %d (prime `%s`)\n- Descriptive component cutoff (not a gate): `%.3g`\n- Environment: `%s`, `%s/%s`, CPU `%s`\n\n%s\n\n",
+		doc.FormalEvidenceStatus, doc.QualityAssessment, doc.ReviewStatus, doc.MeasurementPrimaryCommit, doc.FastBackendCommit, doc.StandardBackendCommit,
 		doc.ConfigPath, doc.ConfigSHA256, doc.InputSHA256,
 		doc.StandardInputKind, doc.StandardInputMetadataSHA256, doc.FastInputKind, doc.FastInputMetadataSHA256,
 		doc.Parameters.LogN, doc.Parameters.LogSlots, doc.Parameters.InputSlots, doc.Parameters.Q0Target, doc.Parameters.Q0Bits,
-		doc.Parameters.QPrimes[0], doc.NumericalThreshold, doc.GoVersion, doc.OS, doc.Arch, doc.CPU)
-	out.WriteString("## Genuine Standard / Fast bootstrap SNR\n\nSNR uses the reusable `numericalmetrics.Compare(preDecoded, postDecoded)` implementation. Each Standard trial uses a fresh secret/evaluation key pair and fresh native encryption, and decrypts both pre/post values; Fast uses its current c0-direct simulation.\n\n| Backend | Trial | Status | SNR dB | Noise RMSE |\n|---|---:|---|---:|---:|\n")
+		doc.Parameters.QPrimes[0], doc.DescriptiveComponentThreshold, doc.GoVersion, doc.OS, doc.Arch, doc.CPU, doc.QualityAssessmentReason)
+	out.WriteString("## Output versus original input — primary quality evidence\n\nThese per-backend measurements compare each public Bootstrap output with the same original workload. The descriptive component cutoff only counts components; it does not classify quality as pass/fail.\n\n| Backend | Trial | Complex RMSE | Max complex diff | Max real diff | Max imag diff | Real / imag components over descriptive cutoff |\n|---|---:|---:|---:|---:|---:|---:|\n")
+	for i, metric := range doc.StandardOriginalRMSE {
+		fmt.Fprintf(&out, "| Standard | %d | %.9g | %.9g | %.9g | %.9g | %d / %d |\n", i+1, metric.ComplexRMSE, metric.MaxComplexDifference, metric.MaxRealDifference, metric.MaxImagDifference, metric.RealAboveThreshold, metric.ImagAboveThreshold)
+	}
+	for i, metric := range doc.FastOriginalRMSE {
+		fmt.Fprintf(&out, "| Fast | %d | %.9g | %.9g | %.9g | %.9g | %d / %d |\n", i+1, metric.ComplexRMSE, metric.MaxComplexDifference, metric.MaxRealDifference, metric.MaxImagDifference, metric.RealAboveThreshold, metric.ImagAboveThreshold)
+	}
+	out.WriteString("\n## Bootstrap SNR evidence\n\nSNR uses the reusable `numericalmetrics.Compare(preDecoded, postDecoded)` implementation. Standard trials use fresh native encryptions under independent generated secrets; Fast uses its current direct-encoded zero-secret simulation. These input semantics differ and are recorded above.\n\n| Backend | Trial | Status | SNR dB | Noise RMSE |\n|---|---:|---|---:|---:|\n")
 	for i, metric := range doc.StandardBootstrapSNR {
 		fmt.Fprintf(&out, "| Standard | %d | %s | %s | %s |\n", i+1, metric.Status, formatOptional(metric.SNRDB), formatOptional(metric.NoiseRMSE))
 	}
@@ -822,8 +668,8 @@ func renderPairedReport(doc pairedNumericalDocument) string {
 	for _, stage := range doc.FastStageTimings {
 		fmt.Fprintf(&out, "| Fast | %s | %.3f | %t | %s |\n", stage.Stage, float64(stage.ElapsedNS)/1e6, stage.Available, stage.Reason)
 	}
-	fmt.Fprintf(&out, "\n## Actual pinned-baseline output comparison\n\n- Median Fast-vs-Standard complex RMSE across %d trial pairs: `%.9g`\n- Maximum complex difference: `%.9g`\n- Max real / imag component difference: `%.9g` / `%.9g`\n- Real / imag components over threshold: %d / %d\n\n| Fast trial | Standard trial | Fast-vs-Standard RMSE | Max complex diff | Median precision bits | Fast-vs-original RMSE |\n|---:|---:|---:|---:|---:|---:|\n",
-		len(doc.TrialComparisons), doc.MedianFastStandardRMSE, doc.MaxFastStandardDifference,
+	fmt.Fprintf(&out, "\n## Fast-versus-Standard pairwise comparison — secondary evidence\n\nFormal quality remains `%s`; pairwise differences are descriptive and require independent review. Median Fast-vs-Standard complex RMSE across %d trial pairs: `%.9g`; maximum complex difference: `%.9g`; max real / imag component difference: `%.9g` / `%.9g`; components over descriptive cutoff: %d / %d.\n\n| Fast trial | Standard trial | Pairwise complex RMSE | Max complex diff | Median precision bits | Fast-vs-original RMSE |\n|---:|---:|---:|---:|---:|---:|\n",
+		doc.QualityAssessment, len(doc.TrialComparisons), doc.MedianFastStandardRMSE, doc.MaxFastStandardDifference,
 		doc.MaxRealComponentDifference, doc.MaxImagComponentDifference, doc.RealThresholdViolations, doc.ImagThresholdViolations)
 	for _, pair := range doc.TrialComparisons {
 		fmt.Fprintf(&out, "| %d | %d | %.9g | %.9g | %.4f | %.9g |\n", pair.FastTrial, pair.StandardTrial,
@@ -845,56 +691,8 @@ func renderPairedReport(doc pairedNumericalDocument) string {
 			fmt.Fprintf(&out, "\n  Not comparable: %s\n", stage.NotComparableReason)
 		}
 	}
-	fmt.Fprintf(&out, "\n## Detailed EvalMod / capacity evidence\n\nFastdiag classification: `%s`. Q-prefix capacity gate: strict `2B < S_Q`, %d checkpoints, %d failures; first failure `%s`. Raw fastdiag SHA-256: `%s` (`%s`). Compact PS generated-power, polynomial, per-round DoubleAngle, stage, and capacity evidence is included under `fastdiag_stage_lockstep`; the full raw fastdiag artifact is separate.\n\n%s\n\n",
-		doc.FastdiagClassification, doc.CapacityCheckpointCount, doc.CapacityFailureCount, emptyAsNone(doc.FirstCapacityFailure), doc.FastdiagSHA256, doc.FastdiagRawArtifact, doc.StageCoverage)
-	out.WriteString(renderFastdiagInternal(doc))
-	out.WriteString("## Interpretation limits\n\n")
-	out.WriteString(doc.SecurityCaveat + "\n")
-	out.WriteString("The detailed internal PS/DoubleAngle replay was performed with Fast's direct diagnostic hooks and the Standard evaluator API compiled from the pinned Fast source tree. Exact pinned worktrees recorded public checkpoint states, but raw decoded values from different maintained Q-prefix widths are not compared directly; those checkpoints are marked NOT_COMPARABLE and the common-Q fastdiag replay is reported separately.\n")
+	fmt.Fprintf(&out, "\n## Evidence scope and interpretation limits\n\n%s\n\n%s\n", doc.StageCoverage, doc.SecurityCaveat)
 	return out.String()
-}
-
-func renderFastdiagInternal(doc pairedNumericalDocument) string {
-	evidence := doc.FastdiagStageLockstep
-	var out strings.Builder
-	fmt.Fprintf(&out, "Deep stage replay provenance: Primary `%s` (dirty=%t); Secondary `%s` (dirty=%t). This is the detailed fastdiag replay source, separate from the matched public timing harness SHA `%s`.\n\n",
-		doc.FastdiagPrimaryCommit, doc.FastdiagPrimaryDirty, doc.FastdiagSecondaryCommit, doc.FastdiagSecondaryDirty, doc.MeasurementPrimaryCommit)
-	fmt.Fprintf(&out, "First material checkpoint: `%s`, max complex difference `%s` (material threshold `%s`; observable threshold `%s`). PS plan: degree %d, base %d, input level %d, scale log2 %.6f, %d blocks.\n\n",
-		emptyAsNone(evidence.FirstMaterialCheckpoint), formatOptional(evidence.FirstMaterialMaxDiff), formatOptional(evidence.MaterialThreshold), formatOptional(evidence.ObservableThreshold),
-		evidence.PolynomialPlan.Degree, evidence.PolynomialPlan.Base, evidence.PolynomialPlan.Level, evidence.PolynomialPlan.ScaleLog2, evidence.PolynomialPlan.BlockCount)
-	out.WriteString("### Generated Chebyshev powers (real/imag branches)\n\nRMSE/max difference is from the fastdiag common-Q replay; rows with a level/scale mismatch are explicitly not a strict matched-state comparison.\n\n| Branch | Power | Level Fast/Standard | Scale log2 Fast/Standard | RMSE | Max complex diff | State match |\n|---|---:|---:|---:|---:|---:|---|\n")
-	for _, power := range evidence.GeneratedPowerEvidence {
-		stateMatch := "matched"
-		if !power.LevelScaleMatch {
-			stateMatch = "level/scale mismatch"
-		}
-		fmt.Fprintf(&out, "| %s | T%d | %d / %d | %.6f / %.6f | %.9g | %.9g | %s |\n",
-			power.Branch, power.Power, power.FastLevel, power.StandardLevel, power.FastScaleLog2, power.StandardScaleLog2,
-			power.RMSE, power.MaxComplexDifference, stateMatch)
-	}
-	out.WriteString("\n### Polynomial, DoubleAngle and EvalMod internal checkpoints\n\nThese rows use the same fastdiag common-Q replay and keep real/imag as separate branches. Dᵢ is Fast-vs-Standard complex RMSE; Aᵢ and ΔSNRᵢ preserve their undefined-status labels.\n\n| Checkpoint | Level Fast/Standard | Scale log2 Fast/Standard | Maintained/authority Q rows | Dᵢ RMSE | Real RMSE | Imag RMSE | Aᵢ | ΔSNRᵢ dB |\n|---|---:|---:|---:|---:|---:|---:|---:|---:|\n")
-	for _, checkpoint := range evidence.EvalModInternal {
-		if !includeInternalReportCheckpoint(checkpoint.Checkpoint) {
-			continue
-		}
-		fmt.Fprintf(&out, "| %s | %d / %d | %.6f / %.6f | %d / %d | %.9g | %.9g | %.9g | %s (%s) | %s (%s) |\n",
-			checkpoint.Checkpoint, checkpoint.Fast.Metadata.Level, checkpoint.Standard.Metadata.Level,
-			checkpoint.Fast.Metadata.ScaleLog2, checkpoint.Standard.Metadata.ScaleLog2,
-			checkpoint.Fast.MaintainedRows, checkpoint.Standard.AuthorityRows, checkpoint.DIRMSE,
-			checkpoint.FastVsStandard.Real.RMSE, checkpoint.FastVsStandard.Imag.RMSE,
-			formatOptional(checkpoint.Amplification), checkpoint.AmplificationStatus,
-			formatOptional(checkpoint.DeltaSNRDB), checkpoint.DeltaSNRStatus)
-	}
-	out.WriteString("\n")
-	return out.String()
-}
-
-func includeInternalReportCheckpoint(name string) bool {
-	if strings.HasSuffix(name, "/polynomial_input") || strings.HasSuffix(name, "/polynomial_output") ||
-		strings.HasSuffix(name, "/before_double_angle_round_0") || strings.HasSuffix(name, "/evalmod_output_after_public_scale_reset") {
-		return true
-	}
-	return strings.Contains(name, "/double_angle_round_") && strings.HasSuffix(name, "_after_rescale")
 }
 
 func profileArtifactName(profile string) string {
@@ -902,13 +700,6 @@ func profileArtifactName(profile string) string {
 		return "LogN" + strings.TrimPrefix(profile, "logn")
 	}
 	return profile
-}
-
-func emptyAsNone(value string) string {
-	if value == "" {
-		return "none"
-	}
-	return value
 }
 
 func formatOptional(value *float64) string {
