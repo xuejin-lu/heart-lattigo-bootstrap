@@ -73,7 +73,7 @@ After the mandatory startup preflight has completed:
 
 1. Read the synchronized `CURRENT_TASK.md`.
 2. Read the referenced specification in `specs/`.
-3. If the task requires modifying the secondary `lattigo` repository, read that repository's `AGENTS.md` and `docs/FAST_CKKS_SPEC.md` after safely synchronizing the required secondary branch.
+3. If the task requires work on the secondary `lattigo` `fast-qprefix` branch, safely synchronize that branch and read its `AGENTS.md` and authoritative `docs/FAST_QPREFIX_SPEC.md`. Do not read the historical `docs/FAST_CKKS_SPEC.md` by default; consult it only when the active task explicitly requires historical background. For a pinned Standard baseline, follow the active task's specified Standard ref without treating Q-prefix or historical Fast guidance as Standard rules.
 4. Inspect current source before editing. Repository evidence overrides assumptions from previous work.
 5. Execute the current task with the bounded autonomous cycle below.
 6. Report commits, tests, benchmark evidence, self-review findings, and any unresolved compatibility gap.
