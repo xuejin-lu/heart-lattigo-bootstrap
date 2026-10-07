@@ -57,6 +57,16 @@ The core experiment contract is:
 
 > Keep the experiment frontend, workload, parameters, and measurement method fixed; change only the Lattigo implementation/commit being tested.
 
+### Formal Standard baseline contract
+
+For any result claimed as a formal Standard numerical-quality or performance baseline:
+
+- Standard must run from an explicitly pinned Standard Lattigo implementation/commit whose production arithmetic has not been modified for Fast compatibility or for the experiment.
+- Standard input must be produced through the native Standard lifecycle appropriate to the experiment: ordinary Standard key generation, encryption, the measured operation (for example Bootstrap), and decryption/decoding. Do not hand-construct or mutate Standard ciphertext components (for example forcing `c1 = 0`) to make them resemble Fast state.
+- Standard and Fast must use the same original message/workload and the same effective CKKS parameter configuration within a profile. They are **not** required to have identical ciphertext coefficients, key material, randomness, or security/noise semantics.
+- A plaintext-like, zero-a, manually constructed, or otherwise simplified ciphertext may be used only when an explicit diagnostic task defines that specialized experiment. Such a run must be labeled diagnostic-only and must not be promoted to a formal Standard baseline, formal Standard-vs-Fast numerical result, or correctness-preserving performance result.
+- If the formal Standard lifecycle cannot be run under the required matched profile, report the experiment as blocked/non-comparable instead of substituting a simplified Standard input path.
+
 ## Task execution after startup sync
 
 After the mandatory startup preflight has completed:
@@ -167,11 +177,12 @@ For a secondary-repository task, the same principle may be used only when the ac
 
 ## Permanent architecture rules
 
-- The primary repository must not know whether the active backend is Standard or Fast.
-- Do not add runtime backend selectors such as `--fast`, `--normal`, `HW_MODE`, `isFastMode`, or equivalent switches.
+- Production/application code must remain backend-transparent: application CKKS usage must not branch on Standard versus Fast.
+- Development and research harnesses may select Standard versus Fast automatically through build tags, build configuration, or orchestration scripts. This selection is allowed only at the harness/backend-adapter boundary; it must not change the shared workload, effective CKKS parameters, measurement definitions, or application-facing CKKS algorithm being measured.
+- Do not add application/runtime Fast selectors such as `--fast`, `--normal`, `HW_MODE`, `isFastMode`, or equivalent switches to production/application code. Backend choice for research automation belongs in the development harness/build layer.
 - Do not move Fast implementation details into this repository. In particular, do not add q0/q1 residue policy, zero-key construction, Fast ciphertext storage, Fast evaluator internals, or Fast noise behavior here.
-- If the same public frontend cannot run against both Standard and Fast because of a backend API/behavior mismatch, fix the compatibility at the Lattigo backend boundary whenever practical instead of branching the experiment frontend.
-- A valid Standard-vs-Fast comparison must use the same frontend source, same experiment config, same workload, same measurement code, and same command. The Lattigo implementation/commit is the intended variable.
+- If the same public application/frontend cannot run against both Standard and Fast because of a backend API/behavior mismatch, fix the compatibility at the Lattigo backend boundary whenever practical instead of branching the application/frontend.
+- A valid Standard-vs-Fast comparison must use the same shared harness source, experiment config, original workload/message, effective CKKS parameters, measurement code, and measurement procedure. Build-time/backend-adapter selection may differ in order to bind the harness to the pinned Standard or Fast implementation; that selection itself must not alter the measured algorithm or metric definition.
 - Automatically record backend identity and environment metadata in experiment outputs whenever the runner is implemented: primary commit, Lattigo commit, Lattigo branch/ref when available, dirty/clean state when available, Go version, OS/architecture, config, repetitions, and timestamp.
 - Current research priority is speed. Do not add new noise-fidelity mechanisms unless a later task explicitly starts the noise phase.
 
