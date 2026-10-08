@@ -1,24 +1,21 @@
 # Current Task
 
-Task: FAST-STANDARD-OUTPUT-PREFLIGHT-001
+Task: FAST-STANDARD-EPHEMERAL-ABLATION-001
 Status: READY_FOR_CODEX
-Task class: I + E — bounded genuine-Standard/Fast public Bootstrap output preflight
+Task class: E / I — controlled native Standard ephemeral-secret ablation (diagnostic only)
 
-**Authoritative executable spec:** `specs/FAST-STANDARD-OUTPUT-PREFLIGHT-001.md`
+**Authoritative executable spec:** `specs/FAST-STANDARD-EPHEMERAL-ABLATION-001.md`
 
-## Accepted predecessors
+## Web review of predecessor
 
-- `FAST-STANDARD-INPUT-PROVENANCE-001`: native Standard Encrypt/Decrypt and explicit Fast simulation input, independently smoke-validated.
-- `FAST-STANDARD-COMPARISON-EVIDENCE-002`: formal paired report no longer depends on synthetic Standard `fastdiag` and reports unassessed numerical quality.
+`FAST-STANDARD-OUTPUT-PREFLIGHT-001` mechanically completed four single-operation Bootstrap runs (Primary harness `59899ef084380a4fc01d2582798e5113aac2409c`, evidence `eebd68a15eb34f0fa90da06b4f642f94def0d33c`). **Standard genuine-encryption output correctness is not accepted:** RMSE LogN13 `2.195800`, LogN16 `10.348459`. Fast simulation showed smaller errors but is intentionally insecure and not security-equivalent. Formal numerical quality is still `UNASSESSED`.
 
-## Purpose and limits
+## Now: one controlled scientific question
 
-For LogN13 and LogN16, run **one** native encrypted Standard public Bootstrap and **one** explicitly insecure Fast simulated-input public Bootstrap per profile, and report each actual decoded output against the original plaintext. Confirm provenance, valid finite outputs and metadata. Do not classify output-quality pass/fail from the old descriptive `1e-2` cutoff.
+With pinned unmodified genuine Standard source, the exact same Standard secret, native-encrypted ciphertext, workload, all Q/P primes, and K=16, compare `EphemeralSecretWeight=0` to `32` in a **diagnostic-only** LogN13 pair. Only if this discriminates should the analogous LogN16 pair run. No Fast execution, no sweeping, no formal comparison, no timing benchmark, and no alteration of the frozen official configs.
 
-No seven-repetition timing campaign, speedup claim, Secondary edits, production arithmetic changes, parameter tuning, or historical result deletion.
-
-`FAST-STANDARD-PERF-REBASELINE-003` remains **BLOCKED**; do not execute the old specification.
+The original `FAST-STANDARD-PERF-REBASELINE-003` remains **BLOCKED**. Do not resume it.
 
 ## Handoff
 
-Implement only the referenced output-preflight task, run focused tests and four bounded smoke executions, commit/push Primary if safe, and return the defined outcome with `READY_FOR_WEB_REVIEW` or `NEEDS_WEB_REVIEW`.
+Implement the small opt-in Primary diagnostic as specified, test, report the exact numerical contrast, self-review and commit/push Primary when safe; return the classification and `READY_FOR_WEB_REVIEW` or `NEEDS_WEB_REVIEW`.
