@@ -1,0 +1,260 @@
+{
+  "schema_version": "fast-standard-output-preflight-summary.v1",
+  "task": "FAST-STANDARD-OUTPUT-PREFLIGHT-001",
+  "classification": "OUTPUT_PREFLIGHT_NUMERICAL_CONCERN",
+  "quality_assessment": "UNASSESSED",
+  "review_status": "READY_FOR_WEB_REVIEW",
+  "measurement_primary_commit": "59899ef084380a4fc01d2582798e5113aac2409c",
+  "environment": {
+    "go_version": "go1.26.4",
+    "os": "darwin",
+    "arch": "arm64",
+    "cpu": "arm64"
+  },
+  "backend_pins": {
+    "standard": {
+      "commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+      "build_tag": "perf_standard",
+      "compiled_source": "/private/tmp/fast-standard-rebaseline-002/lattigo-standard",
+      "clean_detached_worktree": true,
+      "input_kind": "standard_native_rlwe_encrypt_v1",
+      "input_constructor": "ckks.NewEncoder.Encode -> rlwe.NewEncryptor(residual, generated Standard secret).EncryptNew",
+      "evaluator_path": "fresh GenSecretKey + GenEvaluationKeys + bootstrapping.NewEvaluator",
+      "decode_path": "rlwe.NewDecryptor(matching generated Standard secret).DecryptNew -> ckks.NewEncoder.Decode"
+    },
+    "fast": {
+      "commit": "5feb44917fca40c93abec6def6f26bc81a82c536",
+      "build_tag": "perf_fast",
+      "compiled_source": "/private/tmp/fast-standard-input-provenance-001-lattigo-fast",
+      "clean_detached_worktree": true,
+      "input_kind": "fast_zero_secret_direct_encoded_v1",
+      "input_constructor": "ckks.NewEncoder.Encode -> Fast test-helper-equivalent c0 copy + c1 zero (simulation, not encryption)",
+      "evaluator_path": "bootstrapping.NewFastEvaluator",
+      "decode_path": "Fast c0 copied into CKKS plaintext -> ckks.NewEncoder.Decode (zero-secret simulation)"
+    }
+  },
+  "measurement_contract": {
+    "primary_worktree_clean_for_each_run": true,
+    "backend_worktree_clean_for_each_run": true,
+    "bootstrap_calls_per_run": 1,
+    "timing_performed": false,
+    "warmups": 0,
+    "timed_repetitions": 0,
+    "standard_trials": 1,
+    "input_quality_limit": 1e-6,
+    "descriptive_component_cutoff": 1e-2,
+    "cutoff_is_pass_fail_gate": false,
+    "raw_vectors_serialized": false
+  },
+  "profiles": [
+    {
+      "profile": "logn13",
+      "config_sha256": "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98",
+      "original_sha256": "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285",
+      "effective_parameters_match": true,
+      "effective_parameters_canonical_sha256": "45c5efad1af6bbeab61e1f00a296a2a5c4ed3347356b9508ff9c6eb96cd02c32",
+      "effective_dimensions": {
+        "log_n": 13,
+        "log_slots": 12,
+        "input_slots": 4096,
+        "q0_target_bits": 55,
+        "q0_actual_bits": 55,
+        "q_chain_bits": [55, 39, 40, 39, 40, 60, 60, 61, 60, 60, 60, 61, 61, 56, 57, 56, 56],
+        "p_bits": [61, 61, 62, 61, 62],
+        "default_scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "mod1_log_scale": 60,
+        "mod1_degree": 30,
+        "double_angle": 3,
+        "k": 16,
+        "log_message_ratio": 10,
+        "circuit_order": 0,
+        "q_prefix_rows_at_max_level": 4
+      },
+      "runs": [
+        {
+          "backend": "standard",
+          "run_status": "SUCCEEDED",
+          "input_quality_status": "PASSED",
+          "input_max_complex_deviation": 2.229618213158626e-11,
+          "bootstrap_status": "SUCCEEDED",
+          "output_status": "VALIDATED",
+          "output_metadata": {
+            "level": 1,
+            "scale_log2": 45,
+            "degree": 1,
+            "is_ntt": true,
+            "is_montgomery": false,
+            "component_count": 2,
+            "decoded_slots": 4096
+          },
+          "output_decoded_sha256": "3fca47758687970fbe66f31e3ca152fef1976287743b6b784fdb72133447afeb",
+          "output_vs_original": {
+            "complex_rmse": 2.1958000784440084,
+            "max_complex_difference": 3.105584870921425,
+            "max_real_difference": 3.104650283978798,
+            "max_imag_difference": 3.1047777134096375,
+            "real_components_above_cutoff": 4048,
+            "imag_components_above_cutoff": 4055,
+            "snr_db": -40.604658677963805,
+            "snr_status": "FINITE"
+          },
+          "pre_vs_post_bootstrap": {
+            "complex_rmse": 2.19580007844368,
+            "max_complex_difference": 3.105584870923694,
+            "max_real_difference": 3.104650283972843,
+            "max_imag_difference": 3.104777713409364,
+            "snr_db": -40.604658677909036,
+            "snr_status": "FINITE"
+          }
+        },
+        {
+          "backend": "fast",
+          "run_status": "SUCCEEDED",
+          "input_quality_status": "PASSED",
+          "input_max_complex_deviation": 2.101955261562136e-12,
+          "bootstrap_status": "SUCCEEDED",
+          "output_status": "VALIDATED",
+          "output_metadata": {
+            "level": 1,
+            "scale_log2": 45,
+            "degree": 1,
+            "is_ntt": true,
+            "is_montgomery": false,
+            "component_count": 2,
+            "decoded_slots": 4096
+          },
+          "output_decoded_sha256": "b6e6c903382544adb9ee73b04d5b44eed26ef66925c1bcc310fb7c39f717b755",
+          "output_vs_original": {
+            "complex_rmse": 1.1907546782784477e-9,
+            "max_complex_difference": 5.805793207821362e-8,
+            "max_real_difference": 1.6480985430555872e-9,
+            "max_imag_difference": 5.8057504432468265e-8,
+            "real_components_above_cutoff": 0,
+            "imag_components_above_cutoff": 0,
+            "snr_db": 144.7107513180764,
+            "snr_status": "FINITE"
+          },
+          "pre_vs_post_bootstrap": {
+            "complex_rmse": 1.1907548624512414e-9,
+            "max_complex_difference": 5.805821262257416e-8,
+            "max_real_difference": 1.6476933949183259e-9,
+            "max_imag_difference": 5.8057788132614974e-8,
+            "snr_db": 144.71074997463654,
+            "snr_status": "FINITE"
+          }
+        }
+      ]
+    },
+    {
+      "profile": "logn16",
+      "config_sha256": "16e62fdea2dc5ac32240a33cc256cdf60b935aa00b4a16aa004474d2c3033b02",
+      "original_sha256": "659fc59c899341a8253887270f1ae3478528fd864d66aca14bba918550ce8ccf",
+      "effective_parameters_match": true,
+      "effective_parameters_canonical_sha256": "b6f919bc439b413050262106e459f1377261d5a9129b3282a91f74b99218be6e",
+      "effective_dimensions": {
+        "log_n": 16,
+        "log_slots": 15,
+        "input_slots": 32768,
+        "q0_target_bits": 55,
+        "q0_actual_bits": 56,
+        "q_chain_bits": [56, 39, 39, 39, 39, 60, 61, 60, 61, 61, 60, 60, 61, 57, 56, 56, 57],
+        "p_bits": [61, 61, 62, 61, 62],
+        "default_scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "mod1_log_scale": 60,
+        "mod1_degree": 30,
+        "double_angle": 3,
+        "k": 16,
+        "log_message_ratio": 10,
+        "circuit_order": 0,
+        "q_prefix_rows_at_max_level": 4
+      },
+      "runs": [
+        {
+          "backend": "standard",
+          "run_status": "SUCCEEDED",
+          "input_quality_status": "PASSED",
+          "input_max_complex_deviation": 7.549669495851386e-11,
+          "bootstrap_status": "SUCCEEDED",
+          "output_status": "VALIDATED",
+          "output_metadata": {
+            "level": 1,
+            "scale_log2": 45,
+            "degree": 1,
+            "is_ntt": true,
+            "is_montgomery": false,
+            "component_count": 2,
+            "decoded_slots": 32768
+          },
+          "output_decoded_sha256": "122435459ea5feada0dd2d4df7270ed3c783abdf8f1309cc8306c1fd7d8bc68b",
+          "output_vs_original": {
+            "complex_rmse": 10.348458951979774,
+            "max_complex_difference": 16.11665934307221,
+            "max_real_difference": 15.938220580186886,
+            "max_imag_difference": 15.764809218653259,
+            "real_components_above_cutoff": 32744,
+            "imag_components_above_cutoff": 32747,
+            "snr_db": -54.069045033982206,
+            "snr_status": "FINITE"
+          },
+          "pre_vs_post_bootstrap": {
+            "complex_rmse": 10.348458951979815,
+            "max_complex_difference": 16.116659343059933,
+            "max_real_difference": 15.938220580191073,
+            "max_imag_difference": 15.764809218656618,
+            "snr_db": -54.0690450340323,
+            "snr_status": "FINITE"
+          }
+        },
+        {
+          "backend": "fast",
+          "run_status": "SUCCEEDED",
+          "input_quality_status": "PASSED",
+          "input_max_complex_deviation": 6.442117609356083e-12,
+          "bootstrap_status": "SUCCEEDED",
+          "output_status": "VALIDATED",
+          "output_metadata": {
+            "level": 1,
+            "scale_log2": 45,
+            "degree": 1,
+            "is_ntt": true,
+            "is_montgomery": false,
+            "component_count": 2,
+            "decoded_slots": 32768
+          },
+          "output_decoded_sha256": "84f85bb7891b062e5a3bb58ea8cd2d24c0487cd27b0a2b3cab637f508f8d825e",
+          "output_vs_original": {
+            "complex_rmse": 5.808193349077692e-9,
+            "max_complex_difference": 4.7088049150256786e-7,
+            "max_real_difference": 1.5522432507755757e-8,
+            "max_imag_difference": 4.708494144838732e-7,
+            "real_components_above_cutoff": 0,
+            "imag_components_above_cutoff": 0,
+            "snr_db": 130.94764728940336,
+            "snr_status": "FINITE"
+          },
+          "pre_vs_post_bootstrap": {
+            "complex_rmse": 5.808181046421287e-9,
+            "max_complex_difference": 4.70879447213042e-7,
+            "max_real_difference": 1.5523074495954475e-8,
+            "max_imag_difference": 4.7084837652075495e-7,
+            "snr_db": 130.94766568748457,
+            "snr_status": "FINITE"
+          }
+        }
+      ]
+    }
+  ],
+  "validation_commands": [
+    "go test ./cmd/perfprobe ./internal/perfmeasure",
+    "go test -tags perf_standard ./cmd/perfprobe",
+    "go test -tags perf_fast ./cmd/perfprobe",
+    "git diff --check",
+    "four one-call go run --output-smoke executions, one per profile/backend"
+  ],
+  "limitations": [
+    "The 1e-2 component cutoff is descriptive only, not an output-quality pass/fail gate.",
+    "Fast uses an insecure direct-encoded zero-secret simulation and is not security-equivalent to native Standard encryption.",
+    "No speedup, formal accuracy certification, causal diagnosis, parameter tuning, or benchmark campaign is claimed.",
+    "Raw per-slot vectors, ciphertexts, and secret keys are not included."
+  ]
+}
