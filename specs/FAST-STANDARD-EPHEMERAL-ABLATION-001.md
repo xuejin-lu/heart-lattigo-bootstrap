@@ -1,0 +1,37 @@
+# FAST-STANDARD-EPHEMERAL-ABLATION-001 — Diagnose native Standard Bootstrap failure with one controlled variable
+
+## Purpose, authority and current scientific status
+
+**Task class: M-reviewed E / I (bounded controlled diagnostic). Primary research repository only.**
+**Start status on activation: READY_FOR_CODEX.**
+
+Web review accepted the mechanical `FAST-STANDARD-OUTPUT-PREFLIGHT-001` runs, **not** Standard output accuracy or any speedup. In the committed evidence (`eebd68a15eb34f0fa90da06b4f642f94def0d33c`), native Standard with the current shared profile produced output-vs-original RMSE **2.195800** (LogN13) and **10.348459** (LogN16), while input errors were approximately 1e-11; the intentionally insecure Fast simulation output errors were approximately 1e-9. Both Standard runs completed and returned finite output, so this is a numerical-validity question, not merely an API failure.
+
+The source-backed primary hypothesis (not yet a conclusion) is the interaction of **dense input secret Hamming weight 192**, **`EphemeralSecretWeight=0`**, and **EvalMod K=16**. Primary `internal/perfmeasure/profile.go:ParametersFromConfig` explicitly passes ephemeral weight zero; in genuine Standard `circuits/ckks/bootstrapping/keys.go`, weight zero omits dense/sparse switching keys; pinned Lattigo's `DefaultEphemeralSecretWeight` is 32. This could make true encrypted inputs difficult for the ModUp/EvalMod regime, whereas the artificial zero-a input never exercised the same behavior. The conjecture **must be tested**, not reported as established fact.
+
+## Immutable constraints
+
+- Pinned, **unmodified genuine Standard Lattigo** `5dbffbdea05394de2ca3a432ed5318aa832e3f40` and `perf_standard` research build tag only. Never change pinned Standard source, its key generation, encryption, ciphertext, mathematical routines or security checks.
+- **No Fast run, no Fast source edits**, no official `configs/bootstrap_config.*.json` or `internal/perfmeasure/profile.go` modifications, no formal `cmd/perfprobe compare` invocation and no seven-repetition benchmark. Preserve all prior results.
+- For the controlled pair, keep unchanged: same original input vector/hash, **same generated Standard secret key**, **the exact same genuine Standard-encrypted input ciphertext**, residual and bootstrapping Q/P prime values, LogN, LogSlots, Scale, K=16, polynomial degree, circuit order and all other semantic parameters.
+- Vary **only** the diagnostic copy's `bootstrapping.Parameters.EphemeralSecretWeight` from **0** (frozen current experiment configuration) to **32** (pinned Lattigo default). This is an explicit, **diagnostic-only** single-variable ablation, not approval of parameter tuning in the formal matched baseline. The variant with weight 32 must **not** be compared to Fast to claim a formal speedup or security equivalence.
+- Never hardcode or force Standard ciphertext `c1=0`. The input must use `rlwe.NewEncryptor(residual, secret).EncryptNew(plain)` and decrypt with the matching nonzero secret. Reject or halt on any zero-a/synthetic Standard input. No key/ciphertext raw bytes or key fingerprints in committed artifacts.
+
+## Minimal controlled execution
+
+1. Safely synchronize, read Primary AGENTS and task, verify the pinned detached clean genuine Standard source and compiled module path; use the existing Primary harness's parameter constructor and deterministic original message.
+2. Add **only a tightly scoped, explicitly tagged research diagnostic test/runner in Primary** (e.g. an opt-in `cmd/perfprobe` Go test with a dedicated `perf_standard && ephemeral_diag` build constraint). It must not be included in normal untagged or ordinary `perf_standard` tests or production/application code. Prefer reuse of accepted `EncodeInputPlaintext`, vector metrics and decode helpers. Do not add a new general-purpose measurement engine or configurable benchmark/tuning framework.
+3. On LogN13, construct the frozen parameter set using the existing JSON config; make a shallow parameter **diagnostic** copy with `EphemeralSecretWeight=32` (all other parameters exact). Generate one native Standard secret key and **one** native ciphertext input, validate same-key pre-Bootstrap decoding and nontrivial `c1`, and use the same secret key/ciphertext for both evaluators.
+4. For each of `E=0` and `E=32`, independently call the pinned **Standard** `params.GenEvaluationKeys(secret)` and `bootstrapping.NewEvaluator(params, keys)` with the respective weight, then perform **one** public `Bootstrap(ciphertext.CopyNew())`. For each result, validate metadata, decrypt/decode with the same secret, compute decoded output-vs-original complex RMSE, max error, component deviations and SNR, preserving undefined statuses. Run no warmup/timing campaign. Confirm source-level and, where available, evaluation-key evidence that E=0 omits and E=32 enables ephemeral dense/sparse switching. Record `K=16` unchanged.
+5. If the controlled LogN13 pair *materially discriminates* (substantially improves Standard numerical error under E=32), repeat the **same paired design** for LogN16, using one native input and exactly one Bootstrap per weight. If LogN13 does not discriminate or cannot finish, **stop** and report an unresolved hypothesis, instead of automatically sweeping weights, modifying K or beginning a broad debug campaign.
+6. Output a **compact** Markdown summary in `results/FAST-STANDARD-EPHEMERAL-ABLATION-001-summary.md` with original/config hashes, environment and exact clean Primary/Standard pins, unchanged canonical prime values (or SHA + full effective params SHA), weight 0/32, K=16, secret-Hamming=192, counts/metadata, output metrics, the differential and limitations. Optionally write one compact JSON. Do not include full decoded arrays or confidential material.
+7. Focused tests confirm (a) no synthetic input, (b) identical original input and key/ciphertext across each controlled pair, (c) exactly one Bootstrap per weight per tested profile, and (d) the diagnostic variation cannot reach the normal formal comparison or benchmark path. Run tagged diagnostic, ordinary untagged and `perf_standard` targeted tests, `git diff --check`, review changed-file list; separate any pre-existing failures.
+
+## Interpretation and stop rules
+
+- If E=32 sharply improves the same-input native Standard Bootstrap relative to E=0: classify `EPHEMERAL_WEIGHT_HYPOTHESIS_SUPPORTED`. This is **causal evidence for the controlled contrast**, not proof the whole original defect is fully explained, not formal numerical-quality acceptance, and not a new valid Standard/Fast speedup.
+- If it does not materially improve or another ambiguity remains: `NATIVE_STANDARD_CAUSE_UNRESOLVED`, with the exact contrast and first blocker. Do not speculate that the library itself is incorrect or patch Standard.
+- If the pinned source cannot support the minimal contrast: `EPHEMERAL_ABLATION_BLOCKED`, return `NEEDS_WEB_REVIEW`.
+- Output quality classification remains `UNASSESSED` pending explicit Web review; pre-existing `FAST-STANDARD-PERF-REBASELINE-003` remains **BLOCKED**.
+
+Primary-only minimal commit/push when safe, report actual numbers and tests, return `READY_FOR_WEB_REVIEW` or `NEEDS_WEB_REVIEW`. **Do not automatically promote E=32 to the matched comparison configuration.** Any durable redefinition of Standard/Fast comparability or a changed formal experiment profile must be separately reviewed and authorized.
