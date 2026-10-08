@@ -1,27 +1,22 @@
 # Current Task
 
-Task: FAST-ZERO-SECRET-E-PASSTHROUGH-001
+Task: FAST-ZERO-SECRET-E-METRICS-RECOVERY-002
 Status: READY_FOR_CODEX
-Task class: bounded Secondary Fast implementation plus numerical smoke, followed by independent Web review
+Task class: E — bounded evidence recovery only (two new Fast Bootstrap calls)
 
-**Authoritative executable spec:** `specs/FAST-ZERO-SECRET-E-PASSTHROUGH-001.md`
+**Executable spec:** `specs/FAST-ZERO-SECRET-E-METRICS-RECOVERY-002.md`
+**Long-term objective:** `docs/FAST_DROPIN_ZERO_SECRET_GOAL.md`
 
-**Durable user objective:** `docs/FAST_DROPIN_ZERO_SECRET_GOAL.md`.
+## Web review of predecessor
 
-## Direction and superseded task
+`FAST-ZERO-SECRET-E-PASSTHROUGH-001` is accepted **only as PARTIAL**: the Secondary implementation `c0ac40b736aee441dd32a85ff6cd40b2a9be4b4e` permits E=0/32 zero-secret Fast Bootstrap and Secondary fix `463d494627b2e9e2bfac51aefe7f4ecb3493b68e` serializes exact-zero SNR. Original E0/E32 Bootstrap and decode executed, but aggregate JSON did not persist; no numerical results may be inferred. The genuine Standard E32 reference was recorded with RMSE `4.80507250213e-9`.
 
-The goal is a drop-in Fast numerical-validation backend: keep frontend source, Standard public APIs and parameters unchanged, switch only the Lattigo library version, and internally use intentionally insecure zero-secret execution with sound elimination of unnecessary KeySwitch. Q-prefix is only one optional optimization.
+Primary partial evidence is already pushed at `d1e054dec3a833394091fc56d86d8e9780aade99` (verified as fast-forward from `e884658aebcf7bf7ceffc1be76d679a5cf0b84c1`).
 
-The previous `FAST-STANDARD-EPHEMERAL-REPLICATION-002` is **SUPERSEDED / DO NOT RUN**. No more Standard E0 key-variability experiments under that task.
+## New bounded work
 
-## Active bounded milestone
+Safely synchronize both repositories. **First verify the external pinned Standard E32 reference and targeted serialization tests**. If its exact per-slot file is unavailable/unverifiable, stop without any Bootstrap; do not reconstruct it. Otherwise, under Secondary fixed `463d494627b2e9e2bfac51aefe7f4ecb3493b68e`, run **exactly one new Fast E=0 and one new Fast E=32** public LogN13 Bootstrap using the existing diagnostic, capture JSON and report true numerical differences. Zero Standard Bootstrap, no parameter tuning, no performance benchmark, no LogN16, no production-code edits.
 
-In Secondary `xuejin-lu/lattigo` branch `fast-qprefix`, accept frontend E=0 and E=32 without modifying its public value, preserve zero-secret semantics, omit Dense/Sparse KeySwitch, and perform exactly one LogN13 Fast Bootstrap for each E. Measure actual output vs original and, if matched, genuine Standard E32 as reference. Do not assume result accuracy or speedup before seeing numbers. At most three public Bootstrap runs total, no performance benchmark, no tuning, no LogN16, no broad drop-in retrofit this task.
+Write a new concise Primary result summary, preserve the old partial report. Return `FAST_E_METRICS_RECOVERED_PENDING_WEB_REVIEW`, `FAST_E_METRICS_RECOVERY_PARTIAL`, or a precise blocked classification. Then `READY_FOR_WEB_REVIEW` / `NEEDS_WEB_REVIEW`.
 
-Do not modify the pinned Standard implementation or Primary frontend/production harness.
-
-The old `FAST-STANDARD-PERF-REBASELINE-003` remains **BLOCKED**.
-
-## Handoff
-
-Safe-sync, implement this scope with tests, bounded self-review and permitted Secondary/Primary report commits; return measured errors, code/source evidence and `FAST_E_PASSTHROUGH_RUN_COMPLETE`, `FAST_E_PASSTHROUGH_PARTIAL` or `FAST_E_PASSTHROUGH_BLOCKED`, then `READY_FOR_WEB_REVIEW` or `NEEDS_WEB_REVIEW`.
+`FAST-STANDARD-PERF-REBASELINE-003` remains **BLOCKED**.
