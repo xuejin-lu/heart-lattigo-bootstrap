@@ -1,0 +1,30 @@
+# FAST-STANDARD-EPHEMERAL-REPLICATION-002 — Bound LogN13 native Standard variability across independently encrypted inputs
+
+## Accepted evidence and unresolved question
+
+**Task class: diagnostic E/I. Primary-only research/test code. Status upon activation: READY_FOR_CODEX.**
+
+Review accepts the controlled within-pair E=0 vs E=32 difference in `FAST-STANDARD-EPHEMERAL-ABLATION-001` (runner `d654fc39bb2c5fbe41018fac6e3dce4cb20b450f`, report `5791c45dee6f4a647d6a7a9fe7e26da9eb61832a`) as **support for the effect of ephemeral-secret encapsulation** under one native Standard key and ciphertext per profile. It does **not** establish reliability across independent keys/inputs, a formal Standard numerical acceptance criterion, or a fair Fast/Standard performance baseline.
+
+The immediate unresolved discrepancy is **LogN13 E=0 output error variability**: the previous genuine-Standard output preflight recorded complex RMSE `2.195800078444`; the controlled ablation's independently generated E=0 input recorded `9.355135785595e-6`, with the same frozen workload/profile and input errors near 1e-11. Key generation, ciphertext encryption, evaluation-key randomness, and the choice to use / omit sparse encapsulation are possible factors; **no individual mechanism has been proven**. Avoid interpreting E=0 as reliably accurate or inaccurate from one sample.
+
+## Immutable rules
+
+1. Use only pinned **unmodified Standard Lattigo** SHA `5dbffbdea05394de2ca3a432ed5318aa832e3f40` under clean detached source and `perf_standard` diagnostic build; verify compiled local source replacement and exact SHA. Do not edit Secondary, Standard primitives, official configs or `internal/perfmeasure/profile.go`.
+2. Restrict this task to **LogN13** and the frozen `configs/bootstrap_config.logN13.json`: same deterministic original complex vector, hash, actual Q/P primes, LogSlots, Scale, main-secret Hamming 192, `K=16`, degree/circuit order, and every other existing parameter. Diagnostic `E=32` must arise only from a copy of the standard `E=0` bootstrapping parameters.
+3. Run **exactly three independent Standard key-and-ciphertext pairs**. In each pair, generate a new actual native Standard secret and new `EncryptNew` ciphertext with nontrivial `c1`, independently generate each E=0 and E=32 evaluation-key set under that pair's **same** secret, then call each public `Bootstrap(input.CopyNew())` **once**. Hence **six total public Bootstrap calls**, with no warmup or timed repetition. Keep the exact same secret, ciphertext and original message **within** each E0/E32 pair; ensure secret keys and `c1` differ **across** pairs. Do not persist secret/ciphertext material or fingerprints of secrets. A `c1` uniqueness check can occur in memory without exporting its hash.
+4. For each run record before-Bootstrap max decoded deviation (must meet the existing `1e-6` limit), post-Bootstrap metadata, decoded vector finiteness/slot count and the numerical output against the original: complex RMSE, max complex/real/imag difference, real/imag component counts over *descriptive* `1e-2`, SNR with status. Observe keys absent for E=0 and both encapsulation keys present for E=32. All validation and native Encrypt/Decrypt rules from the previous accepted diagnostic remain in force.
+5. Keep E0 and E32 pairwise results together; show the per-pair E0 vs E32 contrast **without collapsing to one impressive aggregate percentage**. Summarize the observed E0 range and E32 range, and separately juxtapose the earlier two LogN13 E0 records with clear cross-run independence caveats. Three pairs cannot estimate a security/failure probability; do not attempt to extrapolate one.
+6. Use a small opt-in **test-only** entry point with a distinct tag (`perf_standard && ephemeral_diag && ephemeral_repro` or equally isolated), reusing accepted helpers where practical. Avoid refactoring the accepted ablation test unless needed for compiling shared helpers; never alter its scientific semantics or past evidence. Do not affect normal tagged/untagged tests or the formal perfprobe/compare and benchmarking paths.
+7. Write at most one short Markdown and one compact JSON evidence file under `results/FAST-STANDARD-EPHEMERAL-REPLICATION-002-*`. Preserve full source/config/primary provenance, parameter hashes and paired numerical metrics; omit raw slot vectors, ciphertexts, private-key data, user-specific absolute filesystem paths from committed reports. Keep the generated raw per-run output temporary if practical.
+8. Do **not** run LogN16, Fast, full timing, seven-repetition benchmarks, stage/PS attribution, a K sweep, parameter tuning or historical-result cleanup. Stop if an unexpected source mismatch, key/ciphertext mutation, invalid input, or E32 catastrophic output occurs; report the exact failing pair and stage. Do not silently rerun failed samples to select favorable values.
+
+## Expected classifications
+
+- `E0_VARIABILITY_REPRODUCED`: the independent E0 samples have clearly distinct error regimes (e.g. order-of-magnitude variations) under the same original profile, with per-pair evidence; report E32 results and do not overinterpret.
+- `E0_VARIABILITY_NOT_REPRODUCED_IN_SMALL_SAMPLE`: all three E0 results fall in a similar numerical regime; the original cross-run discrepancy **remains unexplained**.
+- `EPHEMERAL_REPLICATION_PARTIAL` / `EPHEMERAL_REPLICATION_BLOCKED`: give exact failing pair, backend operation and source/preflight evidence.
+
+No result establishes a formal Standard/Fast comparable profile. E=32 remains **diagnostic-only** until a separate architectural/scientific review explicitly addresses whether a native Standard E32 baseline may be compared with intentionally insecure zero-secret Fast at fixed shared core CKKS parameters. Never unblock `FAST-STANDARD-PERF-REBASELINE-003` in this task.
+
+Run focused untagged and ordinary `perf_standard` tests, the opt-in replication only, build-tag isolation check, `git diff --check`; self-review and commit/push only Primary if safe. Return classification, range/individual metrics and `READY_FOR_WEB_REVIEW` or `NEEDS_WEB_REVIEW`.
