@@ -177,6 +177,26 @@ Codex must stop and return `NEEDS_WEB_REVIEW` when:
 
 Do not keep iterating autonomously past these boundaries.
 
+## 4A. Reuse-first architecture gate (mandatory for existing capability integration)
+
+**Why this exists:** In October 2026, Fast CKKS already had explicit implementations of Add, MulRelin, Rescale and Rotate in `schemes/ckks/fast`, but the orchestration incorrectly commissioned additional ordinary-public-`ckks.Evaluator` primitive implementations without first making a repository-wide integration decision. A local test of numerical correctness does not demonstrate that an existing optimized kernel has been reused or even invoked.
+
+**Before GPT Web authorizes an implementation spec** for an API, primitive, backend replacement, or integration feature, it must inspect **current source** and record a compact reuse inventory:
+
+1. The **user's end goal** (e.g. identical CKKS frontend source and parameters, only library dependency swapped), distinct from the next local test.
+2. Existing implementations and call sites, with **files/functions and their verified capabilities**, including parallel or legacy variants, and which code is actually dispatched.
+3. The gap classification: `MISSING_CORE`, `INTEGRATION_DISPATCH`, `REPRESENTATION_CONTRACT`, `API_ADAPTER`, `GENUINE_UNSUPPORTED_CASE`, or `UNKNOWN`. Do not call an integration issue a missing algorithm.
+4. A **reuse-first design** with candidate dependency direction, Go concrete types/signatures, interface/import-cycle constraints, existing shared helpers, and Level/Scale/c1/Q-prefix/full-active-Q/NTT/Montgomery/key-layout invariants. Prefer an adapter or moving a truly shared kernel into an import-neutral lower-level package, only if mathematical and API semantics remain valid; do not require a specific architecture before source analysis.
+5. A minimal execution/verification plan that **proves which kernel actually ran** (dispatch/key-lookup instrumentation or equivalent), separately from cleartext-oracle correctness, and states explicitly what remains unproved.
+
+**Default ordering:** reuse already-proved kernel -> minimal API bridge/adapter -> source-backed extraction of shared kernel -> **new algorithm implementation only when an existing kernel demonstrably cannot satisfy the contract**. Duplicating an existing arithmetic kernel requires an explicit written technical reason and Web authorization; a failing constructor dispatch or different Go method signature is not sufficient reason by itself.
+
+**Mandatory STOP gate:** If a source audit finds existing functionality with a plausible reuse path, a Go import cycle, or incompatible full-Q vs compact Q-prefix representations, do **not** issue a piecemeal reimplementation spec. Classify `NEEDS_WEB_ARCHITECTURE_REVIEW`, compare the feasible architectures, and approve an integration contract **before** implementation. Codex must report the discovery and stop rather than implement around it.
+
+**Before Web accepts results:** check four separate questions: (a) numerical output correct for supported inputs; (b) proven execution of intended Fast kernel/algorithm; (c) no forbidden native fallback or representation violation; (d) compatibility with the original *end-to-end* goal. Pass on (a) alone is `NUMERICAL_ONLY`, not `FAST_BACKEND_INTEGRATED`.
+
+**Scope discipline:** This gate is a brief source-backed check, not an excuse for unbounded audits or exhaustive historical research. If the same inventory remains valid, link to it in subsequent tasks rather than redo it. Codex self-review must flag any new implementation that duplicates a discovered existing backend primitive. This rule supplements the current M/I/E authority model and preserves the user's simple `開始` / `review` workflow.
+
 ## 5. Executable mathematics
 
 Whenever possible, GPT Web should convert mathematical decisions into executable contracts before implementation.
