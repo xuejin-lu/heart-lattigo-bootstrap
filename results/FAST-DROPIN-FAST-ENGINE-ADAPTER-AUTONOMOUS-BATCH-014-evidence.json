@@ -1,0 +1,687 @@
+{
+  "schema_version": "fast-dropin-fast-engine-adapter-batch-014-combined.v1",
+  "created_utc": "2026-10-09T20:47:37.205264Z",
+  "status": "paired_public_add_sub_composition_passed",
+  "primary_commit_during_runs": "2c08ca374e4b868ac00fc29e1ae548424189d8e2",
+  "primary_dirty_during_runs": true,
+  "identical_frontend_sha256": "3da11cd491fbc0da8887d0bd3c2f44f9e3f9aa076074ffd3d612a0b034e6ea93",
+  "identical_test_source_sha256": "52884f33138df8ddde84f73056c8b576b390c25ec3bdd83f3a2a7e02e28b5742",
+  "profile": {
+    "log_n": 13,
+    "log_q_bits": [
+      55,
+      39,
+      40,
+      39
+    ],
+    "log_p_bits": [
+      60
+    ],
+    "default_scale_log2": 45,
+    "log_slots": 4,
+    "test_levels": [
+      1,
+      3
+    ]
+  },
+  "deterministic_input_sha256": "296447e0602fcaec7839fd302ec783dd0994418aad18757c20cfe9d38323cd24",
+  "bootstrap_calls": 0,
+  "standard": {
+    "schema_version": "fast-dropin-fast-engine-adapter-batch-014-run.v1",
+    "status": "public_add_sub_composition_passed",
+    "created_utc": "2026-10-09T20:47:33.526385Z",
+    "go_version": "go1.26.4",
+    "os": "darwin",
+    "architecture": "arm64",
+    "primary_commit": "2c08ca374e4b868ac00fc29e1ae548424189d8e2",
+    "primary_dirty": true,
+    "backend_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+    "backend_ref": "pinned-standard-5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+    "backend_dirty": false,
+    "fast_zero_secret_capability": false,
+    "backend_mode": "genuine Standard CKKS",
+    "public_evaluator": "ckks.NewEvaluator(params, nil)",
+    "profile": {
+      "log_n": 13,
+      "log_q_bits": [
+        55,
+        39,
+        40,
+        39
+      ],
+      "log_p_bits": [
+        60
+      ],
+      "default_scale_log2": 45,
+      "log_slots": 4,
+      "test_levels": [
+        1,
+        3
+      ]
+    },
+    "profile_sha256": "4ac3a9eb4a1662395dbda550ca9469f89989ba7c1ee3ca26148f20a593e2a78b",
+    "effective_qp_sha256": "41c103fb3338c8fca82ab0c5b2e4dfd17cf1affc6d7295e082a6ba4a6e372324",
+    "q_primes": [
+      36028797018652673,
+      549755731969,
+      1099511480321,
+      549756026881
+    ],
+    "p_primes": [
+      1152921504606830593
+    ],
+    "shared_frontend_sha256": "3da11cd491fbc0da8887d0bd3c2f44f9e3f9aa076074ffd3d612a0b034e6ea93",
+    "shared_test_source_sha256": "52884f33138df8ddde84f73056c8b576b390c25ec3bdd83f3a2a7e02e28b5742",
+    "deterministic_input_sha256": "296447e0602fcaec7839fd302ec783dd0994418aad18757c20cfe9d38323cd24",
+    "encryption_lifecycle": "ckks.NewKeyGenerator -\u003e GenSecretKeyNew; ckks.NewPlaintext/Encoder.Encode; rlwe.NewEncryptor(params, sk).EncryptNew; public ckks.NewEvaluator AddNew/SubNew; ordinary rlwe.NewDecryptor.DecryptNew/ckks.Encoder.Decode",
+    "encrypted_inputs": [
+      {
+        "name": "a-l1",
+        "state": {
+          "level": 1,
+          "degree": 1,
+          "scale_log2": 45,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "c1_zero": false,
+          "rows_per_component": [
+            2,
+            2
+          ],
+          "all_active_q_rows_materialized": true
+        },
+        "plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 5.01567169136917e-13,
+          "max_complex_error": 9.205703636093637e-13
+        }
+      },
+      {
+        "name": "b-l1",
+        "state": {
+          "level": 1,
+          "degree": 1,
+          "scale_log2": 45,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "c1_zero": false,
+          "rows_per_component": [
+            2,
+            2
+          ],
+          "all_active_q_rows_materialized": true
+        },
+        "plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 5.063399047078581e-13,
+          "max_complex_error": 7.356735353854003e-13
+        }
+      },
+      {
+        "name": "a-l3",
+        "state": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 45,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "c1_zero": false,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true
+        },
+        "plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 5.279167152405759e-13,
+          "max_complex_error": 8.649649317811322e-13
+        }
+      },
+      {
+        "name": "b-l3",
+        "state": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 45,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "c1_zero": false,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true
+        },
+        "plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 4.283943553962439e-13,
+          "max_complex_error": 7.429005907148772e-13
+        }
+      }
+    ],
+    "checkpoints": [
+      {
+        "id": "addnew-l1",
+        "api": "AddNew",
+        "level": 1,
+        "scale_log2": 45,
+        "degree": 1,
+        "output_state": {
+          "level": 1,
+          "degree": 1,
+          "scale_log2": 45,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "c1_zero": false,
+          "rows_per_component": [
+            2,
+            2
+          ],
+          "all_active_q_rows_materialized": true
+        },
+        "plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 6.274059667494572e-13,
+          "max_complex_error": 1.3518125470418668e-12
+        },
+        "status": "passed"
+      },
+      {
+        "id": "subnew-l1",
+        "api": "SubNew",
+        "level": 1,
+        "scale_log2": 45,
+        "degree": 1,
+        "output_state": {
+          "level": 1,
+          "degree": 1,
+          "scale_log2": 45,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "c1_zero": false,
+          "rows_per_component": [
+            2,
+            2
+          ],
+          "all_active_q_rows_materialized": true
+        },
+        "plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 7.8883246926568e-13,
+          "max_complex_error": 1.0916340651617353e-12
+        },
+        "status": "passed"
+      },
+      {
+        "id": "add-sub-recovery-l1",
+        "api": "SubNew(AddNew(a,b), b)",
+        "level": 1,
+        "scale_log2": 45,
+        "degree": 1,
+        "output_state": {
+          "level": 1,
+          "degree": 1,
+          "scale_log2": 45,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "c1_zero": false,
+          "rows_per_component": [
+            2,
+            2
+          ],
+          "all_active_q_rows_materialized": true
+        },
+        "plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 5.01567169136917e-13,
+          "max_complex_error": 9.205703636093637e-13
+        },
+        "status": "passed"
+      },
+      {
+        "id": "addnew-l3",
+        "api": "AddNew",
+        "level": 3,
+        "scale_log2": 45,
+        "degree": 1,
+        "output_state": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 45,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "c1_zero": false,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true
+        },
+        "plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 5.327645469449839e-13,
+          "max_complex_error": 9.709711812193296e-13
+        },
+        "status": "passed"
+      },
+      {
+        "id": "subnew-l3",
+        "api": "SubNew",
+        "level": 3,
+        "scale_log2": 45,
+        "degree": 1,
+        "output_state": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 45,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "c1_zero": false,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true
+        },
+        "plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 8.003699522476833e-13,
+          "max_complex_error": 1.5932780212535162e-12
+        },
+        "status": "passed"
+      },
+      {
+        "id": "add-sub-recovery-l3",
+        "api": "SubNew(AddNew(a,b), b)",
+        "level": 3,
+        "scale_log2": 45,
+        "degree": 1,
+        "output_state": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 45,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "c1_zero": false,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true
+        },
+        "plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 5.279167152405759e-13,
+          "max_complex_error": 8.649649317811322e-13
+        },
+        "status": "passed"
+      }
+    ],
+    "bootstrap_calls": 0
+  },
+  "fast": {
+    "schema_version": "fast-dropin-fast-engine-adapter-batch-014-run.v1",
+    "status": "public_add_sub_composition_passed",
+    "created_utc": "2026-10-09T20:47:33.168136Z",
+    "go_version": "go1.26.4",
+    "os": "darwin",
+    "architecture": "arm64",
+    "primary_commit": "2c08ca374e4b868ac00fc29e1ae548424189d8e2",
+    "primary_dirty": true,
+    "backend_commit": "0c92e7ed071a1be6eb258474811db470e4463df7",
+    "backend_ref": "fast-qprefix",
+    "backend_dirty": false,
+    "fast_zero_secret_capability": true,
+    "backend_mode": "Fast zero-secret simulation",
+    "public_evaluator": "ckks.NewEvaluator(params, nil)",
+    "profile": {
+      "log_n": 13,
+      "log_q_bits": [
+        55,
+        39,
+        40,
+        39
+      ],
+      "log_p_bits": [
+        60
+      ],
+      "default_scale_log2": 45,
+      "log_slots": 4,
+      "test_levels": [
+        1,
+        3
+      ]
+    },
+    "profile_sha256": "4ac3a9eb4a1662395dbda550ca9469f89989ba7c1ee3ca26148f20a593e2a78b",
+    "effective_qp_sha256": "41c103fb3338c8fca82ab0c5b2e4dfd17cf1affc6d7295e082a6ba4a6e372324",
+    "q_primes": [
+      36028797018652673,
+      549755731969,
+      1099511480321,
+      549756026881
+    ],
+    "p_primes": [
+      1152921504606830593
+    ],
+    "shared_frontend_sha256": "3da11cd491fbc0da8887d0bd3c2f44f9e3f9aa076074ffd3d612a0b034e6ea93",
+    "shared_test_source_sha256": "52884f33138df8ddde84f73056c8b576b390c25ec3bdd83f3a2a7e02e28b5742",
+    "deterministic_input_sha256": "296447e0602fcaec7839fd302ec783dd0994418aad18757c20cfe9d38323cd24",
+    "encryption_lifecycle": "ckks.NewKeyGenerator -\u003e GenSecretKeyNew; ckks.NewPlaintext/Encoder.Encode; rlwe.NewEncryptor(params, sk).EncryptNew; public ckks.NewEvaluator AddNew/SubNew; ordinary rlwe.NewDecryptor.DecryptNew/ckks.Encoder.Decode",
+    "encrypted_inputs": [
+      {
+        "name": "a-l1",
+        "state": {
+          "level": 1,
+          "degree": 1,
+          "scale_log2": 45,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "c1_zero": true,
+          "rows_per_component": [
+            2,
+            2
+          ],
+          "all_active_q_rows_materialized": true
+        },
+        "plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 4.3074465359754706e-14,
+          "max_complex_error": 8.564136368436897e-14
+        }
+      },
+      {
+        "name": "b-l1",
+        "state": {
+          "level": 1,
+          "degree": 1,
+          "scale_log2": 45,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "c1_zero": true,
+          "rows_per_component": [
+            2,
+            2
+          ],
+          "all_active_q_rows_materialized": true
+        },
+        "plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 4.8063139929870046e-14,
+          "max_complex_error": 9.499856654154729e-14
+        }
+      },
+      {
+        "name": "a-l3",
+        "state": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 45,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "c1_zero": true,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true
+        },
+        "plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 4.3074465359754706e-14,
+          "max_complex_error": 8.564136368436897e-14
+        }
+      },
+      {
+        "name": "b-l3",
+        "state": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 45,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "c1_zero": true,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true
+        },
+        "plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 4.8063139929870046e-14,
+          "max_complex_error": 9.499856654154729e-14
+        }
+      }
+    ],
+    "checkpoints": [
+      {
+        "id": "addnew-l1",
+        "api": "AddNew",
+        "level": 1,
+        "scale_log2": 45,
+        "degree": 1,
+        "output_state": {
+          "level": 1,
+          "degree": 1,
+          "scale_log2": 45,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "c1_zero": true,
+          "rows_per_component": [
+            2,
+            2
+          ],
+          "all_active_q_rows_materialized": true
+        },
+        "plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 6.366054749149383e-14,
+          "max_complex_error": 9.928313431575474e-14
+        },
+        "status": "passed"
+      },
+      {
+        "id": "subnew-l1",
+        "api": "SubNew",
+        "level": 1,
+        "scale_log2": 45,
+        "degree": 1,
+        "output_state": {
+          "level": 1,
+          "degree": 1,
+          "scale_log2": 45,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "c1_zero": true,
+          "rows_per_component": [
+            2,
+            2
+          ],
+          "all_active_q_rows_materialized": true
+        },
+        "plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 6.541187211590919e-14,
+          "max_complex_error": 1.147158704982844e-13
+        },
+        "status": "passed"
+      },
+      {
+        "id": "add-sub-recovery-l1",
+        "api": "SubNew(AddNew(a,b), b)",
+        "level": 1,
+        "scale_log2": 45,
+        "degree": 1,
+        "output_state": {
+          "level": 1,
+          "degree": 1,
+          "scale_log2": 45,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "c1_zero": true,
+          "rows_per_component": [
+            2,
+            2
+          ],
+          "all_active_q_rows_materialized": true
+        },
+        "plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 4.3074465359754706e-14,
+          "max_complex_error": 8.564136368436897e-14
+        },
+        "status": "passed"
+      },
+      {
+        "id": "addnew-l3",
+        "api": "AddNew",
+        "level": 3,
+        "scale_log2": 45,
+        "degree": 1,
+        "output_state": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 45,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "c1_zero": true,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true
+        },
+        "plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 6.366054749149383e-14,
+          "max_complex_error": 9.928313431575474e-14
+        },
+        "status": "passed"
+      },
+      {
+        "id": "subnew-l3",
+        "api": "SubNew",
+        "level": 3,
+        "scale_log2": 45,
+        "degree": 1,
+        "output_state": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 45,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "c1_zero": true,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true
+        },
+        "plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 6.541187211590919e-14,
+          "max_complex_error": 1.147158704982844e-13
+        },
+        "status": "passed"
+      },
+      {
+        "id": "add-sub-recovery-l3",
+        "api": "SubNew(AddNew(a,b), b)",
+        "level": 3,
+        "scale_log2": 45,
+        "degree": 1,
+        "output_state": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 45,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "c1_zero": true,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true
+        },
+        "plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 4.3074465359754706e-14,
+          "max_complex_error": 8.564136368436897e-14
+        },
+        "status": "passed"
+      }
+    ],
+    "bootstrap_calls": 0
+  },
+  "paired_checkpoints": [
+    {
+      "id": "addnew-l1",
+      "standard_complex_rmse": 6.274059667494572e-13,
+      "fast_complex_rmse": 6.366054749149383e-14,
+      "fast_vs_standard_complex_rmse": 6.284978314260694e-13,
+      "fast_vs_standard_max_complex_error": 1.379871789243392e-12,
+      "standard_level": 1,
+      "fast_level": 1,
+      "standard_scale_log2": 45,
+      "fast_scale_log2": 45
+    },
+    {
+      "id": "subnew-l1",
+      "standard_complex_rmse": 7.8883246926568e-13,
+      "fast_complex_rmse": 6.541187211590919e-14,
+      "fast_vs_standard_complex_rmse": 7.881538765475032e-13,
+      "fast_vs_standard_max_complex_error": 1.0728521530991992e-12,
+      "standard_level": 1,
+      "fast_level": 1,
+      "standard_scale_log2": 45,
+      "fast_scale_log2": 45
+    },
+    {
+      "id": "add-sub-recovery-l1",
+      "standard_complex_rmse": 5.01567169136917e-13,
+      "fast_complex_rmse": 4.3074465359754706e-14,
+      "fast_vs_standard_complex_rmse": 4.979864222629077e-13,
+      "fast_vs_standard_max_complex_error": 9.314964054562295e-13,
+      "standard_level": 1,
+      "fast_level": 1,
+      "standard_scale_log2": 45,
+      "fast_scale_log2": 45
+    },
+    {
+      "id": "addnew-l3",
+      "standard_complex_rmse": 5.327645469449839e-13,
+      "fast_complex_rmse": 6.366054749149383e-14,
+      "fast_vs_standard_complex_rmse": 5.115951271130638e-13,
+      "fast_vs_standard_max_complex_error": 9.616961146763893e-13,
+      "standard_level": 3,
+      "fast_level": 3,
+      "standard_scale_log2": 45,
+      "fast_scale_log2": 45
+    },
+    {
+      "id": "subnew-l3",
+      "standard_complex_rmse": 8.003699522476833e-13,
+      "fast_complex_rmse": 6.541187211590919e-14,
+      "fast_vs_standard_complex_rmse": 8.178353689337081e-13,
+      "fast_vs_standard_max_complex_error": 1.6085931067776315e-12,
+      "standard_level": 3,
+      "fast_level": 3,
+      "standard_scale_log2": 45,
+      "fast_scale_log2": 45
+    },
+    {
+      "id": "add-sub-recovery-l3",
+      "standard_complex_rmse": 5.279167152405759e-13,
+      "fast_complex_rmse": 4.3074465359754706e-14,
+      "fast_vs_standard_complex_rmse": 5.2407232381419e-13,
+      "fast_vs_standard_max_complex_error": 8.623256542989704e-13,
+      "standard_level": 3,
+      "fast_level": 3,
+      "standard_scale_log2": 45,
+      "fast_scale_log2": 45
+    }
+  ],
+  "dispatch_proof": "Focused Secondary TestPublicFastZeroSecretAddSubUsesSharedQPrefixCoreAndDecodes instruments the shared AddSubCore and verifies public AddNew/SubNew hit it at Levels 1 and 3; the Level-5 structural test verifies the four-row capped path. The independent Standard build does not implement the Fast capability marker.",
+  "compact_boundary": "At the frozen LogN13 profile, max logical Level is 3 and all active Q rows fit in the four-row prefix. The Level-5 test proves Add/Sub compaction structurally; public MulRelin, Rescale, and Rotate fail closed at the first missing active row q4 rather than reading dormant rows. No \u003ecap decoded oracle is claimed."
+}
