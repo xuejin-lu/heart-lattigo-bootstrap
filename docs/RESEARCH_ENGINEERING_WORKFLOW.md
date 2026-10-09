@@ -197,6 +197,36 @@ Do not keep iterating autonomously past these boundaries.
 
 **Scope discipline:** This gate is a brief source-backed check, not an excuse for unbounded audits or exhaustive historical research. If the same inventory remains valid, link to it in subsequent tasks rather than redo it. Codex self-review must flag any new implementation that duplicates a discovered existing backend primitive. This rule supplements the current M/I/E authority model and preserves the user's simple `開始` / `review` workflow.
 
+## 4B. Autonomous milestone batches (default after architecture is frozen)
+
+**Reason:** The former `one small task → independent Web review → next task` handoff created unnecessary human coordination and repeatedly blocked routine engineering progress. Independent Web review is required at **scientific milestones**, not after every mechanical implementation or test fix.
+
+**Default handoff model:**
+
+```text
+Web: approve mathematical/representation architecture + bounded batch charter
+  ↓
+Codex: subtask A → test → coding self-review → repair → commit
+  ↓
+Codex: subtask B → test → coding self-review → repair → commit
+  ↓
+Codex: subtask C / D → test → self-review → final aggregate report → push
+  ↓
+Web: ONE independent scientific / architectural milestone review
+```
+
+- A batch should normally include **3–5 closely related implementation/experiment subtasks**, or one coherent scientific integration milestone with 3–5 checkpoints. This is a guideline, **not a requirement to create filler tasks**, not authorization for unlimited autonomous changes, and not an excuse to delay a genuine stop condition.
+- GPT Web owns the **batch charter**: original end goal, frozen M invariants, candidate scope, pre-approved I/E actions, test oracles, permitted repos/paths, upper bounds on expensive experiments, task dependencies, and precise STOP conditions. Codex may choose the ordering and detailed next I/E implementation **inside that charter** based on test results, including routine local fixes and follow-up tests. It must not invent new cryptographic semantics or broaden the charters itself.
+- The first local subtask can be an existing independently approved spec. Codex should read it but follow any **explicitly specified** batch-level extension/supersession from a new charter. Preserve old specs and results as immutable history.
+- **Per-subtask Codex responsibility:** implement or execute; verify the test oracle; inspect source/diff and edge cases; at most one *local repair pass* for the same issue; rerun affected tests; commit as an atomic milestone only if valid. It may continue autonomously to the next authorized subtask **without waiting for GPT Web**. Use repository-safe fast-forward pushes at coherent checkpoints or sprint end; never change refs forcefully.
+- **Scientific review boundaries:** local coding self-review cannot accept new math, Q-prefix/full-Q representation contracts, key-layout semantics, crypto/security claims, changed parameters or failed numerical oracles. A bounded batch cannot silently hide a failure and move on to unrelated work. If blocked and no safe approved fallback, stop with `NEEDS_WEB_REVIEW`, comprehensive evidence and the exact decision sought. Web also reviews at batch completion, even if all Codex tests pass.
+- **No counterfeit provenance:** record separate backend commits, exact frontend/config/input hashes, Standard genuine encryption, Fast zero-secret semantics, measurement methods and the **kernel that actually executed**. A passing plaintext oracle does not prove optimized Fast dispatch. Preserve the distinction between numerical correctness, architecture integration and runtime speedup.
+- **Expensive work:** batch specs explicitly cap Bootstrap counts, heavyweight tests, benchmarks, parameter sweeps and retries **across the entire sprint**, not per subtask by accident. Do not rerun Bootstrap only to obtain more favorable metrics. Ordinary cheap tests may be rerun for genuine implementation repairs within the approved charter.
+- **Recoverability:** Codex writes a compact batch journal under `results/` with each subtask's status, commit, verification, attempt counts and next action. If the Codex session ends before the milestone is finished, report `BATCH_IN_PROGRESS` and journal a safe resumable checkpoint; on the next user `開始`, safely sync and continue **without repeating completed heavy work**. Never claim to run asynchronously between turns.
+- **Web review cadence:** after a completed batch/milestone, or immediately for an unresolved M/architecture/cross-repository decision, incompatible Standard baseline, persistent numeric failure, unsafe Git operation, or scope overrun. Web should perform ONE integrated review covering architecture, re-use, numerical correctness, true Fast dispatch, cost and next research direction, and should avoid redundant line-by-line reviews of routine source changes.
+
+**Status vocabulary:** `BATCH_IN_PROGRESS`, `BATCH_COMPLETE_READY_FOR_WEB_REVIEW`, `BATCH_BLOCKED_NEEDS_WEB_REVIEW`. Existing one-task statuses remain valid for explicitly single-task exceptions. In the batch mode, `READY_FOR_WEB_REVIEW` applies at the **batch boundary**, not after each successful subtask.
+
 ## 5. Executable mathematics
 
 Whenever possible, GPT Web should convert mathematical decisions into executable contracts before implementation.
