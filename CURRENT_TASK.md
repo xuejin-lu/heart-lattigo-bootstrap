@@ -1,28 +1,26 @@
 # Current Task
 
-Task: FAST-DROPIN-ABOVE-CAP-NUMERICAL-AUTONOMOUS-BATCH-016
+Task: FAST-DROPIN-PUBLIC-PRIMITIVE-BOOTSTRAP-AUTONOMOUS-BATCH-017
 Status: READY_FOR_CODEX
-Mode: FOUR-CHECKPOINT BOUNDED AUTONOMOUS ABOVE-CAP NUMERICAL VALIDATION
-Review: one Web milestone review after checkpoint D or immediately at a real math/provenance blocker
+Mode: APPROVED FOUR-CHECKPOINT BOUNDED E32 PUBLIC BOOTSTRAP INTEGRATION BATCH
+Web review: once after batch D or immediately on actual architectural/mathematical blocker
 
-**Executable charter:** `specs/FAST-DROPIN-ABOVE-CAP-NUMERICAL-AUTONOMOUS-BATCH-016.md`
-**Accepted previous review:** `results/FAST-DROPIN-BATCH-015-EVIDENCE-REPAIR-015R-web-review.md`
-**Workflow:** `AGENTS.md`, `docs/RESEARCH_ENGINEERING_WORKFLOW.md` §4A/4B
-**User goal:** `docs/FAST_DROPIN_ZERO_SECRET_GOAL.md`
+**Runnable charter:** `specs/FAST-DROPIN-PUBLIC-PRIMITIVE-BOOTSTRAP-AUTONOMOUS-BATCH-017.md`
+**Accepted previous milestone:** `results/FAST-DROPIN-ABOVE-CAP-NUMERICAL-AUTONOMOUS-BATCH-016-web-review.md`
+**Workflow:** `AGENTS.md`, `docs/RESEARCH_ENGINEERING_WORKFLOW.md` §4A/4B; Secondary `AGENTS.md`, `docs/FAST_QPREFIX_SPEC.md`
+**End goal:** `docs/FAST_DROPIN_ZERO_SECRET_GOAL.md`
 
-## Reviewed status
+## Review status
 
-Batch 015 + 015R is ACCEPTED within the supported Level 1/3 compact-public primitive chain scope. It proves unchanged frontend AddNew → MulRelinNew → Rescale → RotateNew, real Fast shared-kernel dispatch, exact Level/Scale/row-structure gates, and eight corrected nonempty Fast-vs-genuinely-encrypted-Standard decoded comparisons. The original Batch 015 bogus eight `RMSE=0` paired fields are invalid historical evidence and are superseded by immutable 015R evidence.
+Accept Batch 016 as bounded actual LogN13 Level-5 above-cap public Add→MulRelin→Rescale→Rotate numerical composition. The full chain maintains only q0..q3 in the Fast *outputs*, and Standard/Fast paired maximum complex difference is 1.646501045172496e-12 with capacity gates satisfied. Initial Fast EncryptNew ciphertexts retained q4/q5 backing; its high-Level measurement decoder used backend-specific centered-prefix materialization at the **measurement boundary**, not standard native DecryptNew. Thus 016 does NOT prove full transparent application-level ciphertext lifecycle, Bootstrap composition, security, or acceleration.
 
-This acceptance does **NOT** prove the same numerical chain for logical Level 5 with q4/q5 dormant; Batch 015's Level-5 work was only structural. It also does not establish complete public Bootstrap interoperability, all CKKS overloads, cryptographic security, or measured acceleration.
+## 017 authorized checkpoints
 
-## Authorized 016 research
+A: read current sources; reuse 012 verified E32 public Rotate→Bootstrap runner/keyplan, and 015 public chain; mathematically verify one E32 canonical-profile Add/MulRelin/Rescale/Rotate→Bootstrap common public frontend with correct residual Level/Scale. **Stop before expensive calls** if no valid supported chain exists.
+B: one matched cheap public primitive preflight against genuine Standard/Fast with native public DecryptNew/Decode at supported residual Level, honest dispatch and provenance.
+C: only if A/B pass, maximum **one Standard + one Fast Bootstrap** on the actual chain result, public GenEvaluationKeys/NewEvaluator/Bootstrap, E32 and unchanged frontend; check numeric oracles and direct delta.
+D: compact evidence, focused tests/vet, Codex self-review, safe Primary-only commit/push and Web handoff.
 
-A: source/mathematical audit and capacity-certified independent centered Level-5 numeric oracle; STOP on unproven decoding contract instead of inventing math.
-B: one shared unchanged public frontend Level-5 Add→MulRelin→Rescale→Rotate numerical run per pinned dependency, real 16-sample direct paired metrics, no q4/q5 read in Fast evaluation.
-C: enforce maintained-prefix/capacity and provenance, focused tests/vet and first-failure investigation, never pass on full-Q/stale-row aliasing.
-D: write compact Primary evidence, self-review, normal fast-forward commit/push, Web handoff.
+**Pins:** genuine original Standard `5dbffbdea05394de2ca3a432ed5318aa832e3f40` clean/read-only; Fast Secondary `xuejin-lu/lattigo fast-qprefix@2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac` clean/read-only. Primary runner/results only; no Secondary edits.
 
-**Repos:** Primary `xuejin-lu/heart-lattigo-bootstrap main` may add only 016 runner/tests/results. Fast Secondary `xuejin-lu/lattigo fast-qprefix@2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac` and genuine unmodified Standard `5dbffbdea05394de2ca3a432ed5318aa832e3f40` are READ-ONLY / pinned. Verify current remote heads and clean worktrees before work.
-
-**Costs:** 0 Bootstrap, 0 benchmark, 0 LogN16, no sweeps, max one matched Standard/Fast deterministic pair with cheap focused tests. No new algorithm and no Secondary edits. STOP with evidence for any novel mathematical or integration decision. Do not automatically start the next batch.
+**Budget:** 1 Standard + 1 Fast Bootstrap **maximum total**, zero retries, zero benchmarks, zero LogN16, zero sweeps. Preserve E32, Q/P, parameters and accepted original evidence. Do not start 018 without Web.
