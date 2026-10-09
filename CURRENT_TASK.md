@@ -1,23 +1,27 @@
 # Current Task
 
-Task: FAST-DROPIN-ROTATE-BOOTSTRAP-KEYPLAN-011
+Task: FAST-DROPIN-INTEGRATION-AUTONOMOUS-BATCH-012
 Status: READY_FOR_CODEX
-Class: bounded E integration and frontend evaluation-key pairing fix only
+Mode: EXPLICITLY AUTHORIZED MULTI-CHECKPOINT AUTONOMOUS BATCH
+Review: ONE Web milestone review on completion, or immediate NEEDS_WEB_REVIEW on a hard blocker
 
-**Executable spec:** `specs/FAST-DROPIN-ROTATE-BOOTSTRAP-KEYPLAN-011.md`
-**Web review:** `results/FAST-DROPIN-PUBLIC-ROTATE-BOOTSTRAP-COMPOSITION-010-web-review.md`
-**Original goal:** `docs/FAST_DROPIN_ZERO_SECRET_GOAL.md`
+**Executable batch charter:** `specs/FAST-DROPIN-INTEGRATION-AUTONOMOUS-BATCH-012.md`
+**Prior approved key-plan math:** `specs/FAST-DROPIN-ROTATE-BOOTSTRAP-KEYPLAN-011.md`
+**010 Web failure diagnosis:** `results/FAST-DROPIN-PUBLIC-ROTATE-BOOTSTRAP-COMPOSITION-010-web-review.md`
+**Durable autonomy/workflow authority:** `docs/RESEARCH_ENGINEERING_WORKFLOW.md` §4B; `AGENTS.md`.
 
-## 010 decision and root cause
+## Purpose
 
-Task 010 is **BLOCKED with useful Fast preflight evidence**, not an indictment of Fast arithmetic or Standard Rotate. Fast public keyless Level0 Rotate passed a 4096-slot complex oracle with RMSE `7.44997342660252e-13`, zero c1, and no GaloisKey lookups. **No Bootstrap calls were made**, and no Standard-vs-Fast comparison exists. Standard panicked because the 010 test runner passed **Bootstrap-parameter-generated Galois keys (P Level 4)** into an evaluator built from the P-free **residual** parameters (P Level -1). The Galois element's presence alone does not imply Q/P compatibility. Codex's Fast reflection-harness fix required one additional preflight run; provenance is documented.
+The user authorized Codex to implement, test, self-review, repair and **continue across related subtasks without a Web handoff on each small change**. Web review remains compulsory **at the batch milestone** or when a genuine architecture/math/provenance blocker requires independent arbitration.
 
-## Authorized corrective task
+This batch covers a strict ordered chain:
+- **A**: fix Standard `RotateNew` evaluator/key QP mismatch in a **new identical-source shared frontend**, using the Bootstrap Parameters evaluator with existing Bootstrap evaluation keys in BOTH pinned Standard/Fast builds.
+- **B**: validate both ordinary public Rotate preflights, genuine Standard native encryption and Fast zero-secret input, independent plaintext oracle and full provenance.
+- **C**: only if both B preflights pass, execute at most **ONE genuine Standard + ONE Fast E32 Bootstrap** on their rotated ciphertexts; zero repeats.
+- **D**: if C passes, produce a concise read-only end-to-end compatibility/gap inventory and milestone handoff.
 
-Create **new identical-source 011 Primary frontend** to pair `ckks.NewEvaluator(btpParams.BootstrappingParameters, keys.MemEvaluationKeySet)` with the existing Bootstrap-generated keys in **both** pinned Standard and Fast builds, on the original residual-generated Level0 ciphertext. Preflight Q-prefix equality, ring degree, Standard-ring type, same-secret extension in pinned Standard code, exact config/input/Q/P hashes and unchanged Scale/Level. Only if both no-Bootstrap preflights pass may the run execute at most one E32 Bootstrap per backend on the rotated ciphertext. Log all results, including early failure/panic, before deciding any library repair. **Do not alter either Lattigo library or existing 004/010 evidence.**
+**After each passed checkpoint, Codex automatically proceeds to the next permitted checkpoint** after coding self-review, affected tests and safe journal commits. No need to return for Web between A, B, C and D. Journal under `results/FAST-DROPIN-INTEGRATION-AUTONOMOUS-BATCH-012-journal.md`; if session ends, return `BATCH_IN_PROGRESS` and resume from journal on next `開始` without repeating consumed Bootstrap work. Stop `BATCH_BLOCKED_NEEDS_WEB_REVIEW` when any math, architecture, parameter, key-layout or numerical decision is unapproved or a required gate fails; report evidence, do not improvise.
 
-Pinned genuine Standard: `5dbffbdea05394de2ca3a432ed5318aa832e3f40`.
-Pinned Fast Secondary: `00ac70ba136d190fa31bbb26c2f51d003a221634`.
-Old performance task `FAST-STANDARD-PERF-REBASELINE-003` remains BLOCKED.
+Pinned genuine Standard `5dbffbdea05394de2ca3a432ed5318aa832e3f40`. Pinned Fast Secondary `00ac70ba136d190fa31bbb26c2f51d003a221634`. Both libraries unmodified. Existing 004/010 source and reports immutable. Original zero-secret simulation is **not secure HE**. Formal `FAST-STANDARD-PERF-REBASELINE-003` remains BLOCKED.
 
-Return `FAST_DROPIN_KEYPLAN_COMPOSITION_COMPLETE_PENDING_WEB_REVIEW`, `FAST_DROPIN_KEYPLAN_COMPOSITION_PARTIAL`, or `FAST_DROPIN_KEYPLAN_COMPOSITION_BLOCKED` plus `READY_FOR_WEB_REVIEW` / `NEEDS_WEB_REVIEW`.
+At completed batch, return `BATCH_COMPLETE_READY_FOR_WEB_REVIEW` and `READY_FOR_WEB_REVIEW`. Before batch completion, `BATCH_IN_PROGRESS` means continue autonomously or await the next Codex session, **not a request for Web acceptance**.
