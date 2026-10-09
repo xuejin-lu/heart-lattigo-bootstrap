@@ -1,28 +1,28 @@
 # Current Task
 
-Task: FAST-DROPIN-BATCH-015-EVIDENCE-REPAIR-015R
+Task: FAST-DROPIN-ABOVE-CAP-NUMERICAL-AUTONOMOUS-BATCH-016
 Status: READY_FOR_CODEX
-Mode: APPROVED PRIMARY-ONLY EVIDENCE REPAIR (THREE CHECKPOINTS)
-Review: ONE independent Web acceptance after repair or immediate genuine blocker
+Mode: FOUR-CHECKPOINT BOUNDED AUTONOMOUS ABOVE-CAP NUMERICAL VALIDATION
+Review: one Web milestone review after checkpoint D or immediately at a real math/provenance blocker
 
-**Runnable spec:** `specs/FAST-DROPIN-BATCH-015-EVIDENCE-REPAIR-015R.md`
-**Web review / root cause:** `results/FAST-DROPIN-COMPACT-CONSUMERS-AUTONOMOUS-BATCH-015-web-review.md`
-**Frozen original report:** `results/FAST-DROPIN-COMPACT-CONSUMERS-AUTONOMOUS-BATCH-015-{summary.md,journal.md,evidence.json}` — never overwrite.
+**Executable charter:** `specs/FAST-DROPIN-ABOVE-CAP-NUMERICAL-AUTONOMOUS-BATCH-016.md`
+**Accepted previous review:** `results/FAST-DROPIN-BATCH-015-EVIDENCE-REPAIR-015R-web-review.md`
 **Workflow:** `AGENTS.md`, `docs/RESEARCH_ENGINEERING_WORKFLOW.md` §4A/4B
+**User goal:** `docs/FAST_DROPIN_ZERO_SECRET_GOAL.md`
 
-## User goal and review classification
+## Reviewed status
 
-Batch 015 completed the selected compact public CKKS Add → MulRelin → Rescale → Rotate Fast Q-prefix core integration. However, the Primary evidence aggregation **lost raw decoded vectors through Go slice aliasing**, then wrongly accepted two empty arrays as RMSE=0. The eight saved direct `fast_vs_standard_rmse=0` and max-error=0 values are invalid; original plaintext-oracle results remain bounded historical evidence, not independent Web reruns.
+Batch 015 + 015R is ACCEPTED within the supported Level 1/3 compact-public primitive chain scope. It proves unchanged frontend AddNew → MulRelinNew → Rescale → RotateNew, real Fast shared-kernel dispatch, exact Level/Scale/row-structure gates, and eight corrected nonempty Fast-vs-genuinely-encrypted-Standard decoded comparisons. The original Batch 015 bogus eight `RMSE=0` paired fields are invalid historical evidence and are superseded by immutable 015R evidence.
 
-**This task repairs evidence only.** Preserve all Secondary CKKS algorithms/kernels and genuine Standard baseline unchanged. Freeze frontend, Q/P, E, deterministic inputs, thresholds and levels. Correct the aliasing and empty/mismatch/nonfinite guards; add regression tests; run one fresh genuine Standard and one Fast matched runner; publish corrected standalone 015R evidence with real paired RMSE/max.
+This acceptance does **NOT** prove the same numerical chain for logical Level 5 with q4/q5 dormant; Batch 015's Level-5 work was only structural. It also does not establish complete public Bootstrap interoperability, all CKKS overloads, cryptographic security, or measured acceleration.
 
-## Sequential checkpoints
+## Authorized 016 research
 
-A: inspect source; regression-first unit tests for `summaryOf` immutability and `compare` nonempty/shape; fix combiner without modifying workload.
-B: two small matched runs (Standard/Fast) and corrected compact numerical report with exact provenance; do not overwrite 015 artifacts.
-C: focused tests, vet, diff/self-review, safe Primary-only commit/push, final Web handoff.
+A: source/mathematical audit and capacity-certified independent centered Level-5 numeric oracle; STOP on unproven decoding contract instead of inventing math.
+B: one shared unchanged public frontend Level-5 Add→MulRelin→Rescale→Rotate numerical run per pinned dependency, real 16-sample direct paired metrics, no q4/q5 read in Fast evaluation.
+C: enforce maintained-prefix/capacity and provenance, focused tests/vet and first-failure investigation, never pass on full-Q/stale-row aliasing.
+D: write compact Primary evidence, self-review, normal fast-forward commit/push, Web handoff.
 
-**Pins:** Standard `5dbffbdea05394de2ca3a432ed5318aa832e3f40` separate clean; Fast Secondary `2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac` branch `fast-qprefix`, read-only.
-**Cost:** zero Bootstrap, zero benchmarks, zero LogN16. No Secondary modification or push. No subsequent batch without a new Web authorization.
+**Repos:** Primary `xuejin-lu/heart-lattigo-bootstrap main` may add only 016 runner/tests/results. Fast Secondary `xuejin-lu/lattigo fast-qprefix@2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac` and genuine unmodified Standard `5dbffbdea05394de2ca3a432ed5318aa832e3f40` are READ-ONLY / pinned. Verify current remote heads and clean worktrees before work.
 
-**Expected terminal:** `BATCH_COMPLETE_READY_FOR_WEB_REVIEW` only if corrected eight real pairs and original individual plaintext gates pass; else `BATCH_BLOCKED_NEEDS_WEB_REVIEW` with exact failure.
+**Costs:** 0 Bootstrap, 0 benchmark, 0 LogN16, no sweeps, max one matched Standard/Fast deterministic pair with cheap focused tests. No new algorithm and no Secondary edits. STOP with evidence for any novel mathematical or integration decision. Do not automatically start the next batch.
