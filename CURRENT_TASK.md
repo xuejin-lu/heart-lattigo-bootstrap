@@ -1,10 +1,10 @@
 # Current Task
 
 Task: FAST-DROPIN-KEYLESS-ROTATE-007
-Status: READY_FOR_CODEX
+Status: ON_HOLD_FOR_WEB_ARCHITECTURE_REVIEW
 Task class: narrowly bounded M-approved Fast zero-secret Rotate implementation and no-Bootstrap numerical preflight
 
-**Executable spec:** `specs/FAST-DROPIN-KEYLESS-ROTATE-007.md`
+**Existing proposed spec (SUSPENDED; DO NOT EXECUTE):** `specs/FAST-DROPIN-KEYLESS-ROTATE-007.md`
 **Independent prior review:** `results/FAST-DROPIN-KEYLESS-MULRELIN-SAFETY-006A-web-review.md`
 **Long-term goal:** `docs/FAST_DROPIN_ZERO_SECRET_GOAL.md`
 
@@ -21,3 +21,9 @@ Only Fast Secondary implementation and tests; same unchanged frontend for one Fa
 Read and execute the referenced spec after AGENTS safe sync. Report `FAST_DROPIN_KEYLESS_ROTATE_COMPLETE_PENDING_WEB_REVIEW`, `FAST_DROPIN_KEYLESS_ROTATE_PARTIAL`, or `FAST_DROPIN_KEYLESS_ROTATE_BLOCKED`, plus `READY_FOR_WEB_REVIEW` / `NEEDS_WEB_REVIEW`.
 
 `FAST-STANDARD-PERF-REBASELINE-003` remains BLOCKED.
+
+## Halt instruction (2026-10-09)
+
+The user correctly questioned whether new public CKKS Rotate reimplements work already present in `schemes/ckks/fast`. GPT Web independently verified that the dedicated Fast evaluator already implements Add, MulRelin, Rescale and Rotate while ordinary `ckks.NewEvaluator` does not select those optimized methods. A one-primitive-at-a-time reimplementation inside `schemes/ckks` risks duplicate arithmetic, incorrect Q-prefix authority, and maintenance divergence. **007 is suspended** pending a Web-approved, source-backed architecture decision for transparent reuse of existing Fast kernels under unchanged public signatures, including Go import-cycle constraints and representation/Level/Scale semantics.
+
+When the user says `開始`, Codex must still perform mandatory safe sync and read this file, then **STOP with ON_HOLD status**, with no implementation or benchmarks, until Web issues a new authorized task/spec. Existing accepted 006A changes are retained unchanged; do not revert or reset anything. This is an orchestration hold, not a rollback or a finding that 006A numerical results were invalid.
