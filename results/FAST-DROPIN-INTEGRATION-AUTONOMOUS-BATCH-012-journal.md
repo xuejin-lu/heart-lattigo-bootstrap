@@ -2,8 +2,8 @@
 
 **Batch state:** `BATCH_IN_PROGRESS`
 
-**Current checkpoint:** C — single bounded public Bootstrap composition
-**Bootstrap budget:** Standard `0/1`; Fast `0/1`
+**Current checkpoint:** C — Standard single Bootstrap attempt reserved
+**Bootstrap budget:** Standard `1/1 reserved before launch`; Fast `0/1`
 
 ## Resume preflight — 2026-10-10
 
@@ -51,4 +51,4 @@
 
 ## Checkpoint C / D
 
-C is now authorized. Run exactly one Bootstrap under pinned Standard, inspect its result, then run exactly one under pinned Fast only if Standard completes. D is authorized only if both C runs complete. Do not retry or perform any other Bootstrap. Current shared frontend SHA for C: `a19841d94311d95a6f0cbab9a3301e49d5820fb5660885f1037a088e1a9204ad`.
+C is authorized. The one Standard attempt slot is reserved before launch; after the attempt, update its exact status/result and push the journal before deciding whether Fast is eligible. The Standard output target is `/private/tmp/fast-dropin-keyplan-011-standard-bootstrap.json`. Do not relaunch this attempt if the process or output becomes ambiguous. Fast remains `0/1` and is permitted only after Standard completes successfully. D is authorized only if both C runs complete. Current shared frontend SHA for C: `a19841d94311d95a6f0cbab9a3301e49d5820fb5660885f1037a088e1a9204ad`.
