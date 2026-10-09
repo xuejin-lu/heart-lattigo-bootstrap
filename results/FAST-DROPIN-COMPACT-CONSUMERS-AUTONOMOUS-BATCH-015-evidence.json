@@ -1,0 +1,491 @@
+{
+  "schema_version": "fast-dropin-compact-consumers-batch-015-evidence.v1",
+  "status": "paired_public_compact_chain_passed",
+  "created_utc": "2026-10-09T22:22:45.737464Z",
+  "primary_commit_during_runs": "d097a3f638431ed862e8f0da34956480e348c937",
+  "primary_dirty_during_runs": true,
+  "profile": {
+    "log_n": 13,
+    "log_q_bits": [
+      55,
+      39,
+      40,
+      39
+    ],
+    "log_p_bits": [
+      60
+    ],
+    "default_scale_log2": 45,
+    "log_slots": 4,
+    "levels": [
+      1,
+      3
+    ]
+  },
+  "profile_sha256": "f1d7944ea3febd9731cfd846af71c8596089893d014b729e489fc694d27f7ebc",
+  "effective_qp_sha256": "41c103fb3338c8fca82ab0c5b2e4dfd17cf1affc6d7295e082a6ba4a6e372324",
+  "shared_runner_sha256": "720a4860fd7ed0f2d88673d7b5b5908661bd80913af7e8e8d2be2c5e0391ce3f",
+  "deterministic_input_sha256": "296447e0602fcaec7839fd302ec783dd0994418aad18757c20cfe9d38323cd24",
+  "bootstrap_calls": 0,
+  "standard": {
+    "commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+    "ref": "detached-pinned-standard",
+    "dirty": false,
+    "fast_zero_secret_capability": false,
+    "key_lookups": {
+      "relinearization": 2,
+      "galois": 2,
+      "galois_key_list": 1
+    },
+    "checkpoints": [
+      {
+        "id": "add-l1",
+        "api": "AddNew",
+        "state": {
+          "level": 1,
+          "degree": 1,
+          "scale_log2": 45,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "c1_zero": false,
+          "rows_per_component": [
+            2,
+            2
+          ]
+        },
+        "plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 8.570052293144194e-13,
+          "max_complex_error": 1.6598647988925484e-12
+        },
+        "status": "passed"
+      },
+      {
+        "id": "mul-relin-l1",
+        "api": "MulRelinNew",
+        "state": {
+          "level": 1,
+          "degree": 1,
+          "scale_log2": 90,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "c1_zero": false,
+          "rows_per_component": [
+            2,
+            2
+          ]
+        },
+        "plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 1.1876649668057073e-13,
+          "max_complex_error": 2.785867809437807e-13
+        },
+        "status": "passed"
+      },
+      {
+        "id": "rescale-l1",
+        "api": "Rescale",
+        "state": {
+          "level": 0,
+          "degree": 1,
+          "scale_log2": 51.00000021497571,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "c1_zero": false,
+          "rows_per_component": [
+            1,
+            1
+          ]
+        },
+        "plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 1.191433893785213e-13,
+          "max_complex_error": 2.8427588143895157e-13
+        },
+        "status": "passed"
+      },
+      {
+        "id": "rotate-l0",
+        "api": "RotateNew",
+        "state": {
+          "level": 0,
+          "degree": 1,
+          "scale_log2": 51.00000021497571,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "c1_zero": false,
+          "rows_per_component": [
+            1,
+            1
+          ]
+        },
+        "plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 1.2218006909531684e-13,
+          "max_complex_error": 2.921894213768164e-13
+        },
+        "status": "passed"
+      },
+      {
+        "id": "add-l3",
+        "api": "AddNew",
+        "state": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 45,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "c1_zero": false,
+          "rows_per_component": [
+            4,
+            4
+          ]
+        },
+        "plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 6.146130475104634e-13,
+          "max_complex_error": 9.84598081851819e-13
+        },
+        "status": "passed"
+      },
+      {
+        "id": "mul-relin-l3",
+        "api": "MulRelinNew",
+        "state": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 90,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "c1_zero": false,
+          "rows_per_component": [
+            4,
+            4
+          ]
+        },
+        "plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 1.1788622187031278e-13,
+          "max_complex_error": 3.18688645137287e-13
+        },
+        "status": "passed"
+      },
+      {
+        "id": "rescale-l3",
+        "api": "Rescale",
+        "state": {
+          "level": 2,
+          "degree": 1,
+          "scale_log2": 50.999999441053866,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "c1_zero": false,
+          "rows_per_component": [
+            3,
+            3
+          ]
+        },
+        "plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 1.17598549556441e-13,
+          "max_complex_error": 3.205925586119129e-13
+        },
+        "status": "passed"
+      },
+      {
+        "id": "rotate-l2",
+        "api": "RotateNew",
+        "state": {
+          "level": 2,
+          "degree": 1,
+          "scale_log2": 50.999999441053866,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "c1_zero": false,
+          "rows_per_component": [
+            3,
+            3
+          ]
+        },
+        "plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 1.171925043074307e-13,
+          "max_complex_error": 3.11461560996897e-13
+        },
+        "status": "passed"
+      }
+    ]
+  },
+  "fast": {
+    "commit": "2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac",
+    "ref": "fast-qprefix",
+    "dirty": false,
+    "fast_zero_secret_capability": true,
+    "key_lookups": {
+      "relinearization": 0,
+      "galois": 0,
+      "galois_key_list": 1
+    },
+    "checkpoints": [
+      {
+        "id": "add-l1",
+        "api": "AddNew",
+        "state": {
+          "level": 1,
+          "degree": 1,
+          "scale_log2": 45,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "c1_zero": true,
+          "rows_per_component": [
+            2,
+            2
+          ]
+        },
+        "plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 6.366054749149383e-14,
+          "max_complex_error": 9.928313431575474e-14
+        },
+        "status": "passed"
+      },
+      {
+        "id": "mul-relin-l1",
+        "api": "MulRelinNew",
+        "state": {
+          "level": 1,
+          "degree": 1,
+          "scale_log2": 90,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "c1_zero": true,
+          "rows_per_component": [
+            2,
+            2
+          ]
+        },
+        "plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 1.2107810342262678e-14,
+          "max_complex_error": 3.412798172914084e-14
+        },
+        "status": "passed"
+      },
+      {
+        "id": "rescale-l1",
+        "api": "Rescale",
+        "state": {
+          "level": 0,
+          "degree": 1,
+          "scale_log2": 51.00000021497571,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "c1_zero": true,
+          "rows_per_component": [
+            1,
+            1
+          ]
+        },
+        "plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 1.2091291087356483e-14,
+          "max_complex_error": 3.428030545004269e-14
+        },
+        "status": "passed"
+      },
+      {
+        "id": "rotate-l0",
+        "api": "RotateNew",
+        "state": {
+          "level": 0,
+          "degree": 1,
+          "scale_log2": 51.00000021497571,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "c1_zero": true,
+          "rows_per_component": [
+            1,
+            1
+          ]
+        },
+        "plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 1.2091040566293166e-14,
+          "max_complex_error": 3.4279439580701376e-14
+        },
+        "status": "passed"
+      },
+      {
+        "id": "add-l3",
+        "api": "AddNew",
+        "state": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 45,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "c1_zero": true,
+          "rows_per_component": [
+            4,
+            4
+          ]
+        },
+        "plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 6.366054749149383e-14,
+          "max_complex_error": 9.928313431575474e-14
+        },
+        "status": "passed"
+      },
+      {
+        "id": "mul-relin-l3",
+        "api": "MulRelinNew",
+        "state": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 90,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "c1_zero": true,
+          "rows_per_component": [
+            4,
+            4
+          ]
+        },
+        "plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 1.2107810342262678e-14,
+          "max_complex_error": 3.412798172914084e-14
+        },
+        "status": "passed"
+      },
+      {
+        "id": "rescale-l3",
+        "api": "Rescale",
+        "state": {
+          "level": 2,
+          "degree": 1,
+          "scale_log2": 50.999999441053866,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "c1_zero": true,
+          "rows_per_component": [
+            3,
+            3
+          ]
+        },
+        "plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 1.2037748285292441e-14,
+          "max_complex_error": 3.376880213786467e-14
+        },
+        "status": "passed"
+      },
+      {
+        "id": "rotate-l2",
+        "api": "RotateNew",
+        "state": {
+          "level": 2,
+          "degree": 1,
+          "scale_log2": 50.999999441053866,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "c1_zero": true,
+          "rows_per_component": [
+            3,
+            3
+          ]
+        },
+        "plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 1.2037006811678599e-14,
+          "max_complex_error": 3.376540869292024e-14
+        },
+        "status": "passed"
+      }
+    ]
+  },
+  "paired_checkpoints": [
+    {
+      "id": "add-l1",
+      "standard_plaintext_rmse": 8.570052293144194e-13,
+      "fast_plaintext_rmse": 6.366054749149383e-14,
+      "fast_vs_standard_rmse": 0,
+      "fast_vs_standard_max_complex_error": 0,
+      "level": 1,
+      "standard_scale_log2": 45,
+      "fast_scale_log2": 45
+    },
+    {
+      "id": "mul-relin-l1",
+      "standard_plaintext_rmse": 1.1876649668057073e-13,
+      "fast_plaintext_rmse": 1.2107810342262678e-14,
+      "fast_vs_standard_rmse": 0,
+      "fast_vs_standard_max_complex_error": 0,
+      "level": 1,
+      "standard_scale_log2": 90,
+      "fast_scale_log2": 90
+    },
+    {
+      "id": "rescale-l1",
+      "standard_plaintext_rmse": 1.191433893785213e-13,
+      "fast_plaintext_rmse": 1.2091291087356483e-14,
+      "fast_vs_standard_rmse": 0,
+      "fast_vs_standard_max_complex_error": 0,
+      "level": 0,
+      "standard_scale_log2": 51.00000021497571,
+      "fast_scale_log2": 51.00000021497571
+    },
+    {
+      "id": "rotate-l0",
+      "standard_plaintext_rmse": 1.2218006909531684e-13,
+      "fast_plaintext_rmse": 1.2091040566293166e-14,
+      "fast_vs_standard_rmse": 0,
+      "fast_vs_standard_max_complex_error": 0,
+      "level": 0,
+      "standard_scale_log2": 51.00000021497571,
+      "fast_scale_log2": 51.00000021497571
+    },
+    {
+      "id": "add-l3",
+      "standard_plaintext_rmse": 6.146130475104634e-13,
+      "fast_plaintext_rmse": 6.366054749149383e-14,
+      "fast_vs_standard_rmse": 0,
+      "fast_vs_standard_max_complex_error": 0,
+      "level": 3,
+      "standard_scale_log2": 45,
+      "fast_scale_log2": 45
+    },
+    {
+      "id": "mul-relin-l3",
+      "standard_plaintext_rmse": 1.1788622187031278e-13,
+      "fast_plaintext_rmse": 1.2107810342262678e-14,
+      "fast_vs_standard_rmse": 0,
+      "fast_vs_standard_max_complex_error": 0,
+      "level": 3,
+      "standard_scale_log2": 90,
+      "fast_scale_log2": 90
+    },
+    {
+      "id": "rescale-l3",
+      "standard_plaintext_rmse": 1.17598549556441e-13,
+      "fast_plaintext_rmse": 1.2037748285292441e-14,
+      "fast_vs_standard_rmse": 0,
+      "fast_vs_standard_max_complex_error": 0,
+      "level": 2,
+      "standard_scale_log2": 50.999999441053866,
+      "fast_scale_log2": 50.999999441053866
+    },
+    {
+      "id": "rotate-l2",
+      "standard_plaintext_rmse": 1.171925043074307e-13,
+      "fast_plaintext_rmse": 1.2037006811678599e-14,
+      "fast_vs_standard_rmse": 0,
+      "fast_vs_standard_max_complex_error": 0,
+      "level": 2,
+      "standard_scale_log2": 50.999999441053866,
+      "fast_scale_log2": 50.999999441053866
+    }
+  ],
+  "compact_boundary": "Numerical decoding is limited to accepted LogN13 Levels 1 and 3, where the maintained Q-prefix includes every active row. The separate Level-5 Secondary test is structural-only: q4/q5 remain dormant through Add/MulRelin/Rescale/Rotate. No Bootstrap, benchmark, or LogN16 run was made."
+}
