@@ -1,28 +1,28 @@
 # Current Task
 
-Task: FAST-DROPIN-COMPACT-CONSUMERS-AUTONOMOUS-BATCH-015
+Task: FAST-DROPIN-BATCH-015-EVIDENCE-REPAIR-015R
 Status: READY_FOR_CODEX
-Mode: APPROVED FOUR-CHECKPOINT AUTONOMOUS INTEGRATION BATCH
-Web review: ONCE after checkpoint D, or immediately on the first genuine mathematical/representation blocker
+Mode: APPROVED PRIMARY-ONLY EVIDENCE REPAIR (THREE CHECKPOINTS)
+Review: ONE independent Web acceptance after repair or immediate genuine blocker
 
-**Runnable spec:** `specs/FAST-DROPIN-COMPACT-CONSUMERS-AUTONOMOUS-BATCH-015.md`
-**Accepted partial predecessor / pending gap:** `results/FAST-DROPIN-FAST-ENGINE-ADAPTER-AUTONOMOUS-BATCH-014-web-review.md`
-**End goal:** `docs/FAST_DROPIN_ZERO_SECRET_GOAL.md`
-**Workflow:** `docs/RESEARCH_ENGINEERING_WORKFLOW.md` §4A/4B, Primary/Secondary `AGENTS.md`
-**Fast Secondary:** `xuejin-lu/lattigo fast-qprefix@0c92e7ed071a1be6eb258474811db470e4463df7` (verify latest when synchronizing).
-**Genuine Standard baseline:** `5dbffbdea05394de2ca3a432ed5318aa832e3f40`, separate unchanged checkout.
+**Runnable spec:** `specs/FAST-DROPIN-BATCH-015-EVIDENCE-REPAIR-015R.md`
+**Web review / root cause:** `results/FAST-DROPIN-COMPACT-CONSUMERS-AUTONOMOUS-BATCH-015-web-review.md`
+**Frozen original report:** `results/FAST-DROPIN-COMPACT-CONSUMERS-AUTONOMOUS-BATCH-015-{summary.md,journal.md,evidence.json}` — never overwrite.
+**Workflow:** `AGENTS.md`, `docs/RESEARCH_ENGINEERING_WORKFLOW.md` §4A/4B
 
-## Web scientific review
+## User goal and review classification
 
-Batch 014 is **accepted only as a proven public compact Fast Add/Sub bridge**, not as an end-to-end compact-Q frontend. Its Level-5 downstream public `MulRelin`, `Rescale`, and `Rotate` currently reject q4 because legacy public wrappers still require full-active-Q; this is an integration boundary, **not** evidence that q4 should be materialized or that existing Fast Q-prefix algorithms lack CRT/rotation capability. Review the accepted `014-web-review.md` before implementation.
+Batch 015 completed the selected compact public CKKS Add → MulRelin → Rescale → Rotate Fast Q-prefix core integration. However, the Primary evidence aggregation **lost raw decoded vectors through Go slice aliasing**, then wrongly accepted two empty arrays as RMSE=0. The eight saved direct `fast_vs_standard_rmse=0` and max-error=0 values are invalid; original plaintext-oracle results remain bounded historical evidence, not independent Web reruns.
 
-## Authorized A→D charter
+**This task repairs evidence only.** Preserve all Secondary CKKS algorithms/kernels and genuine Standard baseline unchanged. Freeze frontend, Q/P, E, deterministic inputs, thresholds and levels. Correct the aliasing and empty/mismatch/nonfinite guards; add regression tests; run one fresh genuine Standard and one Fast matched runner; publish corrected standalone 015R evidence with real paired RMSE/max.
 
-A: exact source-backed existing Fast `MulRelin`/Rescale/Rotate kernel map, select minimal import-neutral adapter extraction and proven capacity/row policy.
-B: connect public `MulRelin/MulRelinNew` compact ciphertext path to reused Fast Q-prefix multiplication/relinearization core, preserve zero-secret semantics and no native KeySwitch.
-C: bridge existing Fast Rescale/Rotate compact consumer semantics behind unchanged public APIs, test a small unchanged-frontend compact arithmetic chain, stop at any actual new mathematical/representation conflict.
-D: compact evidence, instrumentation, matched independent Standard fixture, affected package tests/vet, self-review, safe commit/push, one Web handoff.
+## Sequential checkpoints
 
-Do not expand P0 full-Q generic arithmetic as a substitute for Fast integration. No Fast-specific imports/constructors/flags in application frontend, no Standard fallback on dormant rows, no duplication of already existing Fast kernels. Stage A capacity/CRT/Level semantics stay governed by the Secondary Q-prefix constitution. Distinguish Level-5 structural-only evidence from an independently valid numeric oracle.
+A: inspect source; regression-first unit tests for `summaryOf` immutability and `compare` nonempty/shape; fix combiner without modifying workload.
+B: two small matched runs (Standard/Fast) and corrected compact numerical report with exact provenance; do not overwrite 015 artifacts.
+C: focused tests, vet, diff/self-review, safe Primary-only commit/push, final Web handoff.
 
-**Budget:** zero Bootstrap, zero benchmark, zero LogN16. Preserve previous reports and both repositories' safe-Git rules. Stop on first real blocker; do not start 016 autonomously.
+**Pins:** Standard `5dbffbdea05394de2ca3a432ed5318aa832e3f40` separate clean; Fast Secondary `2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac` branch `fast-qprefix`, read-only.
+**Cost:** zero Bootstrap, zero benchmarks, zero LogN16. No Secondary modification or push. No subsequent batch without a new Web authorization.
+
+**Expected terminal:** `BATCH_COMPLETE_READY_FOR_WEB_REVIEW` only if corrected eight real pairs and original individual plaintext gates pass; else `BATCH_BLOCKED_NEEDS_WEB_REVIEW` with exact failure.
