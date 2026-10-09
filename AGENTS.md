@@ -80,6 +80,10 @@ After the mandatory startup preflight has completed:
 5. Execute the current task with the bounded autonomous cycle below.
 6. Report commits, tests, benchmark evidence, self-review findings, and any unresolved compatibility gap.
 
+### Milestone-batch exception (explicitly authorized only)
+
+When synchronized `CURRENT_TASK.md` points to an **approved autonomous batch charter** in `specs/`, apply `docs/RESEARCH_ENGINEERING_WORKFLOW.md` §4B: execute its **sequential authorized checkpoints**, using the coding self-review/repair cycle after each checkpoint, and automatically advance after a passing gate **without waiting for Web**. The batch charter replaces the usual single-task `READY_FOR_WEB_REVIEW` handoff **only for its enumerated I/E scope**; the GPT Web review is mandatory at the completed batch boundary or at a STOP escalation. Preserve a compact `results/` journal and expensive-experiment budget for safe resume across Codex sessions. A new mathematical/representation choice, unexpected failure or forbidden scope change **always** requires immediate `NEEDS_WEB_REVIEW`; it is not something Codex may self-authorize. Without an explicitly approved batch, the usual single-task cycle below remains in force.
+
 ### Bounded autonomous implementation/review cycle
 
 A normal `開始` run should not stop after the first implementation pass merely to ask the user for a review. Codex owns one bounded local review-and-repair cycle before handing the result back to the independent GPT Web orchestrator.
