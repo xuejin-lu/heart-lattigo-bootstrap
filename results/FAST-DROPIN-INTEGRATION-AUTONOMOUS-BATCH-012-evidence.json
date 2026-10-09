@@ -1,0 +1,332 @@
+{
+  "schema_version": "fast-dropin-rotate-bootstrap-keyplan-011.compare.v2",
+  "timestamp_utc": "2026-10-09T18:06:16.88904Z",
+  "evidence_repairs": [
+    "standard.evaluation_keys.rotation_galois_element derived from captured rotate_galois_element",
+    "fast.evaluation_keys.rotation_galois_element derived from captured rotate_galois_element"
+  ],
+  "primary_commit": "2321df7bf761585a05b9f116abe2c390a29904b5",
+  "primary_dirty": false,
+  "frontend_sha256": "14435c478ee9af0ba2ae0e3548850ed3c121b69141c4e0918d8a05bee4650e7f",
+  "config_sha256": "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98",
+  "input_sha256": "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285",
+  "standard_backend_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+  "standard_backend_ref": "pinned-standard-5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+  "standard_backend_dirty": false,
+  "fast_backend_commit": "00ac70ba136d190fa31bbb26c2f51d003a221634",
+  "fast_backend_ref": "fast-qprefix",
+  "fast_backend_dirty": false,
+  "bootstrap_calls_standard": 0,
+  "bootstrap_calls_fast": 0,
+  "standard_status": "preflight_passed",
+  "fast_status": "preflight_passed",
+  "standard": {
+    "primary_commit": "2321df7bf761585a05b9f116abe2c390a29904b5",
+    "primary_dirty": false,
+    "backend_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+    "backend_ref": "pinned-standard-5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+    "backend_dirty": false,
+    "frontend_sha256": "14435c478ee9af0ba2ae0e3548850ed3c121b69141c4e0918d8a05bee4650e7f",
+    "go_version": "go1.26.4",
+    "os": "darwin",
+    "architecture": "arm64",
+    "fast_bootstrap_selected": false,
+    "evaluation_keys": {
+      "generated_by": "btpParams.GenEvaluationKeys(sk)",
+      "galois_key_count": 30,
+      "standard_layout_key_count": 30,
+      "fast_layout_key_count": 0,
+      "rotation_galois_element": 5,
+      "rotation_key_present": true,
+      "rotation_key_layout": "implicit-standard",
+      "rotation_key_level_p": 4,
+      "evaluator_max_level_p": 4,
+      "relinearization_key_present": true,
+      "secret_q0_preserved": true,
+      "input_secret_level_q": 1,
+      "input_secret_level_p": -1,
+      "bootstrap_secret_level_q": 16,
+      "bootstrap_secret_level_p": 4
+    },
+    "rotate_galois_element": 5,
+    "rotate_evaluator_parameters": "btpParams.BootstrappingParameters",
+    "rotate_get_galois_key_calls": 1,
+    "rotate_get_galois_key_list_calls": 0,
+    "residual_q_is_exact_bootstrap_prefix": true,
+    "q0_prime_equal": true,
+    "residual_q_prime_bits": [
+      55,
+      39
+    ],
+    "bootstrap_q_prime_bits": [
+      55,
+      39,
+      40,
+      39,
+      40,
+      60,
+      60,
+      61,
+      60,
+      60,
+      60,
+      61,
+      61,
+      56,
+      57,
+      56,
+      56
+    ],
+    "bootstrap_p_prime_bits": [
+      61,
+      61,
+      62,
+      61,
+      62
+    ],
+    "residual_q_sha256": "127f596d800c0f1b943a6b89b1f5de0592e36336a4ae46a30d65ead94e3b436e",
+    "bootstrap_q_sha256": "30066778ef1caea959b3357b0a70ff792fe8582ba9545f6b53c8df2a1a6cb568",
+    "bootstrap_p_sha256": "70451211d27cd1e6bf092aa3c0752a63147c34842211dcd70d64d50755d318f7",
+    "residual_max_level": 1,
+    "bootstrap_max_level": 16,
+    "bootstrap_calls": 0,
+    "bootstrap_input_is_rotated_ciphertext": false,
+    "input_ciphertext": {
+      "level": 0,
+      "scale_log2": 45,
+      "degree": 1,
+      "n": 8192,
+      "component_count": 2,
+      "rows_per_component": [
+        1,
+        1
+      ],
+      "active_rows": 1,
+      "full_active_q": true,
+      "is_ntt": true,
+      "is_montgomery": false,
+      "is_batched": true,
+      "is_bit_reversed": false,
+      "log_dimensions_rows": 0,
+      "log_dimensions_cols": 12,
+      "log_slots": 12,
+      "c1_zero": false,
+      "c1_nonzero_count": 8192,
+      "c1_coefficient_count": 8192,
+      "c0_row_sha256": [
+        "a5d261710202e736fbbf77582963a99d1f93ffca83cceb4738290d860b483e26"
+      ],
+      "c1_row_sha256": [
+        "b5d360dfae7e3312b1b8e8e046d81260362fc08c4a2b1c3dc1d635249d47696d"
+      ]
+    },
+    "rotated_ciphertext": {
+      "level": 0,
+      "scale_log2": 45,
+      "degree": 1,
+      "n": 8192,
+      "component_count": 2,
+      "rows_per_component": [
+        1,
+        1
+      ],
+      "active_rows": 1,
+      "full_active_q": true,
+      "is_ntt": true,
+      "is_montgomery": false,
+      "is_batched": true,
+      "is_bit_reversed": false,
+      "log_dimensions_rows": 0,
+      "log_dimensions_cols": 12,
+      "log_slots": 12,
+      "c1_zero": false,
+      "c1_nonzero_count": 8192,
+      "c1_coefficient_count": 8192,
+      "c0_row_sha256": [
+        "3da192df29c5c4c4e8af8fa188d2c9e5897b47fa4af8e43a6aff140345c21044"
+      ],
+      "c1_row_sha256": [
+        "19532bf340c77f70eefb3fe5663df0f54ccb802d39d60c6cde4130269c20fecb"
+      ]
+    },
+    "immediate_decryption": {
+      "finite": true,
+      "complex_rmse": 8.337456445218973e-12,
+      "max_complex_error": 2.7186643647688807e-11,
+      "max_real_error": 2.696262657586601e-11,
+      "max_imag_error": 2.2374335023611636e-11,
+      "snr_db": 187.80652568362328,
+      "snr_state": "finite"
+    },
+    "rotate_vs_rotated_oracle": {
+      "finite": true,
+      "complex_rmse": 1.342087606921074e-11,
+      "max_complex_error": 5.379396273494723e-11,
+      "max_real_error": 4.472062303806368e-11,
+      "max_imag_error": 4.861838882874725e-11,
+      "snr_db": 183.67157992669885,
+      "snr_state": "finite"
+    },
+    "decoded_input_sha256": "0672cec80ee52203958a05f1fb49e0543b960fe9ac4ede232369c0e2c4598c0e",
+    "decoded_rotate_sha256": "0043a5e04d544646b42206b77903c0622a9ac93aa3dec4bfb27527ed2c73622e"
+  },
+  "fast": {
+    "primary_commit": "2321df7bf761585a05b9f116abe2c390a29904b5",
+    "primary_dirty": false,
+    "backend_commit": "00ac70ba136d190fa31bbb26c2f51d003a221634",
+    "backend_ref": "fast-qprefix",
+    "backend_dirty": false,
+    "frontend_sha256": "14435c478ee9af0ba2ae0e3548850ed3c121b69141c4e0918d8a05bee4650e7f",
+    "go_version": "go1.26.4",
+    "os": "darwin",
+    "architecture": "arm64",
+    "fast_bootstrap_selected": true,
+    "evaluation_keys": {
+      "generated_by": "btpParams.GenEvaluationKeys(sk)",
+      "galois_key_count": 30,
+      "standard_layout_key_count": 0,
+      "fast_layout_key_count": 30,
+      "rotation_galois_element": 5,
+      "rotation_key_present": true,
+      "rotation_key_layout": "fast",
+      "rotation_key_level_p": 4,
+      "evaluator_max_level_p": 4,
+      "relinearization_key_present": true,
+      "secret_q0_preserved": true,
+      "input_secret_level_q": 1,
+      "input_secret_level_p": -1,
+      "bootstrap_secret_level_q": 16,
+      "bootstrap_secret_level_p": 4
+    },
+    "rotate_galois_element": 5,
+    "rotate_evaluator_parameters": "btpParams.BootstrappingParameters",
+    "rotate_get_galois_key_calls": 0,
+    "rotate_get_galois_key_list_calls": 0,
+    "residual_q_is_exact_bootstrap_prefix": true,
+    "q0_prime_equal": true,
+    "residual_q_prime_bits": [
+      55,
+      39
+    ],
+    "bootstrap_q_prime_bits": [
+      55,
+      39,
+      40,
+      39,
+      40,
+      60,
+      60,
+      61,
+      60,
+      60,
+      60,
+      61,
+      61,
+      56,
+      57,
+      56,
+      56
+    ],
+    "bootstrap_p_prime_bits": [
+      61,
+      61,
+      62,
+      61,
+      62
+    ],
+    "residual_q_sha256": "127f596d800c0f1b943a6b89b1f5de0592e36336a4ae46a30d65ead94e3b436e",
+    "bootstrap_q_sha256": "30066778ef1caea959b3357b0a70ff792fe8582ba9545f6b53c8df2a1a6cb568",
+    "bootstrap_p_sha256": "70451211d27cd1e6bf092aa3c0752a63147c34842211dcd70d64d50755d318f7",
+    "residual_max_level": 1,
+    "bootstrap_max_level": 16,
+    "bootstrap_calls": 0,
+    "bootstrap_input_is_rotated_ciphertext": false,
+    "input_ciphertext": {
+      "level": 0,
+      "scale_log2": 45,
+      "degree": 1,
+      "n": 8192,
+      "component_count": 2,
+      "rows_per_component": [
+        1,
+        1
+      ],
+      "active_rows": 1,
+      "full_active_q": true,
+      "is_ntt": true,
+      "is_montgomery": false,
+      "is_batched": true,
+      "is_bit_reversed": false,
+      "log_dimensions_rows": 0,
+      "log_dimensions_cols": 12,
+      "log_slots": 12,
+      "c1_zero": true,
+      "c1_nonzero_count": 0,
+      "c1_coefficient_count": 8192,
+      "c0_row_sha256": [
+        "d28e82688ffdbd2cc5a067f0c0919952063278a6fb23c64d8ae2ebcda096cd30"
+      ],
+      "c1_row_sha256": [
+        "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+      ]
+    },
+    "rotated_ciphertext": {
+      "level": 0,
+      "scale_log2": 45,
+      "degree": 1,
+      "n": 8192,
+      "component_count": 2,
+      "rows_per_component": [
+        1,
+        1
+      ],
+      "active_rows": 1,
+      "full_active_q": true,
+      "is_ntt": true,
+      "is_montgomery": false,
+      "is_batched": true,
+      "is_bit_reversed": false,
+      "log_dimensions_rows": 0,
+      "log_dimensions_cols": 12,
+      "log_slots": 12,
+      "c1_zero": true,
+      "c1_nonzero_count": 0,
+      "c1_coefficient_count": 8192,
+      "c0_row_sha256": [
+        "420d39b6b3f4c421ff39cd6138cbb8af0b8d388f6c739454426a61b52f3e1025"
+      ],
+      "c1_row_sha256": [
+        "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+      ]
+    },
+    "immediate_decryption": {
+      "finite": true,
+      "complex_rmse": 7.449975091875706e-13,
+      "max_complex_error": 2.101955261562136e-12,
+      "max_real_error": 1.842290209275177e-12,
+      "max_imag_error": 1.982903424790905e-12,
+      "snr_db": 208.78410083248798,
+      "snr_state": "finite"
+    },
+    "rotate_vs_rotated_oracle": {
+      "finite": true,
+      "complex_rmse": 7.44997342660252e-13,
+      "max_complex_error": 2.1019564094557047e-12,
+      "max_real_error": 1.842279800934321e-12,
+      "max_imag_error": 1.982906894237857e-12,
+      "snr_db": 208.78410277402207,
+      "snr_state": "finite"
+    },
+    "decoded_input_sha256": "d107a20b1606f9d73a65b21299ead4d24f177adf74edcecb65dc7648aa4bdc5f",
+    "decoded_rotate_sha256": "9c6e4b1ba41c9cb7d0d96ff700298abaf1f91d15a74e29767c3f184de36bdc21"
+  },
+  "rotate_fast_vs_standard": {
+    "finite": true,
+    "complex_rmse": 1.3396909694030365e-11,
+    "max_complex_error": 5.3631037691780624e-11,
+    "max_real_error": 4.4845429453266306e-11,
+    "max_imag_error": 4.865565242373471e-11,
+    "snr_db": 183.68710464953378,
+    "snr_state": "finite"
+  }
+}

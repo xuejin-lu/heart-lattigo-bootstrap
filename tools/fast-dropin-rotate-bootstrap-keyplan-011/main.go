@@ -28,8 +28,11 @@ import (
 const (
 	canonicalConfigSHA256  = "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98"
 	canonicalInputSHA256   = "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285"
+	pinnedStandardCommit   = "5dbffbdea05394de2ca3a432ed5318aa832e3f40"
+	pinnedFastCommit       = "00ac70ba136d190fa31bbb26c2f51d003a221634"
 	preflightRMSETolerance = 1e-7
 	rotation               = 1
+	rotationGaloisElement  = 5
 )
 
 type config struct {
@@ -169,12 +172,18 @@ type runEvidence struct {
 type comparisonEvidence struct {
 	SchemaVersion           string     `json:"schema_version"`
 	TimestampUTC            string     `json:"timestamp_utc"`
+	EvidenceRepairs         []string   `json:"evidence_repairs,omitempty"`
 	PrimaryCommit           string     `json:"primary_commit"`
+	PrimaryDirty            bool       `json:"primary_dirty"`
 	FrontendSHA256          string     `json:"frontend_sha256"`
 	ConfigSHA256            string     `json:"config_sha256"`
 	InputSHA256             string     `json:"input_sha256"`
 	StandardBackendCommit   string     `json:"standard_backend_commit"`
+	StandardBackendRef      string     `json:"standard_backend_ref"`
+	StandardBackendDirty    bool       `json:"standard_backend_dirty"`
 	FastBackendCommit       string     `json:"fast_backend_commit"`
+	FastBackendRef          string     `json:"fast_backend_ref"`
+	FastBackendDirty        bool       `json:"fast_backend_dirty"`
 	BootstrapCallsStandard  int        `json:"bootstrap_calls_standard"`
 	BootstrapCallsFast      int        `json:"bootstrap_calls_fast"`
 	StandardStatus          string     `json:"standard_status"`
@@ -186,13 +195,33 @@ type comparisonEvidence struct {
 }
 
 type runSummary struct {
+	PrimaryCommit          string              `json:"primary_commit"`
+	PrimaryDirty           bool                `json:"primary_dirty"`
+	BackendCommit          string              `json:"backend_commit"`
+	BackendRef             string              `json:"backend_ref"`
+	BackendDirty           bool                `json:"backend_dirty"`
+	FrontendSHA256         string              `json:"frontend_sha256"`
+	GoVersion              string              `json:"go_version"`
+	OS                     string              `json:"os"`
+	Architecture           string              `json:"architecture"`
 	FastBootstrapSelected  bool                `json:"fast_bootstrap_selected"`
 	EvaluationKeys         keyEvidence         `json:"evaluation_keys"`
+	RotateGaloisElement    uint64              `json:"rotate_galois_element"`
+	RotateEvaluatorParams  string              `json:"rotate_evaluator_parameters"`
+	RotateGaloisKeyCalls   int                 `json:"rotate_get_galois_key_calls"`
+	RotateGaloisListCalls  int                 `json:"rotate_get_galois_key_list_calls"`
+	ResidualQPrefix        bool                `json:"residual_q_is_exact_bootstrap_prefix"`
+	Q0PrimeEqual           bool                `json:"q0_prime_equal"`
+	ResidualQPrimeBits     []int               `json:"residual_q_prime_bits"`
+	BootstrapQPrimeBits    []int               `json:"bootstrap_q_prime_bits"`
+	BootstrapPPrimeBits    []int               `json:"bootstrap_p_prime_bits"`
 	ResidualQSHA256        string              `json:"residual_q_sha256"`
 	BootstrapQSHA256       string              `json:"bootstrap_q_sha256"`
 	BootstrapPSHA256       string              `json:"bootstrap_p_sha256"`
 	ResidualMaxLevel       int                 `json:"residual_max_level"`
 	BootstrapMaxLevel      int                 `json:"bootstrap_max_level"`
+	BootstrapCalls         int                 `json:"bootstrap_calls"`
+	BootstrapInputRotated  bool                `json:"bootstrap_input_is_rotated_ciphertext"`
 	InputCiphertext        *ciphertextEvidence `json:"input_ciphertext,omitempty"`
 	RotatedCiphertext      *ciphertextEvidence `json:"rotated_ciphertext,omitempty"`
 	BootstrapOutput        *ciphertextEvidence `json:"bootstrap_output,omitempty"`
@@ -578,6 +607,7 @@ func inspectKeys(keys *bootstrapping.EvaluationKeys, rotationGalEl uint64, evalu
 			result.FastLayoutKeyCount++
 		}
 		if key.GaloisElement == rotationGalEl {
+			result.RotationGaloisElement = rotationGalEl
 			result.RotationKeyPresent = true
 			result.RotationKeyLayout = layout
 			result.RotationKeyLevelP = key.GadgetCiphertext.LevelP()
@@ -761,38 +791,211 @@ func compareFiles(standardPath, fastPath string) (comparisonEvidence, error) {
 	if err := readJSON(fastPath, &fast); err != nil {
 		return comparisonEvidence{}, fmt.Errorf("read Fast evidence: %w", err)
 	}
-	if standard.Phase != fast.Phase || (standard.Phase != "preflight" && standard.Phase != "bootstrap") {
-		return comparisonEvidence{}, fmt.Errorf("evidence phases do not match or are unsupported")
+	var evidenceRepairs []string
+	for _, item := range []struct {
+		name string
+		run  *runEvidence
+	}{{"standard", &standard}, {"fast", &fast}} {
+		// The first B raw captures predate the compact-schema fix and omitted
+		// this nested field even though the same record captured the requested
+		// element at its top level and confirmed that the key was present.
+		if item.run.EvaluationKeys.RotationGaloisElement == 0 && item.run.EvaluationKeys.RotationKeyPresent && item.run.RotateGaloisElement != 0 {
+			item.run.EvaluationKeys.RotationGaloisElement = item.run.RotateGaloisElement
+			evidenceRepairs = append(evidenceRepairs, item.name+".evaluation_keys.rotation_galois_element derived from captured rotate_galois_element")
+		}
 	}
-	if standard.FrontendSHA256 == "" || standard.FrontendSHA256 != fast.FrontendSHA256 || standard.ConfigSHA256 != fast.ConfigSHA256 || standard.InputSHA256 != fast.InputSHA256 || standard.BootstrapQSHA256 != fast.BootstrapQSHA256 || standard.BootstrapPSHA256 != fast.BootstrapPSHA256 {
-		return comparisonEvidence{}, fmt.Errorf("Standard/Fast frontend, config, input, Q or P identities differ")
+	if err := validateComparableRuns(standard, fast); err != nil {
+		return comparisonEvidence{}, err
 	}
 	comparison := comparisonEvidence{
-		SchemaVersion: "fast-dropin-rotate-bootstrap-keyplan-011.compare.v1", TimestampUTC: time.Now().UTC().Format(time.RFC3339Nano),
-		PrimaryCommit: standard.PrimaryCommit, FrontendSHA256: standard.FrontendSHA256, ConfigSHA256: standard.ConfigSHA256, InputSHA256: standard.InputSHA256,
-		StandardBackendCommit: standard.BackendCommit, FastBackendCommit: fast.BackendCommit,
+		SchemaVersion: "fast-dropin-rotate-bootstrap-keyplan-011.compare.v2", TimestampUTC: time.Now().UTC().Format(time.RFC3339Nano),
+		EvidenceRepairs: evidenceRepairs,
+		PrimaryCommit:   standard.PrimaryCommit, PrimaryDirty: standard.PrimaryDirty, FrontendSHA256: standard.FrontendSHA256, ConfigSHA256: standard.ConfigSHA256, InputSHA256: standard.InputSHA256,
+		StandardBackendCommit: standard.BackendCommit, StandardBackendRef: standard.BackendRef, StandardBackendDirty: standard.BackendDirty,
+		FastBackendCommit: fast.BackendCommit, FastBackendRef: fast.BackendRef, FastBackendDirty: fast.BackendDirty,
 		BootstrapCallsStandard: standard.BootstrapCalls, BootstrapCallsFast: fast.BootstrapCalls,
 		StandardStatus: standard.Status, FastStatus: fast.Status,
 		Standard: summarizeRun(standard), Fast: summarizeRun(fast),
 	}
 	if standard.Status == "preflight_passed" && fast.Status == "preflight_passed" {
-		comparison.RotateFastVsStandard = metricPtr(compareValues(fromComplexValues(standard.RotatedDecodedValues), fromComplexValues(fast.RotatedDecodedValues)))
+		value := compareValues(fromComplexValues(standard.RotatedDecodedValues), fromComplexValues(fast.RotatedDecodedValues))
+		if !value.Finite {
+			return comparisonEvidence{}, fmt.Errorf("direct Rotate Fast-vs-Standard comparison is non-finite")
+		}
+		comparison.RotateFastVsStandard = metricPtr(value)
 	}
 	if standard.Status == "bootstrap_completed" && fast.Status == "bootstrap_completed" {
-		comparison.BootstrapFastVsStandard = metricPtr(compareValues(fromComplexValues(standard.BootstrapDecodedValues), fromComplexValues(fast.BootstrapDecodedValues)))
+		value := compareValues(fromComplexValues(standard.BootstrapDecodedValues), fromComplexValues(fast.BootstrapDecodedValues))
+		if !value.Finite {
+			return comparisonEvidence{}, fmt.Errorf("direct Bootstrap Fast-vs-Standard comparison is non-finite")
+		}
+		comparison.BootstrapFastVsStandard = metricPtr(value)
 	}
 	return comparison, nil
 }
 
 func summarizeRun(run runEvidence) runSummary {
 	return runSummary{
+		PrimaryCommit: run.PrimaryCommit, PrimaryDirty: run.PrimaryDirty,
+		BackendCommit: run.BackendCommit, BackendRef: run.BackendRef, BackendDirty: run.BackendDirty,
+		FrontendSHA256: run.FrontendSHA256, GoVersion: run.GoVersion, OS: run.OS, Architecture: run.Architecture,
 		FastBootstrapSelected: run.FastBootstrapSelected, EvaluationKeys: run.EvaluationKeys,
+		RotateGaloisElement: run.RotateGaloisElement, RotateEvaluatorParams: run.RotateEvaluatorParameters,
+		RotateGaloisKeyCalls: run.RotateGetGaloisKeyCalls, RotateGaloisListCalls: run.RotateGetGaloisKeyListCalls,
+		ResidualQPrefix: run.ResidualQIsExactBootstrapPrefix, Q0PrimeEqual: run.Q0PrimeEqual,
+		ResidualQPrimeBits: run.ResidualQPrimeBits, BootstrapQPrimeBits: run.BootstrapQPrimeBits, BootstrapPPrimeBits: run.BootstrapPPrimeBits,
 		ResidualQSHA256: run.ResidualQSHA256, BootstrapQSHA256: run.BootstrapQSHA256, BootstrapPSHA256: run.BootstrapPSHA256,
 		ResidualMaxLevel: run.ResidualMaxLevel, BootstrapMaxLevel: run.BootstrapMaxLevel,
+		BootstrapCalls: run.BootstrapCalls, BootstrapInputRotated: run.BootstrapInputIsRotated,
 		InputCiphertext: run.InputCiphertext, RotatedCiphertext: run.RotatedCiphertext, BootstrapOutput: run.BootstrapOutput,
 		ImmediateDecryption: run.ImmediateDecryption, RotateVsOracle: run.RotateVsOracle, BootstrapVsOracle: run.BootstrapVsOracle,
 		DecodedInputSHA256: run.DecodedInputSHA256, DecodedRotateSHA256: run.DecodedRotateSHA256, DecodedBootstrapSHA256: run.DecodedBootstrapSHA256,
 	}
+}
+
+func validateComparableRuns(standard, fast runEvidence) error {
+	if standard.Phase != fast.Phase || (standard.Phase != "preflight" && standard.Phase != "bootstrap") {
+		return fmt.Errorf("evidence phases do not match or are unsupported")
+	}
+	if standard.PrimaryCommit == "" || standard.PrimaryCommit != fast.PrimaryCommit || standard.PrimaryDirty || fast.PrimaryDirty {
+		return fmt.Errorf("Standard/Fast Primary provenance differs or is dirty")
+	}
+	if standard.BackendCommit != pinnedStandardCommit || standard.BackendRef != "pinned-standard-"+pinnedStandardCommit || standard.BackendDirty {
+		return fmt.Errorf("Standard backend is not the clean pinned implementation %s", pinnedStandardCommit)
+	}
+	if fast.BackendCommit != pinnedFastCommit || fast.BackendRef != "fast-qprefix" || fast.BackendDirty {
+		return fmt.Errorf("Fast backend is not the clean pinned fast-qprefix implementation %s", pinnedFastCommit)
+	}
+	if standard.FrontendSHA256 == "" || standard.FrontendSHA256 != fast.FrontendSHA256 ||
+		standard.ConfigSHA256 != canonicalConfigSHA256 || fast.ConfigSHA256 != canonicalConfigSHA256 ||
+		standard.InputSHA256 != canonicalInputSHA256 || fast.InputSHA256 != canonicalInputSHA256 {
+		return fmt.Errorf("Standard/Fast frontend, canonical config, or fixed input identity differs")
+	}
+	if standard.ResidualQSHA256 == "" || standard.ResidualQSHA256 != fast.ResidualQSHA256 ||
+		standard.BootstrapQSHA256 == "" || standard.BootstrapQSHA256 != fast.BootstrapQSHA256 ||
+		standard.BootstrapPSHA256 == "" || standard.BootstrapPSHA256 != fast.BootstrapPSHA256 ||
+		!reflect.DeepEqual(standard.ResidualQPrimeBits, fast.ResidualQPrimeBits) ||
+		!reflect.DeepEqual(standard.BootstrapQPrimeBits, fast.BootstrapQPrimeBits) ||
+		!reflect.DeepEqual(standard.BootstrapPPrimeBits, fast.BootstrapPPrimeBits) {
+		return fmt.Errorf("Standard/Fast actual Q/P identities or prime-bit profiles differ")
+	}
+	if err := validateOneRun(standard, false); err != nil {
+		return fmt.Errorf("validate Standard evidence: %w", err)
+	}
+	if err := validateOneRun(fast, true); err != nil {
+		return fmt.Errorf("validate Fast evidence: %w", err)
+	}
+	return nil
+}
+
+func validateOneRun(run runEvidence, fast bool) error {
+	wantKeyLayout, wantFastKeys, wantStandardKeys := "implicit-standard", 0, 30
+	if fast {
+		wantKeyLayout, wantFastKeys, wantStandardKeys = "fast", 30, 0
+	}
+	if run.FastBootstrapSelected != fast {
+		return fmt.Errorf("Fast bootstrap dispatch flag is %t", run.FastBootstrapSelected)
+	}
+	if run.ResidualN != 8192 || run.BootstrapN != 8192 || run.ResidualRingType != "Standard" || run.BootstrapRingType != "Standard" ||
+		run.ResidualMaxLevel != 1 || run.BootstrapMaxLevel != 16 || run.LogSlots != 12 || run.Slots != 4096 ||
+		run.RotateK != rotation || run.RotateGaloisElement != rotationGaloisElement || run.RotateEvaluatorParameters != "btpParams.BootstrappingParameters" {
+		return fmt.Errorf("canonical LogN13 E32 parameter or Rotate profile mismatch")
+	}
+	keys := run.EvaluationKeys
+	if !run.ResidualQIsExactBootstrapPrefix || !run.Q0PrimeEqual || run.QPrimePrefixCount != 2 ||
+		keys.GeneratedBy != "btpParams.GenEvaluationKeys(sk)" || keys.GaloisKeyCount != 30 ||
+		keys.StandardLayoutKeyCount != wantStandardKeys || keys.FastLayoutKeyCount != wantFastKeys ||
+		keys.RotationGaloisElement != rotationGaloisElement || !keys.RotationKeyPresent || keys.RotationKeyLayout != wantKeyLayout ||
+		keys.RotationKeyLevelP != 4 || keys.EvaluatorMaxLevelP != 4 || !keys.RelinearizationKeyPresent || !keys.SecretQ0Preserved ||
+		keys.InputSecretLevelQ != 1 || keys.InputSecretLevelP != -1 || keys.BootstrapSecretLevelQ != 16 || keys.BootstrapSecretLevelP != 4 {
+		return fmt.Errorf("Bootstrap evaluation-key plan, key layout, P level, or secret-extension evidence mismatch")
+	}
+	wantKeyCalls := 1
+	if fast {
+		wantKeyCalls = 0
+	}
+	if run.RotateGetGaloisKeyCalls != wantKeyCalls || run.RotateGetGaloisKeyListCalls != 0 {
+		return fmt.Errorf("public Rotate Galois lookup counts are key=%d list=%d, want key=%d list=0", run.RotateGetGaloisKeyCalls, run.RotateGetGaloisKeyListCalls, wantKeyCalls)
+	}
+	if err := validateLevelZeroEvidence("EncryptNew", run.InputCiphertext, fast); err != nil {
+		return err
+	}
+	if err := validateLevelZeroEvidence("RotateNew", run.RotatedCiphertext, fast); err != nil {
+		return err
+	}
+	if !run.InputUnchangedByRotate {
+		return fmt.Errorf("RotateNew input mutation evidence is false")
+	}
+	if err := validateFiniteMetric("immediate decryption", run.ImmediateDecryption, preflightRMSETolerance); err != nil {
+		return err
+	}
+	if err := validateFiniteMetric("Rotate oracle", run.RotateVsOracle, preflightRMSETolerance); err != nil {
+		return err
+	}
+	if len(run.RotatedDecodedValues) != run.Slots {
+		return fmt.Errorf("decoded Rotate slot count is %d, want %d", len(run.RotatedDecodedValues), run.Slots)
+	}
+	if run.Phase == "preflight" {
+		if run.Status != "preflight_passed" || run.BootstrapCalls != 0 || run.BootstrapInputIsRotated || run.BootstrapOutput != nil || run.BootstrapVsOracle != nil {
+			return fmt.Errorf("preflight status/call count contains unexpected Bootstrap evidence")
+		}
+		return nil
+	}
+	if run.Status != "bootstrap_completed" || run.BootstrapCalls != 1 || !run.BootstrapInputIsRotated || run.BootstrapOutput == nil {
+		return fmt.Errorf("Bootstrap phase did not record exactly one completed call on the pre-rotated ciphertext")
+	}
+	if err := validateBootstrapOutputEvidence(run.BootstrapOutput, fast); err != nil {
+		return err
+	}
+	if err := validateFiniteMetric("Bootstrap oracle", run.BootstrapVsOracle, 0); err != nil {
+		return err
+	}
+	if len(run.BootstrapDecodedValues) != run.Slots {
+		return fmt.Errorf("decoded Bootstrap slot count is %d, want %d", len(run.BootstrapDecodedValues), run.Slots)
+	}
+	return nil
+}
+
+func validateLevelZeroEvidence(name string, ct *ciphertextEvidence, fast bool) error {
+	if ct == nil || ct.Level != 0 || ct.ScaleLog2 != 45 || ct.Degree != 1 || ct.N != 8192 || ct.ComponentCount != 2 ||
+		!reflect.DeepEqual(ct.RowsPerComponent, []int{1, 1}) || ct.ActiveRows != 1 || !ct.FullActiveQ ||
+		!ct.IsNTT || ct.IsMontgomery || !ct.IsBatched || ct.IsBitReversed || ct.LogDimensionsRows != 0 ||
+		ct.LogDimensionsCols != 12 || ct.LogSlots != 12 || ct.C1CoefficientCount != 8192 || len(ct.C0RowSHA256) != 1 || len(ct.C1RowSHA256) != 1 {
+		return fmt.Errorf("%s ciphertext violates the canonical Level-0/Scale/domain/q0-row contract", name)
+	}
+	if fast && (!ct.C1Zero || ct.C1NonzeroCount != 0) {
+		return fmt.Errorf("Fast %s ciphertext is not zero-c1", name)
+	}
+	if !fast && (ct.C1Zero || ct.C1NonzeroCount == 0) {
+		return fmt.Errorf("Standard %s ciphertext does not retain native nonzero c1", name)
+	}
+	return nil
+}
+
+func validateBootstrapOutputEvidence(ct *ciphertextEvidence, fast bool) error {
+	if ct == nil || ct.Level < 0 || ct.Level > 1 || !finite(ct.ScaleLog2) || ct.ScaleLog2 <= 0 || ct.Degree != 1 ||
+		ct.N != 8192 || ct.ComponentCount != 2 || ct.ActiveRows != ct.Level+1 || !ct.FullActiveQ ||
+		len(ct.RowsPerComponent) != 2 || ct.RowsPerComponent[0] < ct.ActiveRows || ct.RowsPerComponent[1] < ct.ActiveRows ||
+		!ct.IsNTT || ct.IsMontgomery || ct.LogSlots != 12 || len(ct.C0RowSHA256) < ct.ActiveRows || len(ct.C1RowSHA256) < ct.ActiveRows {
+		return fmt.Errorf("Bootstrap output violates the public CKKS level/scale/slot/active-Q contract")
+	}
+	if fast && (!ct.C1Zero || ct.C1NonzeroCount != 0) {
+		return fmt.Errorf("Fast Bootstrap output is not zero-c1")
+	}
+	return nil
+}
+
+func validateFiniteMetric(name string, result *metric, maxRMSE float64) error {
+	if result == nil || !result.Finite || !finite(result.ComplexRMSE) || !finite(result.MaxComplexError) || !finite(result.MaxRealError) || !finite(result.MaxImagError) {
+		return fmt.Errorf("%s metrics are missing or non-finite", name)
+	}
+	if result.SNRDB != nil && !finite(*result.SNRDB) {
+		return fmt.Errorf("%s SNR is non-finite", name)
+	}
+	if maxRMSE > 0 && result.ComplexRMSE > maxRMSE {
+		return fmt.Errorf("%s RMSE %.12g exceeds fixed tolerance %.12g", name, result.ComplexRMSE, maxRMSE)
+	}
+	return nil
 }
 
 func metricPtr(value metric) *metric { return &value }
