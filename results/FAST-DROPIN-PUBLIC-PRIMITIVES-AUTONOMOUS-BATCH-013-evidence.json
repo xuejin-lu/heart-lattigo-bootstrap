@@ -1,0 +1,2950 @@
+{
+  "schema_version": "fast-dropin-public-primitives-batch-013-combined.v1",
+  "status": "paired_source_identical_p0_coverage_complete",
+  "created_utc": "2026-10-09T19:20:23.816381Z",
+  "go_version": "go1.26.4",
+  "os": "darwin",
+  "architecture": "arm64",
+  "primary_commit_during_runs": "e7dbe218c53b7f92df26da80f9a099c8b24e434a",
+  "primary_dirty_during_runs": true,
+  "identical_frontend_sha256": "09cf4453d5fb2b638ed2b04af61e36d4d2e069be0dd6ebbb1b983d8ffbd03bc2",
+  "identical_test_source_sha256": "c2f6e3ca5cba95550b94f74a5c733aaec20207210d54d80c415801782f474535",
+  "profile": {
+    "log_n": 13,
+    "log_q_bits": [
+      55,
+      39,
+      40,
+      39
+    ],
+    "log_p_bits": [
+      60
+    ],
+    "default_scale_log2": 45,
+    "log_slots": 4,
+    "test_levels": [
+      3,
+      2
+    ],
+    "secret_hamming_weight": 192,
+    "rotation_left": 1
+  },
+  "profile_sha256": "bb1150b29a9826279c1977047fc015c8d532549a7ef9bed763bbf4302abea0bb",
+  "effective_qp_sha256": "a5c89c81dc72d0a3a0481e926430ac6960bf0db2c72d60627d55e162e2734128",
+  "q_primes": [
+    36028797018652673,
+    549755731969,
+    1099511480321,
+    549756026881
+  ],
+  "p_primes": [
+    1152921504606830593
+  ],
+  "deterministic_input_sha256": "af17a0326e27bdb93b3d02bcb3e653dcb8e04d8e0e4437cdcf8151b2d2f2b6aa",
+  "bootstrap_calls": 0,
+  "standard": {
+    "commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+    "ref": "pinned-standard-5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+    "dirty": false,
+    "mode": "genuine-standard-encryption",
+    "c1_policy": "nonzero",
+    "relinearization_key_layout": "native Standard key type (no Layout field in pinned API)",
+    "galois_key_layout": "native Standard key type (no Layout field in pinned API)",
+    "evaluation_key_generation": "ckks.NewKeyGenerator(params): native Standard-layout relinearization and Galois keys",
+    "total_key_lookup_counts": {
+      "relinearization_key": 7,
+      "galois_key": 1
+    },
+    "inputs": [
+      {
+        "name": "encrypt-l3-a",
+        "state": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 45,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": false,
+          "c1_nonzero_coefficients": 32768,
+          "c1_active_coefficients": 32768
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 6.080254390957136e-13,
+          "max_complex_error": 1.1628024770073754e-12,
+          "max_real_error": 7.946698854510714e-13,
+          "max_imag_error": 1.152376805091393e-12
+        }
+      },
+      {
+        "name": "encrypt-l3-b",
+        "state": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 45,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": false,
+          "c1_nonzero_coefficients": 32768,
+          "c1_active_coefficients": 32768
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 5.224335759454257e-13,
+          "max_complex_error": 9.970635470897617e-13,
+          "max_real_error": 9.935385847370526e-13,
+          "max_imag_error": 6.31272811801864e-13
+        }
+      },
+      {
+        "name": "encrypt-l2-a",
+        "state": {
+          "level": 2,
+          "degree": 1,
+          "scale_log2": 45,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            3,
+            3
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": false,
+          "c1_nonzero_coefficients": 24576,
+          "c1_active_coefficients": 24576
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 3.875402824467718e-13,
+          "max_complex_error": 7.64761784731355e-13,
+          "max_real_error": 7.223388553967425e-13,
+          "max_imag_error": 6.035623389966105e-13
+        }
+      },
+      {
+        "name": "encrypt-l2-b",
+        "state": {
+          "level": 2,
+          "degree": 1,
+          "scale_log2": 45,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            3,
+            3
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": false,
+          "c1_nonzero_coefficients": 24576,
+          "c1_active_coefficients": 24576
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 5.964328434413441e-13,
+          "max_complex_error": 9.036898954940838e-13,
+          "max_real_error": 8.099076964640517e-13,
+          "max_imag_error": 9.009390455894106e-13
+        }
+      }
+    ],
+    "operations": [
+      {
+        "id": "addnew-ctct-l3",
+        "api": "AddNew",
+        "overload": "ciphertext/ciphertext",
+        "actual_path": "genuine Standard ckks.Evaluator -\u003e generic full-active-Q CKKS ring operations",
+        "status": "passed",
+        "inputs": [
+          "a",
+          "b"
+        ],
+        "output": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 45,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": false,
+          "c1_nonzero_coefficients": 32768,
+          "c1_active_coefficients": 32768
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 8.243743971092209e-13,
+          "max_complex_error": 1.5805934596927203e-12,
+          "max_real_error": 1.1580736369865008e-12,
+          "max_imag_error": 1.5172897660509221e-12
+        },
+        "expected_level": 3,
+        "expected_degree": 1,
+        "expected_scale_log2": 45,
+        "scale_rule": "unchanged",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        }
+      },
+      {
+        "id": "subnew-ctct-l3",
+        "api": "SubNew",
+        "overload": "ciphertext/ciphertext",
+        "actual_path": "genuine Standard ckks.Evaluator -\u003e generic full-active-Q CKKS ring operations",
+        "status": "passed",
+        "inputs": [
+          "a",
+          "b"
+        ],
+        "output": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 45,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": false,
+          "c1_nonzero_coefficients": 32768,
+          "c1_active_coefficients": 32768
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 7.782488789843235e-13,
+          "max_complex_error": 1.240170767657476e-12,
+          "max_real_error": 1.2332149190719122e-12,
+          "max_imag_error": 1.1925512660715398e-12
+        },
+        "expected_level": 3,
+        "expected_degree": 1,
+        "expected_scale_log2": 45,
+        "scale_rule": "unchanged",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        }
+      },
+      {
+        "id": "add-scalar-l3",
+        "api": "AddNew",
+        "overload": "complex128 scalar",
+        "actual_path": "genuine Standard ckks.Evaluator -\u003e generic full-active-Q CKKS ring operations",
+        "status": "passed",
+        "inputs": [
+          "a"
+        ],
+        "output": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 45,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": false,
+          "c1_nonzero_coefficients": 32768,
+          "c1_active_coefficients": 32768
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 6.080260809802302e-13,
+          "max_complex_error": 1.1628043312974998e-12,
+          "max_real_error": 7.946698854510714e-13,
+          "max_imag_error": 1.152376805091393e-12
+        },
+        "expected_level": 3,
+        "expected_degree": 1,
+        "expected_scale_log2": 45,
+        "scale_rule": "unchanged",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        },
+        "note": "supported scalar overload"
+      },
+      {
+        "id": "sub-vector-l3",
+        "api": "SubNew",
+        "overload": "[]complex128 plaintext",
+        "actual_path": "genuine Standard ckks.Evaluator -\u003e generic full-active-Q CKKS ring operations",
+        "status": "passed",
+        "inputs": [
+          "a"
+        ],
+        "output": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 45,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": false,
+          "c1_nonzero_coefficients": 32768,
+          "c1_active_coefficients": 32768
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 6.157676753728311e-13,
+          "max_complex_error": 1.1460373624265295e-12,
+          "max_real_error": 8.355260927572772e-13,
+          "max_imag_error": 1.1412121248000062e-12
+        },
+        "expected_level": 3,
+        "expected_degree": 1,
+        "expected_scale_log2": 45,
+        "scale_rule": "unchanged",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        },
+        "note": "supported encoded-plaintext overload"
+      },
+      {
+        "id": "add-alias-l3",
+        "api": "Add",
+        "overload": "ciphertext/ciphertext",
+        "actual_path": "genuine Standard ckks.Evaluator -\u003e generic full-active-Q CKKS ring operations",
+        "status": "passed",
+        "inputs": [
+          "a",
+          "b"
+        ],
+        "output": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 45,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": false,
+          "c1_nonzero_coefficients": 32768,
+          "c1_active_coefficients": 32768
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 8.243743971092209e-13,
+          "max_complex_error": 1.5805934596927203e-12,
+          "max_real_error": 1.1580736369865008e-12,
+          "max_imag_error": 1.5172897660509221e-12
+        },
+        "expected_level": 3,
+        "expected_degree": 1,
+        "expected_scale_log2": 45,
+        "scale_rule": "unchanged",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "output_alias": "op0",
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        },
+        "note": "opOut aliases op0; op0 mutation is intentional"
+      },
+      {
+        "id": "sub-alias-l3",
+        "api": "Sub",
+        "overload": "ciphertext/ciphertext",
+        "actual_path": "genuine Standard ckks.Evaluator -\u003e generic full-active-Q CKKS ring operations",
+        "status": "passed",
+        "inputs": [
+          "a",
+          "b"
+        ],
+        "output": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 45,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": false,
+          "c1_nonzero_coefficients": 32768,
+          "c1_active_coefficients": 32768
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 7.782488789843235e-13,
+          "max_complex_error": 1.240170767657476e-12,
+          "max_real_error": 1.2332149190719122e-12,
+          "max_imag_error": 1.1925512660715398e-12
+        },
+        "expected_level": 3,
+        "expected_degree": 1,
+        "expected_scale_log2": 45,
+        "scale_rule": "unchanged",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "output_alias": "op0",
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        },
+        "note": "opOut aliases op0; op0 mutation is intentional"
+      },
+      {
+        "id": "add-ctct-l2",
+        "api": "Add",
+        "overload": "ciphertext/ciphertext",
+        "actual_path": "genuine Standard ckks.Evaluator -\u003e generic full-active-Q CKKS ring operations",
+        "status": "passed",
+        "inputs": [
+          "a",
+          "b"
+        ],
+        "output": {
+          "level": 2,
+          "degree": 1,
+          "scale_log2": 45,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            3,
+            3
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": false,
+          "c1_nonzero_coefficients": 24576,
+          "c1_active_coefficients": 24576
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 7.150877921015256e-13,
+          "max_complex_error": 1.195134433950841e-12,
+          "max_real_error": 9.841710779667778e-13,
+          "max_imag_error": 1.1672277727692304e-12
+        },
+        "expected_level": 2,
+        "expected_degree": 1,
+        "expected_scale_log2": 45,
+        "scale_rule": "unchanged",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        }
+      },
+      {
+        "id": "sub-ctct-l2",
+        "api": "Sub",
+        "overload": "ciphertext/ciphertext",
+        "actual_path": "genuine Standard ckks.Evaluator -\u003e generic full-active-Q CKKS ring operations",
+        "status": "passed",
+        "inputs": [
+          "a",
+          "b"
+        ],
+        "output": {
+          "level": 2,
+          "degree": 1,
+          "scale_log2": 45,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            3,
+            3
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": false,
+          "c1_nonzero_coefficients": 24576,
+          "c1_active_coefficients": 24576
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 7.074514086287553e-13,
+          "max_complex_error": 1.1118499102578915e-12,
+          "max_real_error": 7.401301793663606e-13,
+          "max_imag_error": 1.1117738674126798e-12
+        },
+        "expected_level": 2,
+        "expected_degree": 1,
+        "expected_scale_log2": 45,
+        "scale_rule": "unchanged",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        }
+      },
+      {
+        "id": "mulrelinnew-ctct-l3",
+        "api": "MulRelinNew",
+        "overload": "ciphertext/ciphertext",
+        "actual_path": "genuine Standard ckks.Evaluator.MulRelin -\u003e native relin-key lookup + GadgetProduct",
+        "status": "passed",
+        "inputs": [
+          "a",
+          "b"
+        ],
+        "output": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 90,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": false,
+          "c1_nonzero_coefficients": 32768,
+          "c1_active_coefficients": 32768
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 6.008694847038927e-14,
+          "max_complex_error": 1.305517689324053e-13,
+          "max_real_error": 1.3029508028061798e-13,
+          "max_imag_error": 8.58800877634458e-14
+        },
+        "expected_level": 3,
+        "expected_degree": 1,
+        "expected_scale_log2": 90,
+        "scale_rule": "multiply scales",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 1,
+          "galois_key": 0
+        },
+        "note": "independent pointwise complex product oracle"
+      },
+      {
+        "id": "mulrelinnew-square-l3",
+        "api": "MulRelinNew",
+        "overload": "ciphertext squared",
+        "actual_path": "genuine Standard ckks.Evaluator.MulRelin -\u003e native relin-key lookup + GadgetProduct",
+        "status": "passed",
+        "inputs": [
+          "a"
+        ],
+        "output": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 90,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": false,
+          "c1_nonzero_coefficients": 32768,
+          "c1_active_coefficients": 32768
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 1.0153975723302616e-13,
+          "max_complex_error": 2.2981998057837636e-13,
+          "max_real_error": 1.4739598430679735e-13,
+          "max_imag_error": 2.06360969978725e-13
+        },
+        "expected_level": 3,
+        "expected_degree": 1,
+        "expected_scale_log2": 90,
+        "scale_rule": "square scales",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 1,
+          "galois_key": 0
+        },
+        "note": "independent complex square oracle"
+      },
+      {
+        "id": "mulrelin-alias-op0-l3",
+        "api": "MulRelin",
+        "overload": "ciphertext/ciphertext",
+        "actual_path": "genuine Standard ckks.Evaluator.MulRelin -\u003e native relin-key lookup + GadgetProduct",
+        "status": "passed",
+        "inputs": [
+          "a",
+          "b"
+        ],
+        "output": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 90,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": false,
+          "c1_nonzero_coefficients": 32768,
+          "c1_active_coefficients": 32768
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 6.008694847038927e-14,
+          "max_complex_error": 1.305517689324053e-13,
+          "max_real_error": 1.3029508028061798e-13,
+          "max_imag_error": 8.58800877634458e-14
+        },
+        "expected_level": 3,
+        "expected_degree": 1,
+        "expected_scale_log2": 90,
+        "scale_rule": "multiply scales",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "output_alias": "op0",
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 1,
+          "galois_key": 0
+        },
+        "note": "opOut aliases op0; supported in-place product path"
+      },
+      {
+        "id": "mulrelin-scalar-l3",
+        "api": "MulRelinNew",
+        "overload": "int64 scalar",
+        "actual_path": "genuine Standard ckks.Evaluator.MulRelin -\u003e public Mul scalar/plaintext overload; no relin lookup",
+        "status": "passed",
+        "inputs": [
+          "a"
+        ],
+        "output": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 45,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": false,
+          "c1_nonzero_coefficients": 32768,
+          "c1_active_coefficients": 32768
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 1.2160508781914271e-12,
+          "max_complex_error": 2.3256049540147507e-12,
+          "max_real_error": 1.5893397709021428e-12,
+          "max_imag_error": 2.304753610182786e-12
+        },
+        "expected_level": 3,
+        "expected_degree": 1,
+        "expected_scale_log2": 45,
+        "scale_rule": "Gaussian-integer scalar: scale unchanged",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        },
+        "note": "public method delegates supported scalar operand to Mul; no relin key is required"
+      },
+      {
+        "id": "mulrelin-vector-l3",
+        "api": "MulRelinNew",
+        "overload": "[]complex128 plaintext",
+        "actual_path": "genuine Standard ckks.Evaluator.MulRelin -\u003e public Mul scalar/plaintext overload; no relin lookup",
+        "status": "passed",
+        "inputs": [
+          "a"
+        ],
+        "output": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 84.00000055894613,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": false,
+          "c1_nonzero_coefficients": 32768,
+          "c1_active_coefficients": 32768
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 2.0600707677428245e-13,
+          "max_complex_error": 3.691746244629434e-13,
+          "max_real_error": 2.4346665091976027e-13,
+          "max_imag_error": 3.6836527751715753e-13
+        },
+        "expected_level": 3,
+        "expected_degree": 1,
+        "expected_scale_log2": 84.00000055894613,
+        "scale_rule": "encoded plaintext scale is q[level]",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        },
+        "note": "public method delegates supported vector operand to generic Mul"
+      },
+      {
+        "id": "mulrelin-ctct-l2",
+        "api": "MulRelin",
+        "overload": "ciphertext/ciphertext",
+        "actual_path": "genuine Standard ckks.Evaluator.MulRelin -\u003e native relin-key lookup + GadgetProduct",
+        "status": "passed",
+        "inputs": [
+          "a",
+          "b"
+        ],
+        "output": {
+          "level": 2,
+          "degree": 1,
+          "scale_log2": 90,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            3,
+            3
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": false,
+          "c1_nonzero_coefficients": 24576,
+          "c1_active_coefficients": 24576
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 5.3094503400910706e-14,
+          "max_complex_error": 1.0603403370282186e-13,
+          "max_real_error": 5.5446966462646685e-14,
+          "max_imag_error": 9.505677495136311e-14
+        },
+        "expected_level": 2,
+        "expected_degree": 1,
+        "expected_scale_log2": 90,
+        "scale_rule": "multiply scales",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 1,
+          "galois_key": 0
+        },
+        "note": "preallocated output; independent product oracle"
+      },
+      {
+        "id": "mulrelin-invalid-c1",
+        "api": "MulRelin",
+        "overload": "ciphertext/ciphertext with mutated nonzero c1",
+        "actual_path": "not applicable: this negative control targets Fast zero-secret fail-closed semantics",
+        "status": "not_applicable_to_genuine_standard",
+        "full_active_q_backing_checked": false,
+        "non_aliased_inputs_unchanged": false,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        },
+        "note": "Standard ciphertexts legitimately have nonzero c1; no invalid-c1 rejection is asserted for Standard."
+      },
+      {
+        "id": "mulrelin-invalid-operand",
+        "api": "MulRelinNew",
+        "overload": "unsupported struct{} operand",
+        "actual_path": "genuine Standard ckks.Evaluator.MulRelin -\u003e public Mul scalar/plaintext overload; no relin lookup",
+        "status": "passed_expected_rejection",
+        "inputs": [
+          "a-l3"
+        ],
+        "full_active_q_backing_checked": false,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        },
+        "note": "An unrecognized operand remains an error; no unsupported overload was invented."
+      },
+      {
+        "id": "rescale-source-mulrelin-l3",
+        "api": "MulRelinNew",
+        "overload": "ciphertext/ciphertext",
+        "actual_path": "genuine Standard ckks.Evaluator.MulRelin -\u003e native relin-key lookup + GadgetProduct",
+        "status": "passed",
+        "inputs": [
+          "a",
+          "b"
+        ],
+        "output": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 90,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": false,
+          "c1_nonzero_coefficients": 32768,
+          "c1_active_coefficients": 32768
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 6.008694847038927e-14,
+          "max_complex_error": 1.305517689324053e-13,
+          "max_real_error": 1.3029508028061798e-13,
+          "max_imag_error": 8.58800877634458e-14
+        },
+        "expected_level": 3,
+        "expected_degree": 1,
+        "expected_scale_log2": 90,
+        "scale_rule": "multiply scales",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 1,
+          "galois_key": 0
+        },
+        "note": "source checkpoint for isolated Rescale"
+      },
+      {
+        "id": "rescale-l3-q3",
+        "api": "Rescale",
+        "overload": "ciphertext/ciphertext result",
+        "actual_path": "genuine Standard ckks.Evaluator.Rescale/RescaleTo -\u003e logical full-active-Q CKKS path",
+        "status": "passed",
+        "inputs": [
+          "product"
+        ],
+        "output": {
+          "level": 2,
+          "degree": 1,
+          "scale_log2": 50.999999441053866,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            3,
+            3
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": false,
+          "c1_nonzero_coefficients": 24576,
+          "c1_active_coefficients": 24576
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 5.963338919189642e-14,
+          "max_complex_error": 1.237105911552946e-13,
+          "max_real_error": 1.2357823098163578e-13,
+          "max_imag_error": 9.492233388197491e-14
+        },
+        "expected_level": 2,
+        "expected_degree": 1,
+        "expected_scale_log2": 50.999999441053866,
+        "scale_rule": "input scale / actual logical q3",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        },
+        "note": "consumes logical q3=549756026881; P0 input has all four active rows"
+      },
+      {
+        "id": "rescaleto-source-mulrelin-l3",
+        "api": "MulRelinNew",
+        "overload": "ciphertext/ciphertext",
+        "actual_path": "genuine Standard ckks.Evaluator.MulRelin -\u003e native relin-key lookup + GadgetProduct",
+        "status": "passed",
+        "inputs": [
+          "a",
+          "b"
+        ],
+        "output": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 90,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": false,
+          "c1_nonzero_coefficients": 32768,
+          "c1_active_coefficients": 32768
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 6.008694847038927e-14,
+          "max_complex_error": 1.305517689324053e-13,
+          "max_real_error": 1.3029508028061798e-13,
+          "max_imag_error": 8.58800877634458e-14
+        },
+        "expected_level": 3,
+        "expected_degree": 1,
+        "expected_scale_log2": 90,
+        "scale_rule": "multiply scales",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 1,
+          "galois_key": 0
+        },
+        "note": "source checkpoint for RescaleTo"
+      },
+      {
+        "id": "rescaleto-l3-q3",
+        "api": "RescaleTo",
+        "overload": "minScale=2^50",
+        "actual_path": "genuine Standard ckks.Evaluator.Rescale/RescaleTo -\u003e logical full-active-Q CKKS path",
+        "status": "passed",
+        "inputs": [
+          "product"
+        ],
+        "output": {
+          "level": 2,
+          "degree": 1,
+          "scale_log2": 50.999999441053866,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            3,
+            3
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": false,
+          "c1_nonzero_coefficients": 24576,
+          "c1_active_coefficients": 24576
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 5.963338919189642e-14,
+          "max_complex_error": 1.237105911552946e-13,
+          "max_real_error": 1.2357823098163578e-13,
+          "max_imag_error": 9.492233388197491e-14
+        },
+        "expected_level": 2,
+        "expected_degree": 1,
+        "expected_scale_log2": 50.999999441053866,
+        "scale_rule": "consume q3 once; stop above minScale/2",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        },
+        "note": "RescaleTo is present in both pinned public APIs"
+      },
+      {
+        "id": "chain-add-l3",
+        "api": "AddNew",
+        "overload": "ciphertext/ciphertext",
+        "actual_path": "genuine Standard ckks.Evaluator -\u003e generic full-active-Q CKKS ring operations",
+        "status": "passed",
+        "inputs": [
+          "a",
+          "b"
+        ],
+        "output": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 45,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": false,
+          "c1_nonzero_coefficients": 32768,
+          "c1_active_coefficients": 32768
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 8.243743971092209e-13,
+          "max_complex_error": 1.5805934596927203e-12,
+          "max_real_error": 1.1580736369865008e-12,
+          "max_imag_error": 1.5172897660509221e-12
+        },
+        "expected_level": 3,
+        "expected_degree": 1,
+        "expected_scale_log2": 45,
+        "scale_rule": "unchanged",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        },
+        "note": "composition checkpoint 1/4"
+      },
+      {
+        "id": "chain-mulrelin-l3",
+        "api": "MulRelinNew",
+        "overload": "ciphertext/ciphertext",
+        "actual_path": "genuine Standard ckks.Evaluator.MulRelin -\u003e native relin-key lookup + GadgetProduct",
+        "status": "passed",
+        "inputs": [
+          "sum",
+          "a"
+        ],
+        "output": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 90,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": false,
+          "c1_nonzero_coefficients": 32768,
+          "c1_active_coefficients": 32768
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 1.2657566568671394e-13,
+          "max_complex_error": 2.703621777698391e-13,
+          "max_real_error": 2.2144786004929529e-13,
+          "max_imag_error": 2.315873187663797e-13
+        },
+        "expected_level": 3,
+        "expected_degree": 1,
+        "expected_scale_log2": 90,
+        "scale_rule": "multiply scales",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 1,
+          "galois_key": 0
+        },
+        "note": "composition checkpoint 2/4"
+      },
+      {
+        "id": "chain-rescale-l3-q3",
+        "api": "Rescale",
+        "overload": "ciphertext/ciphertext result",
+        "actual_path": "genuine Standard ckks.Evaluator.Rescale/RescaleTo -\u003e logical full-active-Q CKKS path",
+        "status": "passed",
+        "inputs": [
+          "product"
+        ],
+        "output": {
+          "level": 2,
+          "degree": 1,
+          "scale_log2": 50.999999441053866,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            3,
+            3
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": false,
+          "c1_nonzero_coefficients": 24576,
+          "c1_active_coefficients": 24576
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 1.249051646685477e-13,
+          "max_complex_error": 2.566000787936306e-13,
+          "max_real_error": 2.1623675072746096e-13,
+          "max_imag_error": 2.2404821053978452e-13
+        },
+        "expected_level": 2,
+        "expected_degree": 1,
+        "expected_scale_log2": 50.999999441053866,
+        "scale_rule": "input scale / actual logical q3",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        },
+        "note": "composition checkpoint 3/4"
+      },
+      {
+        "id": "chain-rotate-l2",
+        "api": "RotateNew",
+        "overload": "left rotation by 1",
+        "actual_path": "genuine Standard ckks.Evaluator.Rotate -\u003e RLWE Automorphism + native Galois-key lookup",
+        "status": "passed",
+        "inputs": [
+          "rescaled"
+        ],
+        "output": {
+          "level": 2,
+          "degree": 1,
+          "scale_log2": 50.999999441053866,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            3,
+            3
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": false,
+          "c1_nonzero_coefficients": 24576,
+          "c1_active_coefficients": 24576
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 1.258718128624671e-13,
+          "max_complex_error": 2.593902952873706e-13,
+          "max_real_error": 2.047667591043023e-13,
+          "max_imag_error": 2.2471781380151157e-13
+        },
+        "expected_level": 2,
+        "expected_degree": 1,
+        "expected_scale_log2": 50.999999441053866,
+        "scale_rule": "unchanged",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 1
+        },
+        "note": "composition checkpoint 4/4; Standard key-backed vs Fast shared-core branch"
+      }
+    ]
+  },
+  "fast": {
+    "commit": "00ac70ba136d190fa31bbb26c2f51d003a221634",
+    "ref": "fast-qprefix",
+    "dirty": false,
+    "mode": "fast-p0-zero-secret-simulation",
+    "c1_policy": "zero",
+    "relinearization_key_layout": "KeyLayoutStandard",
+    "galois_key_layout": "KeyLayoutStandard",
+    "evaluation_key_generation": "ckks.NewKeyGenerator(params): native Standard-layout relinearization and Galois keys",
+    "total_key_lookup_counts": {
+      "relinearization_key": 0,
+      "galois_key": 0
+    },
+    "inputs": [
+      {
+        "name": "encrypt-l3-a",
+        "state": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 45,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": true,
+          "c1_nonzero_coefficients": 0,
+          "c1_active_coefficients": 32768
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 4.3074465359754706e-14,
+          "max_complex_error": 8.564136368436897e-14,
+          "max_real_error": 8.393286066166183e-14,
+          "max_imag_error": 4.9884575636927053e-14
+        }
+      },
+      {
+        "name": "encrypt-l3-b",
+        "state": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 45,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": true,
+          "c1_nonzero_coefficients": 0,
+          "c1_active_coefficients": 32768
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 4.8063139929870046e-14,
+          "max_complex_error": 9.499856654154729e-14,
+          "max_real_error": 7.179673522372809e-14,
+          "max_imag_error": 8.289202657607575e-14
+        }
+      },
+      {
+        "name": "encrypt-l2-a",
+        "state": {
+          "level": 2,
+          "degree": 1,
+          "scale_log2": 45,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            3,
+            3
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": true,
+          "c1_nonzero_coefficients": 0,
+          "c1_active_coefficients": 24576
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 4.3074465359754706e-14,
+          "max_complex_error": 8.564136368436897e-14,
+          "max_real_error": 8.393286066166183e-14,
+          "max_imag_error": 4.9884575636927053e-14
+        }
+      },
+      {
+        "name": "encrypt-l2-b",
+        "state": {
+          "level": 2,
+          "degree": 1,
+          "scale_log2": 45,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            3,
+            3
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": true,
+          "c1_nonzero_coefficients": 0,
+          "c1_active_coefficients": 24576
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 4.8063139929870046e-14,
+          "max_complex_error": 9.499856654154729e-14,
+          "max_real_error": 7.179673522372809e-14,
+          "max_imag_error": 8.289202657607575e-14
+        }
+      }
+    ],
+    "operations": [
+      {
+        "id": "addnew-ctct-l3",
+        "api": "AddNew",
+        "overload": "ciphertext/ciphertext",
+        "actual_path": "Fast P0 public ckks.Evaluator.Add/Sub -\u003e generic full-active-Q CKKS path (not explicit fast.Evaluator kernel)",
+        "status": "passed",
+        "inputs": [
+          "a",
+          "b"
+        ],
+        "output": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 45,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": true,
+          "c1_nonzero_coefficients": 0,
+          "c1_active_coefficients": 32768
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 6.366054749149383e-14,
+          "max_complex_error": 9.928313431575474e-14,
+          "max_real_error": 9.681144774731365e-14,
+          "max_imag_error": 8.940070905794073e-14
+        },
+        "expected_level": 3,
+        "expected_degree": 1,
+        "expected_scale_log2": 45,
+        "scale_rule": "unchanged",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        }
+      },
+      {
+        "id": "subnew-ctct-l3",
+        "api": "SubNew",
+        "overload": "ciphertext/ciphertext",
+        "actual_path": "Fast P0 public ckks.Evaluator.Add/Sub -\u003e generic full-active-Q CKKS path (not explicit fast.Evaluator kernel)",
+        "status": "passed",
+        "inputs": [
+          "a",
+          "b"
+        ],
+        "output": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 45,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": true,
+          "c1_nonzero_coefficients": 0,
+          "c1_active_coefficients": 32768
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 6.541187211590919e-14,
+          "max_complex_error": 1.147158704982844e-13,
+          "max_real_error": 1.1283335377143544e-13,
+          "max_imag_error": 1.0100947855917752e-13
+        },
+        "expected_level": 3,
+        "expected_degree": 1,
+        "expected_scale_log2": 45,
+        "scale_rule": "unchanged",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        }
+      },
+      {
+        "id": "add-scalar-l3",
+        "api": "AddNew",
+        "overload": "complex128 scalar",
+        "actual_path": "Fast P0 public ckks.Evaluator.Add/Sub -\u003e generic full-active-Q CKKS path (not explicit fast.Evaluator kernel)",
+        "status": "passed",
+        "inputs": [
+          "a"
+        ],
+        "output": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 45,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": true,
+          "c1_nonzero_coefficients": 0,
+          "c1_active_coefficients": 32768
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 4.307873976538518e-14,
+          "max_complex_error": 8.564274305026829e-14,
+          "max_real_error": 8.393286066166183e-14,
+          "max_imag_error": 4.989064716909297e-14
+        },
+        "expected_level": 3,
+        "expected_degree": 1,
+        "expected_scale_log2": 45,
+        "scale_rule": "unchanged",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        },
+        "note": "supported scalar overload"
+      },
+      {
+        "id": "sub-vector-l3",
+        "api": "SubNew",
+        "overload": "[]complex128 plaintext",
+        "actual_path": "Fast P0 public ckks.Evaluator.Add/Sub -\u003e generic full-active-Q CKKS path (not explicit fast.Evaluator kernel)",
+        "status": "passed",
+        "inputs": [
+          "a"
+        ],
+        "output": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 45,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": true,
+          "c1_nonzero_coefficients": 0,
+          "c1_active_coefficients": 32768
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 6.7396074365355e-14,
+          "max_complex_error": 9.310687795183515e-14,
+          "max_real_error": 8.763476055939634e-14,
+          "max_imag_error": 7.112626460026306e-14
+        },
+        "expected_level": 3,
+        "expected_degree": 1,
+        "expected_scale_log2": 45,
+        "scale_rule": "unchanged",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        },
+        "note": "supported encoded-plaintext overload"
+      },
+      {
+        "id": "add-alias-l3",
+        "api": "Add",
+        "overload": "ciphertext/ciphertext",
+        "actual_path": "Fast P0 public ckks.Evaluator.Add/Sub -\u003e generic full-active-Q CKKS path (not explicit fast.Evaluator kernel)",
+        "status": "passed",
+        "inputs": [
+          "a",
+          "b"
+        ],
+        "output": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 45,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": true,
+          "c1_nonzero_coefficients": 0,
+          "c1_active_coefficients": 32768
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 6.366054749149383e-14,
+          "max_complex_error": 9.928313431575474e-14,
+          "max_real_error": 9.681144774731365e-14,
+          "max_imag_error": 8.940070905794073e-14
+        },
+        "expected_level": 3,
+        "expected_degree": 1,
+        "expected_scale_log2": 45,
+        "scale_rule": "unchanged",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "output_alias": "op0",
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        },
+        "note": "opOut aliases op0; op0 mutation is intentional"
+      },
+      {
+        "id": "sub-alias-l3",
+        "api": "Sub",
+        "overload": "ciphertext/ciphertext",
+        "actual_path": "Fast P0 public ckks.Evaluator.Add/Sub -\u003e generic full-active-Q CKKS path (not explicit fast.Evaluator kernel)",
+        "status": "passed",
+        "inputs": [
+          "a",
+          "b"
+        ],
+        "output": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 45,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": true,
+          "c1_nonzero_coefficients": 0,
+          "c1_active_coefficients": 32768
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 6.541187211590919e-14,
+          "max_complex_error": 1.147158704982844e-13,
+          "max_real_error": 1.1283335377143544e-13,
+          "max_imag_error": 1.0100947855917752e-13
+        },
+        "expected_level": 3,
+        "expected_degree": 1,
+        "expected_scale_log2": 45,
+        "scale_rule": "unchanged",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "output_alias": "op0",
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        },
+        "note": "opOut aliases op0; op0 mutation is intentional"
+      },
+      {
+        "id": "add-ctct-l2",
+        "api": "Add",
+        "overload": "ciphertext/ciphertext",
+        "actual_path": "Fast P0 public ckks.Evaluator.Add/Sub -\u003e generic full-active-Q CKKS path (not explicit fast.Evaluator kernel)",
+        "status": "passed",
+        "inputs": [
+          "a",
+          "b"
+        ],
+        "output": {
+          "level": 2,
+          "degree": 1,
+          "scale_log2": 45,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            3,
+            3
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": true,
+          "c1_nonzero_coefficients": 0,
+          "c1_active_coefficients": 24576
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 6.366054749149383e-14,
+          "max_complex_error": 9.928313431575474e-14,
+          "max_real_error": 9.681144774731365e-14,
+          "max_imag_error": 8.940070905794073e-14
+        },
+        "expected_level": 2,
+        "expected_degree": 1,
+        "expected_scale_log2": 45,
+        "scale_rule": "unchanged",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        }
+      },
+      {
+        "id": "sub-ctct-l2",
+        "api": "Sub",
+        "overload": "ciphertext/ciphertext",
+        "actual_path": "Fast P0 public ckks.Evaluator.Add/Sub -\u003e generic full-active-Q CKKS path (not explicit fast.Evaluator kernel)",
+        "status": "passed",
+        "inputs": [
+          "a",
+          "b"
+        ],
+        "output": {
+          "level": 2,
+          "degree": 1,
+          "scale_log2": 45,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            3,
+            3
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": true,
+          "c1_nonzero_coefficients": 0,
+          "c1_active_coefficients": 24576
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 6.541187211590919e-14,
+          "max_complex_error": 1.147158704982844e-13,
+          "max_real_error": 1.1283335377143544e-13,
+          "max_imag_error": 1.0100947855917752e-13
+        },
+        "expected_level": 2,
+        "expected_degree": 1,
+        "expected_scale_log2": 45,
+        "scale_rule": "unchanged",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        }
+      },
+      {
+        "id": "mulrelinnew-ctct-l3",
+        "api": "MulRelinNew",
+        "overload": "ciphertext/ciphertext",
+        "actual_path": "Fast P0 ckks.Evaluator.MulRelin -\u003e mulRelinFastCKKSZeroSecret -\u003e existing product kernel with relin=false; no native key lookup",
+        "status": "passed",
+        "inputs": [
+          "a",
+          "b"
+        ],
+        "output": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 90,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": true,
+          "c1_nonzero_coefficients": 0,
+          "c1_active_coefficients": 32768
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 5.320587702687035e-15,
+          "max_complex_error": 1.2117592599745943e-14,
+          "max_real_error": 1.2117043479697998e-14,
+          "max_imag_error": 9.788177213199134e-15
+        },
+        "expected_level": 3,
+        "expected_degree": 1,
+        "expected_scale_log2": 90,
+        "scale_rule": "multiply scales",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        },
+        "note": "independent pointwise complex product oracle"
+      },
+      {
+        "id": "mulrelinnew-square-l3",
+        "api": "MulRelinNew",
+        "overload": "ciphertext squared",
+        "actual_path": "Fast P0 ckks.Evaluator.MulRelin -\u003e mulRelinFastCKKSZeroSecret -\u003e existing product kernel with relin=false; no native key lookup",
+        "status": "passed",
+        "inputs": [
+          "a"
+        ],
+        "output": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 90,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": true,
+          "c1_nonzero_coefficients": 0,
+          "c1_active_coefficients": 32768
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 5.704500214808438e-15,
+          "max_complex_error": 1.196745516885663e-14,
+          "max_real_error": 1.1554559392612518e-14,
+          "max_imag_error": 9.35471318463943e-15
+        },
+        "expected_level": 3,
+        "expected_degree": 1,
+        "expected_scale_log2": 90,
+        "scale_rule": "square scales",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        },
+        "note": "independent complex square oracle"
+      },
+      {
+        "id": "mulrelin-alias-op0-l3",
+        "api": "MulRelin",
+        "overload": "ciphertext/ciphertext",
+        "actual_path": "Fast P0 ckks.Evaluator.MulRelin -\u003e mulRelinFastCKKSZeroSecret -\u003e existing product kernel with relin=false; no native key lookup",
+        "status": "passed",
+        "inputs": [
+          "a",
+          "b"
+        ],
+        "output": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 90,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": true,
+          "c1_nonzero_coefficients": 0,
+          "c1_active_coefficients": 32768
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 5.320587702687035e-15,
+          "max_complex_error": 1.2117592599745943e-14,
+          "max_real_error": 1.2117043479697998e-14,
+          "max_imag_error": 9.788177213199134e-15
+        },
+        "expected_level": 3,
+        "expected_degree": 1,
+        "expected_scale_log2": 90,
+        "scale_rule": "multiply scales",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "output_alias": "op0",
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        },
+        "note": "opOut aliases op0; supported in-place product path"
+      },
+      {
+        "id": "mulrelin-scalar-l3",
+        "api": "MulRelinNew",
+        "overload": "int64 scalar",
+        "actual_path": "Fast P0 public ckks.Evaluator.MulRelin -\u003e generic Mul scalar/plaintext overload over full-active-Q rows",
+        "status": "passed",
+        "inputs": [
+          "a"
+        ],
+        "output": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 45,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": true,
+          "c1_nonzero_coefficients": 0,
+          "c1_active_coefficients": 32768
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 8.614893071950941e-14,
+          "max_complex_error": 1.7128272736873795e-13,
+          "max_real_error": 1.6786572132332367e-13,
+          "max_imag_error": 9.976915127385411e-14
+        },
+        "expected_level": 3,
+        "expected_degree": 1,
+        "expected_scale_log2": 45,
+        "scale_rule": "Gaussian-integer scalar: scale unchanged",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        },
+        "note": "public method delegates supported scalar operand to Mul; no relin key is required"
+      },
+      {
+        "id": "mulrelin-vector-l3",
+        "api": "MulRelinNew",
+        "overload": "[]complex128 plaintext",
+        "actual_path": "Fast P0 public ckks.Evaluator.MulRelin -\u003e generic Mul scalar/plaintext overload over full-active-Q rows",
+        "status": "passed",
+        "inputs": [
+          "a"
+        ],
+        "output": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 84.00000055894613,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": true,
+          "c1_nonzero_coefficients": 0,
+          "c1_active_coefficients": 32768
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 2.0531610967766256e-13,
+          "max_complex_error": 3.6268163411331503e-13,
+          "max_real_error": 2.385815069810837e-13,
+          "max_imag_error": 3.619507037838643e-13
+        },
+        "expected_level": 3,
+        "expected_degree": 1,
+        "expected_scale_log2": 84.00000055894613,
+        "scale_rule": "encoded plaintext scale is q[level]",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        },
+        "note": "public method delegates supported vector operand to generic Mul"
+      },
+      {
+        "id": "mulrelin-ctct-l2",
+        "api": "MulRelin",
+        "overload": "ciphertext/ciphertext",
+        "actual_path": "Fast P0 ckks.Evaluator.MulRelin -\u003e mulRelinFastCKKSZeroSecret -\u003e existing product kernel with relin=false; no native key lookup",
+        "status": "passed",
+        "inputs": [
+          "a",
+          "b"
+        ],
+        "output": {
+          "level": 2,
+          "degree": 1,
+          "scale_log2": 90,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            3,
+            3
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": true,
+          "c1_nonzero_coefficients": 0,
+          "c1_active_coefficients": 24576
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 5.320587702687035e-15,
+          "max_complex_error": 1.2117592599745943e-14,
+          "max_real_error": 1.2117043479697998e-14,
+          "max_imag_error": 9.788177213199134e-15
+        },
+        "expected_level": 2,
+        "expected_degree": 1,
+        "expected_scale_log2": 90,
+        "scale_rule": "multiply scales",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        },
+        "note": "preallocated output; independent product oracle"
+      },
+      {
+        "id": "mulrelin-invalid-c1",
+        "api": "MulRelin",
+        "overload": "ciphertext/ciphertext with one mutated active c1 residue",
+        "actual_path": "Fast P0 ckks.Evaluator.MulRelin -\u003e mulRelinFastCKKSZeroSecret -\u003e existing product kernel with relin=false; no native key lookup",
+        "status": "passed_expected_rejection",
+        "inputs": [
+          "invalid-a-l3",
+          "b-l3"
+        ],
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "rejected_output_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        },
+        "note": "A genuine KeyLayoutStandard relin key was present in the instrumented keyset; rejection must precede key lookup and output mutation."
+      },
+      {
+        "id": "mulrelin-invalid-operand",
+        "api": "MulRelinNew",
+        "overload": "unsupported struct{} operand",
+        "actual_path": "Fast P0 public ckks.Evaluator.MulRelin -\u003e generic Mul scalar/plaintext overload over full-active-Q rows",
+        "status": "passed_expected_rejection",
+        "inputs": [
+          "a-l3"
+        ],
+        "full_active_q_backing_checked": false,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        },
+        "note": "An unrecognized operand remains an error; no unsupported overload was invented."
+      },
+      {
+        "id": "rescale-source-mulrelin-l3",
+        "api": "MulRelinNew",
+        "overload": "ciphertext/ciphertext",
+        "actual_path": "Fast P0 ckks.Evaluator.MulRelin -\u003e mulRelinFastCKKSZeroSecret -\u003e existing product kernel with relin=false; no native key lookup",
+        "status": "passed",
+        "inputs": [
+          "a",
+          "b"
+        ],
+        "output": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 90,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": true,
+          "c1_nonzero_coefficients": 0,
+          "c1_active_coefficients": 32768
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 5.320587702687035e-15,
+          "max_complex_error": 1.2117592599745943e-14,
+          "max_real_error": 1.2117043479697998e-14,
+          "max_imag_error": 9.788177213199134e-15
+        },
+        "expected_level": 3,
+        "expected_degree": 1,
+        "expected_scale_log2": 90,
+        "scale_rule": "multiply scales",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        },
+        "note": "source checkpoint for isolated Rescale"
+      },
+      {
+        "id": "rescale-l3-q3",
+        "api": "Rescale",
+        "overload": "ciphertext/ciphertext result",
+        "actual_path": "Fast P0 public ckks.Evaluator.Rescale/RescaleTo -\u003e generic full-active-Q CKKS path; all logical rows active",
+        "status": "passed",
+        "inputs": [
+          "product"
+        ],
+        "output": {
+          "level": 2,
+          "degree": 1,
+          "scale_log2": 50.999999441053866,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            3,
+            3
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": true,
+          "c1_nonzero_coefficients": 0,
+          "c1_active_coefficients": 24576
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 5.508744899042129e-15,
+          "max_complex_error": 1.2490249597131585e-14,
+          "max_real_error": 1.2465722898369336e-14,
+          "max_imag_error": 1.0430024899310553e-14
+        },
+        "expected_level": 2,
+        "expected_degree": 1,
+        "expected_scale_log2": 50.999999441053866,
+        "scale_rule": "input scale / actual logical q3",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        },
+        "note": "consumes logical q3=549756026881; P0 input has all four active rows"
+      },
+      {
+        "id": "rescaleto-source-mulrelin-l3",
+        "api": "MulRelinNew",
+        "overload": "ciphertext/ciphertext",
+        "actual_path": "Fast P0 ckks.Evaluator.MulRelin -\u003e mulRelinFastCKKSZeroSecret -\u003e existing product kernel with relin=false; no native key lookup",
+        "status": "passed",
+        "inputs": [
+          "a",
+          "b"
+        ],
+        "output": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 90,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": true,
+          "c1_nonzero_coefficients": 0,
+          "c1_active_coefficients": 32768
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 5.320587702687035e-15,
+          "max_complex_error": 1.2117592599745943e-14,
+          "max_real_error": 1.2117043479697998e-14,
+          "max_imag_error": 9.788177213199134e-15
+        },
+        "expected_level": 3,
+        "expected_degree": 1,
+        "expected_scale_log2": 90,
+        "scale_rule": "multiply scales",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        },
+        "note": "source checkpoint for RescaleTo"
+      },
+      {
+        "id": "rescaleto-l3-q3",
+        "api": "RescaleTo",
+        "overload": "minScale=2^50",
+        "actual_path": "Fast P0 public ckks.Evaluator.Rescale/RescaleTo -\u003e generic full-active-Q CKKS path; all logical rows active",
+        "status": "passed",
+        "inputs": [
+          "product"
+        ],
+        "output": {
+          "level": 2,
+          "degree": 1,
+          "scale_log2": 50.999999441053866,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            3,
+            3
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": true,
+          "c1_nonzero_coefficients": 0,
+          "c1_active_coefficients": 24576
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 5.508744899042129e-15,
+          "max_complex_error": 1.2490249597131585e-14,
+          "max_real_error": 1.2465722898369336e-14,
+          "max_imag_error": 1.0430024899310553e-14
+        },
+        "expected_level": 2,
+        "expected_degree": 1,
+        "expected_scale_log2": 50.999999441053866,
+        "scale_rule": "consume q3 once; stop above minScale/2",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        },
+        "note": "RescaleTo is present in both pinned public APIs"
+      },
+      {
+        "id": "chain-add-l3",
+        "api": "AddNew",
+        "overload": "ciphertext/ciphertext",
+        "actual_path": "Fast P0 public ckks.Evaluator.Add/Sub -\u003e generic full-active-Q CKKS path (not explicit fast.Evaluator kernel)",
+        "status": "passed",
+        "inputs": [
+          "a",
+          "b"
+        ],
+        "output": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 45,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": true,
+          "c1_nonzero_coefficients": 0,
+          "c1_active_coefficients": 32768
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 6.366054749149383e-14,
+          "max_complex_error": 9.928313431575474e-14,
+          "max_real_error": 9.681144774731365e-14,
+          "max_imag_error": 8.940070905794073e-14
+        },
+        "expected_level": 3,
+        "expected_degree": 1,
+        "expected_scale_log2": 45,
+        "scale_rule": "unchanged",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        },
+        "note": "composition checkpoint 1/4"
+      },
+      {
+        "id": "chain-mulrelin-l3",
+        "api": "MulRelinNew",
+        "overload": "ciphertext/ciphertext",
+        "actual_path": "Fast P0 ckks.Evaluator.MulRelin -\u003e mulRelinFastCKKSZeroSecret -\u003e existing product kernel with relin=false; no native key lookup",
+        "status": "passed",
+        "inputs": [
+          "sum",
+          "a"
+        ],
+        "output": {
+          "level": 3,
+          "degree": 1,
+          "scale_log2": 90,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            4,
+            4
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": true,
+          "c1_nonzero_coefficients": 0,
+          "c1_active_coefficients": 32768
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 8.042716642715016e-15,
+          "max_complex_error": 2.3861511800471936e-14,
+          "max_real_error": 2.367203655317951e-14,
+          "max_imag_error": 1.0514158987895428e-14
+        },
+        "expected_level": 3,
+        "expected_degree": 1,
+        "expected_scale_log2": 90,
+        "scale_rule": "multiply scales",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        },
+        "note": "composition checkpoint 2/4"
+      },
+      {
+        "id": "chain-rescale-l3-q3",
+        "api": "Rescale",
+        "overload": "ciphertext/ciphertext result",
+        "actual_path": "Fast P0 public ckks.Evaluator.Rescale/RescaleTo -\u003e generic full-active-Q CKKS path; all logical rows active",
+        "status": "passed",
+        "inputs": [
+          "product"
+        ],
+        "output": {
+          "level": 2,
+          "degree": 1,
+          "scale_log2": 50.999999441053866,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            3,
+            3
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": true,
+          "c1_nonzero_coefficients": 0,
+          "c1_active_coefficients": 24576
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 8.004013587338643e-15,
+          "max_complex_error": 2.3942205527812226e-14,
+          "max_real_error": 2.3698057405319162e-14,
+          "max_imag_error": 1.054538401046301e-14
+        },
+        "expected_level": 2,
+        "expected_degree": 1,
+        "expected_scale_log2": 50.999999441053866,
+        "scale_rule": "input scale / actual logical q3",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        },
+        "note": "composition checkpoint 3/4"
+      },
+      {
+        "id": "chain-rotate-l2",
+        "api": "RotateNew",
+        "overload": "left rotation by 1",
+        "actual_path": "Fast P0 ckks.Evaluator.Rotate -\u003e rotateFastCKKSZeroSecret -\u003e shared fastcore.ApplyRows; no Galois-key lookup",
+        "status": "passed",
+        "inputs": [
+          "rescaled"
+        ],
+        "output": {
+          "level": 2,
+          "degree": 1,
+          "scale_log2": 50.999999441053866,
+          "log_dimensions": {
+            "Rows": 1,
+            "Cols": 4
+          },
+          "is_batched": true,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "rows_per_component": [
+            3,
+            3
+          ],
+          "all_active_q_rows_materialized": true,
+          "c1_zero": true,
+          "c1_nonzero_coefficients": 0,
+          "c1_active_coefficients": 24576
+        },
+        "decoded_vs_plaintext_oracle": {
+          "finite": true,
+          "complex_rmse": 8.00406932550516e-15,
+          "max_complex_error": 2.394245269343481e-14,
+          "max_real_error": 2.3698057405319162e-14,
+          "max_imag_error": 1.0543649286987034e-14
+        },
+        "expected_level": 2,
+        "expected_degree": 1,
+        "expected_scale_log2": 50.999999441053866,
+        "scale_rule": "unchanged",
+        "full_active_q_backing_checked": true,
+        "non_aliased_inputs_unchanged": true,
+        "c1_policy_passed": true,
+        "level_scale_degree_domain_checks_passed": true,
+        "key_lookup_delta": {
+          "relinearization_key": 0,
+          "galois_key": 0
+        },
+        "note": "composition checkpoint 4/4; Standard key-backed vs Fast shared-core branch"
+      }
+    ]
+  },
+  "paired_checkpoints": [
+    {
+      "id": "addnew-ctct-l3",
+      "standard_status": "passed",
+      "fast_status": "passed",
+      "standard_complex_rmse": 8.243743971092209e-13,
+      "fast_complex_rmse": 6.366054749149383e-14,
+      "standard_max_complex_error": 1.5805934596927203e-12,
+      "fast_max_complex_error": 9.928313431575474e-14,
+      "fast_actual_path": "Fast P0 public ckks.Evaluator.Add/Sub -\u003e generic full-active-Q CKKS path (not explicit fast.Evaluator kernel)",
+      "fast_key_lookup_delta": {
+        "relinearization_key": 0,
+        "galois_key": 0
+      }
+    },
+    {
+      "id": "subnew-ctct-l3",
+      "standard_status": "passed",
+      "fast_status": "passed",
+      "standard_complex_rmse": 7.782488789843235e-13,
+      "fast_complex_rmse": 6.541187211590919e-14,
+      "standard_max_complex_error": 1.240170767657476e-12,
+      "fast_max_complex_error": 1.147158704982844e-13,
+      "fast_actual_path": "Fast P0 public ckks.Evaluator.Add/Sub -\u003e generic full-active-Q CKKS path (not explicit fast.Evaluator kernel)",
+      "fast_key_lookup_delta": {
+        "relinearization_key": 0,
+        "galois_key": 0
+      }
+    },
+    {
+      "id": "add-scalar-l3",
+      "standard_status": "passed",
+      "fast_status": "passed",
+      "standard_complex_rmse": 6.080260809802302e-13,
+      "fast_complex_rmse": 4.307873976538518e-14,
+      "standard_max_complex_error": 1.1628043312974998e-12,
+      "fast_max_complex_error": 8.564274305026829e-14,
+      "fast_actual_path": "Fast P0 public ckks.Evaluator.Add/Sub -\u003e generic full-active-Q CKKS path (not explicit fast.Evaluator kernel)",
+      "fast_key_lookup_delta": {
+        "relinearization_key": 0,
+        "galois_key": 0
+      }
+    },
+    {
+      "id": "sub-vector-l3",
+      "standard_status": "passed",
+      "fast_status": "passed",
+      "standard_complex_rmse": 6.157676753728311e-13,
+      "fast_complex_rmse": 6.7396074365355e-14,
+      "standard_max_complex_error": 1.1460373624265295e-12,
+      "fast_max_complex_error": 9.310687795183515e-14,
+      "fast_actual_path": "Fast P0 public ckks.Evaluator.Add/Sub -\u003e generic full-active-Q CKKS path (not explicit fast.Evaluator kernel)",
+      "fast_key_lookup_delta": {
+        "relinearization_key": 0,
+        "galois_key": 0
+      }
+    },
+    {
+      "id": "add-alias-l3",
+      "standard_status": "passed",
+      "fast_status": "passed",
+      "standard_complex_rmse": 8.243743971092209e-13,
+      "fast_complex_rmse": 6.366054749149383e-14,
+      "standard_max_complex_error": 1.5805934596927203e-12,
+      "fast_max_complex_error": 9.928313431575474e-14,
+      "fast_actual_path": "Fast P0 public ckks.Evaluator.Add/Sub -\u003e generic full-active-Q CKKS path (not explicit fast.Evaluator kernel)",
+      "fast_key_lookup_delta": {
+        "relinearization_key": 0,
+        "galois_key": 0
+      }
+    },
+    {
+      "id": "sub-alias-l3",
+      "standard_status": "passed",
+      "fast_status": "passed",
+      "standard_complex_rmse": 7.782488789843235e-13,
+      "fast_complex_rmse": 6.541187211590919e-14,
+      "standard_max_complex_error": 1.240170767657476e-12,
+      "fast_max_complex_error": 1.147158704982844e-13,
+      "fast_actual_path": "Fast P0 public ckks.Evaluator.Add/Sub -\u003e generic full-active-Q CKKS path (not explicit fast.Evaluator kernel)",
+      "fast_key_lookup_delta": {
+        "relinearization_key": 0,
+        "galois_key": 0
+      }
+    },
+    {
+      "id": "add-ctct-l2",
+      "standard_status": "passed",
+      "fast_status": "passed",
+      "standard_complex_rmse": 7.150877921015256e-13,
+      "fast_complex_rmse": 6.366054749149383e-14,
+      "standard_max_complex_error": 1.195134433950841e-12,
+      "fast_max_complex_error": 9.928313431575474e-14,
+      "fast_actual_path": "Fast P0 public ckks.Evaluator.Add/Sub -\u003e generic full-active-Q CKKS path (not explicit fast.Evaluator kernel)",
+      "fast_key_lookup_delta": {
+        "relinearization_key": 0,
+        "galois_key": 0
+      }
+    },
+    {
+      "id": "sub-ctct-l2",
+      "standard_status": "passed",
+      "fast_status": "passed",
+      "standard_complex_rmse": 7.074514086287553e-13,
+      "fast_complex_rmse": 6.541187211590919e-14,
+      "standard_max_complex_error": 1.1118499102578915e-12,
+      "fast_max_complex_error": 1.147158704982844e-13,
+      "fast_actual_path": "Fast P0 public ckks.Evaluator.Add/Sub -\u003e generic full-active-Q CKKS path (not explicit fast.Evaluator kernel)",
+      "fast_key_lookup_delta": {
+        "relinearization_key": 0,
+        "galois_key": 0
+      }
+    },
+    {
+      "id": "mulrelinnew-ctct-l3",
+      "standard_status": "passed",
+      "fast_status": "passed",
+      "standard_complex_rmse": 6.008694847038927e-14,
+      "fast_complex_rmse": 5.320587702687035e-15,
+      "standard_max_complex_error": 1.305517689324053e-13,
+      "fast_max_complex_error": 1.2117592599745943e-14,
+      "fast_actual_path": "Fast P0 ckks.Evaluator.MulRelin -\u003e mulRelinFastCKKSZeroSecret -\u003e existing product kernel with relin=false; no native key lookup",
+      "fast_key_lookup_delta": {
+        "relinearization_key": 0,
+        "galois_key": 0
+      }
+    },
+    {
+      "id": "mulrelinnew-square-l3",
+      "standard_status": "passed",
+      "fast_status": "passed",
+      "standard_complex_rmse": 1.0153975723302616e-13,
+      "fast_complex_rmse": 5.704500214808438e-15,
+      "standard_max_complex_error": 2.2981998057837636e-13,
+      "fast_max_complex_error": 1.196745516885663e-14,
+      "fast_actual_path": "Fast P0 ckks.Evaluator.MulRelin -\u003e mulRelinFastCKKSZeroSecret -\u003e existing product kernel with relin=false; no native key lookup",
+      "fast_key_lookup_delta": {
+        "relinearization_key": 0,
+        "galois_key": 0
+      }
+    },
+    {
+      "id": "mulrelin-alias-op0-l3",
+      "standard_status": "passed",
+      "fast_status": "passed",
+      "standard_complex_rmse": 6.008694847038927e-14,
+      "fast_complex_rmse": 5.320587702687035e-15,
+      "standard_max_complex_error": 1.305517689324053e-13,
+      "fast_max_complex_error": 1.2117592599745943e-14,
+      "fast_actual_path": "Fast P0 ckks.Evaluator.MulRelin -\u003e mulRelinFastCKKSZeroSecret -\u003e existing product kernel with relin=false; no native key lookup",
+      "fast_key_lookup_delta": {
+        "relinearization_key": 0,
+        "galois_key": 0
+      }
+    },
+    {
+      "id": "mulrelin-scalar-l3",
+      "standard_status": "passed",
+      "fast_status": "passed",
+      "standard_complex_rmse": 1.2160508781914271e-12,
+      "fast_complex_rmse": 8.614893071950941e-14,
+      "standard_max_complex_error": 2.3256049540147507e-12,
+      "fast_max_complex_error": 1.7128272736873795e-13,
+      "fast_actual_path": "Fast P0 public ckks.Evaluator.MulRelin -\u003e generic Mul scalar/plaintext overload over full-active-Q rows",
+      "fast_key_lookup_delta": {
+        "relinearization_key": 0,
+        "galois_key": 0
+      }
+    },
+    {
+      "id": "mulrelin-vector-l3",
+      "standard_status": "passed",
+      "fast_status": "passed",
+      "standard_complex_rmse": 2.0600707677428245e-13,
+      "fast_complex_rmse": 2.0531610967766256e-13,
+      "standard_max_complex_error": 3.691746244629434e-13,
+      "fast_max_complex_error": 3.6268163411331503e-13,
+      "fast_actual_path": "Fast P0 public ckks.Evaluator.MulRelin -\u003e generic Mul scalar/plaintext overload over full-active-Q rows",
+      "fast_key_lookup_delta": {
+        "relinearization_key": 0,
+        "galois_key": 0
+      }
+    },
+    {
+      "id": "mulrelin-ctct-l2",
+      "standard_status": "passed",
+      "fast_status": "passed",
+      "standard_complex_rmse": 5.3094503400910706e-14,
+      "fast_complex_rmse": 5.320587702687035e-15,
+      "standard_max_complex_error": 1.0603403370282186e-13,
+      "fast_max_complex_error": 1.2117592599745943e-14,
+      "fast_actual_path": "Fast P0 ckks.Evaluator.MulRelin -\u003e mulRelinFastCKKSZeroSecret -\u003e existing product kernel with relin=false; no native key lookup",
+      "fast_key_lookup_delta": {
+        "relinearization_key": 0,
+        "galois_key": 0
+      }
+    },
+    {
+      "id": "mulrelin-invalid-c1",
+      "standard_status": "not_applicable_to_genuine_standard",
+      "fast_status": "passed_expected_rejection",
+      "fast_actual_path": "Fast P0 ckks.Evaluator.MulRelin -\u003e mulRelinFastCKKSZeroSecret -\u003e existing product kernel with relin=false; no native key lookup",
+      "fast_key_lookup_delta": {
+        "relinearization_key": 0,
+        "galois_key": 0
+      }
+    },
+    {
+      "id": "mulrelin-invalid-operand",
+      "standard_status": "passed_expected_rejection",
+      "fast_status": "passed_expected_rejection",
+      "fast_actual_path": "Fast P0 public ckks.Evaluator.MulRelin -\u003e generic Mul scalar/plaintext overload over full-active-Q rows",
+      "fast_key_lookup_delta": {
+        "relinearization_key": 0,
+        "galois_key": 0
+      }
+    },
+    {
+      "id": "rescale-source-mulrelin-l3",
+      "standard_status": "passed",
+      "fast_status": "passed",
+      "standard_complex_rmse": 6.008694847038927e-14,
+      "fast_complex_rmse": 5.320587702687035e-15,
+      "standard_max_complex_error": 1.305517689324053e-13,
+      "fast_max_complex_error": 1.2117592599745943e-14,
+      "fast_actual_path": "Fast P0 ckks.Evaluator.MulRelin -\u003e mulRelinFastCKKSZeroSecret -\u003e existing product kernel with relin=false; no native key lookup",
+      "fast_key_lookup_delta": {
+        "relinearization_key": 0,
+        "galois_key": 0
+      }
+    },
+    {
+      "id": "rescale-l3-q3",
+      "standard_status": "passed",
+      "fast_status": "passed",
+      "standard_complex_rmse": 5.963338919189642e-14,
+      "fast_complex_rmse": 5.508744899042129e-15,
+      "standard_max_complex_error": 1.237105911552946e-13,
+      "fast_max_complex_error": 1.2490249597131585e-14,
+      "fast_actual_path": "Fast P0 public ckks.Evaluator.Rescale/RescaleTo -\u003e generic full-active-Q CKKS path; all logical rows active",
+      "fast_key_lookup_delta": {
+        "relinearization_key": 0,
+        "galois_key": 0
+      }
+    },
+    {
+      "id": "rescaleto-source-mulrelin-l3",
+      "standard_status": "passed",
+      "fast_status": "passed",
+      "standard_complex_rmse": 6.008694847038927e-14,
+      "fast_complex_rmse": 5.320587702687035e-15,
+      "standard_max_complex_error": 1.305517689324053e-13,
+      "fast_max_complex_error": 1.2117592599745943e-14,
+      "fast_actual_path": "Fast P0 ckks.Evaluator.MulRelin -\u003e mulRelinFastCKKSZeroSecret -\u003e existing product kernel with relin=false; no native key lookup",
+      "fast_key_lookup_delta": {
+        "relinearization_key": 0,
+        "galois_key": 0
+      }
+    },
+    {
+      "id": "rescaleto-l3-q3",
+      "standard_status": "passed",
+      "fast_status": "passed",
+      "standard_complex_rmse": 5.963338919189642e-14,
+      "fast_complex_rmse": 5.508744899042129e-15,
+      "standard_max_complex_error": 1.237105911552946e-13,
+      "fast_max_complex_error": 1.2490249597131585e-14,
+      "fast_actual_path": "Fast P0 public ckks.Evaluator.Rescale/RescaleTo -\u003e generic full-active-Q CKKS path; all logical rows active",
+      "fast_key_lookup_delta": {
+        "relinearization_key": 0,
+        "galois_key": 0
+      }
+    },
+    {
+      "id": "chain-add-l3",
+      "standard_status": "passed",
+      "fast_status": "passed",
+      "standard_complex_rmse": 8.243743971092209e-13,
+      "fast_complex_rmse": 6.366054749149383e-14,
+      "standard_max_complex_error": 1.5805934596927203e-12,
+      "fast_max_complex_error": 9.928313431575474e-14,
+      "fast_actual_path": "Fast P0 public ckks.Evaluator.Add/Sub -\u003e generic full-active-Q CKKS path (not explicit fast.Evaluator kernel)",
+      "fast_key_lookup_delta": {
+        "relinearization_key": 0,
+        "galois_key": 0
+      }
+    },
+    {
+      "id": "chain-mulrelin-l3",
+      "standard_status": "passed",
+      "fast_status": "passed",
+      "standard_complex_rmse": 1.2657566568671394e-13,
+      "fast_complex_rmse": 8.042716642715016e-15,
+      "standard_max_complex_error": 2.703621777698391e-13,
+      "fast_max_complex_error": 2.3861511800471936e-14,
+      "fast_actual_path": "Fast P0 ckks.Evaluator.MulRelin -\u003e mulRelinFastCKKSZeroSecret -\u003e existing product kernel with relin=false; no native key lookup",
+      "fast_key_lookup_delta": {
+        "relinearization_key": 0,
+        "galois_key": 0
+      }
+    },
+    {
+      "id": "chain-rescale-l3-q3",
+      "standard_status": "passed",
+      "fast_status": "passed",
+      "standard_complex_rmse": 1.249051646685477e-13,
+      "fast_complex_rmse": 8.004013587338643e-15,
+      "standard_max_complex_error": 2.566000787936306e-13,
+      "fast_max_complex_error": 2.3942205527812226e-14,
+      "fast_actual_path": "Fast P0 public ckks.Evaluator.Rescale/RescaleTo -\u003e generic full-active-Q CKKS path; all logical rows active",
+      "fast_key_lookup_delta": {
+        "relinearization_key": 0,
+        "galois_key": 0
+      }
+    },
+    {
+      "id": "chain-rotate-l2",
+      "standard_status": "passed",
+      "fast_status": "passed",
+      "standard_complex_rmse": 1.258718128624671e-13,
+      "fast_complex_rmse": 8.00406932550516e-15,
+      "standard_max_complex_error": 2.593902952873706e-13,
+      "fast_max_complex_error": 2.394245269343481e-14,
+      "fast_actual_path": "Fast P0 ckks.Evaluator.Rotate -\u003e rotateFastCKKSZeroSecret -\u003e shared fastcore.ApplyRows; no Galois-key lookup",
+      "fast_key_lookup_delta": {
+        "relinearization_key": 0,
+        "galois_key": 0
+      }
+    }
+  ]
+}
