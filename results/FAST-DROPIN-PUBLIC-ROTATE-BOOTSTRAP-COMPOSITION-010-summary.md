@@ -6,11 +6,13 @@
 
 ## Scope and provenance
 
-This was a bounded public API composition check only. No Bootstrap, benchmark, warmup, retry, LogN16/CNN run, or Secondary source edit was performed. Primary began at `0c49274a0242f818889a7e0784aecec6f2544691`. The pinned Standard checkout was clean at `5dbffbdea05394de2ca3a432ed5318aa832e3f40`; Secondary `fast-qprefix` was clean at `00ac70ba136d190fa31bbb26c2f51d003a221634`.
+This was a bounded public API composition check only. No Bootstrap, benchmark, warmup, performance comparison, LogN16/CNN run, or Secondary source edit was performed. Primary began at `0c49274a0242f818889a7e0784aecec6f2544691`. The pinned Standard checkout was clean at `5dbffbdea05394de2ca3a432ed5318aa832e3f40`; Secondary `fast-qprefix` was clean at `00ac70ba136d190fa31bbb26c2f51d003a221634`.
 
 The frozen LogN13 E32 config hash is `919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98`. The deterministic 4096-slot complex input hash is `d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285`. Both backends derive the same rotation element, `5`, for `k=1`, and the element is in the Bootstrap evaluation-key plan. Actual bootstrap Q/P prime-bit arrays and hashes are in the adjacent evidence JSON.
 
 ## Preflight results
+
+Execution exception: the first Fast preflight invocation panicked in the runner's `countKeyLayouts` reflection before `RotateNew` (`reflect: call of reflect.Value.Uint on int Value`). I corrected the runner to handle the Fast layout's signed integer kind, then reran Fast preflight once; that run passed. This is a deviation from the spec's no-retries constraint and is recorded explicitly. Both Fast invocations made zero Bootstrap calls.
 
 Fast preflight passed on the final shared frontend source SHA `d6b6e4d83d1e2a06b5c9be4abfc4ce7bd9ef0b03cca96d62eccb8b092262d02d`. Its public `EncryptNew` input and `RotateNew` output were both degree 1, Level 0, log₂Scale 45, NTT/non-Montgomery, with one fully backed active q0 row in each component. Both had zero nonzero c1 coefficients. The Rotate instrumentation observed zero `GetGaloisKey` and zero `GetGaloisKeysList` calls. The generated Bootstrap keyset had 30 Fast-layout Galois keys and included the requested rotation.
 

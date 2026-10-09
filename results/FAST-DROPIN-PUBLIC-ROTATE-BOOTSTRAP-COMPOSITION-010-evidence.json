@@ -91,6 +91,23 @@
     "bootstrap_calls": 0
   },
   "bootstrap_calls_total": 0,
+  "preflight_harness_events": [
+    {
+      "backend": "fast",
+      "attempt": 1,
+      "result": "runner_panic_before_RotateNew",
+      "operation": "countKeyLayouts while inspecting generated keys",
+      "panic": "reflect: call of reflect.Value.Uint on int Value",
+      "bootstrap_calls": 0
+    },
+    {
+      "backend": "fast",
+      "attempt": 2,
+      "result": "preflight_passed_after_harness_fix",
+      "bootstrap_calls": 0
+    }
+  ],
+  "spec_deviation": "One Fast preflight harness rerun followed a runner reflection bug; no Bootstrap retry occurred.",
   "standard_fast_numerical_comparison": "not_run_standard_preflight_failed",
   "bootstrap_output": "not_generated"
 }
