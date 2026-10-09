@@ -1,25 +1,19 @@
 # Current Task
 
-Task: FAST-DROPIN-ZERO-SECRET-ENCRYPT-BRIDGE-004
+Task: FAST-DROPIN-CKKS-PRIMITIVE-API-AUDIT-005
 Status: READY_FOR_CODEX
-Task class: M-approved invariant + bounded Secondary implementation (I) and conditional single-pair experiment (E)
+Task class: bounded unchanged-frontend CKKS primitive API / semantic audit (no production code changes)
 
-**Executable spec:** `specs/FAST-DROPIN-ZERO-SECRET-ENCRYPT-BRIDGE-004.md`
-**Approved scientific assessment:** `results/FAST-DROPIN-API-LIFECYCLE-AUDIT-003-web-review.md`
-**Long-term goal:** `docs/FAST_DROPIN_ZERO_SECRET_GOAL.md`
+**Executable spec:** `specs/FAST-DROPIN-CKKS-PRIMITIVE-API-AUDIT-005.md`
+**Long-term objective:** `docs/FAST_DROPIN_ZERO_SECRET_GOAL.md`
+**Accepted prior stage:** `results/FAST-DROPIN-ZERO-SECRET-ENCRYPT-BRIDGE-004-web-review.md`
 
-## Previous audit accepted as partial
+## Web review of predecessor
 
-`FAST-DROPIN-API-LIFECYCLE-AUDIT-003` produced the **same unchanged source**, successfully compiled and preflighted against genuine Standard and Fast dependency checkouts. But both versions of ordinary native `EncryptNew` still created nonzero c1 under a nonzero secret. The Fast `GenEvaluationKeys` and `NewEvaluator` already dispatch to intentional zero-secret bootstrap, which cannot faithfully decode a native ciphertext by ignoring nonzero `c1*s`. Thus stopping before Bootstrap was appropriate. The audit is accepted as PARTIAL, not as drop-in success. Primary report `441ee378690de9ca8567520c8fedf9ad00aaa1af`.
+`FAST-DROPIN-ZERO-SECRET-ENCRYPT-BRIDGE-004` is accepted for **one specified secret-key EncryptNew → Bootstrap → DecryptNew numeric lifecycle** using one *identical frontend source* with library-only dependency replacement (LogN13, E32). Secondary `eb7793f1e449702590cdba3d9603261623354f80`, Primary result `19ebcb888cd4e806f40df24e785ac75ec5d85d8e`. Fast output vs original RMSE `1.1907546782784477e-9`; Fast vs genuine Standard RMSE `4.821647086585007e-9`. This is not evidence for general CKKS Add/MulRelin/Rotate/Rescale APIs, public-key EncryptNew, overall speedup or real encryption security.
 
-Two AGENTS Git-sync corrections are verified committed and pushed: Primary `49d2a9ece038c0f58cfa77d0e7addfa056eb0a20` and Secondary `68c3da8ec18222f985ebb5c43f6a8495b853cfc2`.
+## Current bounded task
 
-## Active bounded repair
-
-Implement in the Fast fork only an **internally CKKS-scoped** zero-secret input encryption bridge: the ordinary public `rlwe.NewEncryptor(ckksParams, sk).EncryptNew(pt)` yields logically `(encoded pt, 0)`, with identical signatures and frontend params; other schemes remain unaffected. Maintain metadata and native DecryptNew numeric interpretation. **Do not clear c1 from a normally encrypted ciphertext**. If an operation has nonzero c1, do not silently treat it as zero-secret. Respect Q-prefix support and fail clearly if needed.
-
-Add an unmodified-source Standard/Fast integration frontend under Primary and preflight both builds. Only after correct preflight, at most **one Standard E32** plus **one Fast E32** public Bootstrap; compare decoded outputs and original. Report exact results; no benchmarking, no parameter tuning, no claims of cryptographic security or universal API compatibility.
-
-Use safely synced repos and their AGENTS, tests, self-review, and permitted fast-forward pushes. Return `FAST_DROPIN_ENCRYPT_BRIDGE_COMPLETE_PENDING_WEB_REVIEW`, `FAST_DROPIN_ENCRYPT_BRIDGE_PARTIAL` or `FAST_DROPIN_ENCRYPT_BRIDGE_BLOCKED`, and `READY_FOR_WEB_REVIEW` or `NEEDS_WEB_REVIEW`.
+Audit **the same ordinary public CKKS primitive frontend code** compiled against both genuine Standard and Fast dependencies. Source-check `ckks.NewEvaluator` and Fast key paths; test Add/MulRelin/Rescale/Rotate only within sound representation boundaries with plaintext numeric oracles. Do not silently run Standard KeySwitch on Fast-layout evaluation keys. Stop and report the first mismatch; **no production code modification, no Bootstrap, no benchmarking**. Write compact Primary report and return `FAST_DROPIN_PRIMITIVE_AUDITED`, `FAST_DROPIN_PRIMITIVE_PARTIAL` or `FAST_DROPIN_PRIMITIVE_BLOCKED` plus Web review status.
 
 `FAST-STANDARD-PERF-REBASELINE-003` remains BLOCKED.
