@@ -1,9 +1,9 @@
 # FAST-DROPIN-INTEGRATION-AUTONOMOUS-BATCH-012 Journal
 
-**Batch state:** `BATCH_IN_PROGRESS`
+**Batch state:** `BATCH_COMPLETE_READY_FOR_WEB_REVIEW`
 
-**Current checkpoint:** C — Fast single Bootstrap attempt reserved
-**Bootstrap budget:** Standard `1/1 completed`; Fast `1/1 reserved before launch`
+**Current checkpoint:** D — read-only coverage inventory `PASSED`
+**Bootstrap budget:** Standard `1/1 completed`; Fast `1/1 completed`
 
 ## Resume preflight — 2026-10-10
 
@@ -47,17 +47,34 @@
 - Direct decoded Fast-vs-Standard Rotate delta: RMSE `1.3396909694030365e-11`, max complex error `5.3631037691780624e-11`, SNR `183.68710464953378 dB`.
 - Compact schema self-review found the nested `evaluation_keys.rotation_galois_element` field had been serialized as zero despite a captured top-level element `5` and a present matching key. The runner now records it directly; comparison of the immutable B raw captures transparently derives the missing nested field from their captured top-level value. It also validates pinned provenance, expected dispatch/key lookups, c1 contracts, phase status/call budget, and deterministic repair ordering. B was **not rerun**.
 - Repaired comparison artifact: `results/FAST-DROPIN-INTEGRATION-AUTONOMOUS-BATCH-012-evidence.json` (10,349 bytes). Its `evidence_repairs` field explicitly records the two derived nested fields. The B run-source hash remains the original SHA above; the repaired shared frontend SHA for checkpoint C is `a19841d94311d95a6f0cbab9a3301e49d5820fb5660885f1037a088e1a9204ad`.
-- Reporting repair tests and vet passed under both pinned workspaces. Bootstrap budget remains Standard `0/1`; Fast `0/1`.
+- Reporting repair tests and vet passed under both pinned workspaces. At the B checkpoint boundary, Bootstrap budget was Standard `0/1`; Fast `0/1`.
 
 ## Checkpoint C — single bounded public Bootstrap composition
 
-**Standard status:** `PASSED`; **Fast status:** `RESERVED_BEFORE_LAUNCH`.
+**Status:** `PASSED` — one Standard and one Fast public Bootstrap completed exactly once each.
 
 - Standard attempt count `1/1`; one call completed successfully with `bootstrap_completed`; input was the pre-rotated ciphertext. Provenance: Primary `30a312996b5916de97b1e14b4af4438d95660ebe`, shared frontend SHA `a19841d94311d95a6f0cbab9a3301e49d5820fb5660885f1037a088e1a9204ad`, clean pinned Standard `5dbffbdea05394de2ca3a432ed5318aa832e3f40`.
 - Standard output: Level 1, Scale log2 `45`, degree 1, 4096 slots, full active Q rows, NTT/non-Montgomery; native Standard c1 is nonzero across 16,384 active coefficients.
 - Standard Bootstrap-vs-rotated-cleartext oracle: RMSE `4.885854924910455e-9`, max complex error `1.5351218791077742e-8`, SNR `132.44838589971747 dB`; all recorded metrics finite.
 - Standard raw evidence: `/private/tmp/fast-dropin-keyplan-011-standard-bootstrap.json` (1,309,325 bytes), kept outside the repository; it contains decoded vectors and is not printed or committed.
-- Because Standard completed, Fast's one attempt slot is now reserved before launch. Fast output target: `/private/tmp/fast-dropin-keyplan-011-fast-bootstrap.json`. Do not relaunch if process or output becomes ambiguous. If Fast does not complete, stop; no retries. Fast is permitted only on the same source/profile/input and pinned clean `fast-qprefix` implementation.
-- Current shared frontend SHA for C remains `a19841d94311d95a6f0cbab9a3301e49d5820fb5660885f1037a088e1a9204ad`.
+- Fast attempt count `1/1`; one call completed successfully with `bootstrap_completed`; input was the pre-rotated ciphertext. Provenance: Primary `a682e8616e441f0c9fba15b3bf888187fba276d2`, same shared frontend SHA/config/input, clean pinned Fast `00ac70ba136d190fa31bbb26c2f51d003a221634`.
+- Fast output: Level 1, Scale log2 `45`, degree 1, 4096 slots, full active Q rows, NTT/non-Montgomery; zero c1 across 16,384 active coefficients. Fast dispatch selected; Rotate made zero Galois-key lookups.
+- Fast Bootstrap-vs-rotated-cleartext oracle: RMSE `1.1814120448423705e-9`, max complex error `5.771241651805313e-8`, SNR `144.77916936116213 dB`; all recorded metrics finite.
+- Direct decoded Fast-vs-Standard Bootstrap delta: RMSE `4.954605783029611e-9`, max complex error `4.3240068697009917e-8`, SNR `132.3270151591381 dB`; finite.
+- Fast raw evidence: `/private/tmp/fast-dropin-keyplan-011-fast-bootstrap.json` (1,309,603 bytes), kept outside the repository; it contains decoded vectors and is not printed or committed.
+- Compact C comparison artifact: `results/FAST-DROPIN-INTEGRATION-AUTONOMOUS-BATCH-012-bootstrap-evidence.json` (12,861 bytes), records each run's actual Primary commit separately while confirming the same measured frontend SHA `a19841d94311d95a6f0cbab9a3301e49d5820fb5660885f1037a088e1a9204ad`, fixed config/input, pinned backend identities, and exactly one call each.
+- A reporting-only follow-up now permits distinct clean Primary commits when source/config/input hashes match and retains both commits in the comparison. It does not weaken experiment gates or alter the already-executed frontend. Tests/vet passed under both pinned workspaces. Current comparison-runner source SHA after that follow-up: `2ae57c525fa39fb8c3ec35a646a92da00e364b441a8a076aec62f854404c2ba7`.
 
-Checkpoint D remains unauthorized until the one Fast call also completes successfully.
+## Checkpoint D — read-only coverage inventory
+
+**Status:** `PASSED`.
+
+- Created `results/FAST-DROPIN-INTEGRATION-AUTONOMOUS-BATCH-012-coverage-audit.md` with source-backed operation coverage for EncryptNew, Add, MulRelin, Rescale, Rotate, Bootstrap, and DecryptNew; it distinguishes numerical evidence, selected Fast boundary paths, unproven per-primitive dispatch, P0/C0 limits, security semantics, and runtime speed evidence.
+- The audit recommends four bounded follow-up I/E task areas (Add/Sub, MulRelin operands, public Rescale, explicit compact-Q boundary contract); none was started or implemented.
+- No additional Bootstrap, benchmark, or Secondary edit occurred. Secondary remains clean at `00ac70ba136d190fa31bbb26c2f51d003a221634`.
+- Final runner test/vet commands passed in both pinned workspaces after the last code change; `git diff --check` passed. All report/evidence changes are confined to Primary `results/`.
+
+## Batch result
+
+`BATCH_COMPLETE_READY_FOR_WEB_REVIEW` / `READY_FOR_WEB_REVIEW`.
+Final compact deliverables: this journal, `results/FAST-DROPIN-INTEGRATION-AUTONOMOUS-BATCH-012-summary.md`, B evidence `results/FAST-DROPIN-INTEGRATION-AUTONOMOUS-BATCH-012-evidence.json`, C evidence `results/FAST-DROPIN-INTEGRATION-AUTONOMOUS-BATCH-012-bootstrap-evidence.json`, and the D coverage audit above. No further Bootstrap work is authorized or required in this batch.

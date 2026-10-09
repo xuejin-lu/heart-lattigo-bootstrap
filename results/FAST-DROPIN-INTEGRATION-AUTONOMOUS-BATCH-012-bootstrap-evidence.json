@@ -1,0 +1,411 @@
+{
+  "schema_version": "fast-dropin-rotate-bootstrap-keyplan-011.compare.v2",
+  "timestamp_utc": "2026-10-09T18:14:21.726896Z",
+  "standard_primary_commit": "30a312996b5916de97b1e14b4af4438d95660ebe",
+  "fast_primary_commit": "a682e8616e441f0c9fba15b3bf888187fba276d2",
+  "primary_dirty": false,
+  "frontend_sha256": "a19841d94311d95a6f0cbab9a3301e49d5820fb5660885f1037a088e1a9204ad",
+  "config_sha256": "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98",
+  "input_sha256": "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285",
+  "standard_backend_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+  "standard_backend_ref": "pinned-standard-5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+  "standard_backend_dirty": false,
+  "fast_backend_commit": "00ac70ba136d190fa31bbb26c2f51d003a221634",
+  "fast_backend_ref": "fast-qprefix",
+  "fast_backend_dirty": false,
+  "bootstrap_calls_standard": 1,
+  "bootstrap_calls_fast": 1,
+  "standard_status": "bootstrap_completed",
+  "fast_status": "bootstrap_completed",
+  "standard": {
+    "primary_commit": "30a312996b5916de97b1e14b4af4438d95660ebe",
+    "primary_dirty": false,
+    "backend_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+    "backend_ref": "pinned-standard-5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+    "backend_dirty": false,
+    "frontend_sha256": "a19841d94311d95a6f0cbab9a3301e49d5820fb5660885f1037a088e1a9204ad",
+    "go_version": "go1.26.4",
+    "os": "darwin",
+    "architecture": "arm64",
+    "fast_bootstrap_selected": false,
+    "evaluation_keys": {
+      "generated_by": "btpParams.GenEvaluationKeys(sk)",
+      "galois_key_count": 30,
+      "standard_layout_key_count": 30,
+      "fast_layout_key_count": 0,
+      "rotation_galois_element": 5,
+      "rotation_key_present": true,
+      "rotation_key_layout": "implicit-standard",
+      "rotation_key_level_p": 4,
+      "evaluator_max_level_p": 4,
+      "relinearization_key_present": true,
+      "secret_q0_preserved": true,
+      "input_secret_level_q": 1,
+      "input_secret_level_p": -1,
+      "bootstrap_secret_level_q": 16,
+      "bootstrap_secret_level_p": 4
+    },
+    "rotate_galois_element": 5,
+    "rotate_evaluator_parameters": "btpParams.BootstrappingParameters",
+    "rotate_get_galois_key_calls": 1,
+    "rotate_get_galois_key_list_calls": 0,
+    "residual_q_is_exact_bootstrap_prefix": true,
+    "q0_prime_equal": true,
+    "residual_q_prime_bits": [
+      55,
+      39
+    ],
+    "bootstrap_q_prime_bits": [
+      55,
+      39,
+      40,
+      39,
+      40,
+      60,
+      60,
+      61,
+      60,
+      60,
+      60,
+      61,
+      61,
+      56,
+      57,
+      56,
+      56
+    ],
+    "bootstrap_p_prime_bits": [
+      61,
+      61,
+      62,
+      61,
+      62
+    ],
+    "residual_q_sha256": "127f596d800c0f1b943a6b89b1f5de0592e36336a4ae46a30d65ead94e3b436e",
+    "bootstrap_q_sha256": "30066778ef1caea959b3357b0a70ff792fe8582ba9545f6b53c8df2a1a6cb568",
+    "bootstrap_p_sha256": "70451211d27cd1e6bf092aa3c0752a63147c34842211dcd70d64d50755d318f7",
+    "residual_max_level": 1,
+    "bootstrap_max_level": 16,
+    "bootstrap_calls": 1,
+    "bootstrap_input_is_rotated_ciphertext": true,
+    "input_ciphertext": {
+      "level": 0,
+      "scale_log2": 45,
+      "degree": 1,
+      "n": 8192,
+      "component_count": 2,
+      "rows_per_component": [
+        1,
+        1
+      ],
+      "active_rows": 1,
+      "full_active_q": true,
+      "is_ntt": true,
+      "is_montgomery": false,
+      "is_batched": true,
+      "is_bit_reversed": false,
+      "log_dimensions_rows": 0,
+      "log_dimensions_cols": 12,
+      "log_slots": 12,
+      "c1_zero": false,
+      "c1_nonzero_count": 8192,
+      "c1_coefficient_count": 8192,
+      "c0_row_sha256": [
+        "53875ee4269253c368993e3f55c833d20226cfda92c5140a8832d68098984ae8"
+      ],
+      "c1_row_sha256": [
+        "71b7b7bbd75e23c3e9d8a7480b432de93555173d6c27a5a0e39f0f2f9c8e2a55"
+      ]
+    },
+    "rotated_ciphertext": {
+      "level": 0,
+      "scale_log2": 45,
+      "degree": 1,
+      "n": 8192,
+      "component_count": 2,
+      "rows_per_component": [
+        1,
+        1
+      ],
+      "active_rows": 1,
+      "full_active_q": true,
+      "is_ntt": true,
+      "is_montgomery": false,
+      "is_batched": true,
+      "is_bit_reversed": false,
+      "log_dimensions_rows": 0,
+      "log_dimensions_cols": 12,
+      "log_slots": 12,
+      "c1_zero": false,
+      "c1_nonzero_count": 8192,
+      "c1_coefficient_count": 8192,
+      "c0_row_sha256": [
+        "a5883e3674071dc40f6b512c827622c1868eb1d9b581c3120e2851c277048810"
+      ],
+      "c1_row_sha256": [
+        "845e5dea9cfc1dfd95a85f683cf5db719d8adde62726a0177f26464bc8dae0e5"
+      ]
+    },
+    "bootstrap_output": {
+      "level": 1,
+      "scale_log2": 45,
+      "degree": 1,
+      "n": 8192,
+      "component_count": 2,
+      "rows_per_component": [
+        2,
+        2
+      ],
+      "active_rows": 2,
+      "full_active_q": true,
+      "is_ntt": true,
+      "is_montgomery": false,
+      "is_batched": true,
+      "is_bit_reversed": false,
+      "log_dimensions_rows": 0,
+      "log_dimensions_cols": 12,
+      "log_slots": 12,
+      "c1_zero": false,
+      "c1_nonzero_count": 16384,
+      "c1_coefficient_count": 16384,
+      "c0_row_sha256": [
+        "ad20f1fec00d9b8329cb3704f55757dd57de2b46371e93db29a2ab7a9f37129f",
+        "a7814ae07520e1789abd6fd6c4fbd421b21785b0b1d8c768f9a654d4c6695c97"
+      ],
+      "c1_row_sha256": [
+        "7e6f5085fc4dba9b2de3806c47bc95d82c21207fa85287f11fcb693fe486e0e7",
+        "7eb2eff917ba718dfd278cc00f4d073c74c285bcbfafdc9dabf7af94ae715886"
+      ]
+    },
+    "immediate_decryption": {
+      "finite": true,
+      "complex_rmse": 8.416278044113313e-12,
+      "max_complex_error": 2.4218195880785067e-11,
+      "max_real_error": 2.0112661536231258e-11,
+      "max_imag_error": 2.4215175004060896e-11,
+      "snr_db": 187.72479575517988,
+      "snr_state": "finite"
+    },
+    "rotate_vs_rotated_oracle": {
+      "finite": true,
+      "complex_rmse": 1.3275885394001788e-11,
+      "max_complex_error": 5.156294306634095e-11,
+      "max_real_error": 4.907194789405267e-11,
+      "max_imag_error": 4.650983764786787e-11,
+      "snr_db": 183.76592735438362,
+      "snr_state": "finite"
+    },
+    "bootstrap_vs_rotated_oracle": {
+      "finite": true,
+      "complex_rmse": 4.885854924910455e-9,
+      "max_complex_error": 1.5351218791077742e-8,
+      "max_real_error": 1.2489711051846819e-8,
+      "max_imag_error": 1.476580658178045e-8,
+      "snr_db": 132.44838589971747,
+      "snr_state": "finite"
+    },
+    "decoded_input_sha256": "424506312a50cc064729821078248976c4080b140805064fa3a51dff7efd864e",
+    "decoded_rotate_sha256": "6f2b25700864452de321f3072d8cb51ae9198185d322e40cbf6b306606d15670",
+    "decoded_bootstrap_sha256": "4cd3417f8e8091b036037d62aa91466d166f5c6164f0d2ee11b70f5b8161b38c"
+  },
+  "fast": {
+    "primary_commit": "a682e8616e441f0c9fba15b3bf888187fba276d2",
+    "primary_dirty": false,
+    "backend_commit": "00ac70ba136d190fa31bbb26c2f51d003a221634",
+    "backend_ref": "fast-qprefix",
+    "backend_dirty": false,
+    "frontend_sha256": "a19841d94311d95a6f0cbab9a3301e49d5820fb5660885f1037a088e1a9204ad",
+    "go_version": "go1.26.4",
+    "os": "darwin",
+    "architecture": "arm64",
+    "fast_bootstrap_selected": true,
+    "evaluation_keys": {
+      "generated_by": "btpParams.GenEvaluationKeys(sk)",
+      "galois_key_count": 30,
+      "standard_layout_key_count": 0,
+      "fast_layout_key_count": 30,
+      "rotation_galois_element": 5,
+      "rotation_key_present": true,
+      "rotation_key_layout": "fast",
+      "rotation_key_level_p": 4,
+      "evaluator_max_level_p": 4,
+      "relinearization_key_present": true,
+      "secret_q0_preserved": true,
+      "input_secret_level_q": 1,
+      "input_secret_level_p": -1,
+      "bootstrap_secret_level_q": 16,
+      "bootstrap_secret_level_p": 4
+    },
+    "rotate_galois_element": 5,
+    "rotate_evaluator_parameters": "btpParams.BootstrappingParameters",
+    "rotate_get_galois_key_calls": 0,
+    "rotate_get_galois_key_list_calls": 0,
+    "residual_q_is_exact_bootstrap_prefix": true,
+    "q0_prime_equal": true,
+    "residual_q_prime_bits": [
+      55,
+      39
+    ],
+    "bootstrap_q_prime_bits": [
+      55,
+      39,
+      40,
+      39,
+      40,
+      60,
+      60,
+      61,
+      60,
+      60,
+      60,
+      61,
+      61,
+      56,
+      57,
+      56,
+      56
+    ],
+    "bootstrap_p_prime_bits": [
+      61,
+      61,
+      62,
+      61,
+      62
+    ],
+    "residual_q_sha256": "127f596d800c0f1b943a6b89b1f5de0592e36336a4ae46a30d65ead94e3b436e",
+    "bootstrap_q_sha256": "30066778ef1caea959b3357b0a70ff792fe8582ba9545f6b53c8df2a1a6cb568",
+    "bootstrap_p_sha256": "70451211d27cd1e6bf092aa3c0752a63147c34842211dcd70d64d50755d318f7",
+    "residual_max_level": 1,
+    "bootstrap_max_level": 16,
+    "bootstrap_calls": 1,
+    "bootstrap_input_is_rotated_ciphertext": true,
+    "input_ciphertext": {
+      "level": 0,
+      "scale_log2": 45,
+      "degree": 1,
+      "n": 8192,
+      "component_count": 2,
+      "rows_per_component": [
+        1,
+        1
+      ],
+      "active_rows": 1,
+      "full_active_q": true,
+      "is_ntt": true,
+      "is_montgomery": false,
+      "is_batched": true,
+      "is_bit_reversed": false,
+      "log_dimensions_rows": 0,
+      "log_dimensions_cols": 12,
+      "log_slots": 12,
+      "c1_zero": true,
+      "c1_nonzero_count": 0,
+      "c1_coefficient_count": 8192,
+      "c0_row_sha256": [
+        "d28e82688ffdbd2cc5a067f0c0919952063278a6fb23c64d8ae2ebcda096cd30"
+      ],
+      "c1_row_sha256": [
+        "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+      ]
+    },
+    "rotated_ciphertext": {
+      "level": 0,
+      "scale_log2": 45,
+      "degree": 1,
+      "n": 8192,
+      "component_count": 2,
+      "rows_per_component": [
+        1,
+        1
+      ],
+      "active_rows": 1,
+      "full_active_q": true,
+      "is_ntt": true,
+      "is_montgomery": false,
+      "is_batched": true,
+      "is_bit_reversed": false,
+      "log_dimensions_rows": 0,
+      "log_dimensions_cols": 12,
+      "log_slots": 12,
+      "c1_zero": true,
+      "c1_nonzero_count": 0,
+      "c1_coefficient_count": 8192,
+      "c0_row_sha256": [
+        "420d39b6b3f4c421ff39cd6138cbb8af0b8d388f6c739454426a61b52f3e1025"
+      ],
+      "c1_row_sha256": [
+        "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+      ]
+    },
+    "bootstrap_output": {
+      "level": 1,
+      "scale_log2": 45,
+      "degree": 1,
+      "n": 8192,
+      "component_count": 2,
+      "rows_per_component": [
+        2,
+        2
+      ],
+      "active_rows": 2,
+      "full_active_q": true,
+      "is_ntt": true,
+      "is_montgomery": false,
+      "is_batched": true,
+      "is_bit_reversed": false,
+      "log_dimensions_rows": 0,
+      "log_dimensions_cols": 12,
+      "log_slots": 12,
+      "c1_zero": true,
+      "c1_nonzero_count": 0,
+      "c1_coefficient_count": 16384,
+      "c0_row_sha256": [
+        "4b3836bca8276b4897d5f889bc0c9f880827d40759e39b1b91379386e1fbd51a",
+        "1fab455546931fe3b56d6335e0e31ac6f48d2b052a77d61dae7b45d1d0af073b"
+      ],
+      "c1_row_sha256": [
+        "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+        "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+      ]
+    },
+    "immediate_decryption": {
+      "finite": true,
+      "complex_rmse": 7.449975091875706e-13,
+      "max_complex_error": 2.101955261562136e-12,
+      "max_real_error": 1.842290209275177e-12,
+      "max_imag_error": 1.982903424790905e-12,
+      "snr_db": 208.78410083248798,
+      "snr_state": "finite"
+    },
+    "rotate_vs_rotated_oracle": {
+      "finite": true,
+      "complex_rmse": 7.44997342660252e-13,
+      "max_complex_error": 2.1019564094557047e-12,
+      "max_real_error": 1.842279800934321e-12,
+      "max_imag_error": 1.982906894237857e-12,
+      "snr_db": 208.78410277402207,
+      "snr_state": "finite"
+    },
+    "bootstrap_vs_rotated_oracle": {
+      "finite": true,
+      "complex_rmse": 1.1814120448423705e-9,
+      "max_complex_error": 5.771241651805313e-8,
+      "max_real_error": 1.6743232945926056e-9,
+      "max_imag_error": 5.77055803974158e-8,
+      "snr_db": 144.77916936116213,
+      "snr_state": "finite"
+    },
+    "decoded_input_sha256": "d107a20b1606f9d73a65b21299ead4d24f177adf74edcecb65dc7648aa4bdc5f",
+    "decoded_rotate_sha256": "9c6e4b1ba41c9cb7d0d96ff700298abaf1f91d15a74e29767c3f184de36bdc21",
+    "decoded_bootstrap_sha256": "bff8519afd9925a2093ffc009b76807af77cf55d47b1430f7db90b4566904f95"
+  },
+  "bootstrap_fast_vs_standard": {
+    "finite": true,
+    "complex_rmse": 4.954605783029611e-9,
+    "max_complex_error": 4.3240068697009917e-8,
+    "max_real_error": 1.2131120632336012e-8,
+    "max_imag_error": 4.293977381563535e-8,
+    "snr_db": 132.3270151591381,
+    "snr_state": "finite"
+  }
+}

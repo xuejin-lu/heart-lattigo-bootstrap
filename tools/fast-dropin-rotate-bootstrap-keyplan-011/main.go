@@ -173,7 +173,9 @@ type comparisonEvidence struct {
 	SchemaVersion           string     `json:"schema_version"`
 	TimestampUTC            string     `json:"timestamp_utc"`
 	EvidenceRepairs         []string   `json:"evidence_repairs,omitempty"`
-	PrimaryCommit           string     `json:"primary_commit"`
+	PrimaryCommit           string     `json:"primary_commit,omitempty"`
+	StandardPrimaryCommit   string     `json:"standard_primary_commit"`
+	FastPrimaryCommit       string     `json:"fast_primary_commit"`
 	PrimaryDirty            bool       `json:"primary_dirty"`
 	FrontendSHA256          string     `json:"frontend_sha256"`
 	ConfigSHA256            string     `json:"config_sha256"`
@@ -807,10 +809,15 @@ func compareFiles(standardPath, fastPath string) (comparisonEvidence, error) {
 	if err := validateComparableRuns(standard, fast); err != nil {
 		return comparisonEvidence{}, err
 	}
+	sharedPrimaryCommit := ""
+	if standard.PrimaryCommit == fast.PrimaryCommit {
+		sharedPrimaryCommit = standard.PrimaryCommit
+	}
 	comparison := comparisonEvidence{
 		SchemaVersion: "fast-dropin-rotate-bootstrap-keyplan-011.compare.v2", TimestampUTC: time.Now().UTC().Format(time.RFC3339Nano),
 		EvidenceRepairs: evidenceRepairs,
-		PrimaryCommit:   standard.PrimaryCommit, PrimaryDirty: standard.PrimaryDirty, FrontendSHA256: standard.FrontendSHA256, ConfigSHA256: standard.ConfigSHA256, InputSHA256: standard.InputSHA256,
+		PrimaryCommit:   sharedPrimaryCommit, StandardPrimaryCommit: standard.PrimaryCommit, FastPrimaryCommit: fast.PrimaryCommit,
+		PrimaryDirty: standard.PrimaryDirty || fast.PrimaryDirty, FrontendSHA256: standard.FrontendSHA256, ConfigSHA256: standard.ConfigSHA256, InputSHA256: standard.InputSHA256,
 		StandardBackendCommit: standard.BackendCommit, StandardBackendRef: standard.BackendRef, StandardBackendDirty: standard.BackendDirty,
 		FastBackendCommit: fast.BackendCommit, FastBackendRef: fast.BackendRef, FastBackendDirty: fast.BackendDirty,
 		BootstrapCallsStandard: standard.BootstrapCalls, BootstrapCallsFast: fast.BootstrapCalls,
@@ -857,8 +864,8 @@ func validateComparableRuns(standard, fast runEvidence) error {
 	if standard.Phase != fast.Phase || (standard.Phase != "preflight" && standard.Phase != "bootstrap") {
 		return fmt.Errorf("evidence phases do not match or are unsupported")
 	}
-	if standard.PrimaryCommit == "" || standard.PrimaryCommit != fast.PrimaryCommit || standard.PrimaryDirty || fast.PrimaryDirty {
-		return fmt.Errorf("Standard/Fast Primary provenance differs or is dirty")
+	if standard.PrimaryCommit == "" || fast.PrimaryCommit == "" || standard.PrimaryDirty || fast.PrimaryDirty {
+		return fmt.Errorf("Standard/Fast Primary commit provenance is missing or a worktree was dirty")
 	}
 	if standard.BackendCommit != pinnedStandardCommit || standard.BackendRef != "pinned-standard-"+pinnedStandardCommit || standard.BackendDirty {
 		return fmt.Errorf("Standard backend is not the clean pinned implementation %s", pinnedStandardCommit)

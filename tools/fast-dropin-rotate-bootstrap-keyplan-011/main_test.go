@@ -47,6 +47,12 @@ func TestValidateComparablePreflightEvidence(t *testing.T) {
 	}
 
 	standard, fast = validComparableRuns("preflight")
+	standard.PrimaryCommit, fast.PrimaryCommit = "standard-primary", "fast-primary"
+	if err := validateComparableRuns(standard, fast); err != nil {
+		t.Fatalf("distinct clean Primary journal commits with identical frontend were rejected: %v", err)
+	}
+
+	standard, fast = validComparableRuns("preflight")
 	fast.BackendCommit = "un-pinned"
 	if err := validateComparableRuns(standard, fast); err == nil {
 		t.Fatal("un-pinned Fast backend evidence was accepted")
