@@ -19,8 +19,10 @@ Before deciding whether there is work to do:
 3. If the worktree is dirty, the branch is not `main`, or another unsafe local condition exists, stop and report it. Never reset, stash, overwrite, discard, or switch away from user work automatically.
 4. If the worktree is clean and the branch is `main`, run:
    - `git fetch origin`
-   - `git pull --ff-only origin main`
-5. If fetch or fast-forward pull fails, stop and report the exact failure. Do not continue from stale local instructions.
+   - `git merge --ff-only origin/main`
+   After a successful fetch, use the fetched `origin/main` for the merge; **do not run `git pull`**, because it performs another fetch.
+5. After the merge, verify `git rev-parse HEAD` equals `git rev-parse origin/main`. If fetch or fast-forward merge fails, stop and report the exact failure. Do not continue from stale local instructions.
+   Distinguish a Git command that ran and failed to write Git metadata (for example `.git/FETCH_HEAD: Operation not permitted`) from a tool failure to create the execution process. For a process-creation failure, first verify the working-directory and Git executable paths; do not retry indefinitely. Use the formal permission-escalation mechanism for a Git metadata write denial when available. Never work around either failure with `sudo` or arbitrary permission changes.
 6. **Only after the remote sync succeeds**, re-read the freshly synchronized:
    - `AGENTS.md`
    - `CURRENT_TASK.md`
