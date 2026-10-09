@@ -23,6 +23,10 @@ const (
 	logSlots        = 4
 	defaultScaleLog = 45
 	standardCommit  = "5dbffbdea05394de2ca3a432ed5318aa832e3f40"
+	fastCommit      = "2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac"
+	runSchema       = "fast-dropin-compact-consumers-batch-015-run.v1"
+	runPassed       = "public_compact_add_mul_relin_rescale_rotate_passed"
+	publicLifecycle = "same CKKS public source and profile; NewKeyGenerator/GenSecretKeyNew; NewPlaintext/Encoder.Encode; rlwe.NewEncryptor.EncryptNew; public ckks.NewEvaluator AddNew/MulRelinNew/Rescale/RotateNew; ordinary DecryptNew/Decode"
 )
 
 var levels = []int{1, 3}
@@ -185,8 +189,8 @@ func runCLI() error {
 	result, runErr := executeComposition()
 	result.PrimaryCommit, result.PrimaryDirty = *primaryCommit, *primaryDirty
 	result.BackendCommit, result.BackendRef, result.BackendDirty = *backendCommit, *backendRef, *backendDirty
-	if source, err := os.ReadFile("tools/fast-dropin-compact-consumers-batch-015/main.go"); err == nil {
-		result.SourceSHA256 = hashBytes(source)
+	if sourceSHA256, err := sharedRunnerSHA256(); err == nil {
+		result.SourceSHA256 = sourceSHA256
 	} else if runErr == nil {
 		runErr = fmt.Errorf("hash shared runner: %w", err)
 	}
@@ -229,11 +233,11 @@ func executeComposition() (runEvidence, error) {
 		keys.inner = rlwe.NewMemEvaluationKeySet(relin, galois)
 	}
 	result := runEvidence{
-		SchemaVersion: "fast-dropin-compact-consumers-batch-015-run.v1", Status: "running",
+		SchemaVersion: runSchema, Status: "running",
 		CreatedUTC: time.Now().UTC().Format(time.RFC3339Nano), GoVersion: runtime.Version(), OS: runtime.GOOS, Architecture: runtime.GOARCH,
 		FastCapability: fast, Profile: used, ProfileSHA256: hashBytes(profileJSON), QPSHA256: hashBytes(qpJSON),
 		Q: params.Q(), P: params.P(), InputSHA256: hashInputs(a, b), BootstrapCalls: 0,
-		Lifecycle: "same CKKS public source and profile; NewKeyGenerator/GenSecretKeyNew; NewPlaintext/Encoder.Encode; rlwe.NewEncryptor.EncryptNew; public ckks.NewEvaluator AddNew/MulRelinNew/Rescale/RotateNew; ordinary DecryptNew/Decode",
+		Lifecycle: publicLifecycle,
 	}
 	evaluator := ckks.NewEvaluator(params, keys)
 	encoder := ckks.NewEncoder(params)
@@ -360,17 +364,29 @@ func combine(standardPath, fastPath, outPath string) error {
 	if err := readJSON(fastPath, &fast); err != nil {
 		return err
 	}
-	if standard.FastCapability || !fast.FastCapability || standard.BackendCommit != standardCommit || standard.BackendDirty || fast.BackendDirty {
-		return fmt.Errorf("backend provenance does not identify clean pinned Standard and clean Fast")
+	params, err := frozenParameters()
+	if err != nil {
+		return fmt.Errorf("construct frozen Batch 015 profile for provenance validation: %w", err)
 	}
-	if standard.Status != "public_compact_add_mul_relin_rescale_rotate_passed" || fast.Status != standard.Status {
-		return fmt.Errorf("a backend failed the composed public chain: Standard=%s Fast=%s", standard.Status, fast.Status)
+	profileJSON, _ := json.Marshal(frozenProfile())
+	qpJSON, _ := json.Marshal(struct{ Q, P []uint64 }{params.Q(), params.P()})
+	a, b := deterministicInputs(1 << logSlots)
+	inputSHA256 := hashInputs(a, b)
+	runnerSHA256, err := sharedRunnerSHA256()
+	if err != nil {
+		return fmt.Errorf("hash shared runner for provenance validation: %w", err)
 	}
-	if standard.PrimaryCommit != fast.PrimaryCommit || standard.PrimaryDirty != fast.PrimaryDirty || standard.SourceSHA256 != fast.SourceSHA256 || standard.ProfileSHA256 != fast.ProfileSHA256 || standard.QPSHA256 != fast.QPSHA256 || standard.InputSHA256 != fast.InputSHA256 {
-		return fmt.Errorf("paired runs differ in Primary state, runner, profile, effective Q/P, or deterministic inputs")
+	for _, check := range []struct {
+		name string
+		run  runEvidence
+		fast bool
+	}{{"Standard", standard, false}, {"Fast", fast, true}} {
+		if err := validateRunEvidence(check.run, check.fast, params, hashBytes(profileJSON), hashBytes(qpJSON), inputSHA256, runnerSHA256); err != nil {
+			return fmt.Errorf("invalid %s run evidence: %w", check.name, err)
+		}
 	}
-	if len(standard.Checkpoints) != len(fast.Checkpoints) || len(standard.Checkpoints) != 8 {
-		return fmt.Errorf("expected 8 matched checkpoints, Standard=%d Fast=%d", len(standard.Checkpoints), len(fast.Checkpoints))
+	if standard.PrimaryCommit != fast.PrimaryCommit || standard.PrimaryDirty != fast.PrimaryDirty || standard.GoVersion != fast.GoVersion || standard.OS != fast.OS || standard.Architecture != fast.Architecture {
+		return fmt.Errorf("paired runs differ in Primary state or runtime environment")
 	}
 	combined := combinedEvidence{
 		SchemaVersion: "fast-dropin-compact-consumers-batch-015-evidence.v1", Status: "paired_public_compact_chain_passed",
@@ -379,30 +395,32 @@ func combine(standardPath, fastPath, outPath string) error {
 		RunnerSHA256: standard.SourceSHA256, InputSHA256: standard.InputSHA256, BootstrapCalls: 0,
 		CompactBoundary: "Numerical decoding is limited to accepted LogN13 Levels 1 and 3, where the maintained Q-prefix includes every active row. The separate Level-5 Secondary test is structural-only: q4/q5 remain dormant through Add/MulRelin/Rescale/Rotate. No Bootstrap, benchmark, or LogN16 run was made.",
 	}
-	combined.Standard = summaryOf(standard)
-	combined.Fast = summaryOf(fast)
 	for i := range standard.Checkpoints {
 		sc, fc := standard.Checkpoints[i], fast.Checkpoints[i]
-		if sc.ID != fc.ID || sc.Status != "passed" || fc.Status != "passed" || sc.State.Level != fc.State.Level || sc.State.Degree != fc.State.Degree || math.Abs(sc.State.ScaleLog2-fc.State.ScaleLog2) > 1e-9 {
+		if sc.ID != fc.ID || sc.State.Level != fc.State.Level || sc.State.Degree != fc.State.Degree || math.Abs(sc.State.ScaleLog2-fc.State.ScaleLog2) > 1e-9 {
 			return fmt.Errorf("paired checkpoint mismatch at %d: Standard=%s/%d Fast=%s/%d", i, sc.ID, sc.State.Level, fc.ID, fc.State.Level)
 		}
 		paired := compare(valuesFromEvidence(sc.Decoded), valuesFromEvidence(fc.Decoded))
 		if !paired.Finite {
-			return fmt.Errorf("non-finite Fast-vs-Standard result at %s", sc.ID)
+			return fmt.Errorf("invalid Fast-vs-Standard decoded comparison at %s", sc.ID)
 		}
 		combined.Paired = append(combined.Paired, pairedCheckpoint{ID: sc.ID, StandardRMSE: sc.Plaintext.ComplexRMSE, FastRMSE: fc.Plaintext.ComplexRMSE, FastVsStandardRMSE: paired.ComplexRMSE, FastVsStandardMax: paired.MaxComplex, Level: sc.State.Level, StandardScaleLog2: sc.State.ScaleLog2, FastScaleLog2: fc.State.ScaleLog2})
 	}
-	if fast.KeyLookups.Relinearization != 0 || fast.KeyLookups.Galois != 0 {
+	if fast.KeyLookups.Relinearization != 0 || fast.KeyLookups.Galois != 0 || fast.KeyLookups.GaloisList != 1 {
 		return fmt.Errorf("Fast public chain unexpectedly looked up evaluation keys: %+v", fast.KeyLookups)
 	}
+	combined.Standard = summaryOf(standard)
+	combined.Fast = summaryOf(fast)
 	return writeJSON(outPath, combined)
 }
 
 func summaryOf(result runEvidence) backendSummary {
-	for i := range result.Checkpoints {
-		result.Checkpoints[i].Decoded = nil
+	checkpoints := make([]checkpoint, len(result.Checkpoints))
+	copy(checkpoints, result.Checkpoints)
+	for i := range checkpoints {
+		checkpoints[i].Decoded = nil
 	}
-	return backendSummary{Commit: result.BackendCommit, Ref: result.BackendRef, Dirty: result.BackendDirty, FastCapability: result.FastCapability, KeyLookups: result.KeyLookups, Checkpoints: result.Checkpoints}
+	return backendSummary{Commit: result.BackendCommit, Ref: result.BackendRef, Dirty: result.BackendDirty, FastCapability: result.FastCapability, KeyLookups: result.KeyLookups, Checkpoints: checkpoints}
 }
 
 func deterministicInputs(slots int) ([]complex128, []complex128) {
@@ -432,23 +450,140 @@ func zip(a, b []complex128, operation func(complex128, complex128) complex128) [
 }
 
 func compare(want, got []complex128) metric {
-	out := metric{Finite: len(want) == len(got)}
+	out := metric{}
+	if len(want) == 0 || len(want) != len(got) {
+		return out
+	}
 	var squares float64
 	for i := range want {
-		if !finite(real(got[i])) || !finite(imag(got[i])) {
-			out.Finite = false
+		if !finite(real(want[i])) || !finite(imag(want[i])) || !finite(real(got[i])) || !finite(imag(got[i])) {
+			return metric{}
 		}
 		error := cmplx.Abs(got[i] - want[i])
+		if !finite(error) {
+			return metric{}
+		}
 		squares += error * error
 		out.MaxComplex = math.Max(out.MaxComplex, error)
 	}
-	if len(want) > 0 {
-		out.ComplexRMSE = math.Sqrt(squares / float64(len(want)))
-	}
+	out.ComplexRMSE = math.Sqrt(squares / float64(len(want)))
 	if !finite(out.ComplexRMSE) || !finite(out.MaxComplex) {
-		out.Finite = false
+		return metric{}
 	}
+	out.Finite = true
 	return out
+}
+
+func validateRunEvidence(run runEvidence, fast bool, params ckks.Parameters, profileSHA256, qpSHA256, inputSHA256, runnerSHA256 string) error {
+	if run.SchemaVersion != runSchema || run.Status != runPassed || run.BootstrapCalls != 0 {
+		return fmt.Errorf("unexpected schema/status/bootstrap count: %s / %s / %d", run.SchemaVersion, run.Status, run.BootstrapCalls)
+	}
+	if run.PrimaryCommit == "" || run.GoVersion == "" || run.OS == "" || run.Architecture == "" {
+		return fmt.Errorf("missing Primary or runtime provenance")
+	}
+	if fast {
+		if !run.FastCapability || run.BackendCommit != fastCommit || run.BackendRef != "fast-qprefix" || run.BackendDirty {
+			return fmt.Errorf("backend is not clean pinned Fast %s on fast-qprefix", fastCommit)
+		}
+	} else if run.FastCapability || run.BackendCommit != standardCommit || run.BackendRef != "pinned-standard-"+standardCommit || run.BackendDirty {
+		return fmt.Errorf("backend is not clean pinned genuine Standard %s", standardCommit)
+	}
+	created, err := time.Parse(time.RFC3339Nano, run.CreatedUTC)
+	if err != nil || created.IsZero() {
+		return fmt.Errorf("invalid run timestamp %q", run.CreatedUTC)
+	}
+	profileJSON, _ := json.Marshal(frozenProfile())
+	if hashBytes(profileJSON) != profileSHA256 || run.ProfileSHA256 != profileSHA256 {
+		return fmt.Errorf("profile hash does not match frozen LogN13 profile")
+	}
+	actualProfileJSON, _ := json.Marshal(run.Profile)
+	if hashBytes(actualProfileJSON) != profileSHA256 {
+		return fmt.Errorf("profile fields do not match frozen LogN13 profile")
+	}
+	qpJSON, _ := json.Marshal(struct{ Q, P []uint64 }{run.Q, run.P})
+	if run.QPSHA256 != qpSHA256 || hashBytes(qpJSON) != qpSHA256 {
+		return fmt.Errorf("effective Q/P do not match the frozen profile")
+	}
+	if run.InputSHA256 != inputSHA256 || run.SourceSHA256 != runnerSHA256 || run.Lifecycle != publicLifecycle {
+		return fmt.Errorf("runner, input, or public lifecycle provenance mismatch")
+	}
+	if len(run.Checkpoints) != 8 {
+		return fmt.Errorf("expected 8 checkpoints, got %d", len(run.Checkpoints))
+	}
+	descriptors := expectedCheckpoints()
+	baseScale := rlwe.NewScale(math.Exp2(defaultScaleLog))
+	productScale := baseScale.Mul(baseScale)
+	for i, descriptor := range descriptors {
+		cp := run.Checkpoints[i]
+		if cp.ID != descriptor.id || cp.API != descriptor.api || cp.Status != "passed" || cp.State.Level != descriptor.level || cp.State.Degree != 1 {
+			return fmt.Errorf("checkpoint %d has unexpected identity/status/state: %+v", i, cp)
+		}
+		if len(cp.Decoded) != 1<<logSlots {
+			return fmt.Errorf("checkpoint %s must contain %d decoded samples, got %d", cp.ID, 1<<logSlots, len(cp.Decoded))
+		}
+		for sample, value := range cp.Decoded {
+			if !finite(value.Real) || !finite(value.Imag) {
+				return fmt.Errorf("checkpoint %s sample %d is nonfinite", cp.ID, sample)
+			}
+		}
+		if !cp.Plaintext.Finite || !finite(cp.Plaintext.ComplexRMSE) || !finite(cp.Plaintext.MaxComplex) || cp.Plaintext.MaxComplex > descriptor.tolerance {
+			return fmt.Errorf("checkpoint %s failed its plaintext oracle gate: %+v", cp.ID, cp.Plaintext)
+		}
+		if !cp.State.IsNTT || cp.State.IsMontgomery || cp.State.C1Zero != fast {
+			return fmt.Errorf("checkpoint %s violates expected NTT/Montgomery/c1 state", cp.ID)
+		}
+		rows := descriptor.level + 1
+		if fast && rows > 4 {
+			rows = 4
+		}
+		if len(cp.State.RowsPerComponent) != 2 || cp.State.RowsPerComponent[0] != rows || cp.State.RowsPerComponent[1] != rows {
+			return fmt.Errorf("checkpoint %s has unexpected Q-row authority: %v", cp.ID, cp.State.RowsPerComponent)
+		}
+		expectedScale := baseScale
+		if descriptor.api == "MulRelinNew" {
+			expectedScale = productScale
+		} else if descriptor.api == "Rescale" || descriptor.api == "RotateNew" {
+			expectedScale = productScale.Div(rlwe.NewScale(params.Q()[descriptor.level+1]))
+		}
+		if !finite(cp.State.ScaleLog2) || math.Abs(cp.State.ScaleLog2-expectedScale.Log2()) > 1e-9 {
+			return fmt.Errorf("checkpoint %s has unexpected Scale progression: %.12g", cp.ID, cp.State.ScaleLog2)
+		}
+	}
+	return nil
+}
+
+type checkpointDescriptor struct {
+	id, api   string
+	level     int
+	tolerance float64
+}
+
+func expectedCheckpoints() []checkpointDescriptor {
+	return []checkpointDescriptor{
+		{"add-l1", "AddNew", 1, 1e-6}, {"mul-relin-l1", "MulRelinNew", 1, 1e-4}, {"rescale-l1", "Rescale", 0, 1e-4}, {"rotate-l0", "RotateNew", 0, 1e-4},
+		{"add-l3", "AddNew", 3, 1e-6}, {"mul-relin-l3", "MulRelinNew", 3, 1e-4}, {"rescale-l3", "Rescale", 2, 1e-4}, {"rotate-l2", "RotateNew", 2, 1e-4},
+	}
+}
+
+func frozenProfile() profile {
+	return profile{LogN: logN, LogQ: []int{55, 39, 40, 39}, LogP: []int{60}, ScaleLog2: defaultScaleLog, LogSlots: logSlots, Levels: append([]int(nil), levels...)}
+}
+
+func frozenParameters() (ckks.Parameters, error) {
+	used := frozenProfile()
+	return ckks.NewParametersFromLiteral(ckks.ParametersLiteral{
+		LogN: used.LogN, LogQ: used.LogQ, LogP: used.LogP, LogDefaultScale: used.ScaleLog2,
+		Xs: ring.Ternary{H: 192},
+	})
+}
+
+func sharedRunnerSHA256() (string, error) {
+	for _, path := range []string{"tools/fast-dropin-compact-consumers-batch-015/main.go", "main.go"} {
+		if source, err := os.ReadFile(path); err == nil {
+			return hashBytes(source), nil
+		}
+	}
+	return "", fmt.Errorf("cannot locate shared runner source")
 }
 
 func hashInputs(inputs ...[]complex128) string {
