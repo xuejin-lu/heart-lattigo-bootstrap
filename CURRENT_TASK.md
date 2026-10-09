@@ -1,19 +1,23 @@
 # Current Task
 
-Task: FAST-DROPIN-KEYLESS-MULRELIN-SAFETY-006A
+Task: FAST-DROPIN-KEYLESS-ROTATE-007
 Status: READY_FOR_CODEX
-Task class: narrowly bounded I repair after independent scientific review
+Task class: narrowly bounded M-approved Fast zero-secret Rotate implementation and no-Bootstrap numerical preflight
 
-**Executable spec:** `specs/FAST-DROPIN-KEYLESS-MULRELIN-SAFETY-006A.md`
-**Review evidence:** `results/FAST-DROPIN-KEYLESS-MULRELIN-006-web-review.md`
+**Executable spec:** `specs/FAST-DROPIN-KEYLESS-ROTATE-007.md`
+**Independent prior review:** `results/FAST-DROPIN-KEYLESS-MULRELIN-SAFETY-006A-web-review.md`
 **Long-term goal:** `docs/FAST_DROPIN_ZERO_SECRET_GOAL.md`
 
-## Web decision
+## Accepted predecessor
 
-`FAST-DROPIN-KEYLESS-MULRELIN-006` is accepted **only as PARTIAL**, notwithstanding passing numeric metrics. Secondary `6ce15cf8b949c8a89f610bcca5ab506dd3f560f8` implements a real keyless public CKKS MulRelin with c1=0, full active Q backing, degree-one inputs, Scale/Level preservation and an independent no-relin-key test. Fixed same-source Fast MulRelin RMSE `5.320587702687035e-15` (Standard `4.853e-14`). The original 006 implementation **does not fail closed when c1 is nonzero but normal RelinearizationKey is available**: its helper returns `handled=false` and generic native KeySwitch may run. This violates the original accepted zero-secret input contract.
+`FAST-DROPIN-KEYLESS-MULRELIN-SAFETY-006A` is **ACCEPTED**. Secondary `93ab7ecc5a864fd9bbacea55f0af730941552691` now unconditionally rejects unsupported Fast ciphertext/ciphertext MulRelin, including nonzero c1 even with a valid Standard-layout relinearization key. Tests verify zero relin key lookups and transactional rejection. The valid keyless MulRelin path is unchanged and its fixed-profile Fast RMSE was approximately `5.32e-15`. The full standalone numeric regression preceded a final nil-input guard; final Secondary committed source passed focused package tests. Primary report `23ee62d01116d84a2575981d126db1cecca07068`.
 
-## Current targeted repair
+## Current scope
 
-For Fast-marked `ckks.Evaluator.MulRelin/MulRelinNew` ciphertext/ciphertext operations only, reject any nonzero c1, unsupported degrees/representation, missing active Q backing or other unsupported inputs **without mutation** and **regardless of whether Standard-layout relin keys exist**. Do not silently execute the native Standard KeySwitch as a fallback. Keep the existing passing keyless path and unchanged frontend API/config. The main negative test must give the Fast evaluator a real native-layout key to prove fallback is impossible. No edits to Standard or separate Fast Q-prefix kernels, no Bootstrap or benchmark.
+Add **one** transparent Fast CKKS zero-secret `ckks.Evaluator.Rotate/RotateNew` branch, using an ordinary full-active-Q ring automorphism on `(c0,0)` without Galois key lookup or native KeySwitch. Preserve the same public API, signature, frontend, parameters, Level/Scale/metadata and all active Q rows. Reject invalid inputs and compact/missing Q backing without mutation; do not silently fall back to native Standard rotation or use only q0/q1. In-place aliasing, k=0/+1/-1, two valid levels, and independent plaintext slot oracles are required.
 
-Follow `AGENTS.md` safe sync, execute focused tests and one bounded self-review/repair pass, then commit/push authorized source and concise Primary summary. Return `FAST_DROPIN_KEYLESS_MULRELIN_SAFETY_COMPLETE_PENDING_WEB_REVIEW`, `FAST_DROPIN_KEYLESS_MULRELIN_SAFETY_PARTIAL` or `FAST_DROPIN_KEYLESS_MULRELIN_SAFETY_BLOCKED` and Web review status. `FAST-STANDARD-PERF-REBASELINE-003` remains BLOCKED.
+Only Fast Secondary implementation and tests; same unchanged frontend for one Fast numerical regression; reuse pinned genuine Standard results. **Zero Bootstrap, zero benchmarks, no performance claims or security claims**. Do not expand to RotateHoisted, Conjugate, generic Automorphism, optimized Rescale, public-key EncryptNew or Q-prefix compact inputs.
+
+Read and execute the referenced spec after AGENTS safe sync. Report `FAST_DROPIN_KEYLESS_ROTATE_COMPLETE_PENDING_WEB_REVIEW`, `FAST_DROPIN_KEYLESS_ROTATE_PARTIAL`, or `FAST_DROPIN_KEYLESS_ROTATE_BLOCKED`, plus `READY_FOR_WEB_REVIEW` / `NEEDS_WEB_REVIEW`.
+
+`FAST-STANDARD-PERF-REBASELINE-003` remains BLOCKED.
