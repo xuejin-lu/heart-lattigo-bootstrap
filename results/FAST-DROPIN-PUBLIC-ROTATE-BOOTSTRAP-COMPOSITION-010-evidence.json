@@ -1,0 +1,96 @@
+{
+  "schema_version": "fast-dropin-public-rotate-bootstrap-composition-010.evidence.v1",
+  "classification": "FAST_DROPIN_COMPOSITION_BLOCKED",
+  "task_status": "NEEDS_WEB_REVIEW",
+  "primary": {
+    "commit": "0c49274a0242f818889a7e0784aecec6f2544691",
+    "worktree_was_dirty_for_runner": true,
+    "final_shared_frontend_sha256": "d6b6e4d83d1e2a06b5c9be4abfc4ce7bd9ef0b03cca96d62eccb8b092262d02d"
+  },
+  "canonical_profile": {
+    "config": "configs/bootstrap_config.logN13.json",
+    "config_sha256": "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98",
+    "input_sha256": "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285",
+    "log_n": 13,
+    "slots": 4096,
+    "residual_max_level": 1,
+    "bootstrap_max_level": 16,
+    "input_level": 0,
+    "input_scale_log2": 45,
+    "rotate_k": 1,
+    "rotate_galois_element": 5,
+    "bootstrap_galois_element": 5,
+    "q_prime_bits": [55,39,40,39,40,60,60,61,60,60,60,61,61,56,57,56,56],
+    "p_prime_bits": [61,61,62,61,62],
+    "q_primes_sha256": "30066778ef1caea959b3357b0a70ff792fe8582ba9545f6b53c8df2a1a6cb568",
+    "p_primes_sha256": "70451211d27cd1e6bf092aa3c0752a63147c34842211dcd70d64d50755d318f7"
+  },
+  "standard": {
+    "backend_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+    "backend_ref": "pinned-standard-5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+    "backend_worktree_clean": true,
+    "preflight": "failed_at_public_RotateNew",
+    "shared_frontend_sha256_at_run": "not_recorded_panic_before_json_write",
+    "native_encrypt_c1_nonzero": true,
+    "rotate_element_in_bootstrap_key_plan": true,
+    "rotate_key_p_level": 4,
+    "residual_evaluator_p_level": -1,
+    "panic": "eval.GadgetProductLazy: ctQP.LevelP()=-1 < gadgetCt.LevelP()=4",
+    "first_failing_operation": "ckks.NewEvaluator(residual, bootstrapEvaluationKeys).RotateNew(level0Ciphertext, 1)",
+    "bootstrap_calls": 0
+  },
+  "fast": {
+    "backend_commit": "00ac70ba136d190fa31bbb26c2f51d003a221634",
+    "backend_ref": "fast-qprefix",
+    "backend_worktree_clean": true,
+    "preflight": "passed",
+    "shared_frontend_sha256": "d6b6e4d83d1e2a06b5c9be4abfc4ce7bd9ef0b03cca96d62eccb8b092262d02d",
+    "fast_bootstrap_dispatch_selected": true,
+    "generated_galois_key_count": 30,
+    "standard_layout_key_count": 0,
+    "fast_layout_key_count": 30,
+    "rotation_in_bootstrap_key_plan": true,
+    "rotate_get_galois_key_calls": 0,
+    "rotate_get_galois_key_list_calls": 0,
+    "input_ciphertext": {
+      "level": 0,
+      "scale_log2": 45,
+      "degree": 1,
+      "rows_per_component": [1,1],
+      "full_active_q": true,
+      "ntt": true,
+      "montgomery": false,
+      "c1_nonzero_count": 0,
+      "c1_coefficient_count": 8192,
+      "c0_q0_row_sha256": "d28e82688ffdbd2cc5a067f0c0919952063278a6fb23c64d8ae2ebcda096cd30",
+      "c1_q0_row_sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+    },
+    "immediate_decryption": {
+      "complex_rmse": 7.449975091875706e-13,
+      "max_complex_error": 2.101955261562136e-12,
+      "snr_db": 208.78410083248798
+    },
+    "rotated_ciphertext": {
+      "level": 0,
+      "scale_log2": 45,
+      "degree": 1,
+      "rows_per_component": [1,1],
+      "full_active_q": true,
+      "ntt": true,
+      "montgomery": false,
+      "c1_nonzero_count": 0,
+      "c0_q0_row_sha256": "420d39b6b3f4c421ff39cd6138cbb8af0b8d388f6c739454426a61b52f3e1025",
+      "c1_q0_row_sha256": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+    },
+    "rotate_vs_cleartext_oracle": {
+      "complex_rmse": 7.44997342660252e-13,
+      "max_complex_error": 2.1019564094557047e-12,
+      "snr_db": 208.78410277402207,
+      "decoded_rotate_sha256": "9b0368e8ef66fb7003c9ca704ec237f2a0317c18480afc28698ba7c1ee788585"
+    },
+    "bootstrap_calls": 0
+  },
+  "bootstrap_calls_total": 0,
+  "standard_fast_numerical_comparison": "not_run_standard_preflight_failed",
+  "bootstrap_output": "not_generated"
+}
