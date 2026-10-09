@@ -2,8 +2,8 @@
 
 **Batch state:** `BATCH_IN_PROGRESS`
 
-**Current checkpoint:** C — Standard single Bootstrap attempt reserved
-**Bootstrap budget:** Standard `1/1 reserved before launch`; Fast `0/1`
+**Current checkpoint:** C — Fast single Bootstrap attempt reserved
+**Bootstrap budget:** Standard `1/1 completed`; Fast `1/1 reserved before launch`
 
 ## Resume preflight — 2026-10-10
 
@@ -49,6 +49,15 @@
 - Repaired comparison artifact: `results/FAST-DROPIN-INTEGRATION-AUTONOMOUS-BATCH-012-evidence.json` (10,349 bytes). Its `evidence_repairs` field explicitly records the two derived nested fields. The B run-source hash remains the original SHA above; the repaired shared frontend SHA for checkpoint C is `a19841d94311d95a6f0cbab9a3301e49d5820fb5660885f1037a088e1a9204ad`.
 - Reporting repair tests and vet passed under both pinned workspaces. Bootstrap budget remains Standard `0/1`; Fast `0/1`.
 
-## Checkpoint C / D
+## Checkpoint C — single bounded public Bootstrap composition
 
-C is authorized. The one Standard attempt slot is reserved before launch; after the attempt, update its exact status/result and push the journal before deciding whether Fast is eligible. The Standard output target is `/private/tmp/fast-dropin-keyplan-011-standard-bootstrap.json`. Do not relaunch this attempt if the process or output becomes ambiguous. Fast remains `0/1` and is permitted only after Standard completes successfully. D is authorized only if both C runs complete. Current shared frontend SHA for C: `a19841d94311d95a6f0cbab9a3301e49d5820fb5660885f1037a088e1a9204ad`.
+**Standard status:** `PASSED`; **Fast status:** `RESERVED_BEFORE_LAUNCH`.
+
+- Standard attempt count `1/1`; one call completed successfully with `bootstrap_completed`; input was the pre-rotated ciphertext. Provenance: Primary `30a312996b5916de97b1e14b4af4438d95660ebe`, shared frontend SHA `a19841d94311d95a6f0cbab9a3301e49d5820fb5660885f1037a088e1a9204ad`, clean pinned Standard `5dbffbdea05394de2ca3a432ed5318aa832e3f40`.
+- Standard output: Level 1, Scale log2 `45`, degree 1, 4096 slots, full active Q rows, NTT/non-Montgomery; native Standard c1 is nonzero across 16,384 active coefficients.
+- Standard Bootstrap-vs-rotated-cleartext oracle: RMSE `4.885854924910455e-9`, max complex error `1.5351218791077742e-8`, SNR `132.44838589971747 dB`; all recorded metrics finite.
+- Standard raw evidence: `/private/tmp/fast-dropin-keyplan-011-standard-bootstrap.json` (1,309,325 bytes), kept outside the repository; it contains decoded vectors and is not printed or committed.
+- Because Standard completed, Fast's one attempt slot is now reserved before launch. Fast output target: `/private/tmp/fast-dropin-keyplan-011-fast-bootstrap.json`. Do not relaunch if process or output becomes ambiguous. If Fast does not complete, stop; no retries. Fast is permitted only on the same source/profile/input and pinned clean `fast-qprefix` implementation.
+- Current shared frontend SHA for C remains `a19841d94311d95a6f0cbab9a3301e49d5820fb5660885f1037a088e1a9204ad`.
+
+Checkpoint D remains unauthorized until the one Fast call also completes successfully.
