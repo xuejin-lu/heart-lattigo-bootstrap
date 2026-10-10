@@ -35,7 +35,10 @@ func validatePinnedBackend(backend, commit string) error {
 	case "standard":
 		want = pinnedStandardSHA
 	case "fast":
-		want = pinnedFastSHA
+		if commit != pinnedFastSHA && commit != publicFastSHA {
+			return fmt.Errorf("Fast source SHA %s is neither historical diagnostic pin %s nor approved Batch021 pin %s", commit, pinnedFastSHA, publicFastSHA)
+		}
+		return nil
 	default:
 		return fmt.Errorf("unsupported backend %q", backend)
 	}

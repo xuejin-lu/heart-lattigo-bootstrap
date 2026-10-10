@@ -16,6 +16,17 @@ func TestDeterministicLogN13InputKeepsCanonicalFingerprint(t *testing.T) {
 	}
 }
 
+func TestLegacyFastModeAcceptsHistoricalAndApprovedBatch021PinsOnly(t *testing.T) {
+	for _, pin := range []string{pinnedFastSHA, publicFastSHA} {
+		if err := validatePinnedBackend("fast", pin); err != nil {
+			t.Fatalf("approved Fast pin %s rejected: %v", pin, err)
+		}
+	}
+	if err := validatePinnedBackend("fast", "unapproved-fast-sha"); err == nil {
+		t.Fatal("legacy Fast mode accepted an unapproved source pin")
+	}
+}
+
 func TestBootstrapBudgetFailsClosedAndConsumesFailedAttempts(t *testing.T) {
 	journalBase := filepath.Join(t.TempDir(), "bounded-run")
 	budget := &bootstrapBudget{limit: 1, journalBase: journalBase}
