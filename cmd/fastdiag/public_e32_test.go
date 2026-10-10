@@ -245,6 +245,7 @@ func TestVerifyE32ProductionSourceIdentityAgainstDiagnosticCommit(t *testing.T) 
 }
 
 func TestAnalyzePublicE32EventsPreservesMeasuredClosureAndBounds(t *testing.T) {
+	levelOut := 7
 	events := []Event{
 		{Scope: "stage", Name: "bootstrap", Sequence: 1, ElapsedNS: 1000},
 		{Scope: "stage", Name: "coeffs_to_slots", Sequence: 2, ParentSequence: 1, ElapsedNS: 700},
@@ -254,9 +255,11 @@ func TestAnalyzePublicE32EventsPreservesMeasuredClosureAndBounds(t *testing.T) {
 		{Scope: "rescale", Name: "preflight", Sequence: 6, ParentSequence: 5, ElapsedNS: 80},
 		{Scope: "rescale", Name: "materialization", Sequence: 7, ParentSequence: 5, ElapsedNS: 100},
 		{Scope: "power", Name: "generated_powers", Sequence: 8, ElapsedNS: 500},
+		{Scope: "power", Name: "generated_powers", Sequence: 9, ParentSequence: 2, ElapsedNS: 25, LevelOut: &levelOut},
 	}
 	analysis, err := analyzePublicE32Events(events)
 	require.NoError(t, err)
+	require.Len(t, analysis.Closures, len(events), "legacy per-event closures remain available")
 	require.Equal(t, float64(-100), analysis.RootUnattributedNS, "root closure must preserve negative residuals")
 	require.Equal(t, float64(-0.1), analysis.RootUnattributedFraction)
 	var rescaleClosure, parentClosure publicE32EventClosure
@@ -269,7 +272,9 @@ func TestAnalyzePublicE32EventsPreservesMeasuredClosureAndBounds(t *testing.T) {
 		}
 	}
 	require.Equal(t, float64(20), rescaleClosure.UnattributedNS)
-	require.Equal(t, float64(-50), parentClosure.UnattributedNS, "overlapping child timing must remain visible")
+	require.Equal(t, float64(1), rescaleClosure.InclusiveRootShare,
+		"per-event inclusive shares are relative to their own independent root")
+	require.Equal(t, float64(-75), parentClosure.UnattributedNS, "overlapping child timing must remain visible")
 	require.Len(t, analysis.PositiveExclusivePareto, 3, "independent Bootstrap, Rescale and Power roots remain separate")
 	var rescaleRootGroup *publicE32ParetoGroup
 	for i := range analysis.PositiveExclusivePareto {
@@ -289,6 +294,59 @@ func TestAnalyzePublicE32EventsPreservesMeasuredClosureAndBounds(t *testing.T) {
 	require.NotNil(t, rescaleRootEntry)
 	require.NotNil(t, rescaleRootEntry.RootShare)
 	require.InDelta(t, 0.1, *rescaleRootEntry.RootShare, 1e-12, "Rescale share is relative only to its own root, not Bootstrap")
+	rootExclusiveTotals := make(map[uint64]float64)
+	powerRootSequences := make(map[uint64]bool)
+	var rescaleTypeSummary *publicE32EventTypeSummary
+	var repeatedPowerTypeSummary *publicE32EventTypeSummary
+	for i := range analysis.EventTypeSummaries {
+		summary := &analysis.EventTypeSummaries[i]
+		rootExclusiveTotals[summary.TreeRootSequence] += summary.ExclusiveTotalNS
+		if summary.TreeRootSequence == 5 && summary.Scope == "rescale" && summary.Name == "rescale" {
+			rescaleTypeSummary = summary
+		}
+		if summary.Scope == "power" && summary.Name == "generated_powers" {
+			powerRootSequences[summary.TreeRootSequence] = true
+			if summary.TreeRootSequence == 1 && summary.ParentType == "stage/coeffs_to_slots" {
+				repeatedPowerTypeSummary = summary
+			}
+		}
+	}
+	require.NotNil(t, rescaleTypeSummary)
+	require.Equal(t, uint64(5), rescaleTypeSummary.TreeRootSequence)
+	require.Equal(t, 1, rescaleTypeSummary.Count)
+	require.NotNil(t, rescaleTypeSummary.ExclusiveRootShare)
+	require.InDelta(t, 0.1, *rescaleTypeSummary.ExclusiveRootShare, 1e-12,
+		"type summary shares are local to their own independent event-tree root")
+	require.Equal(t, map[uint64]bool{1: true, 8: true}, powerRootSequences,
+		"same event type under separate roots must remain separate summaries")
+	require.NotNil(t, repeatedPowerTypeSummary)
+	require.Equal(t, 2, repeatedPowerTypeSummary.Count,
+		"event type aggregation ignores per-occurrence metadata while preserving count")
+	require.Equal(t, float64(775), repeatedPowerTypeSummary.ExclusiveTotalNS)
+	require.Equal(t, float64(1000), rootExclusiveTotals[1],
+		"exclusive parent-minus-child accounting must not double count nested inclusive time")
+	require.Equal(t, float64(200), rootExclusiveTotals[5])
+	require.Equal(t, float64(500), rootExclusiveTotals[8])
+	require.Len(t, analysis.PositiveExclusiveByType, 3,
+		"type Pareto groups must remain partitioned by independent event root")
+	var rescaleTypePareto *publicE32EventTypeParetoGroup
+	for i := range analysis.PositiveExclusiveByType {
+		if analysis.PositiveExclusiveByType[i].RootSequence == 5 {
+			rescaleTypePareto = &analysis.PositiveExclusiveByType[i]
+		}
+	}
+	require.NotNil(t, rescaleTypePareto)
+	var rescaleTypeEntry *publicE32EventTypeParetoEntry
+	for i := range rescaleTypePareto.Entries {
+		if rescaleTypePareto.Entries[i].Scope == "rescale" && rescaleTypePareto.Entries[i].Name == "rescale" {
+			rescaleTypeEntry = &rescaleTypePareto.Entries[i]
+		}
+	}
+	require.NotNil(t, rescaleTypeEntry)
+	require.Equal(t, float64(20), rescaleTypeEntry.ExclusiveTotalNS)
+	require.NotNil(t, rescaleTypeEntry.RootShare)
+	require.InDelta(t, 0.1, *rescaleTypeEntry.RootShare, 1e-12,
+		"type Pareto shares are relative only to their own event-tree root")
 	var evalmod publicE32AmdahlScenario
 	for _, scenario := range analysis.AmdahlScenarios {
 		if scenario.Stage == "evalmod_real" {
