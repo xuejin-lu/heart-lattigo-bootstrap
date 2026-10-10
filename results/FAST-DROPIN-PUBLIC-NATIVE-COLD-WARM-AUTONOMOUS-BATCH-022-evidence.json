@@ -1,0 +1,141 @@
+{
+  "schema_version": "fast-dropin-public-native-cold-warm-batch022.v1",
+  "status": "PASS_PUBLIC_BOOTSTRAP_COLD_WARM",
+  "generated_at": "2026-10-10T09:52:23Z",
+  "provenance": {
+    "primary_commit": "37002ff3bbd97889cf0ec8108ff2cd527ab8d3d5",
+    "primary_measurement_source_sha256": "41439844ad5139d07386367247c7f0537d7b752f95a3023a893f57a0e55f81d6",
+    "primary_clean": true,
+    "standard_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+    "standard_checkout_clean_detached": true,
+    "fast_commit": "2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac",
+    "fast_checkout_clean_detached": true,
+    "active_secondary_fast_qprefix_head": "d463c336d511646994ba72f8dcfda5179431c430",
+    "active_secondary_clean_unchanged": true,
+    "preflight_pair_sha256": "e142b5d53196ddae86b7e34ba2f80b111fd70553fba6a1abae6b9e614e968ce9"
+  },
+  "fixture": {
+    "profile": "logn13",
+    "ephemeral_secret_weight": 32,
+    "input_slots": 4096,
+    "config_sha256": "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98",
+    "qp_sha256": "1f045e603a856968779d62e045a037274bba08cbfce8b1dd3dec2828f1f6a46b",
+    "canonical_input_sha256": "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285",
+    "workload_sha256": "00b70a2e77887c7d6a41db1859246f6513f2c984915de648734e5dd8c584cf74",
+    "lifecycle": "EncryptNew -> AddNew -> MulRelinNew -> Rescale(q5) -> RotateNew -> DropLevelNew(4) -> Bootstrap -> native Level1 DecryptNew/Decode",
+    "numerical_gate_max_complex_difference": 1e-6,
+    "standard_encryption": "genuine native generated-secret encryption",
+    "fast_encryption": "pinned intentionally insecure zero-secret mode; no security-equivalence claim",
+    "bootstrap_dispatch": "ordinary bootstrapping.NewEvaluator(...).Bootstrap public interface in both builds"
+  },
+  "environment": {
+    "go_version": "go1.26.4",
+    "os": "darwin",
+    "arch": "arm64",
+    "cpu": "arm64",
+    "num_cpu": 10,
+    "gomaxprocs": 10,
+    "gogc": "runtime-default",
+    "gomemlimit": "runtime-default",
+    "godebug": "runtime-default",
+    "standard_fast_environment_matched": true
+  },
+  "capacity": {
+    "input_a_bound": "2348557866436",
+    "input_b_bound": "1804822278899",
+    "input_c_bound": "76957544167327219",
+    "add_bound": "4153380145335",
+    "mulrelin_bound": "2618441203534382746900245490606080",
+    "rescale_bound": "2271135713118062",
+    "q0123_product": "5986308565615587353347023386369277282933624144412673",
+    "q0": "36028797018652673",
+    "mul_divisor_q5": "1152921504606830593",
+    "q0123_and_q0_capacity_gates": "PASS"
+  },
+  "zero_call_preflight": {
+    "status": "PASS",
+    "bootstrap_calls": 0,
+    "matched_environment": true,
+    "all_checkpoint_gates_passed": true,
+    "checkpoints": [
+      {"name": "encrypt_a_level5", "rmse": 8.236020903084774e-12, "max_complex_difference": 2.415144139886774e-11, "pass": true},
+      {"name": "encrypt_b_level5", "rmse": 8.377126976995002e-12, "max_complex_difference": 2.497386805663872e-11, "pass": true},
+      {"name": "encrypt_c_q5_level5", "rmse": 2.520008873359035e-16, "max_complex_difference": 7.406157026481045e-16, "pass": true},
+      {"name": "add_level5", "rmse": 1.1620274213035154e-11, "max_complex_difference": 3.591041577358855e-11, "pass": true},
+      {"name": "mulrelin_level5", "rmse": 2.380889830464669e-13, "max_complex_difference": 9.324991196800222e-13, "pass": true},
+      {"name": "rescale_q5_level4", "rmse": 1.0416236613262499e-11, "max_complex_difference": 5.4653287556558204e-11, "pass": true},
+      {"name": "rotate_level4", "rmse": 1.5004105487843212e-11, "max_complex_difference": 7.781760773684476e-11, "pass": true},
+      {"name": "drop_level0", "rmse": 1.5004105487843212e-11, "max_complex_difference": 7.781760773684476e-11, "pass": true}
+    ]
+  },
+  "bootstrap_budget": {
+    "per_backend": 2,
+    "actual_total": 4,
+    "attempts_per_backend": ["first_cold_bootstrap", "later_warm_bootstrap"],
+    "held_input_fingerprint_same_within_backend": true,
+    "standard_held_input_sha256": "507dfdf925636b46a1ed49fd04ce1e03342a87c4d7ed457d5fe9935b2f59a060",
+    "fast_held_input_sha256": "e512061ab0cc1ca3ebab443ab8d03ae021286124ade946d97fc51bc216a0c95f",
+    "extra_calls_or_retries": 0
+  },
+  "backend_results": [
+    {
+      "backend": "standard",
+      "public_evaluator_dispatch": "bootstrapping.NewEvaluator genuine Standard evaluator",
+      "bootstrap_evaluator_construction": {"elapsed_ns": 350424417, "allocated_bytes": 710669552, "allocations": 14232894},
+      "secret_key_generation": {"elapsed_ns": 173833, "allocated_bytes": 198448, "allocations": 208},
+      "evaluation_key_generation": {"elapsed_ns": 397630417, "allocated_bytes": 395320432, "allocations": 94257},
+      "ckks_evaluator_construction": {"elapsed_ns": 964667, "allocated_bytes": 2719992, "allocations": 16610},
+      "evaluator_construction_plus_cold": {"elapsed_ns": 662850125, "allocated_bytes": 854702088, "allocations": 14269588},
+      "bootstrap_calls": 2,
+      "bootstrap_results": [
+        {
+          "phase": "first_cold_bootstrap",
+          "timing": {"elapsed_ns": 312425708, "allocated_bytes": 144032536, "allocations": 36694},
+          "self_oracle": {"rmse": 4.627356909363751e-9, "max_complex_difference": 1.4141817696739812e-8, "snr_db": 102.58176220265744, "pass": true},
+          "output_sha256": "d9de29d9e23ab3fcbfb17f3280f88ac24865099e44290aa2c0b2ce67dd41e515"
+        },
+        {
+          "phase": "later_warm_bootstrap",
+          "timing": {"elapsed_ns": 299840750, "allocated_bytes": 91806536, "allocations": 35019},
+          "self_oracle": {"rmse": 4.627356909363751e-9, "max_complex_difference": 1.4141817696739812e-8, "snr_db": 102.58176220265744, "pass": true},
+          "output_sha256": "d9de29d9e23ab3fcbfb17f3280f88ac24865099e44290aa2c0b2ce67dd41e515"
+        }
+      ]
+    },
+    {
+      "backend": "fast",
+      "public_evaluator_dispatch": "bootstrapping.NewEvaluator public wrapper; Fast dispatch selected by pinned zero-secret capability",
+      "bootstrap_evaluator_construction": {"elapsed_ns": 2442625, "allocated_bytes": 8853664, "allocations": 32085},
+      "secret_key_generation": {"elapsed_ns": 163708, "allocated_bytes": 198448, "allocations": 210},
+      "evaluation_key_generation": {"elapsed_ns": 819350458, "allocated_bytes": 578831992, "allocations": 421110},
+      "ckks_evaluator_construction": {"elapsed_ns": 947334, "allocated_bytes": 5408688, "allocations": 16663},
+      "evaluator_construction_plus_cold": {"elapsed_ns": 538649875, "allocated_bytes": 969642832, "allocations": 19314562},
+      "bootstrap_calls": 2,
+      "bootstrap_results": [
+        {
+          "phase": "first_cold_bootstrap",
+          "timing": {"elapsed_ns": 536207250, "allocated_bytes": 960789168, "allocations": 19282477},
+          "self_oracle": {"rmse": 1.1795785978778852e-9, "max_complex_difference": 5.738790672737443e-8, "snr_db": 114.45388448002639, "pass": true},
+          "output_sha256": "31cb3bb8b9f7377918ddd7cae659e9851230bd903acdba69bd32ca4a273bc934"
+        },
+        {
+          "phase": "later_warm_bootstrap",
+          "timing": {"elapsed_ns": 70398500, "allocated_bytes": 7505112, "allocations": 8085},
+          "self_oracle": {"rmse": 1.1795785978778852e-9, "max_complex_difference": 5.738790672737443e-8, "snr_db": 114.45388448002639, "pass": true},
+          "output_sha256": "31cb3bb8b9f7377918ddd7cae659e9851230bd903acdba69bd32ca4a273bc934"
+        }
+      ]
+    }
+  ],
+  "paired_bootstrap_comparisons": [
+    {"phase": "first_cold_bootstrap", "level": 1, "degree": 1, "scale_log2": 45, "q_prefix_rows": 2, "rmse": 4.7262101606249815e-9, "max_complex_difference": 4.489543437647087e-8, "max_real_difference": 1.3345613669615668e-8, "max_imag_difference": 4.488318005354663e-8, "pass": true},
+    {"phase": "later_warm_bootstrap", "level": 1, "degree": 1, "scale_log2": 45, "q_prefix_rows": 2, "rmse": 4.7262101606249815e-9, "max_complex_difference": 4.489543437647087e-8, "max_real_difference": 1.3345613669615668e-8, "max_imag_difference": 4.488318005354663e-8, "pass": true}
+  ],
+  "limitations": [
+    "One cold and one warm sample are descriptive, not a stable speedup estimate.",
+    "Fast E32 in-circuit/internal stage tracing remains unavailable for formal Standard-comparable attribution.",
+    "The intentionally insecure Fast zero-secret mode is not security-equivalent to Standard encryption.",
+    "No GPU/CNN performance claim is made.",
+    "Full ./... tests were not run because the task requires avoiding tests that may invoke unbudgeted Bootstrap; focused unit tests use fake calls only."
+  ]
+}

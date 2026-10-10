@@ -70,7 +70,7 @@ Batch021 repaired the existing Primary measurement platform in place. It does no
 | Fast public evaluator dispatch | Constructor dispatch is verified through ordinary `bootstrapping.NewEvaluator`; the actual `Bootstrap` method was not called. | Build-tag adapters in `public_backend_fast.go` / `public_backend_standard.go` |
 | Bootstrap attempt budget | Explicit process-wide limit, fail-closed before each invocation, and exclusive per-attempt reservation journal. The Batch021 acceptance path fixes the budget to zero. Unit tests cover zero, one, two, failed-call consumption, restart collision, and over-budget refusal without invoking a cryptographic Bootstrap. | `cmd/perfprobe/main.go`; `main_test.go` |
 | Fast compact rows | The native Fast `EncryptNew` fixture initially retains its full physical rows (as in accepted Batch019 evidence); compact `AddNew` and subsequent Fast outputs must have dormant rows above `w_Q(Level)=min(Level+1,4)`. | `public_native.go`; per-checkpoint physical row lengths in Batch021 evidence |
-| Public Bootstrap acceptance/output and cold/warm timing | **Not verified in Batch021** because the absolute actual-Bootstrap budget was zero. Evaluator construction was measured, but first/cold and later/warm Bootstrap phases are explicitly marked unavailable. | Requires a separately authorized one-call Fast public acceptance smoke before any timing campaign |
+| Public Bootstrap acceptance/output and cold/warm timing | Not verified in Batch021 (its budget was zero); subsequently verified in Batch022 with exactly one cold and one warm call per backend. | See Batch022 status below |
 | Fast internal stage/power attribution for formal E32 | Existing `cmd/fastdiag`, `internal/fastdiag`, and Secondary tracing remain reusable for their supported Fast diagnostic profiles, but their fixed P93/E0 assumptions and internal-only checkpoint topology are not interchangeable with this E32 public lifecycle. No Standard internal trace was fabricated and no Secondary code was changed. | Reuse existing Fast-only diagnostics only when a task explicitly accepts their profile and non-comparable label |
 
 ### Batch021 reuse map and migration boundary
@@ -84,4 +84,65 @@ Batch021 repaired the existing Primary measurement platform in place. It does no
 
 The dual-checkout preflight compiled and ran the same committed Primary measurement source against clean detached Standard `5dbffbdea05394de2ca3a432ed5318aa832e3f40` and Fast `2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac` checkouts through isolated temporary modfiles. The original Primary `go.mod` was not changed. Both public E32 runs recorded zero actual Bootstrap calls and passed all eight pre-Bootstrap checkpoints at the fixed `1e-6` gate; see `results/FAST-DROPIN-MEASUREMENT-PLATFORM-REPAIR-AUTONOMOUS-BATCH-021-summary.md`.
 
-**Remaining one-call decision:** a later Web-authorized task must invoke the E32 public Fast `bootstrapping.NewEvaluator(...).Bootstrap` exactly once on the terminal Level0 ciphertext produced by this chain, then validate output metadata, Fast Q-prefix rows, and native low-Level decode. It must use an explicit budget of one, persist the pre-call reservation, and must not be described as a timing campaign. Batch021 intentionally did not run it. Only after Web accepts that public acceptance evidence may a separate task measure first/cold and later/warm Bootstrap phases.
+**Historical Batch021 boundary:** at the time, its zero-call budget left public Bootstrap acceptance and timing unverified. That one-call follow-up was superseded by Batch022's explicitly authorized two-call-per-backend cold/warm measurement below; do not repeat the one-call smoke against the same batch budget.
+
+## 8. Batch022 public-native cold/warm status — 2026-10-10
+
+Batch022 extended this same `cmd/perfprobe` path; it did not add a standalone runner or change production arithmetic. The frozen LogN13/E32 public lifecycle is now verified through ordinary `bootstrapping.NewEvaluator(...).Bootstrap` for both approved implementations. Primary source is `37002ff3bbd97889cf0ec8108ff2cd527ab8d3d5`, genuine Standard is `5dbffbdea05394de2ca3a432ed5318aa832e3f40`, and Fast is `2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac`.
+
+### Integrity and bounded execution
+
+The shared `compare-public` evidence boundary now binds each canonical checkpoint to its separate decoded-vector artifact: exactly 4096 finite complex samples, matching `DecodedSHA256`, recomputed plaintext-oracle metrics/SNR, exact checkpoint coverage, metadata, row authority, pinned provenance, and Q0123/q0 capacity evidence. Cold/warm outputs receive the same hash/finite/oracle/state checks and are compared directly between Standard and Fast at the fixed `1e-6` maximum-complex gate. Unit tests use fake calls only; no test invokes cryptographic Bootstrap.
+
+The existing `public-native` zero-call mode remains available and still requires `--bootstrap-budget=0`. For this profile, first create clean Standard and Fast artifacts and pass them through `compare-public`. Only then may the explicit measurement mode be run, with its passing pair digest supplied and `--bootstrap-budget=2`. It performs exactly one cold and one warm call on independent copies of the same held Level0 ciphertext from `EncryptNew → AddNew → MulRelinNew → Rescale(q5) → RotateNew → DropLevelNew(4)`. Each reservation is written exclusively before invocation; pre-existing result/vector/journal paths fail before measurement. There are no implicit warmups, repetitions, or retries.
+
+Example shape (use task-owned isolated modfiles and exact pinned checkout paths):
+
+```sh
+GOWORK=off go run -modfile=/tmp/standard.mod -tags=perf_standard ./cmd/perfprobe \
+  --mode=public-native --profile=logn13 --config=configs/bootstrap_config.logN13.json \
+  --out=/tmp/standard-preflight.json --vectors-out=/tmp/standard-preflight-vectors.json \
+  --backend-commit=5dbffbdea05394de2ca3a432ed5318aa832e3f40 \
+  --backend-ref=5dbffbdea05394de2ca3a432ed5318aa832e3f40 \
+  --secondary-root=/path/to/clean-standard-checkout --ephemeral-secret-weight=32 --bootstrap-budget=0
+
+GOWORK=off go run -modfile=/tmp/standard.mod ./cmd/perfprobe compare-public \
+  --standard=/tmp/standard-preflight.json --fast=/tmp/fast-preflight.json \
+  --standard-vectors=/tmp/standard-preflight-vectors.json \
+  --fast-vectors=/tmp/fast-preflight-vectors.json --out=/tmp/preflight-pair.json
+
+GOWORK=off go run -modfile=/tmp/standard.mod -tags=perf_standard ./cmd/perfprobe \
+  --mode=public-native --public-bootstrap --preflight-pair=/tmp/preflight-pair.json \
+  --profile=logn13 --config=configs/bootstrap_config.logN13.json \
+  --out=/tmp/standard-bootstrap.json --vectors-out=/tmp/standard-bootstrap-vectors.json \
+  --backend-commit=5dbffbdea05394de2ca3a432ed5318aa832e3f40 \
+  --backend-ref=5dbffbdea05394de2ca3a432ed5318aa832e3f40 \
+  --secondary-root=/path/to/clean-standard-checkout --ephemeral-secret-weight=32 --bootstrap-budget=2
+```
+
+Fast uses the equivalent explicit invocations below, with the isolated modfile replaced by the pinned Fast checkout. After both backends complete, `compare-public` is run again on the Bootstrap result/vector artifacts. Never reuse the same output prefix after any attempt reservation; an interrupted/failed reservation consumes that attempt.
+
+```sh
+GOWORK=off go run -modfile=/tmp/fast.mod -tags=perf_fast ./cmd/perfprobe \
+  --mode=public-native --profile=logn13 --config=configs/bootstrap_config.logN13.json \
+  --out=/tmp/fast-preflight.json --vectors-out=/tmp/fast-preflight-vectors.json \
+  --backend-commit=2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac \
+  --backend-ref=2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac \
+  --secondary-root=/path/to/clean-fast-checkout --ephemeral-secret-weight=32 --bootstrap-budget=0
+
+GOWORK=off go run -modfile=/tmp/fast.mod -tags=perf_fast ./cmd/perfprobe \
+  --mode=public-native --public-bootstrap --preflight-pair=/tmp/preflight-pair.json \
+  --profile=logn13 --config=configs/bootstrap_config.logN13.json \
+  --out=/tmp/fast-bootstrap.json --vectors-out=/tmp/fast-bootstrap-vectors.json \
+  --backend-commit=2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac \
+  --backend-ref=2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac \
+  --secondary-root=/path/to/clean-fast-checkout --ephemeral-secret-weight=32 --bootstrap-budget=2
+```
+
+### Batch022 measured result and remaining boundary
+
+The zero-call preflight passed all eight canonical checkpoints with matching Level/Scale/Degree and matched Go/OS/CPU/runtime environment. Maximum pre-Bootstrap Fast-vs-Standard difference was below `7.8e-11`. Exactly two actual calls per backend were reserved and completed. Both outputs were 4096-slot native Level1 decryptions at Scale `2^45`, and every self-oracle and direct paired comparison passed. Cold and warm Fast-vs-Standard RMSE were both `4.7262101606249815e-9`; maximum complex difference was `4.489543437647087e-8`, below `1e-6`.
+
+The one cold and one warm sample are descriptive, not a stable speedup estimate. The pinned Fast source explicitly initializes its circuit lazily on first Bootstrap (`fast_bootstrap.go:18–40`), whereas Standard constructs its circuit data inside `NewEvaluator` (`evaluator.go:169–178`). This explains why the observed Fast constructor was short and its first call much larger than its warm call; report the phases separately and do not present the first call as steady-state latency. Fast's E32 in-circuit/internal stage tracing remains unavailable for formal Standard-comparable attribution. Fast E=32 is still the intentionally insecure zero-secret simulation mode; this result makes no security-equivalence claim.
+
+Compact result, journal, and provenance/aggregate evidence are in `results/FAST-DROPIN-PUBLIC-NATIVE-COLD-WARM-AUTONOMOUS-BATCH-022-{summary.md,journal.md,evidence.json}`. Raw 4096-slot vectors and temporary alternate modfiles remain outside the repository.
