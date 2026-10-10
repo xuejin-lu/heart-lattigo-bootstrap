@@ -23,6 +23,15 @@ type outputSmokeBackend interface {
 	PrefixRows(*rlwe.Ciphertext) (int, error)
 }
 
+type budgetedOutputBackend struct {
+	outputSmokeBackend
+	budget *bootstrapBudget
+}
+
+func (backend *budgetedOutputBackend) Bootstrap(ct *rlwe.Ciphertext) (*rlwe.Ciphertext, error) {
+	return backend.budget.invoke("output_smoke_bootstrap", func() (*rlwe.Ciphertext, error) { return backend.outputSmokeBackend.Bootstrap(ct) })
+}
+
 type outputCiphertextMetadata struct {
 	State            ciphertextState `json:"state"`
 	IsNTT            bool            `json:"is_ntt"`
@@ -152,7 +161,8 @@ func runOutputSmoke(opts cliOptions, configHash string, residual ckks.Parameters
 	doc.EvaluatorPath, doc.DecodePath = backend.EvaluatorPath(), backend.DecodePath()
 	doc.InputEvidence, doc.InputQualityStatus = &evidence, "PASSED"
 	doc.PreBootstrapDecodedSHA256 = evidence.PreDecodedSHA256
-	execution := executeOutputSmoke(backend, input, values, preDecoded, evidence, effective.LogSlots, params.BootstrappingParameters.MaxLevel(), params.BootstrappingParameters.Q())
+	guardedBackend := &budgetedOutputBackend{outputSmokeBackend: backend, budget: &bootstrapBudget{limit: opts.bootstrapBudget, journalBase: opts.out}}
+	execution := executeOutputSmoke(guardedBackend, input, values, preDecoded, evidence, effective.LogSlots, params.BootstrappingParameters.MaxLevel(), params.BootstrappingParameters.Q())
 	doc.BootstrapCalls, doc.BootstrapStatus = execution.BootstrapCalls, execution.BootstrapStatus
 	doc.LastVerifiedStage = execution.LastVerifiedStage
 	if execution.LastVerifiedStage != "configuration_validated" {

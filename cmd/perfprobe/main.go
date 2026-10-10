@@ -56,16 +56,27 @@ type trial struct {
 }
 
 type timingResult struct {
-	Warmup      int       `json:"warmup"`
-	Repetitions int       `json:"repetitions"`
-	SamplesNS   []int64   `json:"samples_ns"`
-	MedianNS    float64   `json:"median_ns"`
-	MeanNS      float64   `json:"mean_ns"`
-	MinNS       int64     `json:"min_ns"`
-	MaxNS       int64     `json:"max_ns"`
-	BytesPerOp  uint64    `json:"bytes_per_op"`
-	AllocsPerOp uint64    `json:"allocs_per_op"`
-	MeasuredAt  time.Time `json:"measured_at"`
+	Warmup         int         `json:"warmup"`
+	Repetitions    int         `json:"repetitions"`
+	SamplesNS      []int64     `json:"samples_ns"`
+	MedianNS       float64     `json:"median_ns"`
+	MeanNS         float64     `json:"mean_ns"`
+	MinNS          int64       `json:"min_ns"`
+	MaxNS          int64       `json:"max_ns"`
+	BytesPerOp     uint64      `json:"bytes_per_op"`
+	AllocsPerOp    uint64      `json:"allocs_per_op"`
+	MeasuredAt     time.Time   `json:"measured_at"`
+	FirstBootstrap phaseTiming `json:"first_bootstrap_phase,omitempty"`
+}
+
+type phaseTiming struct {
+	Phase      string `json:"phase"`
+	ElapsedNS  int64  `json:"elapsed_ns,omitempty"`
+	AllocBytes uint64 `json:"allocated_bytes,omitempty"`
+	Allocs     uint64 `json:"allocations,omitempty"`
+	Samples    int    `json:"samples,omitempty"`
+	Available  bool   `json:"available"`
+	Reason     string `json:"reason,omitempty"`
 }
 
 type stageTiming struct {
@@ -78,6 +89,7 @@ type stageTiming struct {
 
 type document struct {
 	SchemaVersion       string              `json:"schema_version"`
+	Mode                string              `json:"mode"`
 	Timestamp           time.Time           `json:"timestamp"`
 	Profile             string              `json:"profile"`
 	Backend             string              `json:"backend"`
@@ -103,10 +115,13 @@ type document struct {
 	InputEvidence       inputRecord         `json:"input_evidence"`
 	Parameters          effectiveParameters `json:"effective_parameters"`
 	Timing              timingResult        `json:"full_bootstrap_timing"`
+	BootstrapBudget     int                 `json:"bootstrap_budget"`
+	BootstrapCalls      int                 `json:"actual_bootstrap_calls"`
 	StageTimings        []stageTiming       `json:"separate_stage_timing"`
 	Trials              []trial             `json:"numerical_trials"`
 	Checkpoints         []checkpoint        `json:"stage_checkpoints"`
 	Limitations         []string            `json:"limitations"`
+	ExecutionPhases     []phaseTiming       `json:"execution_phases,omitempty"`
 }
 
 type complexValue struct {
@@ -123,6 +138,9 @@ type vectors struct {
 }
 
 type cliOptions struct {
+	mode                    string
+	ephemeralSecretWeight   int
+	bootstrapBudget         int
 	inputSmoke              bool
 	outputSmoke             bool
 	fastBootstrapAcceptance bool
@@ -146,6 +164,13 @@ func main() {
 		}
 		return
 	}
+	if len(os.Args) > 1 && os.Args[1] == "compare-public" {
+		if err := runPublicCompare(os.Args[2:]); err != nil {
+			fmt.Fprintln(os.Stderr, "perfprobe compare-public:", err)
+			os.Exit(1)
+		}
+		return
+	}
 	if err := run(); err != nil {
 		fmt.Fprintln(os.Stderr, "perfprobe:", err)
 		os.Exit(1)
@@ -154,6 +179,9 @@ func main() {
 
 func run() error {
 	var opts cliOptions
+	flag.StringVar(&opts.mode, "mode", "legacy-diagnostic", "legacy-diagnostic or public-native")
+	flag.IntVar(&opts.ephemeralSecretWeight, "ephemeral-secret-weight", -1, "explicit E for public-native mode; legacy mode remains E=0")
+	flag.IntVar(&opts.bootstrapBudget, "bootstrap-budget", -1, "hard maximum actual Bootstrap attempts for this process; required when mode can invoke Bootstrap")
 	flag.BoolVar(&opts.inputSmoke, "input-smoke", false, "bounded input-origin preflight only; no Bootstrap or timing")
 	flag.BoolVar(&opts.outputSmoke, "output-smoke", false, "one public Bootstrap and decoded-output preflight; no timing campaign")
 	flag.BoolVar(&opts.fastBootstrapAcceptance, "fast-bootstrap-acceptance", false, "input smoke only: at most one Fast public Bootstrap acceptance call")
@@ -198,6 +226,28 @@ func run() error {
 	if cfg.LogN != profileLogN {
 		return fmt.Errorf("%s profile requires config log_n=%d, got %d", opts.profile, profileLogN, cfg.LogN)
 	}
+	if opts.mode == "public-native" {
+		if opts.ephemeralSecretWeight < 0 {
+			return errors.New("public-native mode requires an explicit non-negative --ephemeral-secret-weight")
+		}
+		if opts.bootstrapBudget != 0 {
+			return errors.New("public-native preflight is zero-Bootstrap only; set --bootstrap-budget=0")
+		}
+		if opts.inputSmoke || opts.outputSmoke || opts.fastBootstrapAcceptance || opts.vectorsOut == "" {
+			return errors.New("public-native mode requires --vectors-out and does not accept legacy smoke/Bootstrap flags")
+		}
+		residual, params, effective, err := perfmeasure.ParametersFromConfigWithE(cfg, opts.ephemeralSecretWeight)
+		if err != nil {
+			return err
+		}
+		return runPublicNativePreflight(opts, configHash, residual, params, effective)
+	}
+	if opts.mode != "legacy-diagnostic" {
+		return fmt.Errorf("unsupported --mode %q", opts.mode)
+	}
+	if opts.ephemeralSecretWeight >= 0 && opts.ephemeralSecretWeight != 0 {
+		return errors.New("legacy-diagnostic mode is fixed to historical E=0; select public-native for explicit E")
+	}
 	residual, params, effective, err := perfmeasure.ParametersFromConfig(cfg)
 	if err != nil {
 		return err
@@ -223,6 +273,8 @@ func run() error {
 	if err := validatePinnedBackend(backend.Name(), opts.backendCommit); err != nil {
 		return err
 	}
+	budget := &bootstrapBudget{limit: opts.bootstrapBudget, journalBase: opts.out}
+	backend = &budgetedBackend{backendAdapter: backend, budget: budget}
 	input, preDecoded, inputEvidence, err := prepareAndValidateInput(backend, residual, params, values, effective.LogSlots)
 	if err != nil {
 		return err
@@ -251,6 +303,7 @@ func run() error {
 	var representativeOutput *rlwe.Ciphertext
 	if backend.Name() == "fast" {
 		for i := 0; i < 2; i++ {
+			setBootstrapPhase(backend, "fast_numerical_trial")
 			out, err := backend.Bootstrap(input.CopyNew())
 			if err != nil {
 				return fmt.Errorf("Fast numerical trial %d: %w", i+1, err)
@@ -275,10 +328,11 @@ func run() error {
 		for i := 0; i < opts.standardTrials; i++ {
 			trialInput, trialPreDecoded, trialInputEvidence := input, preDecoded, inputEvidence
 			if i > 0 {
-				backend, err = newBackend(params, residual)
-				if err != nil {
-					return fmt.Errorf("create independent Standard trial %d: %w", i+1, err)
+				trialBackend, backendErr := newBackend(params, residual)
+				if backendErr != nil {
+					return fmt.Errorf("create independent Standard trial %d: %w", i+1, backendErr)
 				}
+				backend = &budgetedBackend{backendAdapter: trialBackend, budget: budget}
 				trialInput, trialPreDecoded, trialInputEvidence, err = prepareAndValidateInput(backend, residual, params, values, effective.LogSlots)
 				if err != nil {
 					return fmt.Errorf("prepare independent Standard trial %d: %w", i+1, err)
@@ -299,6 +353,7 @@ func run() error {
 					return fmt.Errorf("Standard trial %d c1 repeats trial %d", i+1, priorIndex+1)
 				}
 			}
+			setBootstrapPhase(backend, "standard_numerical_trial")
 			out, err := backend.Bootstrap(trialInput.CopyNew())
 			if err != nil {
 				return fmt.Errorf("Standard numerical trial %d: %w", i+1, err)
@@ -326,7 +381,7 @@ func run() error {
 	}
 
 	doc := document{
-		SchemaVersion: "fast-standard-perfprobe.v2", Timestamp: time.Now().UTC(),
+		SchemaVersion: "fast-standard-perfprobe.v3", Mode: "legacy-diagnostic", Timestamp: time.Now().UTC(),
 		Profile: opts.profile, Backend: backend.Name(), BackendCommit: opts.backendCommit,
 		PrimaryPath: primaryRoot, PrimaryCommit: primaryCommit, PrimaryDirty: false, SecondaryDirty: false,
 		SecondaryPath: secondaryRoot, SecondaryRef: opts.backendRef, ConfigSHA256: configHash, ConfigPath: opts.config,
@@ -334,7 +389,12 @@ func run() error {
 		CPU: cpuModel(), NumCPU: runtime.NumCPU(), GOMAXPROCS: runtime.GOMAXPROCS(0),
 		InputSHA256: inputHash, InputMetadataSHA256: inputEvidence.MetadataSHA256, InputState: inputEvidence.State,
 		InputKind: inputEvidence.Kind, InputEvidence: inputEvidence,
-		Parameters: effective, Timing: measured, StageTimings: stageTimings, Trials: numericalTrials, Checkpoints: stages,
+		Parameters: effective, Timing: measured, BootstrapBudget: opts.bootstrapBudget, BootstrapCalls: budget.attempts,
+		StageTimings: stageTimings, Trials: numericalTrials, Checkpoints: stages,
+		ExecutionPhases: []phaseTiming{
+			backend.EvaluatorConstructionTiming(), measured.FirstBootstrap,
+			{Phase: "later_warm_bootstrap", ElapsedNS: int64(measured.MeanNS), AllocBytes: measured.BytesPerOp, Allocs: measured.AllocsPerOp, Samples: measured.Repetitions, Available: measured.Repetitions > 0},
+		},
 		Limitations: []string{
 			"Timing samples cover only the public Bootstrap call; key generation, setup, encoding, decoding, and analysis are outside the timed region.",
 			"Stage checkpoints are a separate public-stage replay and are not summed to estimate total Bootstrap time.",
@@ -356,11 +416,43 @@ func run() error {
 }
 
 func validateExecutionLimits(opts cliOptions) error {
-	if opts.inputSmoke || opts.outputSmoke {
+	if opts.mode == "public-native" {
+		if opts.bootstrapBudget != 0 {
+			return errors.New("public-native zero-call preflight requires --bootstrap-budget=0")
+		}
 		return nil
+	}
+	if opts.inputSmoke || opts.outputSmoke {
+		expected := 0
+		if opts.outputSmoke || opts.fastBootstrapAcceptance {
+			expected = 1
+		}
+		return validateBootstrapBudget(opts.bootstrapBudget, expected)
 	}
 	if opts.warmup < 1 || opts.repetitions < 7 || opts.standardTrials < 3 {
 		return errors.New("measurement requires warmup >= 1, repetitions >= 7, and standard-trials >= 3")
+	}
+	// Fast runs make two additional numerical Bootstrap calls; Standard runs
+	// make standardTrials calls. All attempts, including errors, are budgeted.
+	trialCount := opts.standardTrials
+	if publicBackendName() == "fast" {
+		trialCount = 2
+	}
+	return validateBootstrapBudget(opts.bootstrapBudget, opts.warmup+opts.repetitions+trialCount)
+}
+
+func validateBootstrapBudget(budget, required int) error {
+	if required < 0 {
+		return errors.New("required Bootstrap attempt count cannot be negative")
+	}
+	if required == 0 {
+		return nil
+	}
+	if budget < 0 {
+		return errors.New("a non-negative explicit --bootstrap-budget is required for any Bootstrap-capable mode")
+	}
+	if budget < required {
+		return fmt.Errorf("Bootstrap budget %d is below the mode's maximum %d actual attempts", budget, required)
 	}
 	return nil
 }
@@ -371,6 +463,7 @@ type backendAdapter interface {
 	InputConstructor() string
 	PrepareInput([]complex128, int) (*rlwe.Ciphertext, error)
 	EvaluatorPath() string
+	EvaluatorConstructionTiming() phaseTiming
 	DecodePath() string
 	KeyTrialEvidence() (bool, int)
 	SecretKeyForTrial() *rlwe.SecretKey
@@ -386,10 +479,80 @@ type backendAdapter interface {
 	SlotsToCoeffs(*rlwe.Ciphertext, *rlwe.Ciphertext) (*rlwe.Ciphertext, error)
 }
 
+type bootstrapBudget struct {
+	limit       int
+	attempts    int
+	journalBase string
+	phase       string
+}
+
+type bootstrapAttemptReservation struct {
+	SchemaVersion string    `json:"schema_version"`
+	Index         int       `json:"attempt_index"`
+	Budget        int       `json:"bootstrap_budget"`
+	Phase         string    `json:"phase"`
+	ReservedAt    time.Time `json:"reserved_at"`
+	Status        string    `json:"status"`
+}
+
+func (budget *bootstrapBudget) invoke(phase string, call func() (*rlwe.Ciphertext, error)) (*rlwe.Ciphertext, error) {
+	if budget == nil || budget.limit < 0 {
+		return nil, errors.New("Bootstrap invocation has no explicit non-negative budget")
+	}
+	if budget.attempts >= budget.limit {
+		return nil, fmt.Errorf("Bootstrap budget exhausted at %d/%d attempts", budget.attempts, budget.limit)
+	}
+	if phase == "" {
+		phase = "bootstrap"
+	}
+	index := budget.attempts + 1
+	if budget.journalBase != "" {
+		reservation := bootstrapAttemptReservation{
+			SchemaVersion: "perfprobe-bootstrap-attempt.v1", Index: index, Budget: budget.limit,
+			Phase: phase, ReservedAt: time.Now().UTC(), Status: "irrevocably_reserved_before_call",
+		}
+		journalPath := fmt.Sprintf("%s.bootstrap-attempt-%02d.json", budget.journalBase, index)
+		if err := writeExclusiveJSON(journalPath, reservation); err != nil {
+			return nil, fmt.Errorf("reserve Bootstrap attempt %d before invocation: %w", index, err)
+		}
+	}
+	budget.attempts++ // Failed calls and interrupted processes consume the reservation.
+	return call()
+}
+
+type budgetedBackend struct {
+	backendAdapter
+	budget *bootstrapBudget
+}
+
+func (backend *budgetedBackend) Bootstrap(ct *rlwe.Ciphertext) (*rlwe.Ciphertext, error) {
+	phase := ""
+	if backend.budget != nil {
+		phase = backend.budget.phase
+	}
+	return backend.budget.invoke(phase, func() (*rlwe.Ciphertext, error) { return backend.backendAdapter.Bootstrap(ct) })
+}
+
+func setBootstrapPhase(backend backendAdapter, phase string) {
+	if guarded, ok := backend.(*budgetedBackend); ok && guarded.budget != nil {
+		guarded.budget.phase = phase
+	}
+}
+
 func measureBootstrap(backend backendAdapter, input *rlwe.Ciphertext, warmup, repetitions int) (timingResult, error) {
-	for i := 0; i < warmup; i++ {
+	setBootstrapPhase(backend, "first_cold_bootstrap")
+	firstPhase, err := measurePhase("first_cold_bootstrap", func() error {
+		_, callErr := backend.Bootstrap(input.CopyNew())
+		return callErr
+	})
+	firstPhase.Samples = 1
+	if err != nil {
+		return timingResult{FirstBootstrap: firstPhase}, fmt.Errorf("first/cold Bootstrap call: %w", err)
+	}
+	for i := 1; i < warmup; i++ {
+		setBootstrapPhase(backend, "additional_warmup")
 		if _, err := backend.Bootstrap(input.CopyNew()); err != nil {
-			return timingResult{}, fmt.Errorf("warmup %d: %w", i+1, err)
+			return timingResult{FirstBootstrap: firstPhase}, fmt.Errorf("warmup %d: %w", i+1, err)
 		}
 	}
 	runtime.GC()
@@ -397,6 +560,7 @@ func measureBootstrap(backend backendAdapter, input *rlwe.Ciphertext, warmup, re
 	var totalBytes, totalAllocs uint64
 	var before, after runtime.MemStats
 	for i := range samples {
+		setBootstrapPhase(backend, "timed_warm_bootstrap")
 		ct := input.CopyNew()
 		runtime.ReadMemStats(&before)
 		start := time.Now()
@@ -404,7 +568,7 @@ func measureBootstrap(backend backendAdapter, input *rlwe.Ciphertext, warmup, re
 		elapsed := time.Since(start)
 		runtime.ReadMemStats(&after)
 		if err != nil {
-			return timingResult{}, fmt.Errorf("timed repetition %d: %w", i+1, err)
+			return timingResult{FirstBootstrap: firstPhase}, fmt.Errorf("timed repetition %d: %w", i+1, err)
 		}
 		samples[i] = elapsed.Nanoseconds()
 		totalBytes += after.TotalAlloc - before.TotalAlloc
@@ -424,7 +588,7 @@ func measureBootstrap(backend backendAdapter, input *rlwe.Ciphertext, warmup, re
 		Warmup: warmup, Repetitions: repetitions, SamplesNS: samples, MedianNS: median,
 		MeanNS: total / float64(repetitions), MinNS: ordered[0], MaxNS: ordered[len(ordered)-1],
 		BytesPerOp: totalBytes / uint64(repetitions), AllocsPerOp: totalAllocs / uint64(repetitions),
-		MeasuredAt: time.Now().UTC(),
+		MeasuredAt: time.Now().UTC(), FirstBootstrap: firstPhase,
 	}, nil
 }
 

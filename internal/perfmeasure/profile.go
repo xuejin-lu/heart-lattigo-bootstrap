@@ -44,25 +44,26 @@ type Config struct {
 }
 
 type EffectiveParameters struct {
-	LogN             int      `json:"log_n"`
-	LogSlots         int      `json:"log_slots"`
-	InputSlots       int      `json:"input_slots"`
-	RingN            int      `json:"ring_n"`
-	ResidualRingN    int      `json:"residual_ring_n"`
-	Q0Target         int      `json:"q0_config_target_bits"`
-	Q0Bits           int      `json:"q0_bits"`
-	QChainBits       []int    `json:"q_chain_bits"`
-	PBits            []int    `json:"p_bits"`
-	QPrimes          []string `json:"q_primes"`
-	PPrimes          []string `json:"p_primes"`
-	DefaultScale     string   `json:"default_scale"`
-	Mod1Scale        int      `json:"mod1_log_scale"`
-	Mod1Degree       int      `json:"mod1_degree"`
-	DoubleAngle      int      `json:"double_angle"`
-	K                int      `json:"k"`
-	LogMessageRatio  int      `json:"log_message_ratio"`
-	CircuitOrder     int      `json:"circuit_order"`
-	QPrefixRowsAtMax int      `json:"q_prefix_rows_at_max_level"`
+	EphemeralSecretWeight int      `json:"ephemeral_secret_weight,omitempty"`
+	LogN                  int      `json:"log_n"`
+	LogSlots              int      `json:"log_slots"`
+	InputSlots            int      `json:"input_slots"`
+	RingN                 int      `json:"ring_n"`
+	ResidualRingN         int      `json:"residual_ring_n"`
+	Q0Target              int      `json:"q0_config_target_bits"`
+	Q0Bits                int      `json:"q0_bits"`
+	QChainBits            []int    `json:"q_chain_bits"`
+	PBits                 []int    `json:"p_bits"`
+	QPrimes               []string `json:"q_primes"`
+	PPrimes               []string `json:"p_primes"`
+	DefaultScale          string   `json:"default_scale"`
+	Mod1Scale             int      `json:"mod1_log_scale"`
+	Mod1Degree            int      `json:"mod1_degree"`
+	DoubleAngle           int      `json:"double_angle"`
+	K                     int      `json:"k"`
+	LogMessageRatio       int      `json:"log_message_ratio"`
+	CircuitOrder          int      `json:"circuit_order"`
+	QPrefixRowsAtMax      int      `json:"q_prefix_rows_at_max_level"`
 }
 
 func LoadConfig(path string) (Config, [32]byte, error) {
@@ -83,6 +84,16 @@ func LoadConfig(path string) (Config, [32]byte, error) {
 }
 
 func ParametersFromConfig(cfg Config) (ckks.Parameters, bootstrapping.Parameters, EffectiveParameters, error) {
+	return ParametersFromConfigWithE(cfg, 0)
+}
+
+// ParametersFromConfigWithE constructs the configured profile with an
+// explicit ephemeral-secret weight. ParametersFromConfig remains the
+// historical E=0 diagnostic entry point so existing result meaning is stable.
+func ParametersFromConfigWithE(cfg Config, ephemeralSecretWeight int) (ckks.Parameters, bootstrapping.Parameters, EffectiveParameters, error) {
+	if ephemeralSecretWeight < 0 {
+		return ckks.Parameters{}, bootstrapping.Parameters{}, EffectiveParameters{}, fmt.Errorf("ephemeral secret weight must be non-negative, got %d", ephemeralSecretWeight)
+	}
 	residualQ := []int{cfg.Q0[0], cfg.QSlotsToCoeffs[0]}
 	residual, err := ckks.NewParametersFromLiteral(ckks.ParametersLiteral{
 		LogN: cfg.LogN, LogQ: residualQ, LogDefaultScale: cfg.LogDefaultScale,
@@ -107,11 +118,11 @@ func ParametersFromConfig(cfg Config) (ckks.Parameters, bootstrapping.Parameters
 		return ckks.Parameters{}, bootstrapping.Parameters{}, EffectiveParameters{}, fmt.Errorf("C2S factorization: %w", err)
 	}
 	logN, mod1Scale, degree, doubleAngle := cfg.LogN, cfg.Mod1LogScale, cfg.Mod1Degree, cfg.Mod1DoubleAngle
-	k, ratio, invDegree, zero := cfg.Mod1K, cfg.LogMessageRatio, cfg.Mod1InvDegree, 0
+	k, ratio, invDegree := cfg.Mod1K, cfg.LogMessageRatio, cfg.Mod1InvDegree
 	params, err := bootstrapping.NewParametersFromLiteral(residual, bootstrapping.ParametersLiteral{
 		LogN: &logN, LogP: append([]int(nil), cfg.P...), Xs: ring.Ternary{H: cfg.SecretHamming}, LogSlots: &logSlots,
 		CoeffsToSlotsFactorizationDepthAndLogScales: c2s, SlotsToCoeffsFactorizationDepthAndLogScales: s2c,
-		EvalModLogScale: &mod1Scale, EphemeralSecretWeight: &zero, Mod1Type: mod1.CosDiscrete,
+		EvalModLogScale: &mod1Scale, EphemeralSecretWeight: &ephemeralSecretWeight, Mod1Type: mod1.CosDiscrete,
 		LogMessageRatio: &ratio, K: &k, Mod1Degree: &degree, DoubleAngle: &doubleAngle, Mod1InvDegree: &invDegree,
 	})
 	if err != nil {
@@ -122,7 +133,8 @@ func ParametersFromConfig(cfg Config) (ckks.Parameters, bootstrapping.Parameters
 	q, p := params.BootstrappingParameters.Q(), params.BootstrappingParameters.P()
 	defaultScale := residual.DefaultScale()
 	effective := EffectiveParameters{
-		LogN: params.BootstrappingParameters.LogN(), LogSlots: params.CoeffsToSlotsParameters.LogSlots,
+		EphemeralSecretWeight: params.EphemeralSecretWeight,
+		LogN:                  params.BootstrappingParameters.LogN(), LogSlots: params.CoeffsToSlotsParameters.LogSlots,
 		InputSlots: 1 << params.CoeffsToSlotsParameters.LogSlots, RingN: params.BootstrappingParameters.N(), ResidualRingN: residual.N(),
 		Q0Target: cfg.Q0[0], Q0Bits: bits.Len64(q[0]), QChainBits: primeBits(q), PBits: primeBits(p), QPrimes: primeStrings(q), PPrimes: primeStrings(p),
 		DefaultScale: defaultScale.Value.Text('e', 80), Mod1Scale: cfg.Mod1LogScale, Mod1Degree: cfg.Mod1Degree,

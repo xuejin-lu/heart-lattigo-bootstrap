@@ -164,8 +164,8 @@ func runCompare(args []string) error {
 }
 
 func validatePairedInputs(standard, fast document, standardVectors, fastVectors probeVectors) error {
-	if standard.SchemaVersion != "fast-standard-perfprobe.v2" || fast.SchemaVersion != "fast-standard-perfprobe.v2" {
-		return errors.New("formal comparison requires v2 input provenance; historical/unknown probe records are diagnostic only")
+	if !validLegacyProbeSchema(standard) || !validLegacyProbeSchema(fast) {
+		return errors.New("formal legacy-diagnostic comparison requires supported v2/v3 probe records")
 	}
 	if standard.Backend != "standard" || fast.Backend != "fast" {
 		return fmt.Errorf("backend pair mismatch: Standard=%q Fast=%q", standard.Backend, fast.Backend)
@@ -219,6 +219,17 @@ func validatePairedInputs(standard, fast document, standardVectors, fastVectors 
 		return fmt.Errorf("Fast trial vectors: %w", err)
 	}
 	return nil
+}
+
+func validLegacyProbeSchema(doc document) bool {
+	switch doc.SchemaVersion {
+	case "fast-standard-perfprobe.v2":
+		return doc.Mode == "" || doc.Mode == "legacy-diagnostic"
+	case "fast-standard-perfprobe.v3":
+		return doc.Mode == "legacy-diagnostic"
+	default:
+		return false
+	}
 }
 
 func validateBackendTrialVectors(doc document, vectors probeVectors) error {

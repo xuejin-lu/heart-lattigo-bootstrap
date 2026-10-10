@@ -13,9 +13,10 @@ import (
 )
 
 type fastBackend struct {
-	eval                *bootstrapping.FastEvaluator
-	residual            ckks.Parameters
-	bootstrappingParams ckks.Parameters
+	eval                  *bootstrapping.FastEvaluator
+	residual              ckks.Parameters
+	bootstrappingParams   ckks.Parameters
+	evaluatorConstruction phaseTiming
 }
 
 func newBackend(params bootstrapping.Parameters, residual ckks.Parameters) (backendAdapter, error) {
@@ -24,11 +25,17 @@ func newBackend(params bootstrapping.Parameters, residual ckks.Parameters) (back
 		return nil, err
 	}
 	backend := inputBackend.(*fastBackend)
-	eval, err := bootstrapping.NewFastEvaluator(params)
+	var eval *bootstrapping.FastEvaluator
+	phase, err := measurePhase("legacy_fast_evaluator_construction", func() error {
+		var constructErr error
+		eval, constructErr = bootstrapping.NewFastEvaluator(params)
+		return constructErr
+	})
 	if err != nil {
 		return nil, err
 	}
 	backend.eval = eval
+	backend.evaluatorConstruction = phase
 	return backend, nil
 }
 
@@ -58,6 +65,8 @@ func (b *fastBackend) PrepareInput(values []complex128, logSlots int) (*rlwe.Cip
 }
 
 func (b *fastBackend) EvaluatorPath() string { return "bootstrapping.NewFastEvaluator" }
+
+func (b *fastBackend) EvaluatorConstructionTiming() phaseTiming { return b.evaluatorConstruction }
 
 func (b *fastBackend) DecodePath() string {
 	return "Fast c0 copied into CKKS plaintext -> ckks.NewEncoder.Decode (zero-secret simulation)"

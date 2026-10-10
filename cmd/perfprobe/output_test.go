@@ -130,10 +130,16 @@ func TestOutputSmokeRejectsLegacySyntheticStandardInput(t *testing.T) {
 }
 
 func TestOutputSmokeDoesNotRequireTimingCampaignOptions(t *testing.T) {
-	if err := validateExecutionLimits(cliOptions{outputSmoke: true, warmup: 0, repetitions: 1, standardTrials: 1}); err != nil {
-		t.Fatalf("output smoke incorrectly requires benchmark repetitions: %v", err)
+	if err := validateExecutionLimits(cliOptions{outputSmoke: true, warmup: 0, repetitions: 1, standardTrials: 1}); err == nil {
+		t.Fatal("output smoke accepted an implicit unbounded Bootstrap attempt")
+	}
+	if err := validateExecutionLimits(cliOptions{outputSmoke: true, warmup: 0, repetitions: 1, standardTrials: 1, bootstrapBudget: 1}); err != nil {
+		t.Fatalf("one-call output smoke budget was rejected: %v", err)
 	}
 	if err := validateExecutionLimits(cliOptions{warmup: 0, repetitions: 1, standardTrials: 1}); err == nil {
 		t.Fatal("full measurement unexpectedly lost its seven-repetition precondition")
+	}
+	if err := validateExecutionLimits(cliOptions{warmup: 1, repetitions: 7, standardTrials: 3, bootstrapBudget: 11}); err != nil {
+		t.Fatalf("bounded full measurement attempt budget was rejected: %v", err)
 	}
 }

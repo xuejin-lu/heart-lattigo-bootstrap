@@ -64,6 +64,16 @@ func TestFormalPairRequiresV2NativeStandardAndFastInputEvidence(t *testing.T) {
 	if _, err := buildPairedNumericalDocument(standard, fast, standardVectors, fastVectors, defaultComparisonThreshold); err != nil {
 		t.Fatalf("valid v2 pair could not build formal report without diagnostic input: %v", err)
 	}
+	standardV3, fastV3 := standard, fast
+	standardV3.SchemaVersion, standardV3.Mode = "fast-standard-perfprobe.v3", "legacy-diagnostic"
+	fastV3.SchemaVersion, fastV3.Mode = "fast-standard-perfprobe.v3", "legacy-diagnostic"
+	if err := validatePairedInputs(standardV3, fastV3, standardVectors, fastVectors); err != nil {
+		t.Fatalf("valid versioned legacy-diagnostic pair rejected: %v", err)
+	}
+	standardV3.Mode = "public-native"
+	if err := validatePairedInputs(standardV3, fastV3, standardVectors, fastVectors); err == nil {
+		t.Fatal("legacy comparator accepted a formal public-native document")
+	}
 
 	legacy := standard
 	legacy.InputKind = "c0=encoded-message,c1=0"

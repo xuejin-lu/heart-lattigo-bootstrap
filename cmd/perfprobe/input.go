@@ -240,7 +240,9 @@ func runInputSmoke(opts cliOptions, configHash string, residual ckks.Parameters,
 		if err != nil {
 			return err
 		}
-		if _, err := fullBackend.Bootstrap(firstInput.CopyNew()); err != nil {
+		guardedBackend := &budgetedBackend{backendAdapter: fullBackend, budget: &bootstrapBudget{limit: opts.bootstrapBudget, journalBase: opts.out}}
+		setBootstrapPhase(guardedBackend, "fast_public_acceptance_smoke")
+		if _, err := guardedBackend.Bootstrap(firstInput.CopyNew()); err != nil {
 			return fmt.Errorf("Fast public Bootstrap rejected prepared input: %w", err)
 		}
 		accepted = true

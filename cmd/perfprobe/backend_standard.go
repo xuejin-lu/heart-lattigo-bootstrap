@@ -12,10 +12,11 @@ import (
 )
 
 type standardBackend struct {
-	eval                *bootstrapping.Evaluator
-	residual            ckks.Parameters
-	bootstrappingParams ckks.Parameters
-	secret              *rlwe.SecretKey
+	eval                  *bootstrapping.Evaluator
+	residual              ckks.Parameters
+	bootstrappingParams   ckks.Parameters
+	secret                *rlwe.SecretKey
+	evaluatorConstruction phaseTiming
 }
 
 func newBackend(params bootstrapping.Parameters, residual ckks.Parameters) (backendAdapter, error) {
@@ -28,11 +29,17 @@ func newBackend(params bootstrapping.Parameters, residual ckks.Parameters) (back
 	if err != nil {
 		return nil, fmt.Errorf("generate Standard evaluation keys: %w", err)
 	}
-	eval, err := bootstrapping.NewEvaluator(params, keys)
+	var eval *bootstrapping.Evaluator
+	phase, err := measurePhase("legacy_standard_evaluator_construction", func() error {
+		var constructErr error
+		eval, constructErr = bootstrapping.NewEvaluator(params, keys)
+		return constructErr
+	})
 	if err != nil {
 		return nil, fmt.Errorf("construct Standard evaluator: %w", err)
 	}
 	backend.eval = eval
+	backend.evaluatorConstruction = phase
 	return backend, nil
 }
 
@@ -61,6 +68,8 @@ func (b *standardBackend) PrepareInput(values []complex128, logSlots int) (*rlwe
 func (b *standardBackend) EvaluatorPath() string {
 	return "fresh GenSecretKey + GenEvaluationKeys + bootstrapping.NewEvaluator"
 }
+
+func (b *standardBackend) EvaluatorConstructionTiming() phaseTiming { return b.evaluatorConstruction }
 
 func (b *standardBackend) DecodePath() string {
 	return "rlwe.NewDecryptor(matching generated Standard secret).DecryptNew -> ckks.NewEncoder.Decode"
