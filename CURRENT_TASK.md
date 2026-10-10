@@ -18,11 +18,11 @@ Legacy tool weaknesses established from source: E=0 hardcoded in `perfmeasure.Pa
 ## Five autonomous deliverables
 
 P1: inspect current source and existing measurement tooling; source-backed reuse/gap inventory with migration map.
-P2: repair `perfmeasure/perfprobe` in place for named current formal E32 Public CKKS mode using original 019 chain, native Standard and Fast public constructors, preserved legacy diagnostic mode and hashes.
+P2: repair `perfmeasure/perfprobe` in place for a named E-parameterized formal public CKKS mode (E32 fixed acceptance fixture) using original 019 chain, native Standard and Fast public constructors, preserved legacy diagnostic mode and hashes.
 P3: integrate `fastdiag` where genuinely compatible; adapt bounded invocation budget, measurement stages and legacy mode labeling. No new tracing system.
-P4: paired zero-Bootstrap cheap preflight with genuine Standard vs Fast exact accepted 019 profile, Level/Scale/capacity/native Decrypt and numerical gates. Legacy tests unchanged.
+P4: paired zero-Bootstrap cheap preflight with isolated temporary modfile bindings to original Standard and frozen Fast Lattigo (Primary measurement tools NEVER move or disappear); same Primary source and exact module/commit fingerprint with genuine Standard vs Fast exact accepted 019 profile, Level/Scale/capacity/native Decrypt and numerical gates. Legacy tests unchanged.
 P5: updated durable platform status, compact report and evidence, focused tests/vet, normal safe Primary commits/push, Web review.
 
 **Freeze:** pinned true Standard `5dbffbdea05394de2ca3a432ed5318aa832e3f40`, original Fast production `2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac` (Secondary may have documentation-only AGENTS update), original LogN13 E32 Q/P, 4096 slots, A/B Scale2^45, C Scale=q5, E32 Public Bootstrap keyplan, 1e-6 numerical gate. No mathematical/backend production changes.
 
-**Budget:** ABSOLUTE zero actual Bootstrap calls, zero LogN16, no benchmarks/sweeps. All unit tests must avoid triggering Bootstrap. If architecture/math incompatible, STOP for Web with exact evidence; never silently use legacy E0/direct-c0 as formal.
+**Design rule:** Existing measurement platform lives in Primary, NOT inside Lattigo; never modify pristine Standard or duplicate the tools there. Build the same Primary tool source twice with isolated dependency replacements and only compare public API boundaries symmetrically. Fast-only internal hooks must remain explicitly asymmetric. E is a frontend parameter preserved for both builds; current Fast accepts E=0 or E=32 but mathematical zero-secret simulation need not force E=0.\n\n**Budget:** ABSOLUTE zero actual Bootstrap calls, zero LogN16, no benchmarks/sweeps. All unit tests must avoid triggering Bootstrap. If architecture/math incompatible, STOP for Web with exact evidence; never silently use legacy E0/direct-c0 as formal.
