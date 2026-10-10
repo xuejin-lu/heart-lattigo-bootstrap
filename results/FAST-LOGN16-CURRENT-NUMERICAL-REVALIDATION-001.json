@@ -1,0 +1,80 @@
+{
+  "schema_version": "fast-logn16-current-numerical-revalidation-blocked.v1",
+  "classification": "LOGN16_CURRENT_REVALIDATION_BLOCKED",
+  "generated_at_utc": "2026-10-10T21:35:47Z",
+  "primary_source_head": "9c222531713cc46f192ae3acb43b16fc11091de5",
+  "secondary": {
+    "branch": "fast-qprefix",
+    "commit": "2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f",
+    "clean": true,
+    "production_changes": false
+  },
+  "standard_reference": {
+    "requested_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+    "execution_source_commit": "2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f",
+    "independent_original_standard": false,
+    "standard_secret_level_p": 4,
+    "outer_bootstrapping_fast_dispatch": false,
+    "shared_ckks_evaluator_fast_prefix_dispatch": true
+  },
+  "profile": {
+    "log_n": 16,
+    "log_slots": 15,
+    "effective_q0_bits": 56,
+    "config_sha256": "16e62fdea2dc5ac32240a33cc256cdf60b935aa00b4a16aa004474d2c3033b02",
+    "input_sha256": "659fc59c899341a8253887270f1ae3478528fd864d66aca14bba918550ce8ccf",
+    "input_mode": "historical diagnostic encoded c0 / zero-valued c1; not formal native E32 public lifecycle"
+  },
+  "bootstrap_attempts": {
+    "prior_fast_full_bootstrap_calls": 2,
+    "prior_in_tree_standard_api_bootstrap_calls": 1,
+    "new_preflight_bootstrap_calls": 0,
+    "logn13_runs": 0
+  },
+  "preflight": {
+    "status": "PANIC_REPRODUCED_WITHOUT_BOOTSTRAP",
+    "input_level": 0,
+    "input_scale": "2^45",
+    "input_component_rows": 1,
+    "input_row_length": 65536,
+    "input_is_ntt": true,
+    "input_is_montgomery": false,
+    "modup_level": 16,
+    "modup_rows_per_component": 17,
+    "modup_row_length": 65536,
+    "first_c2s_matrix": "matrix_0 completed",
+    "first_divergent_checkpoint": "C2S group 0 Rescale -> C2S matrix 1",
+    "post_rescale_level": 15,
+    "post_rescale_scale": "2^50",
+    "post_rescale_rows": {
+      "q0_q3_backing_length": 65536,
+      "q4_q15_backing_length": 0
+    },
+    "panic": "cannot inttCoreLazy: len(p1)=0, len(p2)=65536, len(roots)=65536, N=65536",
+    "stack_boundary": "lintrans.Evaluator.EvaluateMany -> rlwe.Evaluator.DecomposeNTT -> ring.INTT"
+  },
+  "root_cause": "FastCKKSZeroSecretSimulation is defined on general ckks.Parameters, so the ordinary Standard CKKS evaluator also takes Fast Q-prefix Rescale and compacts Level-15 ciphertext backing to q0..q3; the next Standard C2S linear transform requires full active-Q backing.",
+  "numerical_results": {
+    "logn13": "NOT_RUN",
+    "logn16_fast_vs_standard_rmse": null,
+    "logn16_evalmod_rmse": null,
+    "logn16_fast_bootstrap_snr_db": null,
+    "gates_evaluated": false,
+    "historical_obsolete_rmse_reused": false
+  },
+  "cleanup": {
+    "deleted": [
+      "fix001_p3_diag_p93_genuine_standard_vs_matched_reconciliation_runner_test.go"
+    ],
+    "historical_runner_retained_due_to_current_cli_reference": true,
+    "q0123_correctness_tests_deleted": false
+  },
+  "validation": {
+    "targeted_tests": "PASS: go test ./cmd/fastdiag ./internal/perfmeasure ./internal/numericalmetrics -count=1",
+    "compile_only": "PASS: go test ./... -run '^$'",
+    "go_vet": "FAIL: pre-existing self-assignment at fix001_p3_diag_logn13_evalmod_matched_normalized_oracle_runner.go:649 (introduced by 365b2bbb)",
+    "full_go_test": "NOT_RUN to avoid Bootstrap-executing tests after LogN16 Bootstrap budget exhaustion",
+    "secondary_unchanged": true
+  },
+  "disposition": "NEEDS_WEB_REVIEW"
+}
