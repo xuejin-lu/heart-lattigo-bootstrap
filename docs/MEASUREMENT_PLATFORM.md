@@ -147,19 +147,24 @@ The one cold and one warm sample are descriptive, not a stable speedup estimate.
 
 Compact result, journal, and provenance/aggregate evidence are in `results/FAST-DROPIN-PUBLIC-NATIVE-COLD-WARM-AUTONOMOUS-BATCH-022-{summary.md,journal.md,evidence.json}`. Raw 4096-slot vectors and temporary alternate modfiles remain outside the repository.
 
-## Batch024 E32 trace preflight status — 2026-10-10
+## Batch024 E32 trace status — 2026-10-11
 
-The Rescale trace producer repair and zero-call source/instrumentation gates
-passed. The S4 E32 trace session is currently **blocked before attempt
-reservation**: the held manifest expects repeatability vectors with schema
-`fast-standard-public-native-repeatability-vectors.v1`, mode
-`public-native-repeatability`, and six `bootstrap_outputs`; the supplied
-`fast-vectors.json` is the distinct pre-Bootstrap artifact
-`fast-standard-public-native-vectors.v1` / `public-native` and has no such
-outputs. Its backend, source, config, Q/P, input, and workload fingerprints
-match, but the artifact contract does not. No Batch024 tokens were reserved,
-no Bootstrap was called, and no raw trace exists. Batch023's 14/14 calls
-remain spent. Do not retry or substitute another vector artifact until Web
-review resolves the authoritative fixture and S4 retry authority. See
-`results/FAST-DROPIN-E32-TRACE-REPAIR-AUTONOMOUS-BATCH-024-summary.md` and its
-compact evidence JSON.
+The Rescale trace producer repair and S1–S3 zero-call gates passed. The first
+S4 preflight supplied the pre-Bootstrap `fast-vectors.json` rather than the
+required six-output repeatability artifact; that historical validator failure
+and its evidence remain preserved. Web authorized recovery only with the
+actual artifact. The matching
+`fast-repeatability-vectors.json` was found and verified (six named 4096-slot
+finite outputs; original Fast, Primary measurement-source, config, Q/P, input
+and workload fingerprints match the held manifest). The Secondary
+`FASTDIAG_VALIDATE_ONLY=1` fixture test passed with zero Bootstrap calls.
+
+With a private writable outer `GOCACHE`, the fixed Primary trace CLI passed
+fixture and production-source identity validation but stopped before the
+Secondary test subprocess and attempt reservation: `git worktree add` could
+not create `.git/worktrees/secondary-diagnostic1` (`Operation not permitted`).
+The output base and both reservation journals are absent. Batch024 remains
+**0/2 reserved, 0 Bootstrap calls**; Batch023's **14/14** remain spent and
+untouched. No further retry or permission workaround was attempted; Batch024
+is blocked for Web review. See the Batch024 summary, journal and evidence JSON
+for exact paths, hashes and command status.

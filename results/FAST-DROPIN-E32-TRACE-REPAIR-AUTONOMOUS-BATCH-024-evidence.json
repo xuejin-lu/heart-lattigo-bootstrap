@@ -4,8 +4,8 @@
   "status": "BATCH_BLOCKED_NEEDS_WEB_REVIEW",
   "primary": {
     "branch": "main",
-    "commit": "b39ae8519a98e88a902d7868924ae29eb721531c",
-    "origin_main": "b39ae8519a98e88a902d7868924ae29eb721531c",
+    "commit": "3413374b3bc830934a00a1ae609fcb4295b90430",
+    "origin_main": "3413374b3bc830934a00a1ae609fcb4295b90430",
     "dirty": false
   },
   "secondary": {
@@ -51,6 +51,26 @@
     ],
     "validator_error": "uninstrumented Fast vectors do not match the E32 trace fixture provenance"
   },
+  "fixture_recovery": {
+    "vectors_path": "/private/tmp/fast-dropin-batch023-final.3VxTOp/fast-repeatability-vectors.json",
+    "vectors_sha256": "63ad89ce9ccc70a0b737397810d4f4a15d8a1ed65e82ccd3af0435d1df4d6881",
+    "schema_version": "fast-standard-public-native-repeatability-vectors.v1",
+    "mode": "public-native-repeatability",
+    "backend_commit": "2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac",
+    "fixture_primary_commit": "6e938918442c409faa6d32e159c7a3f7a1041f7a",
+    "primary_measurement_source_sha256": "b63fef5bbbdfe1e679b2e50ab66e0a5c43afefc526bd2228b16b7541ae01ea63",
+    "bootstrap_outputs": {
+      "bootstrap_first_cold": 4096,
+      "bootstrap_warm_01": 4096,
+      "bootstrap_warm_02": 4096,
+      "bootstrap_warm_03": 4096,
+      "bootstrap_warm_04": 4096,
+      "bootstrap_warm_05": 4096
+    },
+    "all_output_values_finite": true,
+    "secondary_validate_only_test": "PASS; 0 Bootstrap calls",
+    "primary_source_fingerprint_matches_manifest": true
+  },
   "budget": {
     "batch023_calls_spent": 14,
     "batch023_calls_reused": 0,
@@ -60,11 +80,20 @@
     "attempt_journals_created": 0,
     "raw_trace_created": false,
     "certified_trace_created": false,
-    "retry_attempted": false
+    "retry_attempted": true,
+    "bootstrap_retry_attempted": false,
+    "trace_cli_process_started": true,
+    "outer_go_run_invocations_after_fixture_recovery": 2,
+    "outer_trace_cli_invocation_with_private_cache": true,
+    "secondary_trace_test_subprocess_started": false,
+    "diagnostic_attempts_reserved": 0
   },
   "stop": {
-    "phase": "S4 held-vector provenance validation before reservation",
-    "reason": "supplied vector artifact is not the manifest's repeatability artifact",
-    "next_action": "Web review must identify the authoritative matching vectors artifact and resolve whether S4 may be started after this failed preflight"
+    "phase": "S4 isolated Secondary worktree creation before test subprocess and reservation",
+    "reason": "git worktree add was denied while creating .git/worktrees/secondary-diagnostic1: Operation not permitted",
+    "trace_output_base": "/private/tmp/fastdiag-e32-fixture-validation.gNDA1K/batch024-e32-trace.json",
+    "trace_output_and_attempt_journals_exist": false,
+    "bootstrap_calls": 0,
+    "next_action": "Stop for Web review; do not retry or change worktree strategy without a new decision"
   }
 }

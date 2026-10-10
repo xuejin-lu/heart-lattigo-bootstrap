@@ -121,7 +121,7 @@ Status: `BATCH_BLOCKED_NEEDS_WEB_REVIEW` — S1–S3 zero-call gates complete; S
 | S1 source/provenance audit | complete | 0 |
 | S2 regression-first span and raw evidence implementation | complete | 0 |
 | S3 enabled/disabled, committed-source identity, and zero-call validation | complete | 0 |
-| S4 isolated E32 diagnostic trace | blocked before reservations by held-vector schema/mode mismatch; max two remain unused | 0 |
+| S4 isolated E32 diagnostic trace | blocked before reservations: fixture recovered; isolated worktree creation denied | 0 |
 | S5 aggregate report and Web handoff | blocked; compact blocker evidence recorded for Web review | 0 |
 
 ## S4 zero-call preflight stop
@@ -151,3 +151,42 @@ Status: `BATCH_BLOCKED_NEEDS_WEB_REVIEW` — S1–S3 zero-call gates complete; S
 - Resume requires Web review to identify the authoritative matching
   repeatability vectors artifact and decide whether a fresh S4 invocation is
   permitted under the no-retry rule. Until then, do not launch Bootstrap.
+
+## 2026-10-11 — Web-authorized fixture recovery; worktree creation stop
+
+- Primary safely synchronized `main` to `3413374b3bc830934a00a1ae609fcb4295b90430`;
+  `origin/main` matched. Secondary safely synchronized `fast-qprefix` to
+  `4f2557062cb5c1ffb9a671bc3df67401fd7092b4`; its remote matched. Both
+  worktrees were clean.
+- Found the authentic Batch023 Fast repeatability vectors at
+  `/private/tmp/fast-dropin-batch023-final.3VxTOp/fast-repeatability-vectors.json`,
+  SHA-256 `63ad89ce9ccc70a0b737397810d4f4a15d8a1ed65e82ccd3af0435d1df4d6881`.
+  Metadata matches the held manifest: repeatability schema/mode, original Fast
+  commit `2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac`, fixture Primary commit
+  `6e938918442c409faa6d32e159c7a3f7a1041f7a`, six named 4096-slot finite
+  Bootstrap outputs, and matching source/config/QP/input/workload hashes.
+  Current Primary measurement-source fingerprint recomputed to
+  `b63fef5bbbdfe1e679b2e50ab66e0a5c43afefc526bd2228b16b7541ae01ea63`.
+- Re-ran the Secondary test-only fixture gate with
+  `FASTDIAG_VALIDATE_ONLY=1`:
+  `go test -tags=fastdiag ./circuits/ckks/bootstrapping -run '^TestFastDiagPublicE32Trace$' -count=1`
+  — PASS, zero Bootstrap calls. A Primary compile-only check with the
+  task-owned writable `GOCACHE=/private/tmp/batch024-go-cache.TQR9yT` also
+  passed: `go test ./cmd/fastdiag -run '^$' -count=1`.
+- The authorized outer trace command reached Primary fixture and production
+  source identity validation. Exact invocation:
+  `GOCACHE=/private/tmp/batch024-go-cache.TQR9yT go run ./cmd/fastdiag trace --profile=logn13-e32-public --trace=stage,power,rescale --e32-manifest=/private/tmp/fast-dropin-batch023-final.3VxTOp/fast-e32-trace.manifest.json --fast-vectors=/private/tmp/fast-dropin-batch023-final.3VxTOp/fast-repeatability-vectors.json --out=/private/tmp/fastdiag-e32-fixture-validation.gNDA1K/batch024-e32-trace.json`.
+  It then failed at
+  `git worktree add --detach /var/folders/dn/6p3z5ctd50v_2dzzh2y4nvyc0000gn/T/fastdiag-public-e32-2472111079/secondary-diagnostic 4f2557062cb5c1ffb9a671bc3df67401fd7092b4` with
+  `fatal: could not create directory of '.git/worktrees/secondary-diagnostic1': Operation not permitted`.
+  The runner creates the worktree before launching the Secondary test or
+  reserving attempts; source order and filesystem checks confirm this failure
+  was before both. The selected output base and both Batch024 reservation
+  files remain absent. No raw/certified trace exists.
+- Final ledger remains Batch024 **0/2 reserved, 0 Bootstrap calls**; Batch023
+  **14/14 spent, 0 reused**. After this worktree-metadata failure, no
+  escalation, alternate worktree path or repeat trace invocation was
+  attempted. Primary/Secondary worktrees remain clean.
+- **STOP:** `BATCH_BLOCKED_NEEDS_WEB_REVIEW`. The exact blocker is sandbox denial
+  writing Secondary Git worktree metadata, not the Go build cache or fixture.
+  Do not launch another trace until Web provides a new decision.
