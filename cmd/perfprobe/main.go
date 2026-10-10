@@ -6,7 +6,6 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"math/big"
 	"os"
 	"os/exec"
 	"runtime"
@@ -23,16 +22,7 @@ const canonicalLogN13InputSHA256 = "d9151964e398ae9fb77248394b4b28f84c9e5737c621
 
 type effectiveParameters = perfmeasure.EffectiveParameters
 
-type ciphertextState struct {
-	Level       int     `json:"level"`
-	Degree      int     `json:"degree"`
-	Scale       string  `json:"scale"`
-	ScaleLog2   float64 `json:"scale_log2"`
-	LogRows     int     `json:"log_rows"`
-	LogCols     int     `json:"log_cols"`
-	QPrefixRows int     `json:"q_prefix_rows"`
-	PrefixQ     string  `json:"prefix_q"`
-}
+type ciphertextState = perfmeasure.CiphertextState
 
 type checkpoint struct {
 	Name              string          `json:"name"`
@@ -765,25 +755,7 @@ func backendStateOf(backend backendAdapter, ct *rlwe.Ciphertext, q []uint64) (ci
 }
 
 func stateOf(ct *rlwe.Ciphertext, q []uint64, prefixRows int) ciphertextState {
-	if ct == nil {
-		return ciphertextState{}
-	}
-	state := ciphertextState{Level: ct.Level(), Degree: ct.Degree(), Scale: ct.Scale.Value.Text('e', 80), ScaleLog2: ct.Scale.Log2(),
-		LogRows: ct.LogDimensions.Rows, LogCols: ct.LogDimensions.Cols}
-	if q != nil && ct.Level() >= 0 {
-		rows := min(prefixRows, len(q))
-		if rows > len(q) {
-			rows = len(q)
-		}
-		if rows > 0 {
-			product := big.NewInt(1)
-			for _, prime := range q[:rows] {
-				product.Mul(product, new(big.Int).SetUint64(prime))
-			}
-			state.QPrefixRows, state.PrefixQ = rows, product.String()
-		}
-	}
-	return state
+	return perfmeasure.CiphertextStateOf(ct, q, prefixRows)
 }
 
 func encodeVector(values []complex128) []complexValue {

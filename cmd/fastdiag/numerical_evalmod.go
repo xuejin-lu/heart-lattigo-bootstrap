@@ -152,7 +152,7 @@ func runNumericalEvalModStageReplay(
 	}
 	standardPowers, err := numericalStandardGeneratedPowers(standardRes, standardParams.Mod1Poly, powers, standardEval.Evaluator)
 	if err != nil {
-		return trace, fmt.Errorf("%s genuine Standard generated powers: %w", branch, err)
+		return trace, fmt.Errorf("%s ordinary Standard API generated powers from the Fast checkout: %w", branch, err)
 	}
 	trace.powers, err = numericalGeneratedPowerEvidence(branch, powers, standardPowers, standardSK, params)
 	if err != nil {
@@ -389,7 +389,7 @@ func numericalGeneratedPowerEvidence(branch string, powers []ckkspolynomial.Diag
 		}
 		out = append(out, NumericalGeneratedPower{
 			Branch:                     branch,
-			ReferenceKind:              "genuine Standard PowerBasis.GenPower using Standard CKKS Evaluator",
+			ReferenceKind:              "Fast-checkout Standard API PowerBasis.GenPower using Standard CKKS Evaluator",
 			Power:                      power.N,
 			FastLevel:                  power.Ciphertext.Level(),
 			FastScaleLog2:              power.Ciphertext.Scale.Log2(),

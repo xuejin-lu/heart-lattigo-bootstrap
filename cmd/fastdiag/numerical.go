@@ -23,17 +23,189 @@ import (
 )
 
 const (
-	fastStandardInputSHA256 = "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285"
-	correctedFastCommitSHA  = "5feb44917fca40c93abec6def6f26bc81a82c536"
-	numericalThresholdValue = 1e-2
-	precisionErrorFloor     = 1e-30
+	fastStandardInputSHA256       = "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285"
+	fastStandardInputMetadata13   = "9171dac4a79b97f7f916001d0ea5805f6137711527d364f8dfcd8e71ed2764f6"
+	fastStandardInputSHA256LogN16 = "659fc59c899341a8253887270f1ae3478528fd864d66aca14bba918550ce8ccf"
+	fastStandardInputMetadata16   = "58b699119d1ca2d73cfe8812e6ae776f77d4267ff4c25e67229d7b140a6cf44f"
+	correctedFastCommitSHA        = "5feb44917fca40c93abec6def6f26bc81a82c536"
+	originalStandardCommitSHA     = "5dbffbdea05394de2ca3a432ed5318aa832e3f40"
+	numericalThresholdValue       = 1e-2
+	currentNumericalGate          = 1e-7
+	precisionErrorFloor           = 1e-30
 )
+
+const diagnosticInputKind = "diagnostic-encoded-c0-c1-zero-v1"
 
 type decodedNumericalRun struct {
 	output     NumericalOutput
 	values     []complex128
 	preValues  []complex128
 	ciphertext *rlwe.Ciphertext
+}
+
+func validateNumericalFastReference(mode, branch, commit, upstreamCommit string) error {
+	switch mode {
+	case numericalFastRevisionHistorical:
+		if commit != correctedFastCommitSHA || (branch != "fast-qprefix" && branch != "") {
+			return fmt.Errorf("historical-pinned numerical mode requires Fast fast-qprefix commit %s; branch=%q HEAD=%s", correctedFastCommitSHA, branch, commit)
+		}
+	case numericalFastRevisionCurrent:
+		if branch != "fast-qprefix" || commit == "" || upstreamCommit == "" || commit != upstreamCommit {
+			return fmt.Errorf("current-fast-qprefix requires clean fast-qprefix HEAD equal to fetched origin/fast-qprefix; branch=%q HEAD=%s origin=%s", branch, commit, upstreamCommit)
+		}
+	default:
+		return fmt.Errorf("unsupported Fast revision mode %q", mode)
+	}
+	return nil
+}
+
+func numericalInputFingerprints(profile string) (inputSHA256, metadataSHA256 string, err error) {
+	switch profile {
+	case supportedProfile:
+		return fastStandardInputSHA256, fastStandardInputMetadata13, nil
+	case logN16Profile:
+		return fastStandardInputSHA256LogN16, fastStandardInputMetadata16, nil
+	default:
+		return "", "", fmt.Errorf("unsupported numerical profile %q", profile)
+	}
+}
+
+func verifyNumericalSourceStillPinned(primaryRoot, primaryCommit, secondaryRoot, secondaryCommit string) error {
+	primaryBranch, err := gitOutput(primaryRoot, "branch", "--show-current")
+	if err != nil {
+		return err
+	}
+	if primaryBranch != "main" {
+		return fmt.Errorf("current numerical run ended on Primary branch %q, want main", primaryBranch)
+	}
+	currentPrimary, err := gitOutput(primaryRoot, "rev-parse", "HEAD")
+	if err != nil {
+		return err
+	}
+	if currentPrimary != primaryCommit {
+		return fmt.Errorf("Primary HEAD changed during numerical run: started %s, ended %s", primaryCommit, currentPrimary)
+	}
+	if err := requireCleanWorktree(primaryRoot); err != nil {
+		return fmt.Errorf("Primary became dirty during numerical run: %w", err)
+	}
+	secondaryBranch, err := gitOutput(secondaryRoot, "branch", "--show-current")
+	if err != nil {
+		return err
+	}
+	currentSecondary, err := gitOutput(secondaryRoot, "rev-parse", "HEAD")
+	if err != nil {
+		return err
+	}
+	upstream, err := gitOutput(secondaryRoot, "rev-parse", "origin/fast-qprefix")
+	if err != nil {
+		return err
+	}
+	if secondaryBranch != "fast-qprefix" || currentSecondary != secondaryCommit || currentSecondary != upstream {
+		return fmt.Errorf("Secondary source changed during numerical run: branch=%q started=%s ended=%s origin=%s", secondaryBranch, secondaryCommit, currentSecondary, upstream)
+	}
+	if err := requireCleanWorktree(secondaryRoot); err != nil {
+		return fmt.Errorf("Secondary became dirty during numerical run: %w", err)
+	}
+	return nil
+}
+
+func currentLogN16Classification(fast NumericalAggregate, stage NumericalStageLockstep) string {
+	close := currentNumericalValueWithinGate(fast.Complex.RMSE) && currentNumericalValueWithinGate(stage.FinalFastStandardRMSE)
+	for _, name := range []string{"input", "scale_down", "mod_up", "c2s_real", "c2s_imag", "evalmod_real", "evalmod_imag", "s2c", "final_public_output"} {
+		checkpoint := numericalPairCheckpointByName(stage.Checkpoints, name)
+		if checkpoint == nil || !checkpoint.Comparable || checkpoint.FastVsStandard == nil {
+			return "LOGN16_CURRENT_REVALIDATION_BLOCKED"
+		}
+		if !currentNumericalValueWithinGate(checkpoint.FastVsStandard.Complex.RMSE) {
+			close = false
+		}
+	}
+	seenBranches := map[string]bool{"real": false, "imag": false}
+	requiredInternal := []string{
+		"input_before_normalization", "after_normalization", "after_chebyshev_offset", "polynomial_input", "polynomial_output",
+		"before_double_angle_round_0", "evalmod_output_before_public_scale_reset", "evalmod_output_after_public_scale_reset",
+	}
+	for round := 0; round < 3; round++ {
+		requiredInternal = append(requiredInternal,
+			fmt.Sprintf("double_angle_round_%d_after_multiply", round),
+			fmt.Sprintf("double_angle_round_%d_after_add", round),
+			fmt.Sprintf("double_angle_round_%d_after_constant", round),
+			fmt.Sprintf("double_angle_round_%d_after_rescale", round),
+		)
+	}
+	internalByName := make(map[string]NumericalStageCheckpoint, len(stage.EvalModInternal))
+	for _, checkpoint := range stage.EvalModInternal {
+		branch, name, found := strings.Cut(checkpoint.Name, "/")
+		if !found {
+			return "LOGN16_CURRENT_REVALIDATION_BLOCKED"
+		}
+		if branch != "real" && branch != "imag" {
+			return "LOGN16_CURRENT_REVALIDATION_BLOCKED"
+		}
+		seenBranches[branch] = true
+		internalByName[branch+"/"+name] = checkpoint
+		if !checkpoint.Comparable || checkpoint.FastVsStandard == nil {
+			return "LOGN16_CURRENT_REVALIDATION_BLOCKED"
+		}
+		if branch == "real" {
+			seenBranches["real"] = true
+		}
+		if !currentNumericalValueWithinGate(checkpoint.FastVsStandard.Complex.RMSE) {
+			close = false
+		}
+	}
+	for _, branch := range []string{"real", "imag"} {
+		for _, name := range requiredInternal {
+			if _, ok := internalByName[branch+"/"+name]; !ok {
+				return "LOGN16_CURRENT_REVALIDATION_BLOCKED"
+			}
+		}
+	}
+	if !seenBranches["real"] || !seenBranches["imag"] {
+		return "LOGN16_CURRENT_REVALIDATION_BLOCKED"
+	}
+	requiredPowers := map[int]bool{1: true, 2: true, 3: true, 6: true}
+	seenPowerBranches := map[string]bool{"real": false, "imag": false}
+	seenPowerNumbers := map[string]map[int]bool{"real": {}, "imag": {}}
+	for _, power := range stage.GeneratedPowerEvidence {
+		if power.Branch != "real" && power.Branch != "imag" {
+			return "LOGN16_CURRENT_REVALIDATION_BLOCKED"
+		}
+		seenPowerBranches[power.Branch] = true
+		if requiredPowers[power.Power] {
+			seenPowerNumbers[power.Branch][power.Power] = true
+		}
+		if !currentNumericalValueWithinGate(power.RMSEFastStandard) {
+			close = false
+		}
+	}
+	if !seenPowerBranches["real"] || !seenPowerBranches["imag"] {
+		return "LOGN16_CURRENT_REVALIDATION_BLOCKED"
+	}
+	for _, branch := range []string{"real", "imag"} {
+		for power := range requiredPowers {
+			if !seenPowerNumbers[branch][power] {
+				return "LOGN16_CURRENT_REVALIDATION_BLOCKED"
+			}
+		}
+	}
+	if close {
+		return "LOGN16_CURRENT_NUMERICALLY_CLOSE"
+	}
+	return "LOGN16_CURRENT_STILL_DIVERGES"
+}
+
+func currentNumericalValueWithinGate(value float64) bool {
+	return !math.IsNaN(value) && !math.IsInf(value, 0) && value <= currentNumericalGate
+}
+
+func numericalPairCheckpointByName(checkpoints []NumericalStageCheckpoint, name string) *NumericalStageCheckpoint {
+	for i := range checkpoints {
+		if checkpoints[i].Name == name {
+			return &checkpoints[i]
+		}
+	}
+	return nil
 }
 
 func numericalReference(secondaryRoot string, primary RepositoryMetadata, opts options) (NumericalDocument, error) {
@@ -45,11 +217,26 @@ func numericalReference(secondaryRoot string, primary RepositoryMetadata, opts o
 	if err != nil {
 		return NumericalDocument{}, err
 	}
-	if commit != correctedFastCommitSHA || (branch != "fast-qprefix" && branch != "") {
-		return NumericalDocument{}, fmt.Errorf("numerical mode 要求 pinned Fast fast-qprefix commit %s；目前 branch=%q HEAD=%s", correctedFastCommitSHA, branch, commit)
+	upstreamCommit := ""
+	if opts.fastRevision == numericalFastRevisionCurrent {
+		upstreamCommit, err = gitOutput(secondaryRoot, "rev-parse", "origin/fast-qprefix")
+		if err != nil {
+			return NumericalDocument{}, fmt.Errorf("current-fast-qprefix mode 讀取 origin/fast-qprefix 失敗：%w", err)
+		}
 	}
 	if err := requireCleanWorktree(secondaryRoot); err != nil {
 		return NumericalDocument{}, err
+	}
+	if err := validateNumericalFastReference(opts.fastRevision, branch, commit, upstreamCommit); err != nil {
+		return NumericalDocument{}, err
+	}
+	if opts.fastRevision == numericalFastRevisionCurrent {
+		if primary.Dirty {
+			return NumericalDocument{}, fmt.Errorf("current-fast-qprefix mode requires a clean committed Primary tree")
+		}
+		if err := requireCleanWorktree(primary.Path); err != nil {
+			return NumericalDocument{}, fmt.Errorf("current-fast-qprefix mode Primary provenance：%w", err)
+		}
 	}
 	secondaryRef := branch
 	if secondaryRef == "" {
@@ -68,8 +255,12 @@ func numericalReference(secondaryRoot string, primary RepositoryMetadata, opts o
 		return NumericalDocument{}, err
 	}
 	inputHash := fastStandardInputFingerprint(values)
-	if opts.profile == supportedProfile && inputHash != fastStandardInputSHA256 {
-		return NumericalDocument{}, fmt.Errorf("canonical P93 input fingerprint 不符：%s", inputHash)
+	expectedInputHash, expectedInputMetadataHash, err := numericalInputFingerprints(opts.profile)
+	if err != nil {
+		return NumericalDocument{}, err
+	}
+	if inputHash != expectedInputHash {
+		return NumericalDocument{}, fmt.Errorf("%s historical numerical input fingerprint 不符：%s", opts.profile, inputHash)
 	}
 	if len(values) != effective.InputSlots || params.BootstrappingParameters.LogN() != effective.LogN || params.CoeffsToSlotsParameters.LogSlots != effective.LogSlots {
 		return NumericalDocument{}, fmt.Errorf("%s effective profile mismatch: slots=%d LogN=%d LogSlots=%d", opts.profile, len(values), params.BootstrappingParameters.LogN(), params.CoeffsToSlotsParameters.LogSlots)
@@ -80,6 +271,10 @@ func numericalReference(secondaryRoot string, primary RepositoryMetadata, opts o
 	input, err := fastStandardEncodedInput(residual, params.CoeffsToSlotsParameters.LogSlots, values)
 	if err != nil {
 		return NumericalDocument{}, err
+	}
+	inputMetadataHash := perfmeasure.CiphertextStateFingerprint(perfmeasure.CiphertextStateOf(input, params.BootstrappingParameters.Q(), input.Level()+1))
+	if inputMetadataHash != expectedInputMetadataHash {
+		return NumericalDocument{}, fmt.Errorf("%s historical encoded-input metadata fingerprint 不符：%s", opts.profile, inputMetadataHash)
 	}
 	preFastDecoded, err := fastStandardDecodeFast(residual, input)
 	if err != nil {
@@ -232,13 +427,55 @@ func numericalReference(secondaryRoot string, primary RepositoryMetadata, opts o
 		maxMagnitude(values),
 	)
 
+	if opts.fastRevision == numericalFastRevisionCurrent {
+		if err := verifyNumericalSourceStillPinned(primary.Path, primary.Commit, secondaryRoot, secondary.Commit); err != nil {
+			return NumericalDocument{}, err
+		}
+	}
+	taskClassification := ""
+	if opts.fastRevision == numericalFastRevisionCurrent && opts.profile == logN16Profile {
+		taskClassification = currentLogN16Classification(fastAggregate, stageLockstep)
+	}
+	var standardReference *NumericalReferenceProvenance
+	if opts.fastRevision == numericalFastRevisionCurrent {
+		standardReference = &NumericalReferenceProvenance{
+			Kind:                         "ordinary Standard API replay compiled from current Fast checkout",
+			RequestedOriginalStandardSHA: originalStandardCommitSHA,
+			ExecutionSourceCommit:        secondary.Commit,
+			IndependentOriginalStandard:  false,
+		}
+	}
+	schemaVersion := "fastdiag.numerical.v1"
+	if opts.fastRevision == numericalFastRevisionCurrent {
+		schemaVersion = "fastdiag.numerical.v2"
+	}
+	limitations := []string{
+		"Fast output is decoded directly from c0 under the current Fast zero-secret mode; each Standard output is decrypted with its trial secret key.",
+		"The diagnostic uses the canonical deterministic plaintext-like construction c0=encoded message, c1=0; it does not characterize encrypted-input noise or security.",
+		"This is a numerical correctness diagnostic, not a timing benchmark or an independent scientific acceptance decision.",
+	}
+	if opts.fastRevision == numericalFastRevisionCurrent {
+		limitations = append(limitations,
+			"Standard full Bootstrap and lockstep stages use the ordinary Standard API compiled from the current Fast checkout; they are not an independently built original Standard SHA baseline.",
+			"The requested original Standard reference is 5dbffbdea05394de2ca3a432ed5318aa832e3f40; independent execution under the exact plaintext-like c0/c1=0 diagnostic lifecycle is unavailable in the existing shared runner and is not claimed.",
+		)
+	}
 	return NumericalDocument{
-		SchemaVersion: "fastdiag.numerical.v1", Timestamp: time.Now().UTC(), Profile: opts.profile,
+		SchemaVersion: schemaVersion, Timestamp: time.Now().UTC(), Profile: opts.profile,
+		FastRevisionMode: func() string {
+			if opts.fastRevision == numericalFastRevisionCurrent {
+				return opts.fastRevision
+			}
+			return ""
+		}(),
+		StandardReference: standardReference, CurrentTaskClassification: taskClassification,
 		Primary: primary, Secondary: secondary,
 		Environment: EnvironmentMetadata{GoVersion: runtime.Version(), OS: runtime.GOOS, Arch: runtime.GOARCH,
 			CPU: cpuModel(), NumCPU: runtime.NumCPU(), GOMAXPROCS: runtime.GOMAXPROCS(0)},
 		Workload: NumericalWorkload{
-			FingerprintSHA256: inputHash, ConfigPath: configPath, ConfigSHA256: configHash,
+			FingerprintSHA256: inputHash, InputKind: diagnosticInputKind,
+			InputConstructor:    "ckks.NewEncoder.Encode -> c0 copy; c1 zero (diagnostic-only, not encryption)",
+			InputMetadataSHA256: inputMetadataHash, ConfigPath: configPath, ConfigSHA256: configHash,
 			InputSlots: len(values), LogN: effective.LogN, LogSlots: effective.LogSlots,
 			RingN: effective.RingN, ResidualRingN: effective.ResidualRingN, DefaultScale: effective.DefaultScale,
 			Q0ConfigScale: effective.Q0Target, QChainBits: effective.QChainBits, QPrimes: effective.QPrimes,
@@ -247,7 +484,12 @@ func numericalReference(secondaryRoot string, primary RepositoryMetadata, opts o
 			DoubleAngle: params.Mod1ParametersLiteral.DoubleAngle, EvalModLogScale: params.Mod1ParametersLiteral.LogScale,
 			LogMessageRatio: params.Mod1ParametersLiteral.LogMessageRatio,
 		},
-		Execution: map[string]int{"fast_executions": len(fastRuns), "fast_effective_numerical_trials": len(analysisFastRuns), "standard_key_trials": len(standardRuns), "slots_per_trial": len(values)},
+		Execution: map[string]int{
+			"fast_executions": len(fastRuns), "fast_full_bootstrap_calls": len(fastRuns),
+			"fast_effective_numerical_trials": len(analysisFastRuns), "standard_key_trials": len(standardRuns),
+			"standard_full_bootstrap_calls": len(standardRuns), "stage_replay_full_bootstrap_calls": 0,
+			"slots_per_trial": len(values),
+		},
 		Threshold: numericalThresholdValue, PrecisionErrorFloor: precisionErrorFloor,
 		StandardRMSENearZeroFloor: standardRMSENearZeroFloor(maxMagnitude(values)),
 		FastDeterminism:           determinism, FastTrials: fastRecords, StandardTrials: standardRecords,
@@ -257,11 +499,7 @@ func numericalReference(secondaryRoot string, primary RepositoryMetadata, opts o
 		FastVsStandard: pairwise, FastVsStandardThreshold: fastStandardThreshold,
 		StandardToStandardVariability: spread, StageLockstep: &stageLockstep,
 		Classification: classification, ClassificationChecks: checks,
-		Limitations: []string{
-			"Fast output is decoded directly from c0 under the current Fast zero-secret mode; each Standard output is decrypted with its trial secret key.",
-			"The diagnostic uses the canonical deterministic plaintext-like input c0=encoded message, c1=0; it does not characterize encrypted-input noise or security.",
-			"This is a numerical correctness diagnostic, not a timing benchmark or an independent scientific acceptance decision.",
-		},
+		Limitations: limitations,
 	}, nil
 }
 
@@ -317,20 +555,22 @@ func numericalProfile(profile, primaryRoot string) (bootstrapping.Parameters, ck
 		if perfmeasure.Fingerprint(values) != fastStandardInputSHA256 {
 			return bootstrapping.Parameters{}, ckks.Parameters{}, nil, perfmeasure.EffectiveParameters{}, "", "", fmt.Errorf("canonical LogN13 input fingerprint mismatch")
 		}
+		if hex.EncodeToString(configSum[:]) != "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98" {
+			return bootstrapping.Parameters{}, ckks.Parameters{}, nil, perfmeasure.EffectiveParameters{}, "", "", fmt.Errorf("LogN13 canonical config SHA-256 mismatch: %s", hex.EncodeToString(configSum[:]))
+		}
 		return params, residual, values, effective, filepath.Join("configs", configName), hex.EncodeToString(configSum[:]), nil
 	}
 	if effective.LogN != 16 || effective.LogSlots != 15 || effective.InputSlots != 1<<15 || effective.Q0Bits != 56 || cfg.Mod1Degree != 30 || cfg.Mod1DoubleAngle != 3 || cfg.Mod1K != 16 || cfg.LogMessageRatio != 10 {
 		return bootstrapping.Parameters{}, ckks.Parameters{}, nil, perfmeasure.EffectiveParameters{}, "", "", fmt.Errorf("LogN16 effective config contract mismatch: %+v", effective)
 	}
+	if profile == logN16Profile && hex.EncodeToString(configSum[:]) != "16e62fdea2dc5ac32240a33cc256cdf60b935aa00b4a16aa004474d2c3033b02" {
+		return bootstrapping.Parameters{}, ckks.Parameters{}, nil, perfmeasure.EffectiveParameters{}, "", "", fmt.Errorf("LogN16 canonical config SHA-256 mismatch: %s", hex.EncodeToString(configSum[:]))
+	}
 	return params, residual, perfmeasure.DeterministicInput(effective.InputSlots), effective, filepath.Join("configs", configName), hex.EncodeToString(configSum[:]), nil
 }
 
 func fastStandardP93Values() []complex128 {
-	values := make([]complex128, 1<<12)
-	for j := range values {
-		values[j] = complex(float64(j%17-8)/256, float64((3*j)%13-6)/512)
-	}
-	return values
+	return perfmeasure.DeterministicInput(1 << 12)
 }
 
 func fastStandardEncodedInput(params ckks.Parameters, logSlots int, values []complex128) (*rlwe.Ciphertext, error) {
@@ -794,12 +1034,30 @@ func renderNumericalSummary(doc NumericalDocument) string {
 	var out strings.Builder
 	fmt.Fprintf(&out, "# Fast vs Standard numerical reference — %s\n\n", doc.Profile)
 	fmt.Fprintf(&out, "- Classification: **%s**\n- Timestamp: `%s`\n- Threshold: `%.3g`\n", doc.Classification, doc.Timestamp.Format(time.RFC3339), doc.Threshold)
+	if doc.CurrentTaskClassification != "" {
+		fmt.Fprintf(&out, "- Current LogN16 task classification: **%s** (strict close gate `%.1e`)\n", doc.CurrentTaskClassification, currentNumericalGate)
+	}
+	if doc.FastRevisionMode != "" {
+		fmt.Fprintf(&out, "- Fast source mode: `%s`\n", doc.FastRevisionMode)
+	}
 	fmt.Fprintf(&out, "- Primary: `%s` (`%s`, dirty=%t)\n- Secondary: `%s` (`%s`, dirty=%t)\n", doc.Primary.Commit, doc.Primary.Ref, doc.Primary.Dirty, doc.Secondary.Commit, doc.Secondary.Ref, doc.Secondary.Dirty)
+	if doc.StandardReference != nil {
+		fmt.Fprintf(&out, "- Standard reference: `%s`; requested original SHA `%s`; executed from Secondary source `%s`; independent original Standard checkout: `%t`\n",
+			doc.StandardReference.Kind, doc.StandardReference.RequestedOriginalStandardSHA,
+			doc.StandardReference.ExecutionSourceCommit, doc.StandardReference.IndependentOriginalStandard)
+	}
 	fmt.Fprintf(&out, "- Environment: `%s`, `%s/%s`, CPU `%s`, NumCPU `%d`, GOMAXPROCS `%d`\n", doc.Environment.GoVersion, doc.Environment.OS, doc.Environment.Arch, doc.Environment.CPU, doc.Environment.NumCPU, doc.Environment.GOMAXPROCS)
 
-	out.WriteString("\n## Canonical workload\n\n| Field | Value |\n|---|---:|\n")
-	fmt.Fprintf(&out, "| Input SHA-256 | `%s` |\n| Config path / SHA-256 | `%s` / `%s` |\n| Slots | %d |\n| LogN / LogSlots | %d / %d |\n| Ring N / residual N | %d / %d |\n| q0 target / effective bits | %d / %d |\n| Default scale | `%s` |\n| Q-chain bits | `%v` |\n| Q primes | `%v` |\n| P bits | `%v` |\n| P primes | `%v` |\n| Mod1 degree / DoubleAngle | %d / %d |\n| EvalMod log scale / LogMessageRatio | %d / %d |\n| Fast executions / effective numerical trials / Standard key trials | %d / %d / %d |\n", doc.Workload.FingerprintSHA256, doc.Workload.ConfigPath, doc.Workload.ConfigSHA256, doc.Workload.InputSlots, doc.Workload.LogN, doc.Workload.LogSlots, doc.Workload.RingN, doc.Workload.ResidualRingN, doc.Workload.Q0ConfigScale, doc.Workload.Q0Bits, doc.Workload.DefaultScale, doc.Workload.QChainBits, doc.Workload.QPrimes, doc.Workload.PBits, doc.Workload.PPrimes, doc.Workload.PolynomialDegree, doc.Workload.DoubleAngle, doc.Workload.EvalModLogScale, doc.Workload.LogMessageRatio, doc.Execution["fast_executions"], doc.Execution["fast_effective_numerical_trials"], doc.Execution["standard_key_trials"])
-	out.WriteString("\nInput is the existing deterministic plaintext-like construction `c0=encoded message, c1=0`; both Fast and every Standard trial receive the same encoded ciphertext coefficients.\n")
+	out.WriteString("\n## Canonical workload\n\n| Field | Value |\n|---|---|\n")
+	fmt.Fprintf(&out, "| Input kind | `%s` |\n| Input SHA-256 | `%s` |\n| Input metadata SHA-256 | `%s` |\n| Config path / SHA-256 | `%s` / `%s` |\n| Slots | %d |\n| LogN / LogSlots | %d / %d |\n| Ring N / residual N | %d / %d |\n| q0 target / effective bits | %d / %d |\n| Default scale | `%s` |\n| Q-chain bits | `%v` |\n| Q primes | `%v` |\n| P bits | `%v` |\n| P primes | `%v` |\n| Mod1 degree / DoubleAngle | %d / %d |\n| EvalMod log scale / LogMessageRatio | %d / %d |\n| Fast full Bootstrap calls / effective numerical trials | %d / %d |\n| Standard full Bootstrap calls / key trials | %d / %d |\n| Stage-replay full Bootstrap calls | %d |\n",
+		doc.Workload.InputKind, doc.Workload.FingerprintSHA256, doc.Workload.InputMetadataSHA256,
+		doc.Workload.ConfigPath, doc.Workload.ConfigSHA256, doc.Workload.InputSlots, doc.Workload.LogN, doc.Workload.LogSlots,
+		doc.Workload.RingN, doc.Workload.ResidualRingN, doc.Workload.Q0ConfigScale, doc.Workload.Q0Bits, doc.Workload.DefaultScale,
+		doc.Workload.QChainBits, doc.Workload.QPrimes, doc.Workload.PBits, doc.Workload.PPrimes, doc.Workload.PolynomialDegree,
+		doc.Workload.DoubleAngle, doc.Workload.EvalModLogScale, doc.Workload.LogMessageRatio,
+		doc.Execution["fast_full_bootstrap_calls"], doc.Execution["fast_effective_numerical_trials"],
+		doc.Execution["standard_full_bootstrap_calls"], doc.Execution["standard_key_trials"], doc.Execution["stage_replay_full_bootstrap_calls"])
+	out.WriteString("\nInput is the historical deterministic diagnostic-only construction `c0=encoded message, c1=0`; it is not the E32 public-native profile. Fast and in-tree Standard API runs receive the same encoded ciphertext coefficients.\n")
 
 	out.WriteString("\n## Output metadata\n\n| Output | Level | Degree | Scale (log2) | IsNTT | IsMontgomery | LogDimensions | Public contract |\n|---|---:|---:|---:|---|---|---|---|\n")
 	for _, output := range doc.FastTrials {
@@ -901,7 +1159,7 @@ func renderNumericalStageEvidence(out *strings.Builder, doc NumericalDocument) {
 		fmt.Fprintf(out, "`FAST_BOOTSTRAP_SNR_DB=%s`\n", formatSNRDB(doc.FastTrials[0].BootstrapSNR))
 	}
 
-	out.WriteString("\n## Stage reference SNR and divergence\n\n`D_i` is Fast-vs-genuine-Standard complex RMSE. Amplification and SNR deltas follow the explicit stage topology, not table adjacency: C2S real/imag are parallel children of ModUp; each EvalMod branch uses its matching C2S branch; S2C uses a joint EvalMod real+imag reference; final public output may use S2C.\n\n| Checkpoint | Fast state | Standard state | D_i RMSE | A_i parent | A_i | Stage reference SNR (dB / status) | ΔSNR_i parent | ΔSNR_i (dB / status) | Max complex diff |\n|---|---|---|---:|---|---:|---:|---|---:|---:|\n")
+	out.WriteString("\n## Stage reference SNR and divergence\n\n`D_i` is Fast-vs-ordinary-Standard-API complex RMSE within the recorded source checkout; it is not an independently built original Standard result. Amplification and SNR deltas follow the explicit stage topology, not table adjacency: C2S real/imag are parallel children of ModUp; each EvalMod branch uses its matching C2S branch; S2C uses a joint EvalMod real+imag reference; final public output may use S2C.\n\n| Checkpoint | Fast state | Standard API state | D_i RMSE | A_i parent | A_i | Stage reference SNR (dB / status) | ΔSNR_i parent | ΔSNR_i (dB / status) | Max complex diff |\n|---|---|---|---:|---|---:|---:|---|---:|---:|\n")
 	for _, checkpoint := range stage.Checkpoints {
 		if !checkpoint.Comparable || checkpoint.FastVsStandard == nil {
 			continue
@@ -928,7 +1186,7 @@ func renderNumericalStageEvidence(out *strings.Builder, doc NumericalDocument) {
 		formatOptionalFloat(stage.CombinedBranchS2CAmplification), formatOptionalFloat(stage.CombinedBranchS2CAmplification))
 
 	if len(stage.EvalModInternal) > 0 {
-		out.WriteString("\n## EvalMod direct stage-equivalence replay\n\nEach Fast checkpoint is decoded from authoritative Q-prefix rows; Standard is decrypted with the genuine Standard secret key. Comparisons use the same mathematical scale directly, with no representation-specific power-of-two alignment. Replay verification compares the manual stage sequence with each actual public EvalMod output.\n\n| Checkpoint | Fast L / log2(scale) / degree / NTT / Montgomery / rows | Standard L / log2(scale) / degree / NTT / Montgomery / rows | D_i RMSE | A_i | Stage reference SNR (dB / status) | ΔSNR_i (dB / status) | Max complex diff |\n|---|---|---|---:|---:|---:|---:|---:|---:|\n")
+		out.WriteString("\n## EvalMod direct stage-equivalence replay\n\nEach Fast checkpoint is decoded from authoritative Q-prefix rows; the in-tree Standard API checkpoint is decrypted with its matching generated secret key. Comparisons use the same mathematical scale directly, with no representation-specific power-of-two alignment. Replay verification compares the manual stage sequence with each actual public EvalMod output.\n\n| Checkpoint | Fast L / log2(scale) / degree / NTT / Montgomery / rows | Standard API L / log2(scale) / degree / NTT / Montgomery / rows | D_i RMSE | A_i | Stage reference SNR (dB / status) | ΔSNR_i (dB / status) | Max complex diff |\n|---|---|---|---:|---:|---:|---:|---:|---:|\n")
 		for _, checkpoint := range stage.EvalModInternal {
 			if checkpoint.Comparable && checkpoint.FastVsStandard != nil {
 				fmt.Fprintf(out, "| %s | %s | %s | %s | %s (%s) | %s | %s (%s) | %.6e |\n", checkpoint.Name,
@@ -964,7 +1222,7 @@ func renderNumericalStageEvidence(out *strings.Builder, doc NumericalDocument) {
 		plan := stage.PolynomialPlan
 		fmt.Fprintf(out, "\n## Polynomial plan and generated-power evidence\n\n- Fast diagnostic PS plan (%s branch): degree `%d`, base `%d`, level `%d`, target scale log2 `%.6f`, exact `%s`, blocks `%d`.\n", plan.Branch, plan.Degree, plan.Base, plan.Level, plan.ScaleLog2, plan.ScaleExact, plan.BlockCount)
 		if len(stage.GeneratedPowerEvidence) > 0 {
-			out.WriteString("\nEach Standard power is generated by the genuine Standard `PowerBasis.GenPower` using the Standard CKKS evaluator; comparisons decrypt Standard ciphertexts and decode Fast through authoritative Q-prefix rows.\n\n| Branch | Power | Fast Level / Scale log2 | Standard Level / Scale log2 | Fast rows | Standard rows | Level/Scale match | Complex RMSE Fast-vs-Standard | Max complex diff | Reference provenance |\n|---|---:|---|---|---:|---:|---|---:|---:|---|\n")
+			out.WriteString("\nEach Standard reference power is generated by `PowerBasis.GenPower` using the ordinary Standard CKKS evaluator compiled from the recorded Fast source checkout; comparisons decrypt those ciphertexts and decode Fast through authoritative Q-prefix rows. This is a lockstep implementation reference, not an independent original Standard build.\n\n| Branch | Power | Fast Level / Scale log2 | Standard API Level / Scale log2 | Fast rows | Standard rows | Level/Scale match | Complex RMSE Fast-vs-Standard | Max complex diff | Reference provenance |\n|---|---:|---|---|---:|---:|---|---:|---:|---|\n")
 			for _, power := range stage.GeneratedPowerEvidence {
 				fmt.Fprintf(out, "| %s | T%d | %d / %.6f | %d / %.6f | %d | %d | %t | %.6e | %.6e | %s |\n", power.Branch, power.Power, power.FastLevel, power.FastScaleLog2, power.StandardLevel, power.StandardScaleLog2, power.FastMaintainedRows, power.StandardAuthorityRows, power.LevelScaleMatch, power.RMSEFastStandard, power.MaxComplexDiffFastStandard, power.ReferenceKind)
 			}

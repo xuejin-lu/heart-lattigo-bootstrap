@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"math"
 	"os"
 	"path/filepath"
@@ -42,17 +43,81 @@ func TestNumericalProfilesUseCanonicalEffectiveParameters(t *testing.T) {
 	require.Equal(t, fastStandardInputSHA256, perfmeasure.Fingerprint(p93Values))
 	require.Equal(t, 55, p93Effective.Q0Bits)
 	require.Equal(t, "configs/bootstrap_config.logN13.json", p93Config)
-	require.NotEmpty(t, p93ConfigHash)
+	require.Equal(t, "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98", p93ConfigHash)
 	require.Equal(t, fastStandardP93Values(), p93Values)
+	require.Equal(t, fastStandardInputSHA256, perfmeasure.Fingerprint(p93Values))
+	p93Input, err := fastStandardEncodedInput(p93Residual, sharedP93.CoeffsToSlotsParameters.LogSlots, p93Values)
+	require.NoError(t, err)
+	require.Equal(t, fastStandardInputMetadata13,
+		perfmeasure.CiphertextStateFingerprint(perfmeasure.CiphertextStateOf(p93Input, sharedP93.BootstrappingParameters.Q(), 1)))
 
-	logN16, _, logN16Values, logN16Effective, config, configHash, err := numericalProfile(logN16Profile, root)
+	logN16, logN16Residual, logN16Values, logN16Effective, config, configHash, err := numericalProfile(logN16Profile, root)
 	require.NoError(t, err)
 	require.Equal(t, 16, logN16.BootstrappingParameters.LogN())
 	require.Equal(t, 15, logN16.CoeffsToSlotsParameters.LogSlots)
 	require.Len(t, logN16Values, 1<<15)
 	require.Equal(t, 56, logN16Effective.Q0Bits, "report the generated prime bit length, not the requested config scale")
 	require.Equal(t, "configs/bootstrap_config.logN16.json", config)
-	require.NotEmpty(t, configHash)
+	require.Equal(t, "16e62fdea2dc5ac32240a33cc256cdf60b935aa00b4a16aa004474d2c3033b02", configHash)
+	require.Equal(t, fastStandardInputSHA256LogN16, perfmeasure.Fingerprint(logN16Values))
+	logN16Input, err := fastStandardEncodedInput(logN16Residual, logN16.CoeffsToSlotsParameters.LogSlots, logN16Values)
+	require.NoError(t, err)
+	require.Equal(t, fastStandardInputMetadata16,
+		perfmeasure.CiphertextStateFingerprint(perfmeasure.CiphertextStateOf(logN16Input, logN16.BootstrappingParameters.Q(), 1)))
+}
+
+func TestNumericalFastRevisionModesFailClosed(t *testing.T) {
+	require.NoError(t, validateNumericalFastReference(numericalFastRevisionHistorical, "fast-qprefix", correctedFastCommitSHA, ""))
+	require.ErrorContains(t, validateNumericalFastReference(numericalFastRevisionHistorical, "fast-qprefix", "2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f", ""), "historical-pinned")
+	require.NoError(t, validateNumericalFastReference(numericalFastRevisionCurrent, "fast-qprefix", "current", "current"))
+	require.ErrorContains(t, validateNumericalFastReference(numericalFastRevisionCurrent, "fast-qprefix", "local-ahead", "remote"), "equal to fetched origin")
+	require.ErrorContains(t, validateNumericalFastReference(numericalFastRevisionCurrent, "", "current", "current"), "branch=")
+}
+
+func TestCurrentLogN16ClassificationUsesStrictGateAndCompleteBranches(t *testing.T) {
+	checkpoint := func(name string, rmse float64, comparable bool) NumericalStageCheckpoint {
+		return NumericalStageCheckpoint{Name: name, Comparable: comparable, FastVsStandard: &NumericalMetricSet{Complex: NumericalErrorMetric{RMSE: rmse}}}
+	}
+	stageCheckpoints := make([]NumericalStageCheckpoint, 0, 9)
+	for _, name := range []string{"input", "scale_down", "mod_up", "c2s_real", "c2s_imag", "evalmod_real", "evalmod_imag", "s2c", "final_public_output"} {
+		stageCheckpoints = append(stageCheckpoints, checkpoint(name, 5e-8, true))
+	}
+	internal := make([]NumericalStageCheckpoint, 0, 2*24)
+	baseInternal := []string{
+		"input_before_normalization", "after_normalization", "after_chebyshev_offset", "polynomial_input", "polynomial_output",
+		"before_double_angle_round_0", "evalmod_output_before_public_scale_reset", "evalmod_output_after_public_scale_reset",
+	}
+	for round := 0; round < 3; round++ {
+		baseInternal = append(baseInternal,
+			fmt.Sprintf("double_angle_round_%d_after_multiply", round),
+			fmt.Sprintf("double_angle_round_%d_after_add", round),
+			fmt.Sprintf("double_angle_round_%d_after_constant", round),
+			fmt.Sprintf("double_angle_round_%d_after_rescale", round),
+		)
+	}
+	powers := make([]NumericalGeneratedPower, 0, 8)
+	for _, branch := range []string{"real", "imag"} {
+		for _, name := range baseInternal {
+			internal = append(internal, checkpoint(branch+"/"+name, 5e-8, true))
+		}
+		for _, power := range []int{1, 2, 3, 6} {
+			powers = append(powers, NumericalGeneratedPower{Branch: branch, Power: power, RMSEFastStandard: 5e-8})
+		}
+	}
+	stage := NumericalStageLockstep{
+		FinalFastStandardRMSE: 5e-8,
+		Checkpoints:           stageCheckpoints, EvalModInternal: internal, GeneratedPowerEvidence: powers,
+	}
+	fast := NumericalAggregate{Complex: NumericalMetricAggregate{RMSE: 5e-8}}
+	require.Equal(t, "LOGN16_CURRENT_NUMERICALLY_CLOSE", currentLogN16Classification(fast, stage))
+	stage.EvalModInternal[1].FastVsStandard.Complex.RMSE = 1e-6
+	require.Equal(t, "LOGN16_CURRENT_STILL_DIVERGES", currentLogN16Classification(fast, stage))
+	stage.EvalModInternal[1].FastVsStandard.Complex.RMSE = 5e-8
+	stage.Checkpoints[3].FastVsStandard.Complex.RMSE = 1e-6
+	require.Equal(t, "LOGN16_CURRENT_STILL_DIVERGES", currentLogN16Classification(fast, stage))
+	stage.Checkpoints[3].FastVsStandard.Complex.RMSE = 5e-8
+	stage.Checkpoints[6].Comparable = false
+	require.Equal(t, "LOGN16_CURRENT_REVALIDATION_BLOCKED", currentLogN16Classification(fast, stage))
 }
 
 func TestNumericalComparisonMetricsAndThresholdCoordinates(t *testing.T) {
@@ -296,7 +361,7 @@ func TestNumericalSummaryRendersCapacityAndGenuineStandardPowerEvidence(t *testi
 	stage := NumericalStageLockstep{
 		PolynomialPlan: &NumericalPolynomialPlan{Branch: "real", Degree: 30, Base: 4, Level: 12, ScaleLog2: 60, ScaleExact: "2^60"},
 		GeneratedPowerEvidence: []NumericalGeneratedPower{{
-			Branch: "real", ReferenceKind: "genuine Standard PowerBasis.GenPower", Power: 2,
+			Branch: "real", ReferenceKind: "Fast-checkout Standard API PowerBasis.GenPower", Power: 2,
 			FastLevel: 11, FastScaleLog2: 60, FastMaintainedRows: 4,
 			StandardLevel: 11, StandardScaleLog2: 60, StandardAuthorityRows: 12,
 			LevelScaleMatch: true, RMSEFastStandard: 1e-8, MaxComplexDiffFastStandard: 1e-7,
@@ -314,7 +379,7 @@ func TestNumericalSummaryRendersCapacityAndGenuineStandardPowerEvidence(t *testi
 	require.Contains(t, output.String(), "12345")
 	require.Contains(t, output.String(), "`[10 0]`")
 	require.Contains(t, output.String(), "true")
-	require.Contains(t, output.String(), "genuine Standard `PowerBasis.GenPower`")
+	require.Contains(t, output.String(), "ordinary Standard CKKS evaluator compiled from the recorded Fast source checkout")
 	require.Contains(t, output.String(), "11 / 60.000000")
 	require.Contains(t, output.String(), "Complex RMSE Fast-vs-Standard")
 	require.Contains(t, output.String(), "1.000000e-08")

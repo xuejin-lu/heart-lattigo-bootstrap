@@ -38,6 +38,17 @@ func TestParseArgsAndScopeValidation(t *testing.T) {
 	opts, err = parseArgs([]string{"numerical", "--profile", logN16Profile, "--standard-trials", "3"})
 	require.NoError(t, err)
 	require.Equal(t, logN16Profile, opts.profile)
+	require.Equal(t, numericalFastRevisionHistorical, opts.fastRevision)
+	opts, err = parseArgs([]string{"numerical", "--profile", logN16Profile, "--fast-revision", numericalFastRevisionCurrent, "--standard-trials", "1"})
+	require.NoError(t, err)
+	require.Equal(t, numericalFastRevisionCurrent, opts.fastRevision)
+	require.Equal(t, 1, opts.standardTrials)
+	_, err = parseArgs([]string{"numerical", "--profile", logN16Profile, "--fast-revision", numericalFastRevisionCurrent})
+	require.ErrorContains(t, err, "明確指定 --standard-trials=1")
+	_, err = parseArgs([]string{"numerical", "--profile", logN16Profile, "--fast-revision", numericalFastRevisionCurrent, "--standard-trials", "2"})
+	require.ErrorContains(t, err, "明確指定 --standard-trials=1")
+	_, err = parseArgs([]string{"numerical", "--fast-revision", "unknown", "--standard-trials", "3"})
+	require.ErrorContains(t, err, "不支援 Fast revision mode")
 	opts, err = parseArgs([]string{"trace", "--profile", publicE32Profile, "--trace", "stage,power,rescale", "--e32-manifest", "fixture.json", "--fast-vectors", "fast-vectors.json"})
 	require.NoError(t, err)
 	require.Equal(t, 0, opts.warmup)
@@ -52,6 +63,8 @@ func TestParseArgsAndScopeValidation(t *testing.T) {
 	require.ErrorContains(t, err, "介於 3 與 10")
 	_, err = parseArgs([]string{"trace", "--trace", "stage", "--standard-trials", "3"})
 	require.ErrorContains(t, err, "僅供 numerical")
+	_, err = parseArgs([]string{"trace", "--trace", "stage", "--fast-revision", numericalFastRevisionCurrent})
+	require.ErrorContains(t, err, "--fast-revision 僅供 numerical")
 }
 
 func TestParseScopesRejectsEmptyAndAcceptsAll(t *testing.T) {
