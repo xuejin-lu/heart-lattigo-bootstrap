@@ -1,0 +1,20 @@
+# Batch026 independent Web review — accepted negative Rescale candidate
+
+**Date:** 2026-10-11 (Asia/Taipei)  
+**Verdict:** `BATCH_COMPLETE_ACCEPTED_NO_BENEFICIAL_CANDIDATE`. Accept the bounded **negative** result and clean rollback, **not** a claim that the optimization reliably slows Rescale, nor proof that CRT/Div64 are unimportant.
+
+## Provenance independently checked
+
+- Primary remote `main@c6e1aefe45041edd5910c205c762c5374ea147c9`. Its final commit modifies only the Batch026 report/evidence/journal and platform documentation. Secondary remote `fast-qprefix@4f2557062cb5c1ffb9a671bc3df67401fd7092b4`, unchanged from Batch025. Local clean status, tests and measurements were reported by Codex and cannot be independently rerun by this Web review.
+- Frozen original genuine Standard `5dbffbdea05394de2ca3a432ed5318aa832e3f40` and formal Fast `2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac` remain untouched according to evidence.
+- E32 source shape from Batch025: LogN13/E32, Level 9→8, 4→4 authoritative Q-prefix rows, in-place, 2 ciphertext components; six trace occurrences. Benchmark used **synthetic deterministic valid NTT ciphertext**, not the captured Bootstrap ciphertext, so absolute times, memory distribution and actual branch frequency need not match the captured trace.
+- Genuine public Fast `Rescale→RescaleWorkspace.ApplyRows`, regular uninstrumented build, setup/reset excluded from timed loop. Apple M4, macOS 26.6.2, Go1.26.4, GOMAXPROCS=1/GOGC=100, five 100ms repeat samples, both 20 allocs/op and 681–682 bytes/op.
+- Baseline samples `[2676129,2663219,2712441,2692458,2755351]` ns/op; median **2,692,458 ns/op**. Candidate `[2688291,2734854,2740962,2709171,2702554]` ns/op; median **2,709,171 ns/op**, 0.6207% higher nominal median. Ranges overlap substantially; five short unpaired batches do **not** demonstrate a statistically reliable slowdown. They definitively do **not** establish a beneficial candidate.
+- The one attempt was a guarded `Uint192.Hi==0` reduction path inside `mod192By64`. The reported exact E32 bound `floor(Q0123/(2*q9))+1 < 2^111` allows a zero top 64-bit limb at this selected level. Temporary big.Int differential test and focused Fast Rescale/QPrefix tests/vet passed, but the candidate was deleted instead of pushed (temporary candidate source SHA `7dc49c53...`). **Independent exact source review of the candidate diff is therefore unavailable.** This limitation makes archiving future bounded candidate patches (text-only, without secrets/data) valuable.
+- 0 Bootstrap calls, 0 Standard performance calls, 0 P93 benchmarks. This negative result does not invalidate Batch025 post-hoc `OFFLINE_REVALIDATED_TRACE`; original raw remains `TRACE_UNVERIFIED`. It also does not change Batch023's separate, intentionally insecure zero-secret Fast 4.225x warm-median observation.
+
+## Interpretation and recommendation
+
+The runtime in a *traced* single E32 Bootstrap (122.193 ms) and in this **non-traced synthetic microbench** (2.692 ms/op) cannot be directly converted to a whole-workload speedup. In Rescale's own rooted attribution the coefficient-loop exclusive residual (~35.68%) remains materially large, while reconstruction/round/capacity (~31.65%) and residue (~13.80%) point toward the overall per-coefficient processing path; profiling a single high-limb modulo special case did not prove a win. Avoid asserting the compiler cause, branch cost, or Div64 dominance without CPU-level or controlled small-part evidence.
+
+**Next task**: Batch027 should (1) persist the already proven representative benchmark fixture in a test-only form so future batches do not re-create it, (2) improve reproducibility with longer, paired/interleaved baseline timing and appropriately bound CPU profiling *if native tools support it*, (3) locate a specific substantial coefficient cost with source-backed evidence, and (4) try **at most one new, safe hypothesis** only if the evidence justifies one. No full Bootstrap and no arithmetic/representation rewrite without separate Web review; do not force an optimization if no robust candidate exists.

@@ -1,18 +1,18 @@
-# CURRENT TASK — Batch026 E32 Rescale Coefficient Hotspot
+# CURRENT TASK — Batch027 E32 Rescale causal hotspot
 
-Task: FAST-E32-RESCALE-COEFFICIENT-OPT-AUTONOMOUS-BATCH-026
+Task: FAST-E32-RESCALE-CAUSAL-HOTSPOT-AUTONOMOUS-BATCH-027
 Status: READY_FOR_CODEX
-Mode: ZERO-BOOTSTRAP REPRESENTATIVE E32 RESCALE MICROBENCH + ONE BOUNDED CANDIDATE
+Mode: ZERO-BOOTSTRAP REUSABLE REAL-RESCALE BENCHMARK + CAUSAL CHECK + AT MOST ONE NEW CANDIDATE
 
-**Authoritative spec:** `specs/FAST-E32-RESCALE-COEFFICIENT-OPT-AUTONOMOUS-BATCH-026.md`
-**Independent scientific review:** `results/FAST-DROPIN-E32-TRACE-OFFLINE-SALVAGE-AUTONOMOUS-BATCH-025-web-review.md`
-**Permanent rules:** Primary and Secondary AGENTS, docs/MEASUREMENT_PLATFORM.md, workflow §4A/4B.
+**Authoritative spec:** `specs/FAST-E32-RESCALE-CAUSAL-HOTSPOT-AUTONOMOUS-BATCH-027.md`
+**Web review of negative Batch026:** `results/FAST-E32-RESCALE-COEFFICIENT-OPT-AUTONOMOUS-BATCH-026-web-review.md`
+**Permanent rules:** both AGENTS.md; Primary docs/MEASUREMENT_PLATFORM.md, workflow §4A/4B; Secondary docs/FAST_QPREFIX_SPEC.md.
 
-Batch025 `OFFLINE_REVALIDATED_TRACE` accepted as **post-hoc**, original raw remains `TRACE_UNVERIFIED`. 539 events / zero new crypto calls. One instrumented warm E32 Fast Bootstrap 122.193458ms; EvalMod real+imag 91.857958ms (75.17% of Bootstrap traced stage root). Thirty-five independent Rescale roots sum 108.326291ms, which is NOT additive to Bootstrap root or Power roots. Inside those roots, coefficient loop own exclusive plus CRT/reconstruct+round/capacity sum **72.933231ms / ~67.33% of separately-rooted Rescale time**, more than NTT restore 9.567417ms (~8.83%). Single traced sample has measurement overhead; original uninstrumented 72.580ms Fast median / 306.636ms Standard median historical 4.225x is distinct and intentionally insecure zero-secret.
+Batch026 is ACCEPTED `NO_BENEFICIAL_CANDIDATE`: one safe temporary `mod192By64` Hi==0 candidate tested, five 100ms samples; baseline median 2.692458ms, candidate 2.709171ms (+0.62%, sample ranges overlap), unchanged 20 allocs/op. Candidate was removed; Secondary production source clean/unchanged at `4f2557062cb5c1ffb9a671bc3df67401fd7092b4`. This proves no robust win, not a statistically significant regression or CRT irrelevance. Captured Bootstrap trace stays post-hoc only, raw unchanged.
 
-R1: clean startup sync, source map and authentic repeated E32 real-Rescale **regular-build** microbench baseline, no Bootstrap.
-R2: only if justified, one scoped source-backed safe fixed-width/coefficient-loop optimization hypothesis; no CKKS math/representation changes without Web.
-R3: extensive cheap real Rescale oracle equality (rows 1–4, alias, metadata, capacity/rounding), matched baseline/candidate repeated microbench; no benchmark overclaim; revert only own candidate safely if worse.
-R4: compact result + explicit 0 new Bootstrap, safe commits/push and one Web review. No Batch027 authority.
+P1: safe startup sync; reconstruct identical documented Batch026 fixed seed E32 synthetic Level9→8 4→4 in-place public Rescale fixture and verify input SHA. Preserve reusable test-only benchmark in Secondary when correct, even if no production candidate wins.
+P2: longer, source-grounded regular-build baseline and CPU pprof if already supported; fallback bounded helper timing if not. Do not invent kernel attribution or inflate synthetic fixture to representative full Bootstrap.
+P3: optionally ONE non-math-changing candidate only when P2 proves worthwhile, strict exact correctness and paired/interleaved A/B timing, preserve candidate patch hash even if rejected.
+P4: one compact scientific report/tests/vet/diff and safe authorized pushes, then Web review. If no clear hypothesis, complete an honest hotspot/benchmark study rather than guessing a production rewrite.
 
-**Exact expensive call cap: ZERO Bootstrap (Standard and Fast), ZERO full CNN/CKKS benchmark.** Never reuse Batch023 14/14 or Batch024 2/2 spent attempts. Avoid touching old Git worktree metadata or changing frozen genuine Standard and formal original Fast pins.
+**Expensive call budget: 0 Fast + 0 Standard Bootstrap; 0 P93/Standard performance.** Never reuse historical Batch023 14/14 or Batch024 2/2. Preserve original formal Standard `5dbffbdea05394de2ca3a432ed5318aa832e3f40` and production Fast `2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac` pins, unchanged arithmetic/security. No Batch028 permission.
