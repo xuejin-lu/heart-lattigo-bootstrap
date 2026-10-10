@@ -73,7 +73,8 @@ func TestPublicPairProvenanceRequiresPinnedCoverageAndCleanSources(t *testing.T)
 		checkpoints := make([]publicCheckpoint, 0, len(checkpointNames))
 		vectors := make(map[string][]complexValue, len(checkpointNames))
 		for _, name := range checkpointNames {
-			checkpoints = append(checkpoints, publicCheckpoint{Name: name, OraclePass: true, Oracle: vectorMetrics{MaxComplexDifference: 0}})
+			compact := backend == "fast" && name != "encrypt_a_level5" && name != "encrypt_b_level5" && name != "encrypt_c_q5_level5"
+			checkpoints = append(checkpoints, publicCheckpoint{Name: name, FastCompactPrefix: compact, OraclePass: true, Oracle: vectorMetrics{MaxComplexDifference: 0}})
 			vectors[name] = []complexValue{{Real: 0.25}}
 		}
 		params := perfmeasure.EffectiveParameters{EphemeralSecretWeight: 32, InputSlots: 1 << 12}

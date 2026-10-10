@@ -53,6 +53,7 @@ type publicCheckpoint struct {
 	State              ciphertextState      `json:"state"`
 	PhysicalRowLengths [][]int              `json:"physical_row_lengths_by_component"`
 	RowSHA256          [][]string           `json:"active_row_sha256_by_component"`
+	FastCompactPrefix  bool                 `json:"fast_compact_prefix_layout"`
 	C1Nonzero          bool                 `json:"c1_nonzero"`
 	DecodedSHA256      string               `json:"decoded_sha256"`
 	Oracle             vectorMetrics        `json:"oracle_metrics"`
@@ -218,7 +219,7 @@ func runPublicNativePreflight(opts cliOptions, configHash string, residual ckks.
 	phaseTimings := append([]phaseTiming(nil), backend.construction...)
 	checkpoints := make([]publicCheckpoint, 0, 8)
 	vectorMap := make(map[string][]complexValue, 8)
-	addCheckpoint := func(name string, ct *rlwe.Ciphertext, expected []complex128) error {
+	addCheckpoint := func(name string, ct *rlwe.Ciphertext, expected []complex128, fastCompactOutput bool) error {
 		decoded, phase, decodeErr := measurePublicPhase("native_decrypt_decode_"+name, func() ([]complex128, error) {
 			return backend.decode(ct)
 		})
@@ -226,7 +227,7 @@ func runPublicNativePreflight(opts cliOptions, configHash string, residual ckks.
 			return fmt.Errorf("native Level/Scale decode %s: %w", name, decodeErr)
 		}
 		phaseTimings = append(phaseTimings, phase)
-		cp, cpErr := makePublicCheckpoint(backend, name, ct, decoded, expected, q)
+		cp, cpErr := makePublicCheckpoint(backend, name, ct, decoded, expected, q, fastCompactOutput)
 		if cpErr != nil {
 			return cpErr
 		}
@@ -279,13 +280,13 @@ func runPublicNativePreflight(opts cliOptions, configHash string, residual ckks.
 		return errors.New("genuine Standard EncryptNew unexpectedly produced a zero-c1 input")
 	}
 
-	if err := addCheckpoint("encrypt_a_level5", ctA, valuesA); err != nil {
+	if err := addCheckpoint("encrypt_a_level5", ctA, valuesA, false); err != nil {
 		return err
 	}
-	if err := addCheckpoint("encrypt_b_level5", ctB, valuesB); err != nil {
+	if err := addCheckpoint("encrypt_b_level5", ctB, valuesB, false); err != nil {
 		return err
 	}
-	if err := addCheckpoint("encrypt_c_q5_level5", ctC, valuesC); err != nil {
+	if err := addCheckpoint("encrypt_c_q5_level5", ctC, valuesC, false); err != nil {
 		return err
 	}
 	add, phase, err := measurePublicPhase("public_AddNew", func() (*rlwe.Ciphertext, error) {
@@ -299,7 +300,7 @@ func runPublicNativePreflight(opts cliOptions, configHash string, residual ckks.
 		return errors.New("AddNew changed expected Level5/Scale2^45")
 	}
 	expectedAdd := publicAdd(valuesA, valuesB)
-	if err := addCheckpoint("add_level5", add, expectedAdd); err != nil {
+	if err := addCheckpoint("add_level5", add, expectedAdd, true); err != nil {
 		return err
 	}
 
@@ -315,7 +316,7 @@ func runPublicNativePreflight(opts cliOptions, configHash string, residual ckks.
 		return errors.New("MulRelinNew changed expected Level5/2^45*q5 Scale")
 	}
 	expectedProduct := publicMul(expectedAdd, valuesC)
-	if err := addCheckpoint("mulrelin_level5", product, expectedProduct); err != nil {
+	if err := addCheckpoint("mulrelin_level5", product, expectedProduct, true); err != nil {
 		return err
 	}
 
@@ -333,7 +334,7 @@ func runPublicNativePreflight(opts cliOptions, configHash string, residual ckks.
 	if rescaled.Level() != 4 || !rescaled.Scale.Equal(defaultScale) {
 		return errors.New("Rescale(q5) did not yield Level4/Scale2^45")
 	}
-	if err := addCheckpoint("rescale_q5_level4", rescaled, expectedProduct); err != nil {
+	if err := addCheckpoint("rescale_q5_level4", rescaled, expectedProduct, true); err != nil {
 		return err
 	}
 
@@ -348,7 +349,7 @@ func runPublicNativePreflight(opts cliOptions, configHash string, residual ckks.
 		return errors.New("RotateNew changed expected Level4/Scale2^45")
 	}
 	expectedRotated := publicRotateLeft(expectedProduct, 1)
-	if err := addCheckpoint("rotate_level4", rotated, expectedRotated); err != nil {
+	if err := addCheckpoint("rotate_level4", rotated, expectedRotated, true); err != nil {
 		return err
 	}
 
@@ -362,7 +363,7 @@ func runPublicNativePreflight(opts cliOptions, configHash string, residual ckks.
 	if dropped.Level() != publicTerminalLevel || !dropped.Scale.Equal(defaultScale) {
 		return errors.New("DropLevelNew did not yield Level0/Scale2^45")
 	}
-	if err := addCheckpoint("drop_level0", dropped, expectedRotated); err != nil {
+	if err := addCheckpoint("drop_level0", dropped, expectedRotated, true); err != nil {
 		return err
 	}
 
@@ -501,7 +502,7 @@ func (b *publicBackend) decode(ct *rlwe.Ciphertext) ([]complex128, error) {
 	return decoded[:b.maxSlots], nil
 }
 
-func makePublicCheckpoint(backend *publicBackend, name string, ct *rlwe.Ciphertext, decoded, expected []complex128, q []uint64) (publicCheckpoint, error) {
+func makePublicCheckpoint(backend *publicBackend, name string, ct *rlwe.Ciphertext, decoded, expected []complex128, q []uint64, fastCompactOutput bool) (publicCheckpoint, error) {
 	if ct == nil || ct.MetaData == nil || ct.Degree() != 1 || len(ct.Value) != 2 || ct.Level() < 0 || ct.Level() >= len(q) {
 		return publicCheckpoint{}, fmt.Errorf("%s has invalid ciphertext shape/metadata", name)
 	}
@@ -528,11 +529,14 @@ func makePublicCheckpoint(backend *publicBackend, name string, ct *rlwe.Cipherte
 		}
 	}
 	if backend.name == "fast" {
-		for component, polynomial := range ct.Value {
-			coeffRows := polynomial.Coeffs
-			for row := rows; row < len(coeffRows); row++ {
-				if len(coeffRows[row]) != 0 {
-					return publicCheckpoint{}, fmt.Errorf("%s Fast component %d retains dormant q%d row (%d coefficients)", name, component, row, len(coeffRows[row]))
+		cp.FastCompactPrefix = fastCompactOutput
+		if fastCompactOutput {
+			for component, polynomial := range ct.Value {
+				coeffRows := polynomial.Coeffs
+				for row := rows; row < len(coeffRows); row++ {
+					if len(coeffRows[row]) != 0 {
+						return publicCheckpoint{}, fmt.Errorf("%s Fast compact output retains dormant q%d row in component %d (%d coefficients)", name, row, component, len(coeffRows[row]))
+					}
 				}
 			}
 		}
@@ -681,6 +685,17 @@ func validatePublicPairArtifacts(standard, fast publicNativeDocument, standardVe
 			if !checkpoint.OraclePass || checkpoint.Oracle.MaxComplexDifference > publicNumericalGate {
 				return fmt.Errorf("checkpoint %s failed its per-backend cleartext oracle", checkpoint.Name)
 			}
+		}
+	}
+	for _, checkpoint := range standard.Checkpoints {
+		if checkpoint.FastCompactPrefix {
+			return errors.New("Standard artifact incorrectly claims Fast compact-prefix storage")
+		}
+	}
+	for _, checkpoint := range fast.Checkpoints {
+		wantCompact := checkpoint.Name != "encrypt_a_level5" && checkpoint.Name != "encrypt_b_level5" && checkpoint.Name != "encrypt_c_q5_level5"
+		if checkpoint.FastCompactPrefix != wantCompact {
+			return fmt.Errorf("Fast checkpoint %s has unexpected compact-prefix declaration", checkpoint.Name)
 		}
 	}
 	return nil
