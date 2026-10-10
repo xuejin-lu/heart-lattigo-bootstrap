@@ -1,23 +1,20 @@
 # Current Task
 
-Task: FAST-DROPIN-PUBLIC-NATIVE-COLD-WARM-AUTONOMOUS-BATCH-022
+Task: FAST-DROPIN-PUBLIC-NATIVE-REPEATABILITY-AUTONOMOUS-BATCH-023
 Status: READY_FOR_CODEX
-Mode: AUTONOMOUS EVIDENCE-INTEGRITY REPAIR + EXISTING-PERFPROBE PUBLIC E32 BOOTSTRAP COLD/WARM SPRINT
-Review: ONE Web review after all A-D milestones, or immediate STOP on scientific/mathematical/unsafe blocker
+Mode: REUSE-FIRST AUTONOMOUS S1–S5 E32 PUBLIC BOOTSTRAP REPEATABILITY STUDY
+Web handoff: one review at S5 or immediate true math/unsafe STOP
 
-**Executable specification:** `specs/FAST-DROPIN-PUBLIC-NATIVE-COLD-WARM-AUTONOMOUS-BATCH-022.md`
-**021 Web review:** `results/FAST-DROPIN-MEASUREMENT-PLATFORM-REPAIR-AUTONOMOUS-BATCH-021-web-review.md`
-**Permanent authority:** Primary/Secondary AGENTS.md, Primary docs/MEASUREMENT_PLATFORM.md and docs/RESEARCH_ENGINEERING_WORKFLOW.md §4A/4B, Secondary FAST_QPREFIX_SPEC.md.
+**Spec:** `specs/FAST-DROPIN-PUBLIC-NATIVE-REPEATABILITY-AUTONOMOUS-BATCH-023.md`
+**Previous scientific verdict:** `results/FAST-DROPIN-PUBLIC-NATIVE-COLD-WARM-AUTONOMOUS-BATCH-022-web-review.md`
+**Permanent rules:** Primary/Secondary AGENTS.md, Primary docs/MEASUREMENT_PLATFORM.md and RESEARCH_ENGINEERING_WORKFLOW.md §4A/4B.
 
-Batch021 accepted: E-explicit formal native E32 zero-Bootstrap preflight in existing `cmd/perfprobe`, `perfmeasure` and `numericalmetrics`, true Standard original and Fast zero-secret pinned dependencies built from the SAME Primary source via isolated modfiles, eight matched Level/Scale/degree/numerical/capacity checks, zero Bootstrap, legacy E0 diagnostic input smoke retained. Secondary branch HEAD may include AGENTS-only revision; production pinned Fast code is 2d6145d7.
+Batch022 accepted: existing cmd/perfprobe E32 public-native evidence-integrity repaired, two actual Bootstrap calls each backend; one warm Standard ~299.841ms, Fast ~70.399ms (observed 4.26x, **not statistically stable**). Fast lazy initialization made cold comparison asymmetrical; Standard evaluator creation eager. Fast E32 internal stage/power tracing not yet supported.
 
-Web found one P1 evidence-integrity gap: `compare-public` validates source SHA and eight names but does NOT compare ephemeral decoded vector content back against saved `DecodedSHA256`, and permits wrong vector length. Fix this BEFORE costly Bootstrap measurement. A one-slot fixture in current unit tests passes (proof of missing guard), not proof actual 021 numeric samples are false.
+**S1:** inventory/reuse existing perfprobe/fastdiag; freeze same-source and timing fairness methodology. Zero Bootstrap.
+**S2:** extend existing perfprobe bounded same-input 1 cold +5 warm policy without duplicating timers/metrics; preserve original 2-call interface; fake-call regression; zero real Bootstrap.
+**S3:** matched zero-call preflight, then MAX **6 genuine Standard +6 Fast actual Bootstrap calls across whole Batch**, including failures; one cold, five warm each, with irrevocable per-call journal; no hidden/repeated calls.
+**S4:** descriptive five-warm distributions, keygen/evaluator init vs steady costs, Go allocations and honest E32 internal tracing gap, no numerical overclaim.
+**S5:** compact Primary-only results, docs/tests/vet, safe fast-forward commit/push, independent Web review. No Batch024 autonomous authorization.
 
-Milestones:
-A: regression-first exact 4096 decoded vector length and per-checkpoint content-hash binding to `DecodedSHA256` for both backends, anti-NaN/Inf/mismatch; focused tests and safe Primary progress commit.
-B: extend existing `cmd/perfprobe` public-native path, not new runner, for E32 native public Bootstrap using existing phase timers/budget. Do zero-call preflight with the accepted 019 chain, separate constructor/cold/warm. Tests must call ZERO actual Bootstrap.
-C: ONLY after A/B pass, max TWO Standard and TWO Fast public E32 Bootstrap TOTAL, one cold and one warm on the same logical input copies, no extra smokes/warmups/retries. Verify per-call native output oracle and paired numerical gates.
-D: update durable measurement platform status, compact evidence, focused Standard/Fast tests/vet/diff, safe Primary commit/push, Web review. Do not start next batch.
-
-**Pins:** genuine untouched Standard `5dbffbdea05394de2ca3a432ed5318aa832e3f40` separate clean checkout, Fast production `2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac` clean code checkout; no Secondary production edits.
-**Cost:** strict at most 2 real Bootstrap calls/backend across entire batch including failures, no benchmark sweep/LogN16. Zero budget calls in unit tests, no extra changes in CKKS math, E32/QP/default Scale, or Fast zero-secret contract. Preserve historical reports.
+**Frozen backends:** pristine genuine Standard `5dbffbdea05394de2ca3a432ed5318aa832e3f40`; Fast production `2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac`; isolated pinned checkouts/read-only. Frozen LogN13 E32 Q/P/4096 slots, accepted public high-Level Add/MulRelin/Rescale(q5)/Rotate/DropLevel→Bootstrap, A/B Scale2^45 and C Scale=q5, strict numerical/capacity/row gates. No Secondary production changes, no new math/API/rewrite, no LogN16, no profile sweeps. Original 022 artifacts immutable.
