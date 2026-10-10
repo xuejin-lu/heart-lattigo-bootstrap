@@ -1,24 +1,25 @@
 # Current Task
 
-Task: FAST-DROPIN-PUBLIC-NATIVE-REPEATABILITY-AUTONOMOUS-BATCH-023
+Task: FAST-DROPIN-E32-TRACE-REPAIR-AUTONOMOUS-BATCH-024
 Status: READY_FOR_CODEX
-Mode: REUSE-FIRST FULL E32 BOOTSTRAP REPEATABILITY + DEEP STAGE/POWER/RESCALE ATTRIBUTION (S1–S5)
-Web handoff: ONE Web review at S5 or immediate mathematical/safety STOP
+Mode: ROOT-CAUSE-PROVEN RESCALE TRACE REPAIR + FAIL-CLOSED E32 DIAGNOSTIC SESSION
+Web review: once after Batch024, or immediately if new math/unsafe obstacle.
 
-**Authoritative revised spec:** `specs/FAST-DROPIN-PUBLIC-NATIVE-REPEATABILITY-AUTONOMOUS-BATCH-023.md`
-**Accepted previous review:** `results/FAST-DROPIN-PUBLIC-NATIVE-COLD-WARM-AUTONOMOUS-BATCH-022-web-review.md`
-**Permanent rules:** both `AGENTS.md`, Primary `docs/MEASUREMENT_PLATFORM.md`, workflow §4A/4B, Secondary `docs/FAST_QPREFIX_SPEC.md`.
+**Authoritative spec:** `specs/FAST-DROPIN-E32-TRACE-REPAIR-AUTONOMOUS-BATCH-024.md`
+**Batch023 review:** `results/FAST-DROPIN-PUBLIC-NATIVE-REPEATABILITY-AUTONOMOUS-BATCH-023-web-review.md`
+**Permanent rules:** both AGENTS.md, docs/MEASUREMENT_PLATFORM.md and workflow §4A/4B; Secondary docs/FAST_QPREFIX_SPEC.md.
 
-## Scientific correction to previous Batch023
+## Accepted prior result and diagnosed failure
 
-The prior charter focused almost exclusively on collecting five warm total times, with Fast E32 internal stage tracing treated as optional/unavailable. This is insufficient for source-backed diagnosis. Current **Fast production already includes `fastdiag` Stage/Power/Rescale hooks** at Bootstrap root, packing, ScaleDown, ModUp, C2S, EvalMod real/imag, S2C, unpack, finalization, generated powers and per-Rescale phases. The old `cmd/fastdiag` runner invokes a P93/E0 hardcoded test; the missing capability is a **thin E32 public-native diagnostic bridge**, not another tracing system.
+Batch023 public repeatability passed: canonical LogN13 E32 4096 slots, Standard 6 + original Fast 6 real Bootstrap calls, 6/6 matched native output numeric gates RMSE `5.0361026156396345e-9`, max complex `4.062428762032295e-8`, 5 warm Standard median `306.636ms`, Fast `72.580ms`, observed **4.225x**, not stable hardware-general speedup, Fast intentionally zero-secret/insecure. Diagnostic Fast two additional calls passed native oracle, but trace validation failed because `RescaleWorkspace.ApplyRows` records `rescale→preflight` and executes the true subsequent NTT/MForm/commit **without emitting `materialization`** or `ntt_montgomery_restore` subevents. This is proved from source, not an unknown missing event. 023 budget **14/14 SPENT**; do not retry 023.
 
-S1: inventory/map actual existing E32-capable stage/power/rescale hooks, nested phase hierarchy and profiler tools; freeze fair conditions and a precise reuse-based adapter design, zero Bootstrap.
-S2: extend existing `cmd/perfprobe` to 1 cold+5 warm original Standard/Fast without duplicating timers; and adapt existing `cmd/fastdiag` E32 profile with an isolated **test-only Secondary fastdiag diagnostic fixture** (no production code/math changes), based on exact 022 public E32 input rather than old P93/direct-c0. Tests use fake calls only; safe progress commits.
-S3: frozen production-timing lane MAX **6 genuine Standard+6 original Fast Bootstrap**, plus distinct diagnostic E32 tracing lane MAX **2 extra Fast**, 14 total real calls including failures/warmups. Trace lane must **not** contaminate production timings; same held Level0 input and valid oracle; conservative irrevocable pre-reservations before spawning possible two-call test processes.
-S4: deep ranked E32 stage/power/rescale exclusive/inclusive time, Level/Scale/Q-rows, call counts, event closure, CPU profile only within call budget, source mapping and honest Amdahl bottleneck upper bounds. Reuse P93 DIAG007/OPT004 as history only, not as E32 metrics. No autonomous CKKS algorithm rewriting.
-S5: compact results and permanent platform docs, tests/vet, safe Primary and **test-only diagnostic** Secondary commits if needed, Web scientific acceptance. No next Batch authorization.
+## Batch024 autonomous S1–S5
+S1: source map true producer/consumer and optional previously preserved pprof, zero Bootstrap.
+S2: add actual real-Rescale cheap event regression, then guarded **diagnostic-only** span emissions in Secondary `schemes/ckks/internal/fastcore/rescale.go ApplyRows` (ONLY authorized non-test change), absolutely no math changes. Repair E32 test to always preserve RAW events before fatal tree validation; Primary existing fastdiag must preserve raw path on failure. No Bootstrap.
+S3: zero-call regression for Rescale event shape, widths/alias, enabled/disabled equivalence, public E32 fixture validation and cost/provenance. STOP if not proven before calls.
+S4: NEW independent maximum **two Fast E32 diagnostic Bootstrap** calls total: one cold + one warm traced, budget tokens journaled before process spawn, no Standard/formal-fast runs, no retries. Numerical oracle & raw event preservation before event-tree validation. If valid derive stage/power/rescale Pareto/closure and bounded Amdahl, otherwise report first mismatch with raw provenance and no extra calls.
+S5: one compact Primary evidence/report and permanent docs update, test/vet/diff/safe commits and independent Web review, no Batch025 authority.
 
-**Backend pins:** unchanged pristine true Standard `5dbffbdea05394de2ca3a432ed5318aa832e3f40`, original Fast production `2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac` for all formal public timing. Optional isolated diagnostic Secondary test-only commit must be recorded separately and must prove production Go source identity (and no change to math). Active Secondary branch HEAD may differ from pinned production by prior AGENTS-only history.
+**Frozen:** original Standard `5dbffbdea05394de2ca3a432ed5318aa832e3f40` read-only; original uninstrumented Fast production `2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac` read-only. Diagnostic Secondary branch `fast-qprefix` may receive precisely approved event-span-only source changes plus relevant tests, recorded as distinct diagnostic SHA. Canonical public CKKS E32 Q/P/input, Level/Scale/c1/rows/capacity/math/oracle unchanged. No new runner or trace engine.
 
-**Frozen experiment:** canonical LogN13 E32 full Q/P, 4096 slots, A/B Scale2^45 C actual q5, Public Add→MulRelin→Rescale(q5)→Rotate→DropLevel(4)→Bootstrap, original 1e-6 numeric and q0 capacity, identical Primary frontend source, genuine Standard native vs intentionally insecure Fast zero-secret. NO LogN16, parameter sweeps, new measurement runner, Standard internal hook fabrication, or new production algorithm.
+**Budget:** absolutely zero Bootstrap before S4, at most two NEW Fast-only in S4. Never reuse 023's 14 spent calls. Avoid triggering broad/bootstrap tests; all source preflight tests cheap/fake only. No LogN16, sweeping or altering Standard.
