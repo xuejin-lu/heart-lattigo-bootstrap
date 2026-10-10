@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	commonpolynomial "github.com/tuneinsight/lattigo/v6/circuits/common/polynomial"
 	"github.com/xuejin-lu/heart-lattigo-bootstrap/internal/perfmeasure"
 )
 
@@ -150,16 +151,35 @@ func TestValidatePublicE32EventsChecksHierarchyAndRequiredPowers(t *testing.T) {
 func TestValidatePublicE32EventsRecursivePowerTree(t *testing.T) {
 	// Real Fast recursion starts T16 before generating its child T8.
 	events := publicE32TestEvents()
+	var t16Sequence, t8Sequence uint64
 	for i := range events {
-		if events[i].Scope == "power" && events[i].Power != nil && *events[i].Power == 8 {
-			events[i].ParentSequence = 17 // T16
+		if events[i].Scope == "power" && events[i].Name == "power" && events[i].Power != nil {
+			switch *events[i].Power {
+			case 16:
+				if t16Sequence == 0 {
+					t16Sequence = events[i].Sequence
+				}
+			case 8:
+				if t8Sequence == 0 {
+					t8Sequence = events[i].Sequence
+				}
+			}
 		}
 	}
+	require.NotZero(t, t16Sequence)
+	require.NotZero(t, t8Sequence)
+	var t8Parent uint64
+	for _, event := range events {
+		if event.Sequence == t8Sequence {
+			t8Parent = event.ParentSequence
+		}
+	}
+	require.Equal(t, t16Sequence, t8Parent)
 	require.NoError(t, validatePublicE32Events(events))
 
 	wrongScope := append([]Event(nil), events...)
 	for i := range wrongScope {
-		if wrongScope[i].Scope == "power" && wrongScope[i].Power != nil && *wrongScope[i].Power == 8 {
+		if wrongScope[i].Sequence == t8Sequence {
 			wrongScope[i].ParentSequence = 5 // unrelated Bootstrap stage
 		}
 	}
@@ -167,11 +187,36 @@ func TestValidatePublicE32EventsRecursivePowerTree(t *testing.T) {
 
 	cycle := append([]Event(nil), events...)
 	for i := range cycle {
-		if cycle[i].Scope == "power" && cycle[i].Power != nil && *cycle[i].Power == 16 {
-			cycle[i].ParentSequence = 16 // T16 -> T8 -> T16
+		if cycle[i].Scope == "power" && cycle[i].Name == "power" && cycle[i].Power != nil && *cycle[i].Power == 16 && cycle[i].Sequence == t16Sequence {
+			cycle[i].ParentSequence = t8Sequence // T16 -> T8 -> T16
 		}
 	}
 	require.ErrorContains(t, validatePublicE32Events(cycle), "cyclic ancestry")
+}
+
+func TestValidatePublicE32EventsRejectsDuplicatePowerWithinRoot(t *testing.T) {
+	events := publicE32TestEvents()
+	var generatedRoot Event
+	var duplicate Event
+	var maxSequence uint64
+	for _, event := range events {
+		if event.Sequence > maxSequence {
+			maxSequence = event.Sequence
+		}
+		if event.Scope == "power" && event.Name == "generated_powers" && generatedRoot.Sequence == 0 {
+			generatedRoot = event
+		}
+		if event.Scope == "power" && event.Name == "power" && event.Power != nil && *event.Power == 2 && duplicate.Sequence == 0 {
+			duplicate = event
+		}
+	}
+	require.NotZero(t, generatedRoot.Sequence)
+	require.NotZero(t, duplicate.Sequence)
+	duplicate.Sequence = maxSequence + 1
+	duplicate.ParentSequence = generatedRoot.Sequence
+	events = append(events, duplicate)
+
+	require.ErrorContains(t, validatePublicE32Events(events), "duplicate generated power T2")
 }
 
 func TestValidatePublicE32RawTraceRequiresExactMatchedTwoCalls(t *testing.T) {
@@ -289,10 +334,13 @@ func TestAnalyzePublicE32EventsPreservesMeasuredClosureAndBounds(t *testing.T) {
 	require.Len(t, analysis.Closures, len(events), "legacy per-event closures remain available")
 	require.Equal(t, float64(-100), analysis.RootUnattributedNS, "root closure must preserve negative residuals")
 	require.Equal(t, float64(-0.1), analysis.RootUnattributedFraction)
-	var rescaleClosure, parentClosure publicE32EventClosure
+	var rescaleClosure, rescaleChildClosure, parentClosure publicE32EventClosure
 	for _, closure := range analysis.Closures {
 		if closure.Sequence == 5 {
 			rescaleClosure = closure
+		}
+		if closure.Sequence == 7 {
+			rescaleChildClosure = closure
 		}
 		if closure.Sequence == 2 {
 			parentClosure = closure
@@ -301,6 +349,8 @@ func TestAnalyzePublicE32EventsPreservesMeasuredClosureAndBounds(t *testing.T) {
 	require.Equal(t, float64(20), rescaleClosure.UnattributedNS)
 	require.Equal(t, float64(1), rescaleClosure.InclusiveRootShare,
 		"per-event inclusive shares are relative to their own independent root")
+	require.InDelta(t, 0.5, rescaleChildClosure.InclusiveRootShare, 1e-12,
+		"nested Rescale shares use the Rescale root, not the Bootstrap root, and are not counted twice")
 	require.Equal(t, float64(-75), parentClosure.UnattributedNS, "overlapping child timing must remain visible")
 	require.Len(t, analysis.PositiveExclusivePareto, 3, "independent Bootstrap, Rescale and Power roots remain separate")
 	var rescaleRootGroup *publicE32ParetoGroup
@@ -395,15 +445,67 @@ func publicE32TestEvents() []Event {
 		}
 		events = append(events, Event{Scope: "stage", Name: name, Sequence: sequence, ParentSequence: parent})
 	}
-	events = append(events, Event{Scope: "power", Name: "generated_powers", Sequence: 11})
-	for index, power := range []int{2, 3, 4, 6, 8, 16} {
-		p, splitA, splitB := power, power/2, power/2
-		events = append(events, Event{Scope: "power", Name: "power", Sequence: uint64(12 + index), ParentSequence: 11, Power: &p, SplitA: &splitA, SplitB: &splitB})
+	sequence := uint64(len(events) + 1)
+	for range 2 {
+		rootSequence := sequence
+		sequence++
+		events = append(events, Event{Scope: "power", Name: "generated_powers", Sequence: rootSequence})
+		generated := make(map[int]bool)
+		var addPower func(int, uint64)
+		addPower = func(power int, parent uint64) {
+			if power <= 1 || generated[power] {
+				return
+			}
+			generated[power] = true
+			a, b := commonpolynomial.SplitDegree(power)
+			powerSequence := sequence
+			sequence++
+			p, splitA, splitB := power, a, b
+			events = append(events, Event{Scope: "power", Name: "power", Sequence: powerSequence, ParentSequence: parent, Power: &p, SplitA: &splitA, SplitB: &splitB})
+			addPower(a, powerSequence)
+			addPower(b, powerSequence)
+			for _, phase := range []string{"copy_workspace", "mul_relin", "chebyshev_doubling", "recurrence_correction", "rescale"} {
+				events = append(events, Event{Scope: "power", Name: phase, Sequence: sequence, ParentSequence: powerSequence})
+				sequence++
+			}
+		}
+		addPower(16, rootSequence)
+		addPower(6, rootSequence)
 	}
-	events = append(events,
-		Event{Scope: "rescale", Name: "rescale", Sequence: 18, ParentSequence: 6},
-		Event{Scope: "rescale", Name: "preflight", Sequence: 19, ParentSequence: 18},
-		Event{Scope: "rescale", Name: "materialization", Sequence: 20, ParentSequence: 18},
-	)
+	levelIn, levelOut, rowsIn, rowsOut := 4, 3, 4, 4
+	makeRescaleEvent := func(name, component string, parent uint64, elapsed int64) Event {
+		levelInCopy, levelOutCopy, rowsInCopy, rowsOutCopy := levelIn, levelOut, rowsIn, rowsOut
+		return Event{Scope: "rescale", Name: name, Component: component, Sequence: sequence, ParentSequence: parent, ElapsedNS: elapsed,
+			LevelIn: &levelInCopy, LevelOut: &levelOutCopy, RowsIn: &rowsInCopy, RowsOut: &rowsOutCopy}
+	}
+	rescaleRoot := sequence
+	events = append(events, makeRescaleEvent("rescale", "", 0, 100))
+	sequence++
+	preflight := sequence
+	events = append(events, makeRescaleEvent("preflight", "", rescaleRoot, 80))
+	sequence++
+	for _, component := range []string{"c0", "c1"} {
+		events = append(events, makeRescaleEvent("prefix_to_coefficient", component, preflight, 10))
+		sequence++
+	}
+	loopSequences := make(map[string]uint64)
+	for _, component := range []string{"c0", "c1"} {
+		loopSequences[component] = sequence
+		events = append(events, makeRescaleEvent("coefficient_loop", component, preflight, 40))
+		sequence++
+	}
+	for _, component := range []string{"c0", "c1"} {
+		for _, childName := range []string{"reconstruct_center_round_capacity", "residue_materialization"} {
+			events = append(events, makeRescaleEvent(childName, component, loopSequences[component], 15))
+			sequence++
+		}
+	}
+	materialization := sequence
+	events = append(events, makeRescaleEvent("materialization", "", rescaleRoot, 20))
+	sequence++
+	for _, component := range []string{"c0", "c1"} {
+		events = append(events, makeRescaleEvent("ntt_montgomery_restore", component, materialization, 10))
+		sequence++
+	}
 	return events
 }

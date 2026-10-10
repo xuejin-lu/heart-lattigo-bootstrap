@@ -28,7 +28,7 @@ type options struct {
 
 func parseArgs(args []string) (options, error) {
 	if len(args) == 0 {
-		return options{}, errors.New("使用方式：fastdiag trace|compare|numerical [options]")
+		return options{}, errors.New("使用方式：fastdiag trace|compare|numerical [options]，或 fastdiag offline-e32 --raw ... --sidecar ... --manifest ... --vectors ...")
 	}
 	opts := options{mode: args[0], profile: supportedProfile, warmup: 1, repetitions: 5, standardTrials: 3}
 	if opts.mode != "trace" && opts.mode != "compare" && opts.mode != "numerical" {

@@ -16,6 +16,8 @@ import (
 	"strings"
 	"time"
 
+	commonpolynomial "github.com/tuneinsight/lattigo/v6/circuits/common/polynomial"
+	fastckks "github.com/tuneinsight/lattigo/v6/schemes/ckks/fast"
 	"github.com/xuejin-lu/heart-lattigo-bootstrap/internal/perfmeasure"
 )
 
@@ -733,151 +735,363 @@ func readProfileArtifact(dir, name, wantSHA string) (string, error) {
 }
 
 func validatePublicE32Events(events []Event) error {
+	problems := collectPublicE32EventAnomalies(events)
+	if len(problems) == 0 {
+		return nil
+	}
+	return errors.New(strings.Join(problems, "\n"))
+}
+
+func collectPublicE32EventAnomalies(events []Event) []string {
+	var problems []string
+	add := func(format string, args ...any) { problems = append(problems, fmt.Sprintf(format, args...)) }
 	if len(events) == 0 {
-		return errors.New("traced warm call contains no fastdiag events")
+		return []string{"traced warm call contains no fastdiag events"}
 	}
 	sequences := make(map[uint64]Event, len(events))
 	children := make(map[uint64][]Event, len(events))
-	var root *Event
-	var stages []string
-	generatedPowers := make(map[uint64]bool)
-	powers := make(map[int]bool)
-	rescaleCount := 0
+	var stages []Event
+	var generatedRoots []Event
+	var rescaleRoots []Event
+	var bootstrapRoots []Event
+	previousSequence := uint64(0)
 	for _, event := range events {
 		if event.Sequence == 0 || event.ElapsedNS < 0 {
-			return errors.New("fastdiag event has zero sequence or negative elapsed time")
+			add("event %d has zero sequence or negative elapsed time", event.Sequence)
 		}
+		if previousSequence != 0 && event.Sequence <= previousSequence {
+			add("event sequence order is not strictly increasing at %d after %d", event.Sequence, previousSequence)
+		}
+		previousSequence = event.Sequence
 		if event.Scope != "stage" && event.Scope != "power" && event.Scope != "rescale" {
-			return fmt.Errorf("unexpected fastdiag scope %q", event.Scope)
+			add("event %d has unexpected scope %q", event.Sequence, event.Scope)
 		}
 		if _, exists := sequences[event.Sequence]; exists {
-			return fmt.Errorf("duplicate fastdiag event sequence %d", event.Sequence)
+			add("duplicate fastdiag event sequence %d", event.Sequence)
+			continue
 		}
 		sequences[event.Sequence] = event
-		children[event.ParentSequence] = append(children[event.ParentSequence], event)
-		if event.Scope == "stage" {
-			if event.Name == "bootstrap" {
-				if root != nil || event.ParentSequence != 0 {
-					return errors.New("fastdiag event tree must have exactly one root Bootstrap stage")
-				}
-				copy := event
-				root = &copy
-			} else {
-				stages = append(stages, event.Name)
-			}
+		if event.ParentSequence != 0 {
+			children[event.ParentSequence] = append(children[event.ParentSequence], event)
 		}
-		if event.Scope == "power" && event.Name == "generated_powers" {
-			generatedPowers[event.Sequence] = true
+		validatePublicE32ObservedRows(event, add)
+		switch {
+		case event.Scope == "stage" && event.Name == "bootstrap":
+			bootstrapRoots = append(bootstrapRoots, event)
+		case event.Scope == "stage":
+			stages = append(stages, event)
+		case event.Scope == "power" && event.Name == "generated_powers":
+			generatedRoots = append(generatedRoots, event)
+		case event.Scope == "rescale" && event.Name == "rescale":
+			rescaleRoots = append(rescaleRoots, event)
 		}
-		if event.Scope == "power" && event.Name == "power" && event.Power != nil {
-			if event.SplitA == nil || event.SplitB == nil {
-				return fmt.Errorf("generated power T%d has no recurrence split", *event.Power)
-			}
-			if powers[*event.Power] {
-				return fmt.Errorf("duplicate generated power T%d", *event.Power)
-			}
-			powers[*event.Power] = true
-		}
-		if event.Scope == "rescale" && event.Name == "rescale" {
-			rescaleCount++
-		}
-	}
-	if root == nil {
-		return errors.New("missing Bootstrap event root")
 	}
 	for _, event := range events {
 		if event.ParentSequence != 0 {
 			if _, exists := sequences[event.ParentSequence]; !exists {
-				return fmt.Errorf("event %d references missing parent %d", event.Sequence, event.ParentSequence)
+				add("event %d references missing parent %d", event.Sequence, event.ParentSequence)
+			}
+		}
+		if event.Scope == "stage" && event.Name != "bootstrap" && len(children[event.Sequence]) != 0 {
+			add("stage %s event %d unexpectedly has nested children", event.Name, event.Sequence)
+		}
+		if event.Scope == "power" && event.Name != "generated_powers" && event.Name != "power" && len(children[event.Sequence]) != 0 {
+			add("power phase %s event %d unexpectedly has nested children", event.Name, event.Sequence)
+		}
+		if event.Scope == "rescale" && event.Name != "rescale" && event.Name != "preflight" && event.Name != "materialization" && event.Name != "coefficient_loop" && len(children[event.Sequence]) != 0 {
+			add("Rescale leaf phase %s event %d unexpectedly has nested children", event.Name, event.Sequence)
+		}
+	}
+	if len(bootstrapRoots) != 1 || bootstrapRoots[0].ParentSequence != 0 {
+		add("event tree must contain exactly one root Bootstrap stage; got %d", len(bootstrapRoots))
+	}
+	if len(rescaleRoots) == 0 {
+		add("trace has no Rescale parent events")
+	}
+	if len(generatedRoots) != 2 {
+		add("trace must contain two independent generated_powers roots (real and imag branches); got %d", len(generatedRoots))
+	}
+
+	// Resolve every event to its independent root, detecting cycles across all
+	// scopes rather than only in recursive power ancestry.
+	for _, event := range events {
+		current := event
+		seen := map[uint64]bool{event.Sequence: true}
+		for current.ParentSequence != 0 {
+			if seen[current.ParentSequence] {
+				add("event %d belongs to a cyclic parent chain", event.Sequence)
+				current.ParentSequence = 0
+				break
+			}
+			seen[current.ParentSequence] = true
+			parent, exists := sequences[current.ParentSequence]
+			if !exists {
+				break
+			}
+			current = parent
+		}
+		if current.Sequence == 0 {
+			continue
+		}
+		allowed := (current.Scope == "stage" && current.Name == "bootstrap") ||
+			(current.Scope == "power" && current.Name == "generated_powers") ||
+			(current.Scope == "rescale" && current.Name == "rescale")
+		if !allowed {
+			add("event %d terminates at unsupported independent root %s/%s #%d", event.Sequence, current.Scope, current.Name, current.Sequence)
+		}
+	}
+
+	wantStages := []string{"pack_n1_to_n2", "scale_down", "mod_up_trace", "coeffs_to_slots", "evalmod_real", "evalmod_imag", "slots_to_coeffs", "unpack_n2_to_n1", "public_finalization"}
+	if len(stages) != len(wantStages) {
+		add("stage count mismatch: got %d names %v; want %d names %v", len(stages), eventNames(stages), len(wantStages), wantStages)
+	}
+	for index, want := range wantStages {
+		if index >= len(stages) {
+			break
+		}
+		stage := stages[index]
+		if stage.Name != want {
+			add("stage %d is %q, want %q", index, stage.Name, want)
+		}
+		if len(bootstrapRoots) == 1 && stage.ParentSequence != bootstrapRoots[0].Sequence {
+			add("stage %s is not a direct child of Bootstrap", stage.Name)
+		}
+	}
+	for _, event := range stages {
+		if !containsString(wantStages, event.Name) {
+			add("unexpected stage event %q", event.Name)
+		}
+	}
+
+	expectedPowers := []int{2, 3, 4, 6, 8, 16}
+	powersByRoot := make(map[uint64]map[int]Event, len(generatedRoots))
+	for _, root := range generatedRoots {
+		powersByRoot[root.Sequence] = make(map[int]Event)
+		if root.ParentSequence != 0 {
+			add("generated_powers root %d must be independently rooted", root.Sequence)
+		}
+		for _, child := range children[root.Sequence] {
+			if child.Scope != "power" || child.Name != "power" {
+				add("generated_powers root %d has unexpected direct child %s/%s", root.Sequence, child.Scope, child.Name)
 			}
 		}
 	}
-	// A generated Chebyshev power can recursively generate lower powers.
-	// Thus T8 may be a child of T16, which is itself under generated_powers.
-	// Follow the actual ancestry instead of requiring every power to be a
-	// direct child of generated_powers.
 	for _, event := range events {
 		if event.Scope != "power" || event.Name != "power" {
 			continue
 		}
-		if event.Power == nil || event.SplitA == nil || event.SplitB == nil {
-			return fmt.Errorf("power event %d lacks generated-power fields", event.Sequence)
-		}
-		ancestorSequence := event.ParentSequence
-		seen := map[uint64]bool{event.Sequence: true}
-		for {
-			if ancestorSequence == 0 {
-				return fmt.Errorf("power event T%d has no generated_powers ancestor", *event.Power)
-			}
-			if seen[ancestorSequence] {
-				return fmt.Errorf("power event T%d has cyclic ancestry", *event.Power)
-			}
-			seen[ancestorSequence] = true
-			ancestor, found := sequences[ancestorSequence]
-			if !found {
-				return fmt.Errorf("power event T%d has missing ancestor %d", *event.Power, ancestorSequence)
-			}
-			if ancestor.Scope != "power" {
-				return fmt.Errorf("power event T%d has non-power ancestor %d", *event.Power, ancestorSequence)
-			}
-			if ancestor.Name == "generated_powers" {
-				if !generatedPowers[ancestorSequence] {
-					return fmt.Errorf("power event T%d has an unregistered root", *event.Power)
-				}
-				break
-			}
-			if ancestor.Name != "power" || ancestor.Power == nil || *ancestor.Power <= *event.Power {
-				return fmt.Errorf("power event T%d has invalid recursive ancestor %d", *event.Power, ancestorSequence)
-			}
-			ancestorSequence = ancestor.ParentSequence
-		}
-	}
-	wantStages := []string{"pack_n1_to_n2", "scale_down", "mod_up_trace", "coeffs_to_slots", "evalmod_real"}
-	for _, name := range stages {
-		if name == "evalmod_imag" {
-			wantStages = append(wantStages, name)
-		}
-	}
-	wantStages = append(wantStages, "slots_to_coeffs", "unpack_n2_to_n1", "public_finalization")
-	if len(stages) != len(wantStages) {
-		return fmt.Errorf("stage count mismatch: got %v want %v", stages, wantStages)
-	}
-	for index, name := range stages {
-		if name != wantStages[index] {
-			return fmt.Errorf("stage %d is %q, want %q", index, name, wantStages[index])
-		}
-		var stage Event
-		for _, event := range events {
-			if event.Scope == "stage" && event.Name == name {
-				stage = event
-				break
-			}
-		}
-		if stage.ParentSequence != root.Sequence {
-			return fmt.Errorf("stage %s is not a direct child of Bootstrap", name)
-		}
-	}
-	for _, power := range []int{2, 3, 4, 6, 8, 16} {
-		if !powers[power] {
-			return fmt.Errorf("missing generated Chebyshev power T%d", power)
-		}
-	}
-	if rescaleCount == 0 {
-		return errors.New("trace has no Rescale parent events")
-	}
-	for _, event := range events {
-		if event.Scope != "rescale" || event.Name != "rescale" {
+		if event.Power == nil || event.SplitA == nil || event.SplitB == nil || *event.Power <= 0 {
+			add("power event %d lacks valid generated-power and recurrence-split fields", event.Sequence)
 			continue
 		}
-		passes := make(map[string]bool)
-		for _, child := range children[event.Sequence] {
-			passes[child.Name] = child.Scope == "rescale"
+		wantA, wantB := commonpolynomial.SplitDegree(*event.Power)
+		if *event.SplitA != wantA || *event.SplitB != wantB {
+			add("power event T%d has split %d×%d, want source-defined split %d×%d", *event.Power, *event.SplitA, *event.SplitB, wantA, wantB)
 		}
-		if len(passes) != 2 || !passes["preflight"] || !passes["materialization"] {
-			return fmt.Errorf("Rescale event %d must have exactly preflight and materialization children", event.Sequence)
+		rootSequence := uint64(0)
+		ancestorSequence := event.ParentSequence
+		childPower := *event.Power
+		seenAncestors := map[uint64]bool{event.Sequence: true}
+		for ancestorSequence != 0 {
+			if seenAncestors[ancestorSequence] {
+				add("power event T%d has cyclic ancestry", *event.Power)
+				break
+			}
+			seenAncestors[ancestorSequence] = true
+			ancestor, exists := sequences[ancestorSequence]
+			if !exists {
+				add("power event T%d has missing ancestor %d", *event.Power, ancestorSequence)
+				break
+			}
+			if ancestor.Scope != "power" {
+				add("power event T%d has non-power ancestor %d", *event.Power, ancestorSequence)
+				break
+			}
+			if ancestor.Name == "generated_powers" {
+				rootSequence = ancestor.Sequence
+				break
+			}
+			if ancestor.Name != "power" || ancestor.Power == nil || ancestor.SplitA == nil || ancestor.SplitB == nil ||
+				(childPower != *ancestor.SplitA && childPower != *ancestor.SplitB) {
+				add("power event T%d has invalid recursive ancestor %d", *event.Power, ancestorSequence)
+				break
+			}
+			childPower = *ancestor.Power
+			ancestorSequence = ancestor.ParentSequence
+		}
+		if rootSequence == 0 && event.ParentSequence == 0 {
+			add("power event T%d has no generated_powers ancestor", *event.Power)
+		}
+		powerMap, exists := powersByRoot[rootSequence]
+		if !exists {
+			add("power event T%d has no generated_powers root", *event.Power)
+		} else if _, duplicate := powerMap[*event.Power]; duplicate {
+			add("duplicate generated power T%d in event tree rooted at %d", *event.Power, rootSequence)
+		} else {
+			powerMap[*event.Power] = event
+		}
+		if event.ParentSequence != 0 {
+			if parent, exists := sequences[event.ParentSequence]; exists && parent.Scope == "power" && parent.Name == "power" &&
+				(parent.Power == nil || parent.SplitA == nil || parent.SplitB == nil || (*event.Power != *parent.SplitA && *event.Power != *parent.SplitB)) {
+				add("power event T%d is not a recurrence child of parent event %d", *event.Power, parent.Sequence)
+			}
+		}
+		phaseCounts := make(map[string]int)
+		for _, child := range children[event.Sequence] {
+			if child.Scope == "power" && child.Name == "power" {
+				continue
+			}
+			if child.Scope != "power" || !containsString([]string{"copy_workspace", "mul_relin", "mul", "relinearize", "chebyshev_doubling", "recurrence_correction", "rescale"}, child.Name) {
+				add("power event T%d has unsupported direct child %s/%s", *event.Power, child.Scope, child.Name)
+				continue
+			}
+			phaseCounts[child.Name]++
+		}
+		for _, phase := range []string{"copy_workspace", "chebyshev_doubling", "recurrence_correction", "rescale"} {
+			if phaseCounts[phase] != 1 {
+				add("power event T%d has %d %s phase children, want exactly one", *event.Power, phaseCounts[phase], phase)
+			}
+		}
+		mulCount := phaseCounts["mul"] + phaseCounts["mul_relin"]
+		if mulCount != 1 {
+			add("power event T%d has %d multiply phase children, want exactly one", *event.Power, mulCount)
+		}
+		if phaseCounts["relinearize"] > 2 {
+			add("power event T%d has %d unexpected repeated relinearize phases", *event.Power, phaseCounts["relinearize"])
 		}
 	}
-	return nil
+	for _, root := range generatedRoots {
+		powerMap := powersByRoot[root.Sequence]
+		for _, power := range expectedPowers {
+			if _, exists := powerMap[power]; !exists {
+				add("generated_powers root %d is missing generated Chebyshev power T%d", root.Sequence, power)
+			}
+		}
+	}
+
+	for _, root := range rescaleRoots {
+		validatePublicE32RescaleTree(root, children, add)
+	}
+	return problems
+}
+
+func validatePublicE32ObservedRows(event Event, add func(string, ...any)) {
+	for _, pair := range []struct {
+		level *int
+		rows  *int
+		label string
+	}{{event.LevelIn, event.RowsIn, "input"}, {event.LevelOut, event.RowsOut, "output"}} {
+		if pair.level == nil || pair.rows == nil {
+			continue
+		}
+		want, err := fastckks.QPrefixWidth(*pair.level)
+		if err != nil {
+			add("event %d has invalid %s Level %d: %v", event.Sequence, pair.label, *pair.level, err)
+			continue
+		}
+		if *pair.rows != want {
+			add("event %d %s Q-prefix rows %d disagree with Level %d width %d", event.Sequence, pair.label, *pair.rows, *pair.level, want)
+		}
+	}
+}
+
+func validatePublicE32RescaleTree(root Event, children map[uint64][]Event, add func(string, ...any)) {
+	if root.LevelIn == nil || root.LevelOut == nil || root.RowsIn == nil || root.RowsOut == nil {
+		add("Rescale event %d lacks Level/row transition metadata", root.Sequence)
+	} else {
+		if *root.LevelIn <= 0 || *root.LevelOut != *root.LevelIn-1 {
+			add("Rescale event %d has invalid Level transition %d→%d", root.Sequence, *root.LevelIn, *root.LevelOut)
+		}
+	}
+	childCounts := make(map[string]int)
+	var preflight, materialization *Event
+	for _, child := range children[root.Sequence] {
+		childCounts[child.Scope+"/"+child.Name]++
+		copy := child
+		switch child.Scope + "/" + child.Name {
+		case "rescale/preflight":
+			preflight = &copy
+		case "rescale/materialization":
+			materialization = &copy
+		default:
+			add("Rescale event %d has unexpected direct child %s/%s", root.Sequence, child.Scope, child.Name)
+		}
+	}
+	if childCounts["rescale/preflight"] != 1 || childCounts["rescale/materialization"] != 1 || len(childCounts) != 2 {
+		add("Rescale event %d must have exactly one preflight and one materialization child", root.Sequence)
+	}
+	if preflight != nil {
+		want := map[string]bool{"prefix_to_coefficient/c0": false, "prefix_to_coefficient/c1": false, "coefficient_loop/c0": false, "coefficient_loop/c1": false}
+		for _, child := range children[preflight.Sequence] {
+			key := child.Name + "/" + child.Component
+			if child.Scope != "rescale" || !hasKey(want, key) || want[key] {
+				add("Rescale preflight %d has unexpected or duplicate component child %s/%s/%s", preflight.Sequence, child.Name, child.Component, child.Scope)
+				continue
+			}
+			want[key] = true
+		}
+		for key, found := range want {
+			if !found {
+				add("Rescale preflight %d is missing component child %s", preflight.Sequence, key)
+			}
+		}
+		for _, child := range children[preflight.Sequence] {
+			if child.Name != "coefficient_loop" {
+				continue
+			}
+			wantLoopChildren := map[string]bool{"reconstruct_center_round_capacity": false, "residue_materialization": false}
+			for _, grandchild := range children[child.Sequence] {
+				if grandchild.Scope != "rescale" || grandchild.Component != child.Component || !hasKey(wantLoopChildren, grandchild.Name) || wantLoopChildren[grandchild.Name] {
+					add("Rescale coefficient loop %d has unexpected or duplicate child %s/%s", child.Sequence, grandchild.Name, grandchild.Component)
+					continue
+				}
+				wantLoopChildren[grandchild.Name] = true
+			}
+			for name, found := range wantLoopChildren {
+				if !found {
+					add("Rescale coefficient loop %d is missing child %s", child.Sequence, name)
+				}
+			}
+		}
+	}
+	if materialization != nil {
+		want := map[string]bool{"ntt_montgomery_restore/c0": false, "ntt_montgomery_restore/c1": false}
+		for _, child := range children[materialization.Sequence] {
+			key := child.Name + "/" + child.Component
+			if child.Scope != "rescale" || !hasKey(want, key) || want[key] {
+				add("Rescale materialization %d has unexpected or duplicate child %s/%s", materialization.Sequence, child.Name, child.Component)
+				continue
+			}
+			want[key] = true
+		}
+		for key, found := range want {
+			if !found {
+				add("Rescale materialization %d is missing component child %s", materialization.Sequence, key)
+			}
+		}
+	}
+}
+
+func eventNames(events []Event) []string {
+	names := make([]string, len(events))
+	for i, event := range events {
+		names[i] = event.Name
+	}
+	return names
+}
+
+func containsString(values []string, target string) bool {
+	for _, value := range values {
+		if value == target {
+			return true
+		}
+	}
+	return false
+}
+
+func hasKey[V any](values map[string]V, key string) bool {
+	_, exists := values[key]
+	return exists
 }
 
 func renderPublicE32Summary(doc publicE32TraceDocument) string {
