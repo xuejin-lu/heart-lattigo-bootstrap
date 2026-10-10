@@ -101,8 +101,10 @@ from current events. Later reports must label these visibility limits. S1 spent
 ## S2 — reusable six-sample and public E32 trace adapters (zero Bootstrap calls)
 
 **Status:** implementation and zero-call tests complete; Secondary test-only
-adapter is committed and pushed as `37adeb273815dbce039b657a45e9e7e88dbf6cc6`;
-Primary S2 commit/push follows.
+adapter and its pre-reservation fixture-validation gate are committed and
+pushed through `196c6839284eb1bf59715d1fe46fe31772edc875`. Primary S2 core is
+locally committed as `8a059e54379a41c3d8aff06ba27016bc74201d1e`; a follow-up
+Primary checkpoint finalizes the zero-call validation ordering.
 No Bootstrap was invoked. The only Secondary source change is a new
 `fastdiag`-tagged test file; no non-test Secondary source, API, arithmetic,
 Standard code, `AGENTS.md`, or `CURRENT_TASK.md` was changed.
@@ -122,9 +124,12 @@ Standard code, `AGENTS.md`, or `CURRENT_TASK.md` was changed.
   profile. It validates the fixture and six-output vectors, exact Primary and
   pinned production-Fast identities, clean Primary `main` descended from its
   synchronized `origin/main`, clean/pushed Secondary `fast-qprefix`, and equality
-  of all non-test production Go source hashes plus `go.mod`/`go.sum` before
-  reserving both diagnostic attempt journals. Only then does it invoke the
-  Secondary test-only adapter. Its raw event tree remains in a task-owned temp
+  of all non-test production Go source hashes plus `go.mod`/`go.sum`. It first
+  runs the same Secondary adapter in validate-only mode to decode and verify
+  serialized parameters/ciphertext and matched vectors without key generation,
+  evaluator construction, or Bootstrap. Only after that zero-call gate passes
+  does it reserve both diagnostic attempt journals and run the cold+traced-warm
+  process. Its raw event tree remains in a task-owned temp
   directory outside Git; the final command emits a compact summary. The same
   already-budgeted warm traced call is wrapped by Go's built-in CPU profiler;
   a post-warm in-use heap snapshot is emitted after the call. Both profiles are
@@ -173,3 +178,20 @@ GOGC/GOMEMLIMIT/GODEBUG across the trace parent and child. CPU model detection
 now reuses a shared metadata helper that safely reads only the `Chip:` line
 from `system_profiler` when `sysctl` is unavailable. Primary
 `git diff --check` passes. The expensive-call ledger remains **0/14**.
+
+### S3 zero-call preflight — preliminary provenance at Primary `8a059e5`
+
+The canonical Standard and original-Fast `public-native` preflights both
+completed with `bootstrap_budget=0`, `actual_bootstrap_calls=0`, LogN13/E32,
+4096 slots and all eight required checkpoints. Every per-backend plaintext
+oracle passed; the matched pair artifact is `PASS`, all 8/8 states match, and
+the environments match. The shared capacity plan records
+`rescale_bound=2271135713118062` and `q0=36028797018652673`, so `2*B < q0`;
+the full Q0123 product is recorded in the raw preflight artifacts. The Fast
+fixture manifest and `.parameters.bin` / `.ciphertext.bin` files were created
+outside Git, with Level 0, degree 1, Scale `2^45`, one active Q-prefix row,
+4096 decoded slots, and pinned Fast / Primary provenance. These artifacts are
+preliminary only: the subsequent Primary validate-only ordering repair changes
+the Primary commit, so S3 must regenerate and revalidate preflight artifacts
+against the final committed Primary source before any expensive Bootstrap call.
+No call tokens were reserved; the global ledger remains **0/14**.

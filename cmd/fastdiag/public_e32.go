@@ -247,8 +247,11 @@ func tracePublicE32(primaryRoot, secondaryRoot string, primary RepositoryMetadat
 		return publicE32TraceDocument{}, fmt.Errorf("isolated diagnostic checkout fails production-source identity: %w", err)
 	}
 	rawPath := filepath.Join(tempRoot, "raw-trace.json")
+	if err := runPublicE32TraceTest(diagnosticRoot, rawPath, cachePath, profileDir, manifestPath(opts.e32Manifest), manifestPath(opts.fastVectors), diagnosticMeta.Commit, true); err != nil {
+		return publicE32TraceDocument{}, fmt.Errorf("zero-call E32 fixture compatibility validation failed before diagnostic reservations; no Bootstrap call was launched; preserve checkout %s and artifacts %s: %w", diagnosticRoot, tempRoot, err)
+	}
 	if err := runReservedPublicE32Trace(journalBase, func() error {
-		return runPublicE32TraceTest(diagnosticRoot, rawPath, cachePath, profileDir, manifestPath(opts.e32Manifest), manifestPath(opts.fastVectors), diagnosticMeta.Commit)
+		return runPublicE32TraceTest(diagnosticRoot, rawPath, cachePath, profileDir, manifestPath(opts.e32Manifest), manifestPath(opts.fastVectors), diagnosticMeta.Commit, false)
 	}); err != nil {
 		return publicE32TraceDocument{}, fmt.Errorf("E32 tracer failed; both diagnostic attempt tokens remain reserved; preserve checkout %s and artifacts %s: %w", diagnosticRoot, tempRoot, err)
 	}
@@ -473,10 +476,14 @@ func runReservedPublicE32Trace(journalBase string, run func() error) error {
 	return run()
 }
 
-func runPublicE32TraceTest(secondaryRoot, outputPath, cachePath, profileDir, manifestPath, vectorsPath, diagnosticHead string) error {
+func runPublicE32TraceTest(secondaryRoot, outputPath, cachePath, profileDir, manifestPath, vectorsPath, diagnosticHead string, validateOnly bool) error {
 	args := []string{"test", "-tags", "fastdiag", "./circuits/ckks/bootstrapping", "-run", "^TestFastDiagPublicE32Trace$", "-count=1"}
 	command := exec.Command("go", args...)
 	command.Dir = secondaryRoot
+	validateOnlySetting := "0"
+	if validateOnly {
+		validateOnlySetting = "1"
+	}
 	command.Env = updateEnv(os.Environ(), map[string]string{
 		"FASTDIAG_TRACE":                   "stage,power,rescale",
 		"FASTDIAG_PUBLIC_E32_MANIFEST":     manifestPath,
@@ -484,6 +491,7 @@ func runPublicE32TraceTest(secondaryRoot, outputPath, cachePath, profileDir, man
 		"FASTDIAG_DIAGNOSTIC_HEAD":         diagnosticHead,
 		"FASTDIAG_OUTPUT":                  outputPath,
 		"FASTDIAG_PROFILE_DIR":             profileDir,
+		"FASTDIAG_VALIDATE_ONLY":           validateOnlySetting,
 		"GOCACHE":                          cachePath,
 		"GOMAXPROCS":                       fmt.Sprint(runtime.GOMAXPROCS(0)),
 	})
