@@ -1,0 +1,70 @@
+{
+  "schema_version": "fastdiag.batch024.blocked-evidence.v1",
+  "task": "FAST-DROPIN-E32-TRACE-REPAIR-AUTONOMOUS-BATCH-024",
+  "status": "BATCH_BLOCKED_NEEDS_WEB_REVIEW",
+  "primary": {
+    "branch": "main",
+    "commit": "b39ae8519a98e88a902d7868924ae29eb721531c",
+    "origin_main": "b39ae8519a98e88a902d7868924ae29eb721531c",
+    "dirty": false
+  },
+  "secondary": {
+    "branch": "fast-qprefix",
+    "diagnostic_commit": "4f2557062cb5c1ffb9a671bc3df67401fd7092b4",
+    "origin_fast_qprefix": "4f2557062cb5c1ffb9a671bc3df67401fd7092b4",
+    "dirty": false
+  },
+  "frozen_backends": {
+    "genuine_standard_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+    "formal_original_fast_commit": "2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac"
+  },
+  "event_analysis_repair": {
+    "commit": "b39ae8519a98e88a902d7868924ae29eb721531c",
+    "preserves_per_event_analysis": true,
+    "adds_event_type_summaries": true,
+    "exclusive_time_definition": "event elapsed minus immediate child elapsed",
+    "shares_partitioned_by_event_tree_root": true,
+    "tests": "go test ./cmd/fastdiag -count=1",
+    "go_vet": "go vet ./cmd/fastdiag",
+    "diff_check": "git diff --check",
+    "all_passed": true
+  },
+  "fixture": {
+    "manifest_path": "/private/tmp/fast-dropin-batch023-final.3VxTOp/fast-e32-trace.manifest.json",
+    "manifest_sha256": "5bc19b1eb6e67997ca3d19f39e6fd781bf93b27ad305a1be733f0c883611b847",
+    "expected_vectors_schema": "fast-standard-public-native-repeatability-vectors.v1",
+    "expected_vectors_mode": "public-native-repeatability",
+    "supplied_vectors_path": "/private/tmp/fast-dropin-batch023-final.3VxTOp/fast-vectors.json",
+    "supplied_vectors_sha256": "d0334680ac337d8d507a0074750e677dcf0d0ccdda47f17b7219c2655c5b0fc1",
+    "actual_vectors_schema": "fast-standard-public-native-vectors.v1",
+    "actual_vectors_mode": "public-native",
+    "required_bootstrap_outputs": 6,
+    "bootstrap_outputs_key_present": false,
+    "provenance_hashes_match_manifest": [
+      "backend_commit",
+      "primary_commit",
+      "primary_measurement_source_sha256",
+      "config_sha256",
+      "qp_sha256",
+      "input_sha256",
+      "workload_sha256"
+    ],
+    "validator_error": "uninstrumented Fast vectors do not match the E32 trace fixture provenance"
+  },
+  "budget": {
+    "batch023_calls_spent": 14,
+    "batch023_calls_reused": 0,
+    "batch024_call_limit": 2,
+    "batch024_attempts_reserved": 0,
+    "batch024_bootstrap_calls": 0,
+    "attempt_journals_created": 0,
+    "raw_trace_created": false,
+    "certified_trace_created": false,
+    "retry_attempted": false
+  },
+  "stop": {
+    "phase": "S4 held-vector provenance validation before reservation",
+    "reason": "supplied vector artifact is not the manifest's repeatability artifact",
+    "next_action": "Web review must identify the authoritative matching vectors artifact and resolve whether S4 may be started after this failed preflight"
+  }
+}

@@ -1,10 +1,11 @@
 # Batch 024 journal — E32 Rescale trace repair
 
-Status: `BATCH_IN_PROGRESS` — S1–S3 zero-call gates complete; S4 not started.
+Status: `BATCH_BLOCKED_NEEDS_WEB_REVIEW` — S1–S3 zero-call gates complete; S4 stopped at fixture provenance validation before attempt reservation or Bootstrap.
 
 ## Frozen provenance and budget
 
 - Primary synchronized `main`: `4a879e532feabd4b521891f6e99c43a2855bc143`.
+- Current Primary repair commit: `b39ae8519a98e88a902d7868924ae29eb721531c` (pushed; clean and equal to `origin/main`).
 - Secondary synchronized `fast-qprefix`: `f7eb9f88d0c877331e62287508c541a1e1147bdc` (clean; matches origin).
 - Secondary Batch024 diagnostic commit: `4f2557062cb5c1ffb9a671bc3df67401fd7092b4` (pushed to and verified equal with `origin/fast-qprefix`; clean).
 - Genuine Standard pin `5dbffbdea05394de2ca3a432ed5318aa832e3f40`: clean detached worktree.
@@ -120,5 +121,33 @@ Status: `BATCH_IN_PROGRESS` — S1–S3 zero-call gates complete; S4 not started
 | S1 source/provenance audit | complete | 0 |
 | S2 regression-first span and raw evidence implementation | complete | 0 |
 | S3 enabled/disabled, committed-source identity, and zero-call validation | complete | 0 |
-| S4 isolated E32 diagnostic trace | not authorized until S3 passes; max two | 0 |
-| S5 aggregate report and Web handoff | pending | 0 |
+| S4 isolated E32 diagnostic trace | blocked before reservations by held-vector schema/mode mismatch; max two remain unused | 0 |
+| S5 aggregate report and Web handoff | blocked; compact blocker evidence recorded for Web review | 0 |
+
+## S4 zero-call preflight stop
+
+- Invoked the fixed `logn13-e32-public` trace command only after Primary and
+  Secondary were clean, synchronized, and pinned; the runner stopped in
+  `validatePublicE32Fixture` before creating its isolated diagnostic checkout,
+  attempt journals, or launching any Bootstrap.
+- The held manifest is `fast-public-e32-trace-fixture.v1` and expects a
+  `fast-standard-public-native-repeatability-vectors.v1` artifact in mode
+  `public-native-repeatability`, including exactly six
+  `bootstrap_outputs`.
+- The supplied `fast-vectors.json` is instead
+  `fast-standard-public-native-vectors.v1`, mode `public-native`, and contains
+  no `bootstrap_outputs`. Backend/ref, Primary source, config, Q/P, input, and
+  workload hashes match the manifest, but the schema/mode and required output
+  set do not. The exact validator error is
+  `uninstrumented Fast vectors do not match the E32 trace fixture provenance`.
+- Manifest SHA-256:
+  `5bc19b1eb6e67997ca3d19f39e6fd781bf93b27ad305a1be733f0c883611b847`.
+  Supplied vector SHA-256:
+  `d0334680ac337d8d507a0074750e677dcf0d0ccdda47f17b7219c2655c5b0fc1`.
+- Batch024 attempt reservations: **0/2**; Bootstrap calls: **0**. Both
+  attempt-journal paths, the raw/certified trace artifacts, and the requested
+  summary JSON remain absent. Batch023's **14/14** calls remain spent and were
+  not reused. No retry or alternate fixture was attempted.
+- Resume requires Web review to identify the authoritative matching
+  repeatability vectors artifact and decide whether a fresh S4 invocation is
+  permitted under the no-retry rule. Until then, do not launch Bootstrap.

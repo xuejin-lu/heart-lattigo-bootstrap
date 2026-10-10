@@ -146,3 +146,20 @@ The zero-call preflight passed all eight canonical checkpoints with matching Lev
 The one cold and one warm sample are descriptive, not a stable speedup estimate. The pinned Fast source explicitly initializes its circuit lazily on first Bootstrap (`fast_bootstrap.go:18–40`), whereas Standard constructs its circuit data inside `NewEvaluator` (`evaluator.go:169–178`). This explains why the observed Fast constructor was short and its first call much larger than its warm call; report the phases separately and do not present the first call as steady-state latency. Fast's E32 in-circuit/internal stage tracing remains unavailable for formal Standard-comparable attribution. Fast E=32 is still the intentionally insecure zero-secret simulation mode; this result makes no security-equivalence claim.
 
 Compact result, journal, and provenance/aggregate evidence are in `results/FAST-DROPIN-PUBLIC-NATIVE-COLD-WARM-AUTONOMOUS-BATCH-022-{summary.md,journal.md,evidence.json}`. Raw 4096-slot vectors and temporary alternate modfiles remain outside the repository.
+
+## Batch024 E32 trace preflight status — 2026-10-10
+
+The Rescale trace producer repair and zero-call source/instrumentation gates
+passed. The S4 E32 trace session is currently **blocked before attempt
+reservation**: the held manifest expects repeatability vectors with schema
+`fast-standard-public-native-repeatability-vectors.v1`, mode
+`public-native-repeatability`, and six `bootstrap_outputs`; the supplied
+`fast-vectors.json` is the distinct pre-Bootstrap artifact
+`fast-standard-public-native-vectors.v1` / `public-native` and has no such
+outputs. Its backend, source, config, Q/P, input, and workload fingerprints
+match, but the artifact contract does not. No Batch024 tokens were reserved,
+no Bootstrap was called, and no raw trace exists. Batch023's 14/14 calls
+remain spent. Do not retry or substitute another vector artifact until Web
+review resolves the authoritative fixture and S4 retry authority. See
+`results/FAST-DROPIN-E32-TRACE-REPAIR-AUTONOMOUS-BATCH-024-summary.md` and its
+compact evidence JSON.
