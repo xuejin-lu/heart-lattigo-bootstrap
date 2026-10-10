@@ -147,6 +147,33 @@ func TestValidatePublicE32EventsChecksHierarchyAndRequiredPowers(t *testing.T) {
 	require.ErrorContains(t, validatePublicE32Events(duplicateSequence), "duplicate fastdiag event sequence")
 }
 
+func TestValidatePublicE32EventsRecursivePowerTree(t *testing.T) {
+	// Real Fast recursion starts T16 before generating its child T8.
+	events := publicE32TestEvents()
+	for i := range events {
+		if events[i].Scope == "power" && events[i].Power != nil && *events[i].Power == 8 {
+			events[i].ParentSequence = 17 // T16
+		}
+	}
+	require.NoError(t, validatePublicE32Events(events))
+
+	wrongScope := append([]Event(nil), events...)
+	for i := range wrongScope {
+		if wrongScope[i].Scope == "power" && wrongScope[i].Power != nil && *wrongScope[i].Power == 8 {
+			wrongScope[i].ParentSequence = 5 // unrelated Bootstrap stage
+		}
+	}
+	require.ErrorContains(t, validatePublicE32Events(wrongScope), "non-power ancestor")
+
+	cycle := append([]Event(nil), events...)
+	for i := range cycle {
+		if cycle[i].Scope == "power" && cycle[i].Power != nil && *cycle[i].Power == 16 {
+			cycle[i].ParentSequence = 16 // T16 -> T8 -> T16
+		}
+	}
+	require.ErrorContains(t, validatePublicE32Events(cycle), "cyclic ancestry")
+}
+
 func TestValidatePublicE32RawTraceRequiresExactMatchedTwoCalls(t *testing.T) {
 	manifest := publicE32FixtureManifest{
 		SchemaVersion: "fast-public-e32-trace-fixture.v1", Profile: "logn13-e32-public-native", Backend: "fast",

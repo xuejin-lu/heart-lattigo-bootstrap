@@ -777,9 +777,6 @@ func validatePublicE32Events(events []Event) error {
 				return fmt.Errorf("duplicate generated power T%d", *event.Power)
 			}
 			powers[*event.Power] = true
-			if !generatedPowers[event.ParentSequence] {
-				return fmt.Errorf("power event T%d is not nested under generated_powers", *event.Power)
-			}
 		}
 		if event.Scope == "rescale" && event.Name == "rescale" {
 			rescaleCount++
@@ -793,6 +790,46 @@ func validatePublicE32Events(events []Event) error {
 			if _, exists := sequences[event.ParentSequence]; !exists {
 				return fmt.Errorf("event %d references missing parent %d", event.Sequence, event.ParentSequence)
 			}
+		}
+	}
+	// A generated Chebyshev power can recursively generate lower powers.
+	// Thus T8 may be a child of T16, which is itself under generated_powers.
+	// Follow the actual ancestry instead of requiring every power to be a
+	// direct child of generated_powers.
+	for _, event := range events {
+		if event.Scope != "power" || event.Name != "power" {
+			continue
+		}
+		if event.Power == nil || event.SplitA == nil || event.SplitB == nil {
+			return fmt.Errorf("power event %d lacks generated-power fields", event.Sequence)
+		}
+		ancestorSequence := event.ParentSequence
+		seen := map[uint64]bool{event.Sequence: true}
+		for {
+			if ancestorSequence == 0 {
+				return fmt.Errorf("power event T%d has no generated_powers ancestor", *event.Power)
+			}
+			if seen[ancestorSequence] {
+				return fmt.Errorf("power event T%d has cyclic ancestry", *event.Power)
+			}
+			seen[ancestorSequence] = true
+			ancestor, found := sequences[ancestorSequence]
+			if !found {
+				return fmt.Errorf("power event T%d has missing ancestor %d", *event.Power, ancestorSequence)
+			}
+			if ancestor.Scope != "power" {
+				return fmt.Errorf("power event T%d has non-power ancestor %d", *event.Power, ancestorSequence)
+			}
+			if ancestor.Name == "generated_powers" {
+				if !generatedPowers[ancestorSequence] {
+					return fmt.Errorf("power event T%d has an unregistered root", *event.Power)
+				}
+				break
+			}
+			if ancestor.Name != "power" || ancestor.Power == nil || *ancestor.Power <= *event.Power {
+				return fmt.Errorf("power event T%d has invalid recursive ancestor %d", *event.Power, ancestorSequence)
+			}
+			ancestorSequence = ancestor.ParentSequence
 		}
 	}
 	wantStages := []string{"pack_n1_to_n2", "scale_down", "mod_up_trace", "coeffs_to_slots", "evalmod_real"}
