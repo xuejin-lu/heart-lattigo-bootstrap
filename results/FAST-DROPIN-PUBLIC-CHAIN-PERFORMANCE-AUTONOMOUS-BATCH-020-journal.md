@@ -12,7 +12,7 @@
 
 Reused the accepted Batch 019 same-public-source runner and added only measurement instrumentation in Primary. Both backend builds compile the same common source; the build-tagged capacity adapter remains a separate observer and is not in timed operations. Added per-stage wall samples and allocation deltas for key generation, evaluation-key generation, evaluator/codec initialization, Encrypt A/B/C, Add, MulRelin, Rescale, Rotate, DropLevel, native decode, and the later one-shot Bootstrap/post-Bootstrap decode. Heap-stat snapshots occur before and after—not inside—the timed interval. `eval_only_stage_sum_wall_ns` is the sum of only the six timed public-chain stages from Add through native decode, excluding capacity observation/hashing. `process_active_wall_ns_excluding_stdin_wait` excludes the interactive one-shot gate interval. Each checkpoint also reports approximate q-backed bytes as the sum of coefficient-slice capacities × 8; this excludes object headers, keys, evaluator state, and allocator overhead and is not RSS.
 
-Environment for the upcoming measurements is frozen to Go `go1.26.4`, `darwin/arm64`, Apple M4 / 10 CPU cores, `GOMAXPROCS=1`, Go's default GC with no `GOGC` or `GOMEMLIMIT` override, identical process-isolated runs, and a build-before-run workflow so compilation is excluded. The primary harness records Go/OS/arch, CPU count, GOMAXPROCS, and GC-related environment overrides. Peak RSS will be recorded only through macOS `/usr/bin/time -l` process high-water output, separately from q-backed bytes and stage allocations.
+Environment was frozen to Go `go1.26.4`, `darwin/arm64`, Apple M4 / 10 CPU cores, `GOMAXPROCS=1`, Go's default GC with no `GOGC` or `GOMEMLIMIT` override, identical process-isolated runs, and a build-before-run workflow so compilation is excluded. The primary harness records Go/OS/arch, CPU count, GOMAXPROCS, and GC-related environment overrides. Peak RSS collection was attempted with macOS `/usr/bin/time -l`, but sandbox denial of `sysctl kern.clockrate` made that tool exit nonzero. `time -p` works but does not report RSS, so peak RSS is omitted rather than inferred from q-backed bytes or Go allocations.
 
 Validation before measurement:
 
@@ -20,6 +20,13 @@ Validation before measurement:
 - Standard focused `go test -tags lattigo_standard ... -count=1` against the pinned workspace: PASS.
 - Fast and Standard focused `go vet`: PASS.
 - `git diff --check`: PASS.
-- No Bootstrap was invoked. No S2 repetitions have been counted yet.
+- No Bootstrap was invoked. An initial harness smoke process was excluded from S2 because its runtime `GOMAXPROCS` was 10; it also surfaced the `/usr/bin/time -l` sandbox limitation above.
 
-Next: commit/push this Primary-only S1 harness checkpoint, then execute exactly five cheap process-isolated samples per backend for S2. Preserve each raw sample; do not call Bootstrap before S5.
+## S2 — original-pins cheap baseline: COMPLETE
+
+- Five valid process-isolated samples per backend ran with identical committed Primary source, config/input/profile, Go version, host and `GOMAXPROCS=1`; each Standard/Fast pair passed all provenance checks and the unchanged `1e-6` direct numerical gate. All ten pre-Bootstrap native oracles passed; total Bootstrap calls remain Standard `0/1`, Fast `0/1`.
+- Full raw stage wall samples, median/range, allocation medians, paired RMSE/max, compact row-capacity byte estimates, provenance hashes and limitations are preserved in `FAST-DROPIN-PUBLIC-CHAIN-PERFORMANCE-AUTONOMOUS-BATCH-020-S2-original-baseline.md`.
+- Descriptive eval-only stage-sum medians: Standard `6.102 ms`, Fast `3.178 ms`; highest Fast stage is Rescale at `1.730 ms`. This does not establish Bootstrap speedup or statistical significance.
+- No reliable peak RSS value was available. Allocation counters and q-backed ciphertext bytes are kept as separate measurements.
+
+Next: source-backed S3 attribution of Fast's Rescale bottleneck using current Secondary source and reusable historical diagnostics; no Bootstrap before S5.
