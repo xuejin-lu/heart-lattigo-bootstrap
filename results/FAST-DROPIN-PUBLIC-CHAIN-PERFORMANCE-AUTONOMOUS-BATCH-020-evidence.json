@@ -1,0 +1,131 @@
+{
+  "schema": "fast-dropin-public-chain-performance-batch-020.evidence.v1",
+  "status": "BATCH_COMPLETE_READY_FOR_WEB_REVIEW",
+  "classification": "NO_SAFE_OPT_CANDIDATE",
+  "provenance": {
+    "primary_s5_commit": "2bf9893a266d188d28197a2aef5848057d7ac9af",
+    "primary_dirty": false,
+    "primary_harness_commit": "c486cb2b229f4cc6c0b77f9be2b85066c3b6c213",
+    "primary_s2_commit": "d3f630d1aed3a2c6b99275652fe66d79e8190a6f",
+    "primary_s3_commit": "2bf9893a266d188d28197a2aef5848057d7ac9af",
+    "standard_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+    "standard_dirty": false,
+    "fast_ref": "fast-qprefix",
+    "fast_commit": "2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac",
+    "fast_dirty": false,
+    "runtime": {
+      "go": "go1.26.4",
+      "os": "darwin",
+      "architecture": "arm64",
+      "cpu": "Apple M4",
+      "gomaxprocs": 1,
+      "gogc_override": null,
+      "gomemlimit_override": null,
+      "peak_rss": null,
+      "peak_rss_note": "macOS time -l could not run in sandbox because sysctl kern.clockrate was denied"
+    },
+    "sha256": {
+      "shared_frontend": "fc059c1fb0b724f6f77734b5ba5e10e177c5fa6db85a7a188f61abb791f08d30",
+      "config": "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98",
+      "input": "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285",
+      "workload": "00b70a2e77887c7d6a41db1859246f6513f2c984915de648734e5dd8c584cf74",
+      "effective_profile": "862d233af63b18a46e0a2cb5e7f74cda93a9dcab6c04fc2f4b1e425c424a7044",
+      "effective_qp": "1f045e603a856968779d62e045a037274bba08cbfce8b1dd3dec2828f1f6a46b"
+    }
+  },
+  "gate": {
+    "max_complex_error": 0.000001,
+    "s2_prebootstrap_pairs": 5,
+    "s5_bootstrap_calls_total": 2,
+    "s5_standard_calls": 1,
+    "s5_fast_calls": 1,
+    "s5_combined_status": "BATCH_COMPLETE_READY_FOR_WEB_REVIEW"
+  },
+  "s2_original_pin_baseline": {
+    "bootstrap_calls": 0,
+    "eval_only_stage_sum_wall_ns": {
+      "standard_samples": [5941166, 6101624, 7540791, 5754876, 17017917],
+      "standard_median": 6101624,
+      "fast_samples": [2449375, 3186667, 3212833, 3177875, 3160333],
+      "fast_median": 3177875
+    },
+    "fast_rescale_median_ns": 1730000,
+    "paired_prebootstrap_rmse": [
+      1.46203107655e-11,
+      1.43288267233e-11,
+      1.45509715048e-11,
+      1.45172349443e-11,
+      1.45448913764e-11
+    ],
+    "paired_prebootstrap_max": [
+      6.81138397995e-11,
+      6.91904100577e-11,
+      6.28708689093e-11,
+      5.84609944353e-11,
+      6.50102241513e-11
+    ]
+  },
+  "s3": {
+    "verdict": "NO_SAFE_OPT_CANDIDATE",
+    "s4": "skipped",
+    "current_fast_rescale_benchmark": {
+      "iterations": 8078,
+      "ns_per_op": 1278368,
+      "bytes_per_op": 680,
+      "allocs_per_op": 20,
+      "profile_cpu_samples_seconds": 9.18,
+      "largest_flat_cpu_percent": {
+        "math/bits.Div64": 15.8,
+        "ring.nttUnrolled16Lazy": 13.73,
+        "ring.inttLazyUnrolled16": 12.75,
+        "ring.MRedLazy": 10.02
+      },
+      "note": "max-logical-level rows4 q0=55 source-attribution proxy; not the exact public-chain q5 input"
+    }
+  },
+  "s5_one_shot_bootstrap": {
+    "prebootstrap_pair": {
+      "rmse": 1.4749744522248e-11,
+      "max_complex_error": 8.062206332467442e-11,
+      "pass": true
+    },
+    "standard": {
+      "bootstrap_wall_ns": 379014833,
+      "alloc_bytes": 143878040,
+      "allocs": 36648,
+      "native_oracle_rmse": 4.830325551058028e-9,
+      "native_oracle_max_complex_error": 1.501576458513549e-8,
+      "native_oracle_snr_db": 102.20889412290559,
+      "output_level": 1,
+      "output_scale_log2": 45
+    },
+    "fast": {
+      "bootstrap_wall_ns": 574403083,
+      "alloc_bytes": 960703496,
+      "allocs": 19282450,
+      "native_oracle_rmse": 1.1795718406445398e-9,
+      "native_oracle_max_complex_error": 5.7387742390963576e-8,
+      "native_oracle_snr_db": 114.45393423748425,
+      "output_level": 1,
+      "output_scale_log2": 45,
+      "compact_qprefix": true,
+      "zero_c1": true
+    },
+    "fast_vs_standard": {
+      "rmse": 4.914355209707142e-9,
+      "max_complex_error": 4.2372353589552495e-8,
+      "snr_db": 102.05909072045253,
+      "pass": true
+    },
+    "note": "single observation per backend; not a statistically stable performance comparison"
+  },
+  "validation": {
+    "fast_focused_go_test": "PASS",
+    "standard_focused_go_test": "PASS",
+    "fast_focused_go_vet": "PASS",
+    "standard_focused_go_vet": "PASS",
+    "source_changes": "none in Standard or Secondary production",
+    "bootstrap_warmups_or_retries": 0,
+    "logn16": "not run"
+  }
+}

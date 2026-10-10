@@ -29,7 +29,7 @@ Validation before measurement:
 - Descriptive eval-only stage-sum medians: Standard `6.102 ms`, Fast `3.178 ms`; highest Fast stage is Rescale at `1.730 ms`. This does not establish Bootstrap speedup or statistical significance.
 - No reliable peak RSS value was available. Allocation counters and q-backed ciphertext bytes are kept as separate measurements.
 
-Next: source-backed S3 attribution of Fast's Rescale bottleneck using current Secondary source and reusable historical diagnostics; no Bootstrap before S5.
+S3 is complete; see the attribution section below. Optional S4 was skipped because no safe source-backed mechanical candidate was found.
 
 ## S3 — current Rescale attribution: COMPLETE
 
@@ -38,3 +38,14 @@ Next: source-backed S3 attribution of Fast's Rescale bottleneck using current Se
 - Profile attribution points at required NTT/INTT and centered-CRT/round/capacity work; source review found no demonstrably redundant representation-neutral allocation/copy. Batched staging would retain the required transforms and arithmetic while changing intermediate liveness/cache behavior, with no evidence of a high-impact mechanical gain.
 - Verdict: `NO_SAFE_OPT_CANDIDATE`. Optional S4 is skipped. No Secondary source was modified; S5 remains on the frozen original Fast commit. Detailed evidence is in `FAST-DROPIN-PUBLIC-CHAIN-PERFORMANCE-AUTONOMOUS-BATCH-020-S3-attribution.md`.
 - Cumulative Bootstrap budget remains Standard `0/1`, Fast `0/1`.
+
+## S5 — one-shot paired Bootstrap and synthesis: COMPLETE
+
+- Before Bootstrap, reverified Primary clean at `2bf9893a266d188d28197a2aef5848057d7ac9af`; Secondary clean at the original Fast pin `2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac`; Standard detached/clean at `5dbffbdea05394de2ca3a432ed5318aa832e3f40`.
+- Both held native public-chain preflights and the combined provenance gate passed. Pre-Bootstrap paired RMSE was `1.4749744522248e-11`, max `8.062206332467442e-11`; shared frontend/config/input/workload/profile/QP hashes matched.
+- Exactly one Standard and one Fast Bootstrap ran. Standard native output RMSE/max/SNR: `4.830325551058028e-9` / `1.501576458513549e-8` / `102.208894 dB`; wall `379014833 ns`, allocations `143878040 bytes / 36648 objects`.
+- Fast native output RMSE/max/SNR: `1.1795718406445398e-9` / `5.7387742390963576e-8` / `114.453934 dB`; wall `574403083 ns`, allocations `960703496 bytes / 19282450 objects`. Fast output stayed compact Q-prefix with zero `c1`; both outputs Level 1, Scale `2^45`.
+- Paired Bootstrap output RMSE/max/SNR: `4.914355209707142e-9` / `4.2372353589552495e-8` / `102.059091 dB`; pass under fixed `1e-6` gate. Total actual Bootstrap calls: Standard `1/1`, Fast `1/1`. Single-run timings are descriptive only.
+- One initial Standard process received EOF at the pre-Bootstrap gate, wrote `preflight_passed_bootstrap_not_started`, and recorded zero calls/attempts; it is excluded. The accepted held runs passed combined preflight before each backend's one Bootstrap, with no retries or warmups.
+- Final focused Fast/Standard `go test` and `go vet` passed. Compact final synthesis/evidence are in the Batch 020 `summary.md` and `evidence.json` artifacts.
+- Final disposition: `NO_SAFE_OPT_CANDIDATE`; S4 skipped, original Fast pin retained; `BATCH_COMPLETE_READY_FOR_WEB_REVIEW`.
