@@ -244,3 +244,30 @@ and Amdahl details, medians, hashes, and attempt-journal provenance are in
 `results/FAST-DROPIN-E32-TRACE-OFFLINE-SALVAGE-AUTONOMOUS-BATCH-025-{summary.md,journal.md,evidence.json}`.
 The immutable raw and source sidecar remain outside Git. No Secondary
 production code or pinned Standard/Fast backend was changed.
+
+## Batch026 source-backed Rescale microbenchmark guidance (2026-10-11)
+
+For a bounded Fast kernel study, select a representative Level/row-width/alias
+shape from the event-level trace and count its occurrences before constructing
+a fixture. Build the exact effective Q/P profile through the same parameter
+builder and assert its canonical fingerprint. Exercise the public Fast
+`Rescale` path that reaches `RescaleWorkspace.ApplyRows`; do not benchmark an
+isolated arithmetic helper and call it an end-to-end Rescale. Record component
+count, NTT/Montgomery representation, logical Level, backed prefix rows,
+in-place/out-of-place mode, fixture seed and ciphertext fingerprint. If the
+captured trace lacks coefficient data, label a deterministic valid synthetic
+fixture as synthetic—it is not a replay of the captured ciphertext.
+
+Keep fixture construction, reset/copy, and warm-up outside the timed region;
+use a regular build without `fastdiag` tags, a fixed GOMAXPROCS/GC setting, and
+a small bounded number of repeated samples. Preserve each sample, median,
+spread, allocations, and exact command. A local Rescale microbenchmark does not
+establish Bootstrap or Standard/Fast end-to-end speedup. Retain a production
+candidate only when the matched repeated measurement shows a robust benefit
+and the real public-path correctness/oracle gates pass; otherwise remove only
+the candidate and retain the negative result in Primary.
+
+Batch026 applied this protocol to the repeated E32 LogN13 Level 9→8, rows
+4→4, in-place path. It found no robust improvement from the one tested
+high-limb-zero modulo fast path; Secondary production code remained unchanged.
+See `results/FAST-E32-RESCALE-COEFFICIENT-OPT-AUTONOMOUS-BATCH-026-{summary.md,journal.md,evidence.json}`.

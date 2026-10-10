@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "task": "FAST-E32-RESCALE-COEFFICIENT-OPT-AUTONOMOUS-BATCH-026",
+  "classification": "NO_BENEFICIAL_CANDIDATE",
+  "handoff": "READY_FOR_WEB_REVIEW",
+  "generated_date": "2026-10-11",
+  "budget": {
+    "bootstrap_calls": 0,
+    "standard_performance_calls": 0,
+    "p93_benchmarks": 0
+  },
+  "primary": {
+    "baseline_commit": "78f8ab9daadf4522af9dd693f3d952ec9982e8c2",
+    "branch": "main"
+  },
+  "secondary": {
+    "baseline_commit": "4f2557062cb5c1ffb9a671bc3df67401fd7092b4",
+    "final_commit": "4f2557062cb5c1ffb9a671bc3df67401fd7092b4",
+    "branch": "fast-qprefix",
+    "final_clean": true,
+    "commit_created": false
+  },
+  "frozen_pins": {
+    "standard": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+    "fast_production": "2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac",
+    "modified": false
+  },
+  "trace": {
+    "source_status": "TRACE_UNVERIFIED",
+    "offline_classification": "OFFLINE_REVALIDATED_TRACE",
+    "sha256": "f922587fa944da7ef07dcb94a9497505018f2fee2bc67e7f87af6d35bc3d1c74",
+    "event_count": 539,
+    "rescale_root_count": 35,
+    "selected_shape_count": 6,
+    "selected_level_in_out": [9, 8],
+    "source_target_rows": [4, 4],
+    "in_place": true
+  },
+  "profile": {
+    "name": "logn13-e32-public-native",
+    "log_n": 13,
+    "ephemeral_secret_weight": 32,
+    "ring_n": 8192,
+    "effective_qp_sha256": "1f045e603a856968779d62e045a037274bba08cbfce8b1dd3dec2828f1f6a46b"
+  },
+  "fixture": {
+    "kind": "synthetic-fixed-seed-valid-ntt",
+    "not_captured_bootstrap_ciphertext": true,
+    "seed_hex": "0x026e32a5d7c19b43",
+    "component_count": 2,
+    "c0_c1_nonzero": true,
+    "is_ntt": true,
+    "is_montgomery": false,
+    "input_sha256": "001855dc4aba15d1da02e71df32242cb019c8976fa2ebede386bebad43ab1247"
+  },
+  "benchmark": {
+    "path": "Fast public Rescale -> RescaleWorkspace.ApplyRows",
+    "regular_build": true,
+    "command": "GOMAXPROCS=1 GOGC=100 go test ./circuits/ckks/bootstrapping -run '^$' -bench '^BenchmarkFastRescaleE32LogN13Level9Rows4InPlace$' -benchmem -benchtime=100ms -count=5 -v",
+    "environment": {
+      "cpu": "Apple M4",
+      "os": "macOS 26.6.2",
+      "go": "go1.26.4",
+      "goos": "darwin",
+      "goarch": "arm64",
+      "gomaxprocs": 1,
+      "gogc": 100
+    },
+    "baseline": {
+      "ns_per_op_samples": [2676129, 2663219, 2712441, 2692458, 2755351],
+      "median_ns_per_op": 2692458,
+      "min_ns_per_op": 2663219,
+      "max_ns_per_op": 2755351,
+      "bytes_per_op_range": [681, 682],
+      "allocs_per_op": 20
+    },
+    "candidate": {
+      "ns_per_op_samples": [2688291, 2734854, 2740962, 2709171, 2702554],
+      "median_ns_per_op": 2709171,
+      "min_ns_per_op": 2688291,
+      "max_ns_per_op": 2740962,
+      "bytes_per_op_range": [681, 682],
+      "allocs_per_op": 20,
+      "median_change_percent": 0.6207,
+      "result": "no_robust_improvement_removed"
+    }
+  },
+  "candidate_provenance": {
+    "id": "mod192By64_high_limb_zero_fast_path",
+    "commit_sha": null,
+    "temporary_source_file_sha256": "7dc49c53c27212dc05ee3916aef845ae3c734c0fe676ff6b32babf0e92498094",
+    "baseline_source_file_sha256": "38b8cfd3917e3b42282e1a63231441d7a6d203266c5c713426866301a8dd7f99",
+    "level9_bound": {
+      "q0123_product": "5986308565615587353347023386369277282933624144412673",
+      "q9": "1152921504606601217",
+      "rounded_magnitude_upper_bound": "2596147500804154870871593067152517",
+      "upper_bound": "<2^111",
+      "high_limb_zero_proven": true
+    },
+    "retained": false
+  },
+  "validation": {
+    "fastcore_tests": "PASS",
+    "fast_rescale_qprefix_focused_tests": "PASS",
+    "temporary_big_int_differential_test": "PASS",
+    "focused_go_vet": "PASS",
+    "git_diff_check": "PASS",
+    "bootstrap_calls": 0,
+    "standard_performance_calls": 0,
+    "p93_benchmarks": 0
+  }
+}
