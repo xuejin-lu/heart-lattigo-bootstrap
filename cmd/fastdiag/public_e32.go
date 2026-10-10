@@ -272,8 +272,8 @@ func tracePublicE32(primaryRoot, secondaryRoot string, primary RepositoryMetadat
 		return publicE32TraceDocument{}, err
 	}
 	diagnosticRoot := filepath.Join(tempRoot, "secondary-diagnostic")
-	if err := gitRun(secondaryRoot, "worktree", "add", "--detach", diagnosticRoot, secondary.Commit); err != nil {
-		return publicE32TraceDocument{}, fmt.Errorf("create isolated test-only diagnostic checkout (temp retained at %s): %w", tempRoot, err)
+	if err := createPublicE32IsolatedClone(secondaryRoot, diagnosticRoot, secondary.Commit); err != nil {
+		return publicE32TraceDocument{}, fmt.Errorf("create task-local pinned diagnostic clone (temp retained at %s): %w", tempRoot, err)
 	}
 	diagnosticMeta, err := repositoryMetadata(diagnosticRoot, "diagnostic-detached:"+secondary.Commit[:12])
 	if err != nil {
@@ -334,8 +334,8 @@ func tracePublicE32(primaryRoot, secondaryRoot string, primary RepositoryMetadat
 	if err != nil {
 		return publicE32TraceDocument{}, fmt.Errorf("validate post-warm heap profile in preserved temp directory %s: %w", tempRoot, err)
 	}
-	if err := gitRun(secondaryRoot, "worktree", "remove", diagnosticRoot); err != nil {
-		return publicE32TraceDocument{}, fmt.Errorf("E32 trace passed but clean diagnostic checkout could not be removed; preserve %s and %s: %w", diagnosticRoot, tempRoot, err)
+	if err := os.RemoveAll(diagnosticRoot); err != nil {
+		return publicE32TraceDocument{}, fmt.Errorf("clean task-local diagnostic clone %s: %w", diagnosticRoot, err)
 	}
 	profileAttribution := inspectE32CPUProfile(cpuProfilePath)
 	rawSum := sha256.Sum256(rawBytes)
