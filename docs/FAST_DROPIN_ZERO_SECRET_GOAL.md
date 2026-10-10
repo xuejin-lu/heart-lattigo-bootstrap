@@ -14,7 +14,13 @@ Q-prefix is one optimization and is not the definition of Fast. Preserve the pos
 - Output must be measured against the expected cleartext result and a **genuinely encrypted Standard reference using the SAME original frontend E and CKKS profile**, with RMSE, maximum error and SNR reported; failures and unsupported cases must be explicit. Do not guarantee a universal 1e-8 without workload-specific evidence.
 - Do not change the pinned genuine Standard source; Fast-fork changes must retain Standard public API shape, and comply with repository architectural invariants. Preserve user-visible CKKS semantics, Level/Scale and supported operations; never silently fall back to full-RNS on unmaterialized Q-prefix rows.
 
-### Known current gap
+### Current implementation status (2026-10-11; supersedes the historical gap below)
+
+The supported public application-facing **backend-transparent drop-in integration has been achieved**. Ordinary `ckks.NewEvaluator` and `bootstrapping.NewEvaluator` now dispatch into Fast internals with the current Fast dependency; identical frontend source runs against independently pinned original Standard by changing **only** the linked Lattigo checkout at build time. The supported ordinary public workflow and LogN13/E32 paired validation are documented in `docs/BACKEND_TRANSPARENCY_CONTRACT.md` and the Batch022–023 results. Frontend `NewFastEvaluator`, runtime Fast switches and manually built c0/zero-c1 selectors are **not required** and must not be reintroduced.
+
+The 'Known current gap' section below is a **historical 2026-10-08 snapshot**, not a description of the present implementation. The latest LogN16 stage-by-stage numeric validation is still pending; do not confuse this with API transparency.
+
+### Historical 2026-10-08 gap (superseded; retained for context)
 
 Fast Bootstrap currently rejects E != 0 even though its zero-secret ModUp has no Dense/Sparse switching. Primary `backend_fast.go` manually builds a direct-encoded c1=0 input and invokes `NewFastEvaluator`, so it **has not proven** transparent library substitution. The Fast fork has a partial `NewEvaluator` compatibility dispatch, but other conventional call paths are not proven end-to-end.
 
