@@ -23,6 +23,16 @@ Before deciding whether there is work to do:
    After a successful fetch, use the fetched `origin/main` for the merge; **do not run `git pull`**, because it performs another fetch.
 5. After the merge, verify `git rev-parse HEAD` equals `git rev-parse origin/main`. If fetch or fast-forward merge fails, stop and report the exact failure. Do not continue from stale local instructions.
    Distinguish a Git command that ran and failed to write Git metadata (for example `.git/FETCH_HEAD: Operation not permitted`) from a tool failure to create the execution process. For a process-creation failure, first verify the working-directory and Git executable paths; do not retry indefinitely. Use the formal permission-escalation mechanism for a Git metadata write denial when available. Never work around either failure with `sudo` or arbitrary permission changes.
+### Process-launch failure recovery for routine fast-forward sync
+
+A process-launch error such as `No such file or directory` while invoking the **permission-escalation wrapper** is not evidence that `git merge` ran or failed. Do not classify it as Git divergence or treat it as a CKKS task blocker requiring mathematical review.
+
+If `git fetch origin` succeeded, `main` and the worktree are clean, and `origin/main` is a descendant of local HEAD, execute `git merge --ff-only origin/main` once using the normal available shell execution channel and the repository's real absolute working directory. Do not request escalated permissions unless a normal Git command **actually returns a relevant permission error**. A previous wrapper process-launch failure does not itself require escalation.
+
+After an ordinary Git metadata permission failure, use the formal escalation mechanism once when available. If that wrapper itself cannot launch a process, do not repeatedly invoke the same broken wrapper. Verify paths and tools once. If the ordinary channel is also unable to launch or Git still cannot write metadata, stop with `ENVIRONMENT_SYNC_BLOCKED`, report the exact attempted command/error, and provide the smallest safe manual `git merge --ff-only origin/main` command for a user terminal; never pretend synchronization occurred.
+
+Verify `HEAD == origin/main` and then resume from the newly synchronized instructions. No `sudo`, `reset`, `rebase`, `stash`, `force`, `pull`, history rewriting, or modifications to an unclean worktree. Never skip the startup synchronization requirement merely to get past tool failure.
+
 6. **Only after the remote sync succeeds**, re-read the freshly synchronized:
    - `AGENTS.md`
    - `CURRENT_TASK.md`
