@@ -1,18 +1,18 @@
-# CURRENT TASK — Batch025 Zero-call Fast E32 Trace Recovery
+# CURRENT TASK — Batch026 E32 Rescale Coefficient Hotspot
 
-Task: FAST-DROPIN-E32-TRACE-OFFLINE-SALVAGE-AUTONOMOUS-BATCH-025
+Task: FAST-E32-RESCALE-COEFFICIENT-OPT-AUTONOMOUS-BATCH-026
 Status: READY_FOR_CODEX
-Mode: REUSE-EXISTING-FASTDIAG OFFLINE RAW EVIDENCE ANALYSIS, O1–O4
+Mode: ZERO-BOOTSTRAP REPRESENTATIVE E32 RESCALE MICROBENCH + ONE BOUNDED CANDIDATE
 
-**Spec:** `specs/FAST-DROPIN-E32-TRACE-OFFLINE-SALVAGE-AUTONOMOUS-BATCH-025.md`
-**Web review:** `results/FAST-DROPIN-E32-TRACE-REPAIR-AUTONOMOUS-BATCH-024-web-review.md`
-**Permanent rules:** both AGENTS.md, Primary docs/MEASUREMENT_PLATFORM.md, RESEARCH_ENGINEERING_WORKFLOW.md §4A/4B.
+**Authoritative spec:** `specs/FAST-E32-RESCALE-COEFFICIENT-OPT-AUTONOMOUS-BATCH-026.md`
+**Independent scientific review:** `results/FAST-DROPIN-E32-TRACE-OFFLINE-SALVAGE-AUTONOMOUS-BATCH-025-web-review.md`
+**Permanent rules:** Primary and Secondary AGENTS, docs/MEASUREMENT_PLATFORM.md, workflow §4A/4B.
 
-Batch024 fully spent two/2 Fast-only E32 calls: oracle correct (RMSE 1.17958e-9; worst error 5.73879e-8). Raw 539-event trace preserved, SHA256 f922587fa944da7ef07dcb94a9497505018f2fee2bc67e7f87af6d35bc3d1c74. First validator mismatch event 61 T8 child of event 60 T16, event 59 generated_powers: SOURCE-CORRECT recursive generation. Web directly corrected Primary `validatePublicE32Events` to accept source-backed ancestor chains; regression tests added. Original raw remains TRACE_UNVERIFIED and cannot be rewritten.
+Batch025 `OFFLINE_REVALIDATED_TRACE` accepted as **post-hoc**, original raw remains `TRACE_UNVERIFIED`. 539 events / zero new crypto calls. One instrumented warm E32 Fast Bootstrap 122.193458ms; EvalMod real+imag 91.857958ms (75.17% of Bootstrap traced stage root). Thirty-five independent Rescale roots sum 108.326291ms, which is NOT additive to Bootstrap root or Power roots. Inside those roots, coefficient loop own exclusive plus CRT/reconstruct+round/capacity sum **72.933231ms / ~67.33% of separately-rooted Rescale time**, more than NTT restore 9.567417ms (~8.83%). Single traced sample has measurement overhead; original uninstrumented 72.580ms Fast median / 306.636ms Standard median historical 4.225x is distinct and intentionally insecure zero-secret.
 
-O1: safe sync, source, immutable raw/sidecar/fixture and 2/2 journals verified (0 new calls).
-O2: existing `cmd/fastdiag` offline replay with strict full-tree/provenance and synthetic tests (0 new calls).
-O3: source-grounded internal time Pareto, Stage/Power/Rescale and closure from same saved raw only, or explicit all anomalies (0 new calls).
-O4: honest OFFLINE_REVALIDATED_TRACE or OFFLINE_PARTIAL_UNVERIFIED compact report, tests/vet, safe Primary commit/push, ONE Web scientific review.
+R1: clean startup sync, source map and authentic repeated E32 real-Rescale **regular-build** microbench baseline, no Bootstrap.
+R2: only if justified, one scoped source-backed safe fixed-width/coefficient-loop optimization hypothesis; no CKKS math/representation changes without Web.
+R3: extensive cheap real Rescale oracle equality (rows 1–4, alias, metadata, capacity/rounding), matched baseline/candidate repeated microbench; no benchmark overclaim; revert only own candidate safely if worse.
+R4: compact result + explicit 0 new Bootstrap, safe commits/push and one Web review. No Batch027 authority.
 
-**ABSOLUTE expensive cap: 0 Standard and 0 Fast Bootstrap across this batch.** No fresh keygen, CKKS loop, new experiment, Secondary math/test changes, new benchmark runner, or alteration to original evidence. Historical Batch023 14/14 and Batch024 2/2 remain spent. Unavailable old Standard pinned worktree is not a blocker for offline Fast-only analysis; do not clean/prune unrelated stale worktrees.
+**Exact expensive call cap: ZERO Bootstrap (Standard and Fast), ZERO full CNN/CKKS benchmark.** Never reuse Batch023 14/14 or Batch024 2/2 spent attempts. Avoid touching old Git worktree metadata or changing frozen genuine Standard and formal original Fast pins.
