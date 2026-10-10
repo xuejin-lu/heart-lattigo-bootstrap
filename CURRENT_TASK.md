@@ -1,21 +1,28 @@
 # Current Task
 
-Task: FAST-DROPIN-BOOTSTRAP-PERFORMANCE-ATTRIBUTION-AUTONOMOUS-BATCH-021
+Task: FAST-DROPIN-MEASUREMENT-PLATFORM-REPAIR-AUTONOMOUS-BATCH-021
 Status: READY_FOR_CODEX
-Mode: S1–S4 BOUNDED AUTONOMOUS BOOTSTRAP COLD/WARM ATTRIBUTION
-Web review only after S4 or immediate scientific/unsafe STOP.
+Mode: PLATFORM-FIRST AUTONOMOUS P1–P5 MIGRATION, NO EXPENSIVE BOOTSTRAP
+Review: ONE Web scientific/code-architecture review at completion or genuine STOP
 
-**Executable spec:** `specs/FAST-DROPIN-BOOTSTRAP-PERFORMANCE-ATTRIBUTION-AUTONOMOUS-BATCH-021.md`
-**Accepted Batch020 review:** `results/FAST-DROPIN-PUBLIC-CHAIN-PERFORMANCE-AUTONOMOUS-BATCH-020-web-review.md`
-**Workflow:** both AGENTS.md, `docs/RESEARCH_ENGINEERING_WORKFLOW.md` §4A/4B, Secondary FAST_QPREFIX_SPEC.md.
+**Runnable and authoritative task:** `specs/FAST-DROPIN-MEASUREMENT-PLATFORM-REPAIR-AUTONOMOUS-BATCH-021.md`
+**Mandatory permanent infrastructure rules:** Primary `AGENTS.md` plus `docs/MEASUREMENT_PLATFORM.md`; Secondary `AGENTS.md`; `docs/RESEARCH_ENGINEERING_WORKFLOW.md` §4A/4B.
+**Predecessor accepted:** Batch020 Web review. **Supersedes previous** `specs/FAST-DROPIN-BOOTSTRAP-PERFORMANCE-ATTRIBUTION-AUTONOMOUS-BATCH-021.md` cold/warm plan, now DEFERRED until shared platform is fixed and independently reviewed.
 
 ## Why this task
-Batch020 S1–S5 engineering execution and numerical gates accepted. Pre-Bootstrap evaluation-only cheap median: Standard 6.101624 ms, Fast 3.177875 ms (5 samples). One-shot public Bootstrap: Standard 379.015 ms versus Fast 574.403 ms, BUT this comparison is not a fair steady-state result because Standard `NewEvaluator` eagerly builds circuit data while Fast `Bootstrap` lazily builds it on its first call. Likewise first-call allocations 144 MB Standard vs 961 MB Fast conflate initialization boundaries. `NO_SAFE_OPT_CANDIDATE` justified skipping optional S4 under the prior charter.
 
-## Batch021 S1–S4
-S1: source-backed exact cold/warm measurement design and matched same-source instrumentation, with prior accepted 019/020 math/params/API unchanged; safe checkpoint.
-S2: **at most two real E32 Standard Bootstrap + two Fast Bootstrap total across whole Batch**. First-call and second-call in same backend lifecycle, same logical input, no retries or extra warmups; independent native numerical oracle for every call. Report evaluator-construction time separately.
-S3: independent source-backed attribution of cold/warm wall and Go allocation differences, no further Bootstrap calls or library rewrite; scientific classification.
-S4: immutable compact 021 report/evidence, focused tests/vet, safe Primary-only push, one Web scientific review.
+The project already has `cmd/perfprobe`, `cmd/fastdiag`, `internal/perfmeasure`, `internal/numericalmetrics`, root `fast_measurement*.go` and Secondary `internal/fastdiag`. These are **primary research infrastructure**, not historical examples. Batch019/020 duplicate stage timing/provenance/metrics because AGENTS previously failed to enforce reuse. No further Batch-specific timing runner should be written before repair.
 
-**Freeze:** unchanged public application frontend, original LogN13 E32 full Q/P, 4096 slots, A/B Scale2^45, C exact Scale=q5, q-prefix capacity/rows, original max-error1e-6; genuine Standard `5dbffbdea05394de2ca3a432ed5318aa832e3f40` read-only and Fast `xuejin-lu/lattigo fast-qprefix@2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac` read-only. No Secondary optimization in 021, no LogN16/bench sweeps. Never interpret one warm measurement per backend as a statistically stable speedup. Resume journal without repeating expensive calls; do not invent Batch022.
+Legacy tool weaknesses established from source: E=0 hardcoded in `perfmeasure.ParametersFromConfig`; Fast `perfprobe` direct-c0 input/manual c1 zero and explicit NewFastEvaluator; restricted legacy refs/profiles, forced warmup/repetitions. `fastdiag numerical` has E0/P93 legacy assumptions. This does NOT mean Fast current zero-secret mode should have nonzero c1: distinguish E/ephemeral weight from zero-secret coefficient semantics.
+
+## Five autonomous deliverables
+
+P1: inspect current source and existing measurement tooling; source-backed reuse/gap inventory with migration map.
+P2: repair `perfmeasure/perfprobe` in place for named current formal E32 Public CKKS mode using original 019 chain, native Standard and Fast public constructors, preserved legacy diagnostic mode and hashes.
+P3: integrate `fastdiag` where genuinely compatible; adapt bounded invocation budget, measurement stages and legacy mode labeling. No new tracing system.
+P4: paired zero-Bootstrap cheap preflight with genuine Standard vs Fast exact accepted 019 profile, Level/Scale/capacity/native Decrypt and numerical gates. Legacy tests unchanged.
+P5: updated durable platform status, compact report and evidence, focused tests/vet, normal safe Primary commits/push, Web review.
+
+**Freeze:** pinned true Standard `5dbffbdea05394de2ca3a432ed5318aa832e3f40`, original Fast production `2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac` (Secondary may have documentation-only AGENTS update), original LogN13 E32 Q/P, 4096 slots, A/B Scale2^45, C Scale=q5, E32 Public Bootstrap keyplan, 1e-6 numerical gate. No mathematical/backend production changes.
+
+**Budget:** ABSOLUTE zero actual Bootstrap calls, zero LogN16, no benchmarks/sweeps. All unit tests must avoid triggering Bootstrap. If architecture/math incompatible, STOP for Web with exact evidence; never silently use legacy E0/direct-c0 as formal.
