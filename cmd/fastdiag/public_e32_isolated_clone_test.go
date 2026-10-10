@@ -37,3 +37,43 @@ func TestPublicE32IsolatedClonePreservesSourceWorktreeMetadata(t *testing.T) {
  if err:=os.RemoveAll(target);err!=nil{t.Fatal(err)}
  if _,err:=os.Stat(filepath.Join(stale,"gitdir"));err!=nil{t.Fatalf("removed historical metadata: %v",err)}
 }
+
+func TestPublicE32IsolatedCloneAcceptsCanonicalizedTempAliases(t *testing.T) {
+	// A symlinked parent is equivalent to macOS /var vs /private/var paths.
+	// Git canonicalizes --absolute-git-dir; the helper must check directory
+	// identity instead of requiring an exact lexical path match.
+	root := t.TempDir()
+	src := filepath.Join(root, "source")
+	if err := os.Mkdir(src, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	runLocalGitTest(t, src, "init", "-q")
+	runLocalGitTest(t, src, "-c", "user.name=ResearchTest", "-c", "user.email=test@example.invalid", "commit", "--allow-empty", "-qm", "pin")
+	pin := runLocalGitTest(t, src, "rev-parse", "HEAD")
+
+	alias := filepath.Join(root, "alias")
+	if err := os.Symlink(root, alias); err != nil {
+		t.Skipf("directory symlink unavailable: %v", err)
+	}
+	target := filepath.Join(alias, "diagnostic")
+	if err := createPublicE32IsolatedClone(src, target, pin); err != nil {
+		t.Fatal(err)
+	}
+	gitReported := runLocalGitTest(t, target, "rev-parse", "--absolute-git-dir")
+	aliasNamed := filepath.Join(target, ".git")
+	if gitReported == aliasNamed {
+		t.Fatalf("test did not exercise alias normalization: %q", gitReported)
+	}
+	if got := runLocalGitTest(t, target, "rev-parse", "HEAD"); got != pin {
+		t.Fatalf("alias clone HEAD %s differs from pin %s", got, pin)
+	}
+	if status := runLocalGitTest(t, target, "status", "--porcelain"); status != "" {
+		t.Fatalf("alias clone dirty: %s", status)
+	}
+	if err := os.RemoveAll(target); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(filepath.Join(src, ".git")); err != nil {
+		t.Fatalf("source Git metadata was removed: %v", err)
+	}
+}
