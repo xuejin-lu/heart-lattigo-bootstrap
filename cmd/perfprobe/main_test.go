@@ -48,6 +48,35 @@ func TestBootstrapBudgetFailsClosedAndConsumesFailedAttempts(t *testing.T) {
 	}
 }
 
+func TestBootstrapBudgetSupportsExplicitTwoAttemptPolicy(t *testing.T) {
+	journalBase := filepath.Join(t.TempDir(), "two-attempt-run")
+	budget := &bootstrapBudget{limit: 2, journalBase: journalBase}
+	calls := 0
+	call := func() (*rlwe.Ciphertext, error) {
+		calls++
+		return nil, nil
+	}
+	for i, suffix := range []string{"01", "02"} {
+		i++
+		if _, err := budget.invoke("bounded-two-call-test", call); err != nil {
+			t.Fatalf("bounded attempt %d failed: %v", i, err)
+		}
+		journal := journalBase + ".bootstrap-attempt-" + suffix + ".json"
+		if _, err := os.Stat(journal); err != nil {
+			t.Fatalf("attempt %d journal missing: %v", i, err)
+		}
+	}
+	if budget.attempts != 2 || calls != 2 {
+		t.Fatalf("explicit two-attempt budget consumed attempts=%d calls=%d", budget.attempts, calls)
+	}
+	if _, err := budget.invoke("over-budget", call); err == nil {
+		t.Fatal("two-attempt policy allowed a third invocation")
+	}
+	if calls != 2 {
+		t.Fatalf("over-budget invocation executed underlying operation: calls=%d", calls)
+	}
+}
+
 func TestPublicNativeModeIsExplicitlyZeroBootstrap(t *testing.T) {
 	if err := validateExecutionLimits(cliOptions{mode: "public-native", bootstrapBudget: 0}); err != nil {
 		t.Fatalf("zero-call public-native preflight rejected: %v", err)
