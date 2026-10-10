@@ -1,28 +1,23 @@
 # Current Task
 
-Task: FAST-DROPIN-MEASUREMENT-PLATFORM-REPAIR-AUTONOMOUS-BATCH-021
+Task: FAST-DROPIN-PUBLIC-NATIVE-COLD-WARM-AUTONOMOUS-BATCH-022
 Status: READY_FOR_CODEX
-Mode: PLATFORM-FIRST AUTONOMOUS P1–P5 MIGRATION, NO EXPENSIVE BOOTSTRAP
-Review: ONE Web scientific/code-architecture review at completion or genuine STOP
+Mode: AUTONOMOUS EVIDENCE-INTEGRITY REPAIR + EXISTING-PERFPROBE PUBLIC E32 BOOTSTRAP COLD/WARM SPRINT
+Review: ONE Web review after all A-D milestones, or immediate STOP on scientific/mathematical/unsafe blocker
 
-**Runnable and authoritative task:** `specs/FAST-DROPIN-MEASUREMENT-PLATFORM-REPAIR-AUTONOMOUS-BATCH-021.md`
-**Mandatory permanent infrastructure rules:** Primary `AGENTS.md` plus `docs/MEASUREMENT_PLATFORM.md`; Secondary `AGENTS.md`; `docs/RESEARCH_ENGINEERING_WORKFLOW.md` §4A/4B.
-**Predecessor accepted:** Batch020 Web review. **Supersedes previous** `specs/FAST-DROPIN-BOOTSTRAP-PERFORMANCE-ATTRIBUTION-AUTONOMOUS-BATCH-021.md` cold/warm plan, now DEFERRED until shared platform is fixed and independently reviewed.
+**Executable specification:** `specs/FAST-DROPIN-PUBLIC-NATIVE-COLD-WARM-AUTONOMOUS-BATCH-022.md`
+**021 Web review:** `results/FAST-DROPIN-MEASUREMENT-PLATFORM-REPAIR-AUTONOMOUS-BATCH-021-web-review.md`
+**Permanent authority:** Primary/Secondary AGENTS.md, Primary docs/MEASUREMENT_PLATFORM.md and docs/RESEARCH_ENGINEERING_WORKFLOW.md §4A/4B, Secondary FAST_QPREFIX_SPEC.md.
 
-## Why this task
+Batch021 accepted: E-explicit formal native E32 zero-Bootstrap preflight in existing `cmd/perfprobe`, `perfmeasure` and `numericalmetrics`, true Standard original and Fast zero-secret pinned dependencies built from the SAME Primary source via isolated modfiles, eight matched Level/Scale/degree/numerical/capacity checks, zero Bootstrap, legacy E0 diagnostic input smoke retained. Secondary branch HEAD may include AGENTS-only revision; production pinned Fast code is 2d6145d7.
 
-The project already has `cmd/perfprobe`, `cmd/fastdiag`, `internal/perfmeasure`, `internal/numericalmetrics`, root `fast_measurement*.go` and Secondary `internal/fastdiag`. These are **primary research infrastructure**, not historical examples. Batch019/020 duplicate stage timing/provenance/metrics because AGENTS previously failed to enforce reuse. No further Batch-specific timing runner should be written before repair.
+Web found one P1 evidence-integrity gap: `compare-public` validates source SHA and eight names but does NOT compare ephemeral decoded vector content back against saved `DecodedSHA256`, and permits wrong vector length. Fix this BEFORE costly Bootstrap measurement. A one-slot fixture in current unit tests passes (proof of missing guard), not proof actual 021 numeric samples are false.
 
-Legacy tool weaknesses established from source: E=0 hardcoded in `perfmeasure.ParametersFromConfig`; Fast `perfprobe` direct-c0 input/manual c1 zero and explicit NewFastEvaluator; restricted legacy refs/profiles, forced warmup/repetitions. `fastdiag numerical` has E0/P93 legacy assumptions. This does NOT mean Fast current zero-secret mode should have nonzero c1: distinguish E/ephemeral weight from zero-secret coefficient semantics.
+Milestones:
+A: regression-first exact 4096 decoded vector length and per-checkpoint content-hash binding to `DecodedSHA256` for both backends, anti-NaN/Inf/mismatch; focused tests and safe Primary progress commit.
+B: extend existing `cmd/perfprobe` public-native path, not new runner, for E32 native public Bootstrap using existing phase timers/budget. Do zero-call preflight with the accepted 019 chain, separate constructor/cold/warm. Tests must call ZERO actual Bootstrap.
+C: ONLY after A/B pass, max TWO Standard and TWO Fast public E32 Bootstrap TOTAL, one cold and one warm on the same logical input copies, no extra smokes/warmups/retries. Verify per-call native output oracle and paired numerical gates.
+D: update durable measurement platform status, compact evidence, focused Standard/Fast tests/vet/diff, safe Primary commit/push, Web review. Do not start next batch.
 
-## Five autonomous deliverables
-
-P1: inspect current source and existing measurement tooling; source-backed reuse/gap inventory with migration map.
-P2: repair `perfmeasure/perfprobe` in place for a named E-parameterized formal public CKKS mode (E32 fixed acceptance fixture) using original 019 chain, native Standard and Fast public constructors, preserved legacy diagnostic mode and hashes.
-P3: integrate `fastdiag` where genuinely compatible; adapt bounded invocation budget, measurement stages and legacy mode labeling. No new tracing system.
-P4: paired zero-Bootstrap cheap preflight with isolated temporary modfile bindings to original Standard and frozen Fast Lattigo (Primary measurement tools NEVER move or disappear); same Primary source and exact module/commit fingerprint with genuine Standard vs Fast exact accepted 019 profile, Level/Scale/capacity/native Decrypt and numerical gates. Legacy tests unchanged.
-P5: updated durable platform status, compact report and evidence, focused tests/vet, normal safe Primary commits/push, Web review.
-
-**Freeze:** pinned true Standard `5dbffbdea05394de2ca3a432ed5318aa832e3f40`, original Fast production `2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac` (Secondary may have documentation-only AGENTS update), original LogN13 E32 Q/P, 4096 slots, A/B Scale2^45, C Scale=q5, E32 Public Bootstrap keyplan, 1e-6 numerical gate. No mathematical/backend production changes.
-
-**Design rule:** Existing measurement platform lives in Primary, NOT inside Lattigo; never modify pristine Standard or duplicate the tools there. Build the same Primary tool source twice with isolated dependency replacements and only compare public API boundaries symmetrically. Fast-only internal hooks must remain explicitly asymmetric. E is a frontend parameter preserved for both builds; current Fast accepts E=0 or E=32 but mathematical zero-secret simulation need not force E=0.\n\n**Budget:** ABSOLUTE zero actual Bootstrap calls, zero LogN16, no benchmarks/sweeps. All unit tests must avoid triggering Bootstrap. If architecture/math incompatible, STOP for Web with exact evidence; never silently use legacy E0/direct-c0 as formal.
+**Pins:** genuine untouched Standard `5dbffbdea05394de2ca3a432ed5318aa832e3f40` separate clean checkout, Fast production `2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac` clean code checkout; no Secondary production edits.
+**Cost:** strict at most 2 real Bootstrap calls/backend across entire batch including failures, no benchmark sweep/LogN16. Zero budget calls in unit tests, no extra changes in CKKS math, E32/QP/default Scale, or Fast zero-secret contract. Preserve historical reports.
