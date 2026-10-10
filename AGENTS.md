@@ -191,6 +191,12 @@ If the execution environment itself enforces an interactive approval that cannot
 
 For a secondary-repository task, the same principle may be used only when the active Primary specification explicitly requires a secondary commit/push and all secondary repository safety rules are satisfied. Otherwise do not modify or push Secondary.
 
+## Authoritative current backend-transparent CKKS status (2026-10-11)
+
+**MUST READ:** `docs/BACKEND_TRANSPARENCY_CONTRACT.md` before any task involving CKKS frontend, evaluator dispatch, Standard/Fast measurement, or backend selection. The current supported frontend workflow already achieves backend-transparent drop-in through **ordinary** `ckks.NewEvaluator`, `bootstrapping.NewEvaluator`, public CKKS operation calls, and library-internal Fast dispatch. Do not demand, recommend, or reintroduce explicit `NewFastEvaluator` in current frontend code. That constructor is allowed only inside the Fast library or clearly historical diagnostics.
+
+Use **the same Primary application source built twice** against separate pinned, clean Lattigo source checkouts: original genuine Standard and current Fast. A purported Standard evaluator **compiled against Fast checkout is not genuine Standard**, irrespective of its constructor name. Enforce binary/module source provenance but do not create an unnecessary Standard algorithm-revalidation project. Preserve historical data and clearly separate achieved API transparency from pending current LogN16 numerical acceptance. Older 'known gap' discussions are historical, not current status.
+
 ## Permanent architecture rules
 
 - Production/application code must remain backend-transparent: application CKKS usage must not branch on Standard versus Fast.
