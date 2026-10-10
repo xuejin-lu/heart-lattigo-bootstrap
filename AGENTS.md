@@ -33,6 +33,16 @@ A previous local `CURRENT_TASK.md` saying `COMPLETE` is never sufficient reason 
 
 If the synchronized task requires work in the secondary `lattigo` repository, then perform the secondary repository's own safe synchronization procedure before reading or editing its task-relevant files.
 
+## Mandatory measurement-platform reuse (all chats and Codex sessions)
+
+**This project already owns a mature measurement and diagnostic platform. DO NOT rebuild it for every Batch.** Before ANY performance, correctness-diagnostics, Standard/Fast comparison, Bootstrap profile, experiment-runner or tooling task, read `docs/MEASUREMENT_PLATFORM.md` **after startup sync and before implementation/spec interpretation**. This rule is durable across Web-chat/model/Codex handoffs, overrides a task's silence about reuse, and applies even when `CURRENT_TASK.md` points to a new Batch.
+
+Default tools: `cmd/perfprobe/` (matched Standard/Fast experiments and timings), `cmd/fastdiag/` plus `scripts/fastdiag` (stage/power/rescale attribution), `internal/perfmeasure/` (shared Q/P/config/input/provenance), `internal/numericalmetrics/` (shared decoded metrics), plus root `fast_measurement*.go` and Secondary `internal/fastdiag/` hooks. Read relevant historical DIAG/OPT evidence as prior art. **Inventory first, identify unsupported capability second, extend shared tools third; write a one-off runner or metric implementation only if a specific nonreusable gap is demonstrated and documented.** Do not duplicate stage timing, RMSE/SNR, profile hashing, warmup/statistics or report aggregation as convenience.
+
+**Obsolete legacy assumptions must be fixed in the platform itself:** `perfmeasure` hard-coded E=0, `perfprobe` historical Fast direct-encoded c0 and explicit `NewFastEvaluator`, pinned old refs and forced warmup/repetition minima do not automatically represent the accepted public E32 workflow. Repair these with explicit versioned diagnostic-vs-formal-public modes and regression tests; do not silently discard legacy experiments or fabricate a formal Standard baseline. The intentionally insecure current Fast zero-secret **c1=0 remains a mode-specific invariant**; do not confuse that with the obsolete universal E=0 requirement or manual direct-c0 construction.
+
+If shared measurement infrastructure cannot yet run the accepted public CKKS workload correctly, **platform repair takes precedence over a new benchmarking Batch**, and Web must authorize any required new math/backend representation semantics. Handoff reports must state tool reuse status and remaining unsupported mode(s).
+
 ## Durable research workflow authority
 
 Before executing or reviewing nontrivial research work, use:
