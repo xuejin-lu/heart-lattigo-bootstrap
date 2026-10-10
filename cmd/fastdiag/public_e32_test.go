@@ -53,18 +53,20 @@ func TestValidatePublicE32FixturePinsHeldInputAndFastVectors(t *testing.T) {
 	require.NoError(t, err)
 	manifestPath := filepath.Join(root, "manifest.json")
 	require.NoError(t, os.WriteFile(manifestPath, manifestBytes, 0o600))
-	gotManifestBytes, gotManifest, gotVectorsBytes, gotVectors, err := validatePublicE32Fixture(manifestPath, vectorsPath, "primary")
+	gotManifestBytes, gotManifest, gotVectorsBytes, gotVectors, err := validatePublicE32Fixture(manifestPath, vectorsPath, "primary", "source")
 	require.NoError(t, err)
 	require.Equal(t, manifestBytes, gotManifestBytes)
 	require.Equal(t, manifest.CiphertextSHA256, gotManifest.CiphertextSHA256)
 	require.Equal(t, vectorsBytes, gotVectorsBytes)
 	require.Len(t, gotVectors.BootstrapOutputs, 6)
+	_, _, _, _, err = validatePublicE32Fixture(manifestPath, vectorsPath, "primary", "different-source")
+	require.ErrorContains(t, err, "measurement-source fingerprint")
 
 	vectors.BackendCommit = "wrong-fast-commit"
 	vectorsBytes, err = json.Marshal(vectors)
 	require.NoError(t, err)
 	require.NoError(t, os.WriteFile(vectorsPath, vectorsBytes, 0o600))
-	_, _, _, _, err = validatePublicE32Fixture(manifestPath, vectorsPath, "primary")
+	_, _, _, _, err = validatePublicE32Fixture(manifestPath, vectorsPath, "primary", "source")
 	require.ErrorContains(t, err, "do not match")
 }
 
@@ -161,8 +163,9 @@ func TestValidatePublicE32RawTraceRequiresExactMatchedTwoCalls(t *testing.T) {
 		"bootstrap_warm_05":    make([]publicE32Vector, 1<<12),
 	}}
 	raw := publicE32RawTrace{
-		SchemaVersion: "fastdiag.public-e32.trace.v1", Profile: "logn13-e32-public-native", Mode: "test-only-public-e32-fast",
-		PrimaryCommit: "primary", PrimarySourceSHA256: "source", ProductionFastCommit: e32ProductionFastCommit,
+		SchemaVersion: "fastdiag.public-e32.trace.v1", TraceStatus: "TRACE_VALIDATED", Profile: "logn13-e32-public-native", Mode: "test-only-public-e32-fast",
+		PrimaryCommit: "current-primary", FixturePrimaryCommit: "primary", PrimarySourceSHA256: "source", ProductionFastCommit: e32ProductionFastCommit,
+		RawEvidenceFile: "raw-trace-unverified.json", RawEvidenceSHA256: strings.Repeat("c", 64),
 		DiagnosticHead: "diagnostic", ConfigSHA256: "config", QPSHA256: "qp", InputSHA256: "input", WorkloadSHA256: "workload",
 		FixtureManifestSHA256: "manifest", CiphertextSHA256: "ciphertext", ExpectedInputSHA256: "decoded",
 		CallBudget: 2, ActualCalls: 2, CPUProfileFile: "warm-cpu.pprof", CPUProfileSHA256: strings.Repeat("a", 64),
@@ -175,9 +178,126 @@ func TestValidatePublicE32RawTraceRequiresExactMatchedTwoCalls(t *testing.T) {
 		},
 		Events: publicE32TestEvents(),
 	}
-	require.NoError(t, validatePublicE32RawTrace(raw, manifest, vectors, "primary", "diagnostic", "manifest"))
+	require.NoError(t, validatePublicE32RawTrace(raw, manifest, vectors, "current-primary", "primary", "diagnostic", "manifest"))
 	raw.ActualCalls = 3
-	require.ErrorContains(t, validatePublicE32RawTrace(raw, manifest, vectors, "primary", "diagnostic", "manifest"), "exact 2-call budget")
+	require.ErrorContains(t, validatePublicE32RawTrace(raw, manifest, vectors, "current-primary", "primary", "diagnostic", "manifest"), "exact 2-call budget")
+}
+
+func TestValidatePublicE32RawCertificationBindsUnverifiedEvents(t *testing.T) {
+	unverified := publicE32RawTrace{
+		TraceStatus: "TRACE_UNVERIFIED", TraceValidationError: "raw event capture is not certified",
+		PrimaryCommit: "current-primary", FixturePrimaryCommit: "fixture-primary", ProductionFastCommit: e32ProductionFastCommit,
+		DiagnosticHead: "diagnostic", CallBudget: 2, ActualCalls: 2,
+		Runs:   []publicE32Run{{Index: 1, Phase: "cold"}, {Index: 2, Phase: "warm"}},
+		Events: publicE32TestEvents(),
+	}
+	rawBytes, err := json.Marshal(unverified)
+	require.NoError(t, err)
+	certified := unverified
+	certified.TraceStatus = "TRACE_VALIDATED"
+	certified.TraceValidationError = ""
+	certified.RawEvidenceFile = "raw-trace-unverified.json"
+	rawSHA := sha256.Sum256(rawBytes)
+	certified.RawEvidenceSHA256 = hex.EncodeToString(rawSHA[:])
+	require.NoError(t, validatePublicE32RawCertification(unverified, certified, rawBytes))
+
+	certified.Events = append([]Event(nil), certified.Events...)
+	certified.Events[0].ElapsedNS++
+	require.ErrorContains(t, validatePublicE32RawCertification(unverified, certified, rawBytes), "changes captured raw runs or event records")
+}
+
+func TestValidateE32InstrumentationOnlyPatchRejectsArithmeticChanges(t *testing.T) {
+	patch := `diff --git a/rescale.go b/rescale.go
+@@ -1,0 +2,4 @@
++var materializationSpan fastdiag.Span
++if fastdiag.Enabled && fastdiag.Selected(fastdiag.Rescale) {
++materializationSpan = fastdiag.Begin(fastdiag.Rescale, "materialization", wholeSpan.Sequence(), fastdiag.Input(op0, sourceRows).Merge(fastdiag.InPlace(op0 == opOut)).Merge(fastdiag.RepetitionCount(len(op0.Value))))
++}
+@@ -5,0 +10,4 @@
++var restoreSpan fastdiag.Span
++if fastdiag.Enabled && fastdiag.Selected(fastdiag.Rescale) {
++restoreSpan = fastdiag.Begin(fastdiag.Rescale, "ntt_montgomery_restore", materializationSpan.Sequence(), rescaleDiagFields(op0.Level(), targetLevel, sourceRows, targetRows, fmt.Sprintf("c%d", component), op0 == opOut))
++}
+@@ -12,0 +18,3 @@
++if fastdiag.Enabled && fastdiag.Selected(fastdiag.Rescale) {
++restoreSpan.End(fastdiag.Fields{})
++}
+@@ -20,0 +29 @@
++materializationSpan.End(fastdiag.Output(opOut, targetRows))
+`
+	require.NoError(t, validateE32InstrumentationOnlyPatch(patch))
+	require.ErrorContains(t, validateE32InstrumentationOnlyPatch(patch+"+opOut.Scale = op0.Scale\n"), "non-instrumentation")
+	require.ErrorContains(t, validateE32InstrumentationOnlyPatch(patch+"-existingArithmetic()\n"), "removes existing source")
+}
+
+func TestVerifyE32ProductionSourceIdentityAgainstDiagnosticCommit(t *testing.T) {
+	secondaryRoot := os.Getenv("FASTDIAG_SECONDARY_ROOT")
+	if secondaryRoot == "" {
+		t.Skip("set FASTDIAG_SECONDARY_ROOT to verify the committed Batch024 diagnostic source delta")
+	}
+	diagnosticHead, err := gitOutput(secondaryRoot, "rev-parse", "HEAD")
+	require.NoError(t, err)
+	productionHash, diagnosticHash, paths, instrumentationOnly, err := verifyE32ProductionSourceIdentity(secondaryRoot, diagnosticHead)
+	require.NoError(t, err)
+	require.NotEqual(t, productionHash, diagnosticHash, "diagnostic source digest must reflect the separate trace-only spans")
+	require.Equal(t, []string{e32AuthorizedInstrumentationPath}, paths)
+	require.True(t, instrumentationOnly)
+}
+
+func TestAnalyzePublicE32EventsPreservesMeasuredClosureAndBounds(t *testing.T) {
+	events := []Event{
+		{Scope: "stage", Name: "bootstrap", Sequence: 1, ElapsedNS: 1000},
+		{Scope: "stage", Name: "coeffs_to_slots", Sequence: 2, ParentSequence: 1, ElapsedNS: 700},
+		{Scope: "power", Name: "generated_powers", Sequence: 3, ParentSequence: 2, ElapsedNS: 750},
+		{Scope: "stage", Name: "evalmod_real", Sequence: 4, ParentSequence: 1, ElapsedNS: 400},
+		{Scope: "rescale", Name: "rescale", Sequence: 5, ElapsedNS: 200},
+		{Scope: "rescale", Name: "preflight", Sequence: 6, ParentSequence: 5, ElapsedNS: 80},
+		{Scope: "rescale", Name: "materialization", Sequence: 7, ParentSequence: 5, ElapsedNS: 100},
+		{Scope: "power", Name: "generated_powers", Sequence: 8, ElapsedNS: 500},
+	}
+	analysis, err := analyzePublicE32Events(events)
+	require.NoError(t, err)
+	require.Equal(t, float64(-100), analysis.RootUnattributedNS, "root closure must preserve negative residuals")
+	require.Equal(t, float64(-0.1), analysis.RootUnattributedFraction)
+	var rescaleClosure, parentClosure publicE32EventClosure
+	for _, closure := range analysis.Closures {
+		if closure.Sequence == 5 {
+			rescaleClosure = closure
+		}
+		if closure.Sequence == 2 {
+			parentClosure = closure
+		}
+	}
+	require.Equal(t, float64(20), rescaleClosure.UnattributedNS)
+	require.Equal(t, float64(-50), parentClosure.UnattributedNS, "overlapping child timing must remain visible")
+	require.Len(t, analysis.PositiveExclusivePareto, 3, "independent Bootstrap, Rescale and Power roots remain separate")
+	var rescaleRootGroup *publicE32ParetoGroup
+	for i := range analysis.PositiveExclusivePareto {
+		if analysis.PositiveExclusivePareto[i].RootSequence == 5 {
+			rescaleRootGroup = &analysis.PositiveExclusivePareto[i]
+		}
+	}
+	require.NotNil(t, rescaleRootGroup)
+	require.Equal(t, "rescale", rescaleRootGroup.RootScope)
+	require.Len(t, rescaleRootGroup.Entries, 3)
+	var rescaleRootEntry *publicE32ParetoEntry
+	for i := range rescaleRootGroup.Entries {
+		if rescaleRootGroup.Entries[i].Sequence == 5 {
+			rescaleRootEntry = &rescaleRootGroup.Entries[i]
+		}
+	}
+	require.NotNil(t, rescaleRootEntry)
+	require.NotNil(t, rescaleRootEntry.RootShare)
+	require.InDelta(t, 0.1, *rescaleRootEntry.RootShare, 1e-12, "Rescale share is relative only to its own root, not Bootstrap")
+	var evalmod publicE32AmdahlScenario
+	for _, scenario := range analysis.AmdahlScenarios {
+		if scenario.Stage == "evalmod_real" {
+			evalmod = scenario
+		}
+	}
+	require.Equal(t, 0.4, evalmod.ObservedRootFraction)
+	require.NotNil(t, evalmod.TwoXStageOverallSpeedup)
+	require.InDelta(t, 1.25, *evalmod.TwoXStageOverallSpeedup, 1e-12)
 }
 
 func publicE32TestEvents() []Event {

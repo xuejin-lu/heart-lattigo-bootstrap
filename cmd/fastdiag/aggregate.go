@@ -41,11 +41,77 @@ func aggregateEvents(runs []TraceRun) []EventMedian {
 		}
 		event := items[0].event
 		medians = append(medians, EventMedian{
-			Key: key, Scope: event.Scope, Name: event.Name, Power: event.Power, SplitA: event.SplitA, SplitB: event.SplitB,
+			Key: key, ParentKey: items[0].parentKey, Scope: event.Scope, Name: event.Name, Power: event.Power, SplitA: event.SplitA, SplitB: event.SplitB,
 			Component: event.Component, Count: len(items), MedianNS: median(durations),
 		})
 	}
 	return medians
+}
+
+// aggregateSingleTraceEventTypes keeps a compact count/median by event and
+// parent type for diagnostic traces. It intentionally does not merge distinct
+// nesting relationships or infer disjoint time shares.
+func aggregateSingleTraceEventTypes(events []Event) []EventMedian {
+	bySequence := make(map[uint64]Event, len(events))
+	for _, event := range events {
+		bySequence[event.Sequence] = event
+	}
+	type groupedEvents struct {
+		event     Event
+		parent    Event
+		hasParent bool
+		durations []float64
+	}
+	groups := make(map[string]*groupedEvents)
+	for _, event := range events {
+		var parent Event
+		hasParent := event.ParentSequence != 0
+		if hasParent {
+			parent = bySequence[event.ParentSequence]
+		}
+		parentType := ""
+		if hasParent {
+			parentType = eventBaseKey(parent)
+		}
+		key := eventBaseKey(event) + "<-" + parentType
+		group := groups[key]
+		if group == nil {
+			group = &groupedEvents{event: event, parent: parent, hasParent: hasParent}
+			groups[key] = group
+		}
+		group.durations = append(group.durations, float64(event.ElapsedNS))
+	}
+	keys := make([]string, 0, len(groups))
+	for key := range groups {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	out := make([]EventMedian, 0, len(keys))
+	for _, key := range keys {
+		group := groups[key]
+		event := group.event
+		parentKey := ""
+		if group.hasParent {
+			parentKey = eventKindLabel(group.parent)
+		}
+		out = append(out, EventMedian{
+			Key: key, ParentKey: parentKey, Scope: event.Scope, Name: event.Name,
+			Power: event.Power, SplitA: event.SplitA, SplitB: event.SplitB, Component: event.Component,
+			Count: len(group.durations), MedianNS: median(group.durations),
+		})
+	}
+	return out
+}
+
+func eventKindLabel(event Event) string {
+	label := event.Scope + "/" + event.Name
+	if event.Power != nil {
+		label += fmt.Sprintf("/T%d", *event.Power)
+	}
+	if event.Component != "" {
+		label += "/" + event.Component
+	}
+	return label
 }
 
 func compareEvents(baselineRuns, candidateRuns []TraceRun) ([]EventDelta, []ParentClosure) {

@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"reflect"
 	"runtime"
 	"sort"
 	"strings"
@@ -19,6 +20,9 @@ import (
 )
 
 const e32ProductionFastCommit = "2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac"
+const e32FixturePrimaryCommit = "6e938918442c409faa6d32e159c7a3f7a1041f7a"
+
+const e32AuthorizedInstrumentationPath = "schemes/ckks/internal/fastcore/rescale.go"
 
 type publicE32FixtureManifest struct {
 	SchemaVersion         string               `json:"schema_version"`
@@ -87,9 +91,14 @@ type publicE32Run struct {
 type publicE32RawTrace struct {
 	SchemaVersion         string         `json:"schema_version"`
 	Timestamp             time.Time      `json:"timestamp"`
+	TraceStatus           string         `json:"trace_status"`
+	TraceValidationError  string         `json:"trace_validation_error,omitempty"`
+	RawEvidenceFile       string         `json:"raw_unverified_file,omitempty"`
+	RawEvidenceSHA256     string         `json:"raw_unverified_sha256,omitempty"`
 	Profile               string         `json:"profile"`
 	Mode                  string         `json:"mode"`
 	PrimaryCommit         string         `json:"primary_commit"`
+	FixturePrimaryCommit  string         `json:"fixture_primary_commit"`
 	PrimarySourceSHA256   string         `json:"primary_measurement_source_sha256"`
 	ProductionFastCommit  string         `json:"production_fast_commit"`
 	DiagnosticHead        string         `json:"diagnostic_head"`
@@ -119,6 +128,22 @@ type publicE32RawTrace struct {
 	Events                []Event        `json:"warm_traced_events"`
 }
 
+type publicE32FailureArtifact struct {
+	SchemaVersion        string    `json:"schema_version"`
+	Timestamp            time.Time `json:"timestamp"`
+	TraceStatus          string    `json:"trace_status"`
+	FailurePhase         string    `json:"failure_phase"`
+	FailureReason        string    `json:"failure_reason"`
+	RawEvidenceFile      string    `json:"raw_unverified_file"`
+	RawEvidenceSHA256    string    `json:"raw_unverified_sha256"`
+	PrimaryCommit        string    `json:"primary_commit"`
+	FixturePrimaryCommit string    `json:"fixture_primary_commit"`
+	ProductionFastCommit string    `json:"production_fast_commit"`
+	DiagnosticHead       string    `json:"diagnostic_head"`
+	CallBudget           int       `json:"call_budget"`
+	ActualCalls          int       `json:"actual_calls"`
+}
+
 type publicE32TraceDocument struct {
 	SchemaVersion             string                 `json:"schema_version"`
 	Timestamp                 time.Time              `json:"timestamp"`
@@ -127,16 +152,23 @@ type publicE32TraceDocument struct {
 	Primary                   RepositoryMetadata     `json:"primary_repository"`
 	Secondary                 RepositoryMetadata     `json:"diagnostic_secondary_repository"`
 	ProductionFastCommit      string                 `json:"production_fast_commit"`
+	FixturePrimaryCommit      string                 `json:"fixture_primary_commit"`
 	ProductionGoSourceSHA256  string                 `json:"production_go_source_sha256"`
 	DiagnosticGoSourceSHA256  string                 `json:"diagnostic_go_source_sha256"`
 	ProductionSourceIdentical bool                   `json:"production_go_source_identical"`
+	InstrumentationOnlyDelta  bool                   `json:"authorized_instrumentation_only_delta"`
+	ProductionSourceDiffPaths []string               `json:"production_source_diff_paths"`
 	FixtureManifestSHA256     string                 `json:"fixture_manifest_sha256"`
 	CiphertextSHA256          string                 `json:"ciphertext_sha256"`
 	FastVectorsSHA256         string                 `json:"fast_vectors_sha256"`
 	RawTracePath              string                 `json:"raw_trace_path"`
 	RawTraceSHA256            string                 `json:"raw_trace_sha256"`
+	CertifiedTracePath        string                 `json:"certified_trace_path"`
+	CertifiedTraceSHA256      string                 `json:"certified_trace_sha256"`
+	FailureArtifactPath       string                 `json:"failure_artifact_path"`
 	CPUProfilePath            string                 `json:"warm_cpu_profile_path"`
 	CPUProfileSHA256          string                 `json:"warm_cpu_profile_sha256"`
+	CPUProfileAttribution     string                 `json:"cpu_profile_symbol_attribution"`
 	HeapProfilePath           string                 `json:"post_warm_heap_profile_path"`
 	HeapProfileSHA256         string                 `json:"post_warm_heap_profile_sha256"`
 	CallBudget                int                    `json:"call_budget"`
@@ -146,6 +178,7 @@ type publicE32TraceDocument struct {
 	GCEnvironment             publicE32GCEnvironment `json:"gc_environment"`
 	Runs                      []publicE32Run         `json:"runs"`
 	EventMedians              []EventMedian          `json:"event_medians"`
+	Analysis                  publicE32TraceAnalysis `json:"event_analysis"`
 }
 
 type publicE32GCEnvironment struct {
@@ -205,13 +238,20 @@ func tracePublicE32(primaryRoot, secondaryRoot string, primary RepositoryMetadat
 	if err != nil {
 		return publicE32TraceDocument{}, err
 	}
-	productionHash, diagnosticHash, err := verifyE32ProductionSourceIdentity(secondaryRoot, secondary.Commit)
+	productionHash, diagnosticHash, sourceDiffPaths, instrumentationOnlyDelta, err := verifyE32ProductionSourceIdentity(secondaryRoot, secondary.Commit)
 	if err != nil {
 		return publicE32TraceDocument{}, err
 	}
-	manifestBytes, manifest, vectorsBytes, vectors, err := validatePublicE32Fixture(opts.e32Manifest, opts.fastVectors, primary.Commit)
+	measurementSourceHash, err := primaryMeasurementSourceFingerprint(primaryRoot, primary.Commit)
 	if err != nil {
 		return publicE32TraceDocument{}, err
+	}
+	manifestBytes, manifest, vectorsBytes, vectors, err := validatePublicE32Fixture(opts.e32Manifest, opts.fastVectors, e32FixturePrimaryCommit, measurementSourceHash)
+	if err != nil {
+		return publicE32TraceDocument{}, err
+	}
+	if err := gitRun(primaryRoot, "merge-base", "--is-ancestor", manifest.PrimaryCommit, primary.Commit); err != nil {
+		return publicE32TraceDocument{}, fmt.Errorf("held E32 fixture source commit %s is not an ancestor of current Primary harness %s", manifest.PrimaryCommit, primary.Commit)
 	}
 	manifestSum := sha256.Sum256(manifestBytes)
 	manifestHash := hex.EncodeToString(manifestSum[:])
@@ -242,29 +282,45 @@ func tracePublicE32(primaryRoot, secondaryRoot string, primary RepositoryMetadat
 	if diagnosticMeta.Dirty {
 		return publicE32TraceDocument{}, fmt.Errorf("isolated diagnostic checkout unexpectedly dirty; preserved at %s", diagnosticRoot)
 	}
-	productionHash, diagnosticHash, err = verifyE32ProductionSourceIdentity(diagnosticRoot, diagnosticMeta.Commit)
+	productionHash, diagnosticHash, sourceDiffPaths, instrumentationOnlyDelta, err = verifyE32ProductionSourceIdentity(diagnosticRoot, diagnosticMeta.Commit)
 	if err != nil {
 		return publicE32TraceDocument{}, fmt.Errorf("isolated diagnostic checkout fails production-source identity: %w", err)
 	}
-	rawPath := filepath.Join(tempRoot, "raw-trace.json")
-	if err := runPublicE32TraceTest(diagnosticRoot, rawPath, cachePath, profileDir, manifestPath(opts.e32Manifest), manifestPath(opts.fastVectors), diagnosticMeta.Commit, true); err != nil {
+	rawPath := filepath.Join(tempRoot, "raw-trace-unverified.json")
+	certifiedPath := filepath.Join(tempRoot, "raw-trace-certified.json")
+	failurePath := filepath.Join(tempRoot, "trace-failure.json")
+	if err := runPublicE32TraceTest(diagnosticRoot, certifiedPath, rawPath, failurePath, cachePath, profileDir, manifestPath(opts.e32Manifest), manifestPath(opts.fastVectors), diagnosticMeta.Commit, primary.Commit, true); err != nil {
 		return publicE32TraceDocument{}, fmt.Errorf("zero-call E32 fixture compatibility validation failed before diagnostic reservations; no Bootstrap call was launched; preserve checkout %s and artifacts %s: %w", diagnosticRoot, tempRoot, err)
 	}
 	if err := runReservedPublicE32Trace(journalBase, func() error {
-		return runPublicE32TraceTest(diagnosticRoot, rawPath, cachePath, profileDir, manifestPath(opts.e32Manifest), manifestPath(opts.fastVectors), diagnosticMeta.Commit, false)
+		return runPublicE32TraceTest(diagnosticRoot, certifiedPath, rawPath, failurePath, cachePath, profileDir, manifestPath(opts.e32Manifest), manifestPath(opts.fastVectors), diagnosticMeta.Commit, primary.Commit, false)
 	}); err != nil {
-		return publicE32TraceDocument{}, fmt.Errorf("E32 tracer failed; both diagnostic attempt tokens remain reserved; preserve checkout %s and artifacts %s: %w", diagnosticRoot, tempRoot, err)
+		return publicE32TraceDocument{}, fmt.Errorf("E32 tracer failed; both diagnostic attempt tokens remain reserved; preserve checkout %s, raw unverified trace %s, failure record %s, and artifacts %s: %w", diagnosticRoot, rawPath, failurePath, tempRoot, err)
 	}
 	rawBytes, err := os.ReadFile(rawPath)
 	if err != nil {
 		return publicE32TraceDocument{}, fmt.Errorf("read E32 raw trace in preserved temp directory %s: %w", tempRoot, err)
 	}
-	var raw publicE32RawTrace
-	if err := json.Unmarshal(rawBytes, &raw); err != nil {
-		return publicE32TraceDocument{}, fmt.Errorf("decode E32 raw trace in preserved temp directory %s: %w", tempRoot, err)
+	var unverified, raw publicE32RawTrace
+	if err := json.Unmarshal(rawBytes, &unverified); err != nil {
+		return publicE32TraceDocument{}, fmt.Errorf("decode E32 unverified raw trace in preserved temp directory %s: %w", tempRoot, err)
 	}
-	if err := validatePublicE32RawTrace(raw, manifest, vectors, primary.Commit, secondary.Commit, manifestHash); err != nil {
+	certifiedBytes, err := os.ReadFile(certifiedPath)
+	if err != nil {
+		return publicE32TraceDocument{}, fmt.Errorf("read separately certified E32 trace in preserved temp directory %s: %w", tempRoot, err)
+	}
+	if err := json.Unmarshal(certifiedBytes, &raw); err != nil {
+		return publicE32TraceDocument{}, fmt.Errorf("decode separately certified E32 trace in preserved temp directory %s: %w", tempRoot, err)
+	}
+	if err := validatePublicE32RawCertification(unverified, raw, rawBytes); err != nil {
+		return publicE32TraceDocument{}, fmt.Errorf("raw/certified E32 trace linkage failed in preserved temp directory %s: %w", tempRoot, err)
+	}
+	if err := validatePublicE32RawTrace(raw, manifest, vectors, primary.Commit, manifest.PrimaryCommit, secondary.Commit, manifestHash); err != nil {
 		return publicE32TraceDocument{}, fmt.Errorf("invalid E32 trace artifact in preserved temp directory %s: %w", tempRoot, err)
+	}
+	analysis, err := analyzePublicE32Events(raw.Events)
+	if err != nil {
+		return publicE32TraceDocument{}, fmt.Errorf("analyze E32 event closure in preserved temp directory %s: %w", tempRoot, err)
 	}
 	gcEnvironment := publicE32GCEnvironment{GOGC: environmentSetting("GOGC"), GOMEMLIMIT: environmentSetting("GOMEMLIMIT"), GODEBUG: environmentSetting("GODEBUG")}
 	if raw.GOGC != gcEnvironment.GOGC || raw.GOMEMLIMIT != gcEnvironment.GOMEMLIMIT || raw.GODEBUG != gcEnvironment.GODEBUG {
@@ -281,21 +337,25 @@ func tracePublicE32(primaryRoot, secondaryRoot string, primary RepositoryMetadat
 	if err := gitRun(secondaryRoot, "worktree", "remove", diagnosticRoot); err != nil {
 		return publicE32TraceDocument{}, fmt.Errorf("E32 trace passed but clean diagnostic checkout could not be removed; preserve %s and %s: %w", diagnosticRoot, tempRoot, err)
 	}
+	profileAttribution := inspectE32CPUProfile(cpuProfilePath)
 	rawSum := sha256.Sum256(rawBytes)
-	runs := []TraceRun{{Index: 1, ElapsedNS: rootEventElapsed(raw.Events), NumericalMatch: true, Events: raw.Events}}
+	certifiedSum := sha256.Sum256(certifiedBytes)
 	doc := publicE32TraceDocument{
 		SchemaVersion: "fastdiag.public-e32.summary.v1", Timestamp: raw.Timestamp, Profile: publicE32Profile,
 		Trace: []string{"stage", "power", "rescale"}, Primary: primary, Secondary: diagnosticMeta,
-		ProductionFastCommit: e32ProductionFastCommit, ProductionGoSourceSHA256: productionHash,
+		ProductionFastCommit: e32ProductionFastCommit, FixturePrimaryCommit: manifest.PrimaryCommit, ProductionGoSourceSHA256: productionHash,
 		DiagnosticGoSourceSHA256: diagnosticHash, ProductionSourceIdentical: productionHash == diagnosticHash,
+		InstrumentationOnlyDelta: instrumentationOnlyDelta, ProductionSourceDiffPaths: sourceDiffPaths,
 		FixtureManifestSHA256: manifestHash, CiphertextSHA256: manifest.CiphertextSHA256,
 		FastVectorsSHA256: vectorsHash, RawTracePath: rawPath, RawTraceSHA256: hex.EncodeToString(rawSum[:]),
+		CertifiedTracePath: certifiedPath, CertifiedTraceSHA256: hex.EncodeToString(certifiedSum[:]), FailureArtifactPath: failurePath,
 		CPUProfilePath: cpuProfilePath, CPUProfileSHA256: raw.CPUProfileSHA256,
-		HeapProfilePath: heapProfilePath, HeapProfileSHA256: raw.HeapProfileSHA256,
+		CPUProfileAttribution: profileAttribution,
+		HeapProfilePath:       heapProfilePath, HeapProfileSHA256: raw.HeapProfileSHA256,
 		CallBudget: raw.CallBudget, ActualCalls: raw.ActualCalls, NumericalGate: raw.NumericalGate,
 		Environment:   EnvironmentMetadata{GoVersion: raw.GoVersion, OS: raw.OS, Arch: raw.Arch, CPU: cpuModel(), NumCPU: raw.NumCPU, GOMAXPROCS: raw.GOMAXPROCS},
 		GCEnvironment: gcEnvironment,
-		Runs:          raw.Runs, EventMedians: aggregateEvents(runs),
+		Runs:          raw.Runs, EventMedians: aggregateSingleTraceEventTypes(raw.Events), Analysis: analysis,
 	}
 	return doc, nil
 }
@@ -308,6 +368,19 @@ func manifestPath(path string) string {
 	return abs
 }
 
+func primaryMeasurementSourceFingerprint(root, commit string) (string, error) {
+	paths := []string{"cmd/perfprobe", "internal/perfmeasure", "internal/numericalmetrics", "go.mod", "go.sum"}
+	h := sha256.New()
+	for _, path := range paths {
+		object, err := gitOutput(root, "rev-parse", commit+":"+path)
+		if err != nil {
+			return "", fmt.Errorf("resolve Primary measurement source fingerprint %s at %s: %w", path, commit, err)
+		}
+		_, _ = h.Write([]byte(path + "\x00" + object + "\x00"))
+	}
+	return hex.EncodeToString(h.Sum(nil)), nil
+}
+
 func environmentSetting(name string) string {
 	if value := os.Getenv(name); value != "" {
 		return value
@@ -315,7 +388,7 @@ func environmentSetting(name string) string {
 	return "runtime-default"
 }
 
-func validatePublicE32Fixture(manifestPath, vectorsPath, primaryCommit string) ([]byte, publicE32FixtureManifest, []byte, publicE32Vectors, error) {
+func validatePublicE32Fixture(manifestPath, vectorsPath, fixturePrimaryCommit, measurementSourceHash string) ([]byte, publicE32FixtureManifest, []byte, publicE32Vectors, error) {
 	manifestBytes, err := os.ReadFile(manifestPath)
 	if err != nil {
 		return nil, publicE32FixtureManifest{}, nil, publicE32Vectors{}, fmt.Errorf("read E32 fixture manifest: %w", err)
@@ -325,12 +398,15 @@ func validatePublicE32Fixture(manifestPath, vectorsPath, primaryCommit string) (
 		return nil, publicE32FixtureManifest{}, nil, publicE32Vectors{}, fmt.Errorf("decode E32 fixture manifest: %w", err)
 	}
 	if manifest.SchemaVersion != "fast-public-e32-trace-fixture.v1" || manifest.Profile != "logn13-e32-public-native" ||
-		manifest.Backend != "fast" || manifest.BackendCommit != e32ProductionFastCommit || manifest.PrimaryCommit != primaryCommit ||
+		manifest.Backend != "fast" || manifest.BackendCommit != e32ProductionFastCommit || manifest.PrimaryCommit != fixturePrimaryCommit ||
 		manifest.State.Level != 0 || manifest.State.Degree != 1 || manifest.State.QPrefixRows != 1 || manifest.State.PrefixQ == "" ||
 		manifest.NumericalGate != 1e-6 || manifest.EphemeralSecretWeight != 32 || manifest.DecodedSHA256 == "" ||
 		manifest.PrimarySourceSHA256 == "" || manifest.ConfigSHA256 == "" || manifest.QPSHA256 == "" || manifest.InputSHA256 == "" ||
 		manifest.WorkloadSHA256 == "" || manifest.ParametersSHA256 == "" || manifest.CiphertextSHA256 == "" {
 		return nil, publicE32FixtureManifest{}, nil, publicE32Vectors{}, errors.New("fixture manifest fails the frozen public LogN13/E32/Fast Level0 provenance contract")
+	}
+	if manifest.PrimarySourceSHA256 != measurementSourceHash {
+		return nil, publicE32FixtureManifest{}, nil, publicE32Vectors{}, fmt.Errorf("current Primary measurement-source fingerprint %s differs from held fixture %s", measurementSourceHash, manifest.PrimarySourceSHA256)
 	}
 	fixtureDir := filepath.Dir(manifestPath)
 	for _, item := range []struct{ name, digest string }{{manifest.ParametersFile, manifest.ParametersSHA256}, {manifest.CiphertextFile, manifest.CiphertextSHA256}} {
@@ -355,7 +431,7 @@ func validatePublicE32Fixture(manifestPath, vectorsPath, primaryCommit string) (
 		return nil, publicE32FixtureManifest{}, nil, publicE32Vectors{}, fmt.Errorf("decode uninstrumented Fast vectors: %w", err)
 	}
 	if vectors.SchemaVersion != "fast-standard-public-native-repeatability-vectors.v1" || vectors.Mode != "public-native-repeatability" ||
-		vectors.Backend != "fast" || vectors.BackendCommit != e32ProductionFastCommit || vectors.PrimaryCommit != primaryCommit ||
+		vectors.Backend != "fast" || vectors.BackendCommit != e32ProductionFastCommit || vectors.PrimaryCommit != fixturePrimaryCommit ||
 		vectors.SourceSHA256 != manifest.PrimarySourceSHA256 || vectors.ConfigSHA256 != manifest.ConfigSHA256 ||
 		vectors.QPSHA256 != manifest.QPSHA256 || vectors.InputSHA256 != manifest.InputSHA256 || vectors.WorkloadSHA256 != manifest.WorkloadSHA256 {
 		return nil, publicE32FixtureManifest{}, nil, publicE32Vectors{}, errors.New("uninstrumented Fast vectors do not match the E32 trace fixture provenance")
@@ -391,54 +467,120 @@ func validatePublicE32Fixture(manifestPath, vectorsPath, primaryCommit string) (
 	return manifestBytes, manifest, vectorsBytes, vectors, nil
 }
 
-func verifyE32ProductionSourceIdentity(root, diagnosticHead string) (string, string, error) {
+func verifyE32ProductionSourceIdentity(root, diagnosticHead string) (productionHash, diagnosticHash string, changedPaths []string, instrumentationOnly bool, err error) {
 	if _, err := gitOutput(root, "cat-file", "-e", diagnosticHead+":circuits/ckks/bootstrapping/fastdiag_public_e32_test.go"); err != nil {
-		return "", "", errors.New("diagnostic Secondary commit does not contain the test-only public E32 adapter")
+		return "", "", nil, false, errors.New("diagnostic Secondary commit does not contain the test-only public E32 adapter")
 	}
 	productionFiles, err := gitOutput(root, "ls-tree", "-r", "--name-only", e32ProductionFastCommit)
 	if err != nil {
-		return "", "", fmt.Errorf("list pinned Fast production sources: %w", err)
+		return "", "", nil, false, fmt.Errorf("list pinned Fast production sources: %w", err)
 	}
 	diagnosticFiles, err := gitOutput(root, "ls-tree", "-r", "--name-only", diagnosticHead)
 	if err != nil {
-		return "", "", fmt.Errorf("list diagnostic checkout sources: %w", err)
+		return "", "", nil, false, fmt.Errorf("list diagnostic checkout sources: %w", err)
 	}
-	productionHash, err := productionGoTreeHash(root, e32ProductionFastCommit, productionFiles)
+	productionSources, err := productionGoSourceBlobs(root, e32ProductionFastCommit, productionFiles)
 	if err != nil {
-		return "", "", err
+		return "", "", nil, false, err
 	}
-	diagnosticHash, err := productionGoTreeHash(root, diagnosticHead, diagnosticFiles)
+	diagnosticSources, err := productionGoSourceBlobs(root, diagnosticHead, diagnosticFiles)
 	if err != nil {
-		return "", "", err
+		return "", "", nil, false, err
 	}
-	if productionHash != diagnosticHash {
-		return productionHash, diagnosticHash, errors.New("diagnostic checkout production Go source differs from frozen original Fast pin")
+	productionHash = hashProductionGoSources(productionSources)
+	diagnosticHash = hashProductionGoSources(diagnosticSources)
+	allPaths := make(map[string]struct{}, len(productionSources)+len(diagnosticSources))
+	for path := range productionSources {
+		allPaths[path] = struct{}{}
+	}
+	for path := range diagnosticSources {
+		allPaths[path] = struct{}{}
+	}
+	for path := range allPaths {
+		if productionSources[path] != diagnosticSources[path] {
+			changedPaths = append(changedPaths, path)
+		}
+	}
+	sort.Strings(changedPaths)
+	if len(changedPaths) != 1 || changedPaths[0] != e32AuthorizedInstrumentationPath {
+		return productionHash, diagnosticHash, changedPaths, false, fmt.Errorf("diagnostic production Go source differs outside the one authorized trace-instrumentation file: %v", changedPaths)
+	}
+	patch, err := gitOutput(root, "diff", "--no-ext-diff", "--unified=0", e32ProductionFastCommit, diagnosticHead, "--", e32AuthorizedInstrumentationPath)
+	if err != nil {
+		return productionHash, diagnosticHash, changedPaths, false, fmt.Errorf("inspect authorized Rescale instrumentation source delta: %w", err)
+	}
+	if err := validateE32InstrumentationOnlyPatch(patch); err != nil {
+		return productionHash, diagnosticHash, changedPaths, false, err
 	}
 	for _, path := range []string{"go.mod", "go.sum"} {
 		productionBlob, productionErr := gitOutput(root, "rev-parse", e32ProductionFastCommit+":"+path)
 		diagnosticBlob, diagnosticErr := gitOutput(root, "rev-parse", diagnosticHead+":"+path)
 		if productionErr != nil || diagnosticErr != nil || productionBlob != diagnosticBlob {
-			return productionHash, diagnosticHash, fmt.Errorf("diagnostic checkout module manifest %s differs from frozen Fast pin", path)
+			return productionHash, diagnosticHash, changedPaths, false, fmt.Errorf("diagnostic checkout module manifest %s differs from frozen Fast pin", path)
 		}
 	}
-	return productionHash, diagnosticHash, nil
+	return productionHash, diagnosticHash, changedPaths, true, nil
 }
 
-func productionGoTreeHash(root, commit, fileList string) (string, error) {
-	var entries []string
+func productionGoSourceBlobs(root, commit, fileList string) (map[string]string, error) {
+	sources := make(map[string]string)
 	for _, path := range strings.Split(fileList, "\n") {
-		if !strings.HasSuffix(path, ".go") || strings.HasSuffix(path, "_test.go") {
+		if path == "" || !strings.HasSuffix(path, ".go") || strings.HasSuffix(path, "_test.go") {
 			continue
 		}
 		blob, err := gitOutput(root, "rev-parse", commit+":"+path)
 		if err != nil {
-			return "", fmt.Errorf("resolve production source %s at %s: %w", path, commit, err)
+			return nil, fmt.Errorf("resolve production source %s at %s: %w", path, commit, err)
 		}
+		sources[path] = blob
+	}
+	return sources, nil
+}
+
+func hashProductionGoSources(sources map[string]string) string {
+	entries := make([]string, 0, len(sources))
+	for path, blob := range sources {
 		entries = append(entries, path+" "+blob)
 	}
 	sort.Strings(entries)
 	sum := sha256.Sum256([]byte(strings.Join(entries, "\n") + "\n"))
-	return hex.EncodeToString(sum[:]), nil
+	return hex.EncodeToString(sum[:])
+}
+
+func validateE32InstrumentationOnlyPatch(patch string) error {
+	want := map[string]int{
+		"var materializationSpan fastdiag.Span":                        1,
+		"if fastdiag.Enabled && fastdiag.Selected(fastdiag.Rescale) {": 3,
+		"materializationSpan = fastdiag.Begin(fastdiag.Rescale, \"materialization\", wholeSpan.Sequence(), fastdiag.Input(op0, sourceRows).Merge(fastdiag.InPlace(op0 == opOut)).Merge(fastdiag.RepetitionCount(len(op0.Value))))": 1,
+		"var restoreSpan fastdiag.Span": 1,
+		"restoreSpan = fastdiag.Begin(fastdiag.Rescale, \"ntt_montgomery_restore\", materializationSpan.Sequence(), rescaleDiagFields(op0.Level(), targetLevel, sourceRows, targetRows, fmt.Sprintf(\"c%d\", component), op0 == opOut))": 1,
+		"restoreSpan.End(fastdiag.Fields{})":                          1,
+		"materializationSpan.End(fastdiag.Output(opOut, targetRows))": 1,
+		"}": 3,
+	}
+	seen := make(map[string]int, len(want))
+	for _, line := range strings.Split(patch, "\n") {
+		if strings.HasPrefix(line, "+++") || strings.HasPrefix(line, "---") || line == "" {
+			continue
+		}
+		if strings.HasPrefix(line, "-") {
+			return fmt.Errorf("authorized Rescale instrumentation patch removes existing source: %s", line)
+		}
+		if !strings.HasPrefix(line, "+") {
+			continue
+		}
+		code := strings.TrimSpace(strings.TrimPrefix(line, "+"))
+		if _, ok := want[code]; !ok {
+			return fmt.Errorf("authorized Rescale patch contains non-instrumentation source addition: %s", code)
+		}
+		seen[code]++
+	}
+	for code, count := range want {
+		if seen[code] != count {
+			return fmt.Errorf("authorized Rescale instrumentation patch has %d occurrences of %q, want %d", seen[code], code, count)
+		}
+	}
+	return nil
 }
 
 func reservePublicE32TraceAttempts(journalBase string) error {
@@ -476,7 +618,7 @@ func runReservedPublicE32Trace(journalBase string, run func() error) error {
 	return run()
 }
 
-func runPublicE32TraceTest(secondaryRoot, outputPath, cachePath, profileDir, manifestPath, vectorsPath, diagnosticHead string, validateOnly bool) error {
+func runPublicE32TraceTest(secondaryRoot, certifiedPath, rawPath, failurePath, cachePath, profileDir, manifestPath, vectorsPath, diagnosticHead, primaryHead string, validateOnly bool) error {
 	args := []string{"test", "-tags", "fastdiag", "./circuits/ckks/bootstrapping", "-run", "^TestFastDiagPublicE32Trace$", "-count=1"}
 	command := exec.Command("go", args...)
 	command.Dir = secondaryRoot
@@ -489,7 +631,10 @@ func runPublicE32TraceTest(secondaryRoot, outputPath, cachePath, profileDir, man
 		"FASTDIAG_PUBLIC_E32_MANIFEST":     manifestPath,
 		"FASTDIAG_PUBLIC_E32_FAST_VECTORS": vectorsPath,
 		"FASTDIAG_DIAGNOSTIC_HEAD":         diagnosticHead,
-		"FASTDIAG_OUTPUT":                  outputPath,
+		"FASTDIAG_PRIMARY_HEAD":            primaryHead,
+		"FASTDIAG_OUTPUT":                  certifiedPath,
+		"FASTDIAG_RAW_OUTPUT":              rawPath,
+		"FASTDIAG_FAILURE_OUTPUT":          failurePath,
 		"FASTDIAG_PROFILE_DIR":             profileDir,
 		"FASTDIAG_VALIDATE_ONLY":           validateOnlySetting,
 		"GOCACHE":                          cachePath,
@@ -503,9 +648,11 @@ func runPublicE32TraceTest(secondaryRoot, outputPath, cachePath, profileDir, man
 	return nil
 }
 
-func validatePublicE32RawTrace(raw publicE32RawTrace, manifest publicE32FixtureManifest, vectors publicE32Vectors, primaryCommit, diagnosticHead, manifestHash string) error {
-	if raw.SchemaVersion != "fastdiag.public-e32.trace.v1" || raw.Profile != "logn13-e32-public-native" || raw.Mode != "test-only-public-e32-fast" ||
-		raw.PrimaryCommit != primaryCommit || raw.PrimaryCommit != manifest.PrimaryCommit || raw.PrimarySourceSHA256 != manifest.PrimarySourceSHA256 ||
+func validatePublicE32RawTrace(raw publicE32RawTrace, manifest publicE32FixtureManifest, vectors publicE32Vectors, primaryCommit, fixturePrimaryCommit, diagnosticHead, manifestHash string) error {
+	if raw.SchemaVersion != "fastdiag.public-e32.trace.v1" || raw.TraceStatus != "TRACE_VALIDATED" || raw.TraceValidationError != "" ||
+		raw.RawEvidenceFile == "" || filepath.Base(raw.RawEvidenceFile) != raw.RawEvidenceFile || len(raw.RawEvidenceSHA256) != sha256.Size*2 ||
+		raw.Profile != "logn13-e32-public-native" || raw.Mode != "test-only-public-e32-fast" ||
+		raw.PrimaryCommit != primaryCommit || raw.FixturePrimaryCommit != fixturePrimaryCommit || raw.FixturePrimaryCommit != manifest.PrimaryCommit || raw.PrimarySourceSHA256 != manifest.PrimarySourceSHA256 ||
 		raw.ProductionFastCommit != e32ProductionFastCommit || raw.DiagnosticHead != diagnosticHead || raw.ConfigSHA256 != manifest.ConfigSHA256 ||
 		raw.QPSHA256 != manifest.QPSHA256 || raw.InputSHA256 != manifest.InputSHA256 || raw.WorkloadSHA256 != manifest.WorkloadSHA256 ||
 		raw.FixtureManifestSHA256 != manifestHash || raw.CiphertextSHA256 != manifest.CiphertextSHA256 || raw.ExpectedInputSHA256 != manifest.DecodedSHA256 ||
@@ -531,6 +678,42 @@ func validatePublicE32RawTrace(raw publicE32RawTrace, manifest publicE32FixtureM
 		return errors.New("matched uninstrumented Fast repeatability evidence changed during trace validation")
 	}
 	return validatePublicE32Events(raw.Events)
+}
+
+func validatePublicE32RawCertification(unverified, certified publicE32RawTrace, rawBytes []byte) error {
+	if unverified.TraceStatus != "TRACE_UNVERIFIED" || unverified.TraceValidationError == "" {
+		return errors.New("raw event file must remain explicitly TRACE_UNVERIFIED with a validation-status note")
+	}
+	if certified.TraceStatus != "TRACE_VALIDATED" || certified.TraceValidationError != "" {
+		return errors.New("separate certified file must be marked TRACE_VALIDATED only after all gates pass")
+	}
+	if certified.RawEvidenceFile != "raw-trace-unverified.json" || filepath.Base(certified.RawEvidenceFile) != certified.RawEvidenceFile {
+		return errors.New("certified file does not point to the expected unverified raw evidence basename")
+	}
+	rawSum := sha256.Sum256(rawBytes)
+	if certified.RawEvidenceSHA256 != hex.EncodeToString(rawSum[:]) {
+		return errors.New("certified file raw-evidence SHA-256 does not match the preserved unverified trace")
+	}
+	if unverified.ActualCalls != certified.ActualCalls || unverified.CallBudget != certified.CallBudget ||
+		unverified.PrimaryCommit != certified.PrimaryCommit || unverified.FixturePrimaryCommit != certified.FixturePrimaryCommit || unverified.ProductionFastCommit != certified.ProductionFastCommit ||
+		unverified.PrimarySourceSHA256 != certified.PrimarySourceSHA256 || unverified.Profile != certified.Profile || unverified.Mode != certified.Mode ||
+		unverified.DiagnosticHead != certified.DiagnosticHead || unverified.ConfigSHA256 != certified.ConfigSHA256 ||
+		unverified.QPSHA256 != certified.QPSHA256 || unverified.InputSHA256 != certified.InputSHA256 ||
+		unverified.WorkloadSHA256 != certified.WorkloadSHA256 || unverified.FixtureManifestSHA256 != certified.FixtureManifestSHA256 ||
+		unverified.CiphertextSHA256 != certified.CiphertextSHA256 || unverified.ExpectedInputSHA256 != certified.ExpectedInputSHA256 ||
+		unverified.NumericalGate != certified.NumericalGate || unverified.GoVersion != certified.GoVersion || unverified.OS != certified.OS ||
+		unverified.Arch != certified.Arch || unverified.NumCPU != certified.NumCPU || unverified.GOMAXPROCS != certified.GOMAXPROCS ||
+		unverified.GOGC != certified.GOGC || unverified.GOMEMLIMIT != certified.GOMEMLIMIT || unverified.GODEBUG != certified.GODEBUG ||
+		unverified.CPUProfileFile != certified.CPUProfileFile || unverified.HeapProfileFile != certified.HeapProfileFile {
+		return errors.New("unverified and certified E32 artifacts disagree on source, fixture, or call-budget provenance")
+	}
+	if len(unverified.Runs) != len(certified.Runs) || len(unverified.Events) != len(certified.Events) {
+		return errors.New("unverified and certified E32 artifacts disagree on captured run/event counts")
+	}
+	if !reflect.DeepEqual(unverified.Runs, certified.Runs) || !reflect.DeepEqual(unverified.Events, certified.Events) {
+		return errors.New("certified E32 artifact changes captured raw runs or event records")
+	}
+	return nil
 }
 
 func readProfileArtifact(dir, name, wantSHA string) (string, error) {
@@ -660,27 +843,82 @@ func validatePublicE32Events(events []Event) error {
 	return nil
 }
 
-func rootEventElapsed(events []Event) int64 {
-	for _, event := range events {
-		if event.Scope == "stage" && event.Name == "bootstrap" {
-			return event.ElapsedNS
-		}
-	}
-	return 0
-}
-
 func renderPublicE32Summary(doc publicE32TraceDocument) string {
 	var out strings.Builder
-	fmt.Fprintf(&out, "# Public E32 Fast diagnostic trace\n\n- Primary: `%s` (`%s`, dirty=%t)\n- Diagnostic Secondary: `%s` (`%s`, dirty=%t)\n", doc.Primary.Commit, doc.Primary.Ref, doc.Primary.Dirty, doc.Secondary.Commit, doc.Secondary.Ref, doc.Secondary.Dirty)
-	fmt.Fprintf(&out, "- Frozen production Fast: `%s`\n- Production Go-source identity: `%t` (`%s`)\n- E32 trace budget: %d reserved / %d actual calls\n- Numerical gate: %.3g\n- Environment: `%s`, `%s/%s`, CPU `%s`, NumCPU `%d`, GOMAXPROCS `%d`; GC `%s`, limit `%s`, debug `%s`\n- Raw trace (outside Git): `%s` (SHA-256 `%s`)\n- CPU profile (warm traced call only): `%s` (SHA-256 `%s`)\n- Heap profile (post-warm in-use snapshot, not allocation attribution): `%s` (SHA-256 `%s`)\n\n", doc.ProductionFastCommit, doc.ProductionSourceIdentical, doc.ProductionGoSourceSHA256, doc.CallBudget, doc.ActualCalls, doc.NumericalGate, doc.Environment.GoVersion, doc.Environment.OS, doc.Environment.Arch, doc.Environment.CPU, doc.Environment.NumCPU, doc.Environment.GOMAXPROCS, doc.GCEnvironment.GOGC, doc.GCEnvironment.GOMEMLIMIT, doc.GCEnvironment.GODEBUG, doc.RawTracePath, doc.RawTraceSHA256, doc.CPUProfilePath, doc.CPUProfileSHA256, doc.HeapProfilePath, doc.HeapProfileSHA256)
-	out.WriteString("| Scope | Event | Power | Component | Elapsed (ms) | Samples |\n|---|---|---:|---|---:|---:|\n")
+	fmt.Fprintf(&out, "# Public E32 Fast diagnostic trace\n\n- Primary harness: `%s` (`%s`, dirty=%t)\n- Held fixture source Primary: `%s`\n- Diagnostic Secondary: `%s` (`%s`, dirty=%t)\n", doc.Primary.Commit, doc.Primary.Ref, doc.Primary.Dirty, doc.FixturePrimaryCommit, doc.Secondary.Commit, doc.Secondary.Ref, doc.Secondary.Dirty)
+	fmt.Fprintf(&out, "- Frozen formal Fast production pin: `%s`\n- Original production Go-source SHA-256: `%s`\n- Diagnostic production Go-source SHA-256: `%s`\n- Production source identical: `%t`; authorized instrumentation-only delta: `%t`; changed production paths: `%v`\n- E32 trace budget: %d reserved / %d actual calls\n- Numerical gate: %.3g\n- Environment: `%s`, `%s/%s`, CPU `%s`, NumCPU `%d`, GOMAXPROCS `%d`; GC `%s`, limit `%s`, debug `%s`\n- Raw unverified trace (outside Git): `%s` (SHA-256 `%s`)\n- Separately certified trace (outside Git): `%s` (SHA-256 `%s`)\n- Failure sidecar path (created only on failure): `%s`\n- CPU profile (warm traced call only): `%s` (SHA-256 `%s`)\n- Heap profile (post-warm in-use snapshot, not allocation attribution): `%s` (SHA-256 `%s`)\n\n## CPU profile symbol views\n\n%s\n\n", doc.ProductionFastCommit, doc.ProductionGoSourceSHA256, doc.DiagnosticGoSourceSHA256, doc.ProductionSourceIdentical, doc.InstrumentationOnlyDelta, doc.ProductionSourceDiffPaths, doc.CallBudget, doc.ActualCalls, doc.NumericalGate, doc.Environment.GoVersion, doc.Environment.OS, doc.Environment.Arch, doc.Environment.CPU, doc.Environment.NumCPU, doc.Environment.GOMAXPROCS, doc.GCEnvironment.GOGC, doc.GCEnvironment.GOMEMLIMIT, doc.GCEnvironment.GODEBUG, doc.RawTracePath, doc.RawTraceSHA256, doc.CertifiedTracePath, doc.CertifiedTraceSHA256, doc.FailureArtifactPath, doc.CPUProfilePath, doc.CPUProfileSHA256, doc.HeapProfilePath, doc.HeapProfileSHA256, doc.CPUProfileAttribution)
+	fmt.Fprintf(&out, "## Root closure and event topology\n\n- Bootstrap root: %.3f ms; direct children: %.3f ms; signed unknown/unattributed residual: %.3f ms (%.2f%%). Failure-status time is not separately emitted by this event schema, so no failure share is inferred. Residuals are measured as parent minus immediate children; no normalization or forced 100%% closure is applied.\n\n", doc.Analysis.RootElapsedNS/1e6, doc.Analysis.RootImmediateChildrenNS/1e6, doc.Analysis.RootUnattributedNS/1e6, doc.Analysis.RootUnattributedFraction*100)
+	out.WriteString("| Seq | Parent seq | Scope | Event | Component | Inclusive (ms) | Direct children (ms) | Unattributed/exclusive (ms) | Event residual (%) |\n|---:|---:|---|---|---|---:|---:|---:|---:|\n")
+	for _, closure := range doc.Analysis.Closures {
+		fmt.Fprintf(&out, "| %d | %d | %s | %s | %s | %.3f | %.3f | %.3f | %.2f%% |\n", closure.Sequence, closure.ParentSequence, closure.Scope, closure.Name, displayOrDash(closure.Component), closure.InclusiveNS/1e6, closure.ImmediateChildrenNS/1e6, closure.UnattributedNS/1e6, closure.UnattributedFraction*100)
+	}
+	out.WriteString("\n## Positive exclusive-time Pareto by independent event root\n\nStage, Power and Rescale root trees are reported separately because Power/Rescale roots are not children of Bootstrap stages; their percentages must not be summed across trees.\n")
+	for _, group := range doc.Analysis.PositiveExclusivePareto {
+		fmt.Fprintf(&out, "\n### `%s/%s` root #%d (%.3f ms)\n\n| Rank | Scope | Event | Component | Exclusive (ms) | Share of this event-tree root |\n|---:|---|---|---|---:|---:|\n", group.RootScope, group.RootName, group.RootSequence, group.RootElapsedNS/1e6)
+		for _, entry := range group.Entries {
+			fmt.Fprintf(&out, "| %d | %s | %s | %s | %.3f | %s |\n", entry.Rank, entry.Scope, entry.Name, displayOrDash(entry.Component), entry.ExclusiveNS/1e6, formatE32Percent(entry.RootShare))
+		}
+	}
+	out.WriteString("\n## Bounded Amdahl scenarios\n\nThese are hypothetical stage-only speedups computed from each observed inclusive stage/root fraction, not predicted end-to-end performance. The stage-eliminated value is an upper bound under the same simplified model.\n\n| Stage | Observed root fraction | Stage 2× | Stage 4× | If eliminated (upper bound) |\n|---|---:|---:|---:|---:|\n")
+	for _, scenario := range doc.Analysis.AmdahlScenarios {
+		fmt.Fprintf(&out, "| %s | %.2f%% | %s | %s | %s |\n", scenario.Stage, scenario.ObservedRootFraction*100, formatE32OptionalFloat(scenario.TwoXStageOverallSpeedup), formatE32OptionalFloat(scenario.FourXStageOverallSpeedup), formatE32OptionalFloat(scenario.StageEliminatedUpperBound))
+	}
+	out.WriteString("\n## Event medians and hierarchy\n\n`Samples` counts same event/parent-type occurrences within this single traced warm call; these are not repeated-run medians. `Parent key` preserves nesting instead of summing nested inclusive values as disjoint work.\n\n| Parent key | Scope | Event | Power | Component | Elapsed (ms) | Samples |\n|---|---|---|---|---|---:|---:|\n")
 	for _, event := range doc.EventMedians {
 		power := formatPower(event.Power, event.SplitA, event.SplitB)
 		component := event.Component
 		if component == "" {
 			component = "—"
 		}
-		fmt.Fprintf(&out, "| %s | %s | %s | %s | %.3f | %d |\n", event.Scope, event.Name, power, component, event.MedianNS/1e6, event.Count)
+		fmt.Fprintf(&out, "| %s | %s | %s | %s | %s | %.3f | %d |\n", displayOrDash(event.ParentKey), event.Scope, event.Name, power, component, event.MedianNS/1e6, event.Count)
 	}
 	return out.String()
+}
+
+func displayOrDash(value string) string {
+	if value == "" {
+		return "—"
+	}
+	return value
+}
+
+func formatE32OptionalFloat(value *float64) string {
+	if value == nil {
+		return "not defined"
+	}
+	return fmt.Sprintf("%.3fx", *value)
+}
+
+func formatE32Percent(value *float64) string {
+	if value == nil {
+		return "not defined"
+	}
+	return fmt.Sprintf("%.2f%%", *value*100)
+}
+
+func inspectE32CPUProfile(path string) string {
+	var outputs []string
+	for _, view := range []struct {
+		name string
+		args []string
+	}{{"flat", []string{"-top", "-nodecount=12"}}, {"cumulative", []string{"-top", "-cum", "-nodecount=12"}}} {
+		args := append([]string{"tool", "pprof"}, view.args...)
+		args = append(args, path)
+		command := exec.Command("go", args...)
+		output, err := command.CombinedOutput()
+		if err != nil {
+			outputs = append(outputs, fmt.Sprintf("%s: unavailable: go tool pprof: %v (%s)", view.name, err, truncateE32ProfileOutput(strings.TrimSpace(string(output)))))
+			continue
+		}
+		outputs = append(outputs, view.name+":\n"+strings.TrimSpace(string(output)))
+	}
+	return strings.Join(outputs, "\n")
+}
+
+func truncateE32ProfileOutput(value string) string {
+	const limit = 400
+	if len(value) <= limit {
+		return value
+	}
+	return value[:limit] + "…"
 }

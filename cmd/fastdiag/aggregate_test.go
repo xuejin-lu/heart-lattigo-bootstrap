@@ -13,6 +13,39 @@ func TestMedian(t *testing.T) {
 	require.Zero(t, median(nil))
 }
 
+func TestAggregateEventsRetainsDirectParentIdentity(t *testing.T) {
+	medians := aggregateEvents([]TraceRun{{Events: []Event{
+		{Scope: "stage", Name: "bootstrap", ElapsedNS: 100, Sequence: 1},
+		{Scope: "stage", Name: "evalmod_real", ElapsedNS: 40, Sequence: 2, ParentSequence: 1},
+	}}})
+	require.Len(t, medians, 2)
+	for _, event := range medians {
+		if event.Name == "bootstrap" {
+			require.Empty(t, event.ParentKey)
+		}
+		if event.Name == "evalmod_real" {
+			require.NotEmpty(t, event.ParentKey)
+		}
+	}
+}
+
+func TestAggregateSingleTraceEventTypesCountsWithinParentType(t *testing.T) {
+	medians := aggregateSingleTraceEventTypes([]Event{
+		{Scope: "stage", Name: "bootstrap", ElapsedNS: 100, Sequence: 1},
+		{Scope: "stage", Name: "evalmod_real", ElapsedNS: 30, Sequence: 2, ParentSequence: 1},
+		{Scope: "stage", Name: "bootstrap", ElapsedNS: 120, Sequence: 3},
+		{Scope: "stage", Name: "evalmod_real", ElapsedNS: 50, Sequence: 4, ParentSequence: 3},
+	})
+	require.Len(t, medians, 2)
+	for _, event := range medians {
+		if event.Name == "evalmod_real" {
+			require.Equal(t, 2, event.Count)
+			require.Equal(t, float64(40), event.MedianNS)
+			require.Equal(t, "stage/bootstrap", event.ParentKey)
+		}
+	}
+}
+
 func TestCompareAggregationKeepsNegativeDeltaAndClosesParent(t *testing.T) {
 	baseline := []TraceRun{{Events: []Event{
 		{Scope: "stage", Name: "bootstrap", ElapsedNS: 100, Sequence: 1},

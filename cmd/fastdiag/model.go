@@ -72,6 +72,7 @@ type EnvironmentMetadata struct {
 
 type EventMedian struct {
 	Key       string  `json:"key"`
+	ParentKey string  `json:"parent_key,omitempty"`
 	Scope     string  `json:"scope"`
 	Name      string  `json:"name"`
 	Power     *int    `json:"power,omitempty"`
