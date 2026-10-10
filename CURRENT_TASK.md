@@ -1,27 +1,27 @@
 # Current Task
 
-Task: FAST-DROPIN-HIGHLEVEL-TO-BOOTSTRAP-AUTONOMOUS-BATCH-018
+Task: FAST-DROPIN-HIGHLEVEL-MUL-RESCALE-BOOTSTRAP-AUTONOMOUS-BATCH-019
 Status: READY_FOR_CODEX
-Mode: APPROVED FOUR-CHECKPOINT BOUNDED FEASIBILITY-FIRST INTEGRATION BATCH
-Web review: once at batch completion or immediately on a genuine source/math/profile incompatibility
+Mode: APPROVED FOUR-CHECKPOINT BOUNDED FEASIBILITY-FIRST HIGH-LEVEL MULTIPLICATION TO PUBLIC E32 BOOTSTRAP
+Review: ONE independent Web review at completion, or immediate science/architecture stop
 
-**Runnable charter:** `specs/FAST-DROPIN-HIGHLEVEL-TO-BOOTSTRAP-AUTONOMOUS-BATCH-018.md`
-**Accepted predecessor:** `results/FAST-DROPIN-PUBLIC-PRIMITIVE-BOOTSTRAP-AUTONOMOUS-BATCH-017-web-review.md`
-**Goal:** `docs/FAST_DROPIN_ZERO_SECRET_GOAL.md`
-**Workflow:** Primary/Secondary `AGENTS.md`, `docs/RESEARCH_ENGINEERING_WORKFLOW.md` §4A/4B, Secondary `docs/FAST_QPREFIX_SPEC.md`
+**Runnable charter:** `specs/FAST-DROPIN-HIGHLEVEL-MUL-RESCALE-BOOTSTRAP-AUTONOMOUS-BATCH-019.md`
+**Accepted previous review:** `results/FAST-DROPIN-HIGHLEVEL-TO-BOOTSTRAP-AUTONOMOUS-BATCH-018-web-review.md`
+**Durable target:** `docs/FAST_DROPIN_ZERO_SECRET_GOAL.md`
+**Workflow:** both `AGENTS.md`, `docs/RESEARCH_ENGINEERING_WORKFLOW.md` §4A/4B, Secondary `docs/FAST_QPREFIX_SPEC.md`
 
-## Current evidence
+## Accepted results and remaining gap
 
-Batch 017 accepted: genuine unchanged public CKKS EncryptNew → AddNew → MulRelinNew → Rescale → RotateNew → Bootstrap → native DecryptNew/Decode on canonical LogN13 residual-Level1→0, E32 with 4096 slots, using original genuine Standard and intentional zero-secret Fast. One Bootstrap each, final paired RMSE `4.997862453389243e-9`, max `4.326414527528976e-8`. No speed claim.
+Batch 018 ACCEPTED for bounded Level5 Fast compact public `EncryptNew→AddNew→RotateNew→DropLevelNew(5)→native Level0 DecryptNew→E32 Public Bootstrap→native Decode` using the exact 017 E32 full-domain generated Q/P without modification. Pair pre-Bootstrap RMSE `1.5656982925854002e-11`, max `7.13774172628691e-11`; post-Bootstrap RMSE `4.963927268857064e-9`, max `3.93386413412319e-8`, each backend one Bootstrap. Fast output q4/q5 dormant at Level5 and zero-c1. Target Level0 q0 had independent `2B<q0` gate. **018 did not run high-Level MulRelin or Rescale.**
 
-Batch 016 accepted separately: different frozen six-Q LogN13 profile; true compact-Q high-Level5 Add/MulRelin/Rescale/Rotate numerical comparison passed using a **Fast-only measurement-boundary centered CRT decoder**, not native public DecryptNew. The 016 profile is NOT identical to canonical 017 residual inputs; the two successes are not yet one E32 high-Level compact→Bootstrap public workflow.
+Batch 016 separately proved Level5 MulRelin/Rescale with measured high-Level CRT and numeric oracle under **another six-Q profile**, not the canonical E32 Bootstrap chain. Batch 019 addresses this gap, not full CKKS or measured acceleration.
 
-## Batch 018 checkpoints
+## A→D autonomously, preserving STOP conditions
 
-A: mandatory **READ-ONLY exact profile/Level/Scale/CRT feasibility audit**. If canonical E32 residual profile does not permit an above-cap source ciphertext to feed its public Bootstrap without new profile/architecture, STOP with explicit evidence and no Bootstrap attempts; **do not** force/change Q/P.
-B: only if A passes, same public frontend Standard/Fast high-Level compact→residual-Level0 matched cheap preflight; ensure legitimate Level/Scale/capacity, normal low-Level DecryptNew and no dormant/full-RNS fallback.
-C: only after B passes, max one original Standard and one Fast E32 public Bootstrap; no retries.
-D: compact results/report, self-review/test as appropriate, safe Primary-only commit/push, Web review.
+A: mandatory read-only exact q5, Scale and coefficient-capacity feasibility; note that two initial 2^45 scales lead to `2^90/q5 ≈ 2^30`, not canonical 2^45. Only source-backed public per-ciphertext Scale and regular operations may resolve, without changing frozen Q/P, E32 or default Scale. STOP with evidence if impossible.
+B: if A passes, identical frontend Standard/Fast Level5 public Add/MulRelin/Rescale/Rotate/Drop to residual Level0, native decoder, independent bounds and no dormant q4+ read.
+C: if B passes, max one genuine Standard + one Fast public E32 Bootstrap on held B outputs, with native oracle and direct paired metrics.
+D: compact results, focused go tests/vet/self-review, safe Primary-only commit/push; one Web review. No Secondary/genuine Standard changes.
 
-**Pins:** Standard original `5dbffbdea05394de2ca3a432ed5318aa832e3f40` independent clean checkout; Fast `xuejin-lu/lattigo fast-qprefix@2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac` read-only. Verify current refs before work.
-**Cost:** zero benchmarks/LogN16/sweeps; at most 1 Standard+1 Fast Bootstrap ONLY if A/B passing gates. No Secondary edits, no new math or hidden materialization in application workflow. On scientific blocker return `BATCH_BLOCKED_NEEDS_WEB_REVIEW`; no unilateral 019.
+**Pins:** true Standard `5dbffbdea05394de2ca3a432ed5318aa832e3f40` separate read-only; Fast `xuejin-lu/lattigo fast-qprefix@2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac` read-only.
+**Budget:** one Standard + one Fast Bootstrap maximum in batch, only if both preflights pass; zero benchmark, LogN16 or sweeps. No automatic 020.
