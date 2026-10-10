@@ -1,0 +1,966 @@
+{
+  "schema_version": "fast-dropin-highlevel-mul-rescale-batch-019.combined.v1",
+  "status": "BATCH_COMPLETE_READY_FOR_WEB_REVIEW",
+  "created_utc": "2026-10-10T00:53:30.864442Z",
+  "go_version": "go1.26.4",
+  "os": "darwin",
+  "architecture": "arm64",
+  "primary_commit": "9c3a705c854a3c03d7182786c9463f0f6606722c",
+  "primary_dirty_during_runs": false,
+  "config_sha256": "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98",
+  "shared_frontend_sha256": "15700630e2fddbe1c3765cecead2e0612aab770fd23615b5ba4f8d81fa80f352",
+  "canonical_input_sha256": "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285",
+  "workload_sha256": "00b70a2e77887c7d6a41db1859246f6513f2c984915de648734e5dd8c584cf74",
+  "effective_profile_sha256": "862d233af63b18a46e0a2cb5e7f74cda93a9dcab6c04fc2f4b1e425c424a7044",
+  "effective_qp_sha256": "1f045e603a856968779d62e045a037274bba08cbfce8b1dd3dec2828f1f6a46b",
+  "q_primes": [
+    36028797018652673,
+    549755731969,
+    549756026881,
+    549755486209,
+    549756174337,
+    1152921504606830593,
+    1152921504606748673,
+    1152921504606994433,
+    1152921504606683137,
+    1152921504606601217,
+    1152921504606584833,
+    1152921504607191041,
+    1152921504607223809,
+    72057594037616641,
+    72057594038321153,
+    72057594037370881,
+    72057594037338113
+  ],
+  "p_primes": [
+    2305843009213317121,
+    2305843009213120513,
+    2305843009214414849,
+    2305843009212694529,
+    2305843009214758913
+  ],
+  "independent_bounds": {
+    "input_a_B": "2348557866436",
+    "input_b_B": "1804822278899",
+    "input_c_B": "76957544167327219",
+    "add_B": "4153380145335",
+    "mulrelin_B": "2618441203534382746900245490606080",
+    "rescale_B": "2271135713118062",
+    "S_Q0123": "5986308565615587353347023386369277282933624144412673",
+    "q0": "36028797018652673",
+    "logical_rescale_divisor_q5": "1152921504606830593"
+  },
+  "scale_feasibility": {
+    "default_input_scale_2^45": "35184372088832",
+    "chosen_input_c_scale_q5": "1152921504606830593",
+    "chosen_mulrelin_scale_2^45_times_q5": "40564819207302764422326571237376",
+    "chosen_post_rescale_scale": "35184372088832",
+    "naive_two_default_scale_numerator_2^90": "1237940039285380274899124224",
+    "naive_rescale_divisor_q5": "1152921504606830593",
+    "naive_post_rescale_log2": 30.00000000000002
+  },
+  "pre_bootstrap_fast_vs_standard": {
+    "rmse": 1.4678127606723786e-11,
+    "max_complex_error": 5.903515384823777e-11,
+    "snr_db": 152.5550089855535,
+    "pass": true
+  },
+  "bootstrap_fast_vs_standard": {
+    "rmse": 4.937529503163558e-9,
+    "max_complex_error": 5.038821901648196e-8,
+    "snr_db": 102.01822817774493,
+    "pass": true
+  },
+  "standard": {
+    "status": "bootstrap_completed",
+    "backend_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+    "backend_ref": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+    "backend_dirty": false,
+    "fast_zero_secret": false,
+    "public_bootstrap_dispatch": "genuine Standard public Bootstrap evaluator",
+    "bootstrap_calls": 1,
+    "bootstrap_attempted": true,
+    "keyset_identity": "one public GenEvaluationKeys result passed to ckks.NewEvaluator and bootstrapping.NewEvaluator",
+    "bootstrap_secret_full_q_domain": true,
+    "bootstrap_secret_preserves_residual_q0_q1": true,
+    "input_c_scale_q5_integer": "1152921504606830593",
+    "mulrelin_scale_integer": "40564819207302764422326571237376",
+    "rescale_scale_integer": "35184372088832",
+    "primitive_key_accesses": {
+      "evaluator_construction": {
+        "galois_key": 0,
+        "galois_key_list": 1,
+        "relinearization_key": 0
+      },
+      "add": {
+        "galois_key": 0,
+        "galois_key_list": 0,
+        "relinearization_key": 0
+      },
+      "mul_relin": {
+        "galois_key": 0,
+        "galois_key_list": 0,
+        "relinearization_key": 1
+      },
+      "rescale": {
+        "galois_key": 0,
+        "galois_key_list": 0,
+        "relinearization_key": 0
+      },
+      "rotate": {
+        "galois_key": 1,
+        "galois_key_list": 0,
+        "relinearization_key": 0
+      },
+      "bootstrap_internal_key_accesses": "not runtime-instrumented: public Bootstrap uses its existing concrete EvaluationKeys/MemEvaluationKeySet; no claim of zero Bootstrap-internal key access"
+    },
+    "checkpoints": [
+      {
+        "id": "encrypt_a_level5",
+        "public_api": "rlwe.NewEncryptor(...).EncryptNew",
+        "level": 5,
+        "scale_integer": "35184372088832",
+        "scale_log2": 45,
+        "component_row_lengths": [
+          [
+            8192,
+            8192,
+            8192,
+            8192,
+            8192,
+            8192
+          ],
+          [
+            8192,
+            8192,
+            8192,
+            8192,
+            8192,
+            8192
+          ]
+        ],
+        "authoritative_row_sha256": [
+          [
+            "1bebc880f2fe685c0bf07cef5ee735a51de3414b2f194b14d4fe70c2189ea6c9",
+            "c454ea046d19f319e8310936fb3a9ba7dd26bda8819d28aec47206f7ad4f3521",
+            "21bec886c45b3078c5f05b30d74ea331b41a8daabb1c6c94c47fa6b8e5c22238",
+            "c02ee6bc55e393a7395b3f719be5e3d17cdbcc1c40c302e9323a1dfbaccaedf9"
+          ],
+          [
+            "83319033cb58cd35ba5db282ca5cdfc5a92c2f54489b7e8b26f96ff12a970b06",
+            "2b3d867dd43ba6dd0924b166e8256b11f7002df22383932f6ae8f843f59ba891",
+            "d9b1bfb4ffe3b35e4d4c2860460e07e25983b59da49e4071524a51b95e33784a",
+            "e984b920494d74aaa786955d27169eb0443a4536b652750b9666ca2fee8eb629"
+          ]
+        ],
+        "c1_zero_on_authoritative_rows": false,
+        "fast_compact_prefix_layout": false
+      },
+      {
+        "id": "encrypt_b_level5",
+        "public_api": "rlwe.NewEncryptor(...).EncryptNew",
+        "level": 5,
+        "scale_integer": "35184372088832",
+        "scale_log2": 45,
+        "component_row_lengths": [
+          [
+            8192,
+            8192,
+            8192,
+            8192,
+            8192,
+            8192
+          ],
+          [
+            8192,
+            8192,
+            8192,
+            8192,
+            8192,
+            8192
+          ]
+        ],
+        "authoritative_row_sha256": [
+          [
+            "45e38cd6841345d27bf3fd2e7337e2bcf06bf6a77cc41bf8e13c0afcbaab0caf",
+            "270853136f56acdcfc880d4418c7b87ee8500b436bbf95d1d1f5811ae0b5699a",
+            "107f5062604f1d762e8f2f23fd60435e3973f600ef7981105086cc1767bfcc6f",
+            "36c0ddfd94cf0a94b69816974c30813cf0f46e57a695f63a4041f6469330bbc4"
+          ],
+          [
+            "46ea088954050e90efdadc6dbcbfb85852bd44872f20cfb691d5863673f2fa71",
+            "1786c7024acf3c3fdccf514441f4a077a586f5bb7cdd72204552b23b53ded4c6",
+            "d90762911785605d2ea874b1c349889b5b5ff6f2a37757eba3a878879cfbdd4c",
+            "296e6ceb9b986c9ace4558c7b066a4b196602983d08916bc7d441cbcc3545a04"
+          ]
+        ],
+        "c1_zero_on_authoritative_rows": false,
+        "fast_compact_prefix_layout": false
+      },
+      {
+        "id": "encrypt_c_q5_scale_level5",
+        "public_api": "rlwe.NewEncryptor(...).EncryptNew",
+        "level": 5,
+        "scale_integer": "1152921504606830593",
+        "scale_log2": 59.99999999999998,
+        "component_row_lengths": [
+          [
+            8192,
+            8192,
+            8192,
+            8192,
+            8192,
+            8192
+          ],
+          [
+            8192,
+            8192,
+            8192,
+            8192,
+            8192,
+            8192
+          ]
+        ],
+        "authoritative_row_sha256": [
+          [
+            "d01827a5a7923699dc333c31cd3acff087dcfd64d71741029ef4aa7181a23892",
+            "9ffb810251efff69b2817be2928391962660408caf63bf3527fb20ab182180dd",
+            "a0dfc4af49a476f51989dcdf7265662ec10e08ea4b493aeffd57351b71941598",
+            "38478680afb778fd41306150882ab23ac70155273006be3518c5919f9742e8f2"
+          ],
+          [
+            "0c0838654f581d960fefaf5898cc7dec57841c8aa42f4cb4a7b8e4b559369256",
+            "4cae8c6afc7f5e6475d0931d04b42b95137b61405a0006507dec802ab162ff17",
+            "9338d6d62dbc70d78cef227bab168faade6fba04e914e2687e140207aba2d729",
+            "c19bbed9e1b4fde1df8da5b094bf2903812727665745fdc3378b7437024efe14"
+          ]
+        ],
+        "c1_zero_on_authoritative_rows": false,
+        "fast_compact_prefix_layout": false
+      },
+      {
+        "id": "add_level5",
+        "public_api": "ckks.Evaluator.AddNew",
+        "level": 5,
+        "scale_integer": "35184372088832",
+        "scale_log2": 45,
+        "component_row_lengths": [
+          [
+            8192,
+            8192,
+            8192,
+            8192,
+            8192,
+            8192
+          ],
+          [
+            8192,
+            8192,
+            8192,
+            8192,
+            8192,
+            8192
+          ]
+        ],
+        "authoritative_row_sha256": [
+          [
+            "65baba883b2698832764b0c9276046006eff06a7690f1e30edecdec472062c62",
+            "af34cd1b9caf66f72679a471d2554b70ca747c757467bf4cf1102a78e5edd082",
+            "567351ed58f42cc1d8b26f09b1a7a8366a5c64b3eed2bc7f75f70b7dfc0dd228",
+            "3e15f71c38eaf3cf3ed9bb8208e9fe14aa2586b7d6d7fcc8e98d153b4ddcc7d4"
+          ],
+          [
+            "2a45b120606928072deec42bdd760cf118508cea5f22db42893f2e0073cb8f68",
+            "4f81c1afcb8c10af4cd4fa4989719e376f44a6b8e80b5165bfcbe4a7afe2aec9",
+            "b26870d8dae6eb6dcc6e5b5271f049974c25f1812fb8ec618380fedf0ebd640e",
+            "77e75f9d091acee1833be439393ca1e4de797aa14498059b3d9fb490a53ac579"
+          ]
+        ],
+        "c1_zero_on_authoritative_rows": false,
+        "fast_compact_prefix_layout": false
+      },
+      {
+        "id": "mulrelin_level5",
+        "public_api": "ckks.Evaluator.MulRelinNew",
+        "level": 5,
+        "scale_integer": "40564819207302764422326571237376",
+        "scale_log2": 104.99999999999999,
+        "component_row_lengths": [
+          [
+            8192,
+            8192,
+            8192,
+            8192,
+            8192,
+            8192
+          ],
+          [
+            8192,
+            8192,
+            8192,
+            8192,
+            8192,
+            8192
+          ]
+        ],
+        "authoritative_row_sha256": [
+          [
+            "991c9c256fce2f66f821bfe5f9936111ccdeb6d1bd41e1aab76e882214770cbe",
+            "f76c8a3a0f498cc52f8b2f1d4cba0654cf762f22fa21b5998b5e67a77a16d305",
+            "30119dad6cdf16e7b9425c027e87df263c8e48c027ca961338dd51d4b0bdc029",
+            "ba3bc63f6b5f33920a75a3854ebf3566868c2db69b1fee706b0069d7795254fe"
+          ],
+          [
+            "9be3cb2340e41653087048f8b0a66559550fa6abf5a332435a69780fa9210c6b",
+            "ba3357534ad65a78710ef79c95388c3960d934eb4b40a13b932d61f357ced639",
+            "d9f9619dd907e9fb5b011f2a6fa14c21a50cdad8498350b6c97aa0a019374fed",
+            "a800ec658fb35400b46c53293393587ac15fd4ea606000cb746ac6bd74a4d5c7"
+          ]
+        ],
+        "c1_zero_on_authoritative_rows": false,
+        "fast_compact_prefix_layout": false
+      },
+      {
+        "id": "rescale_q5_level4",
+        "public_api": "ckks.Evaluator.Rescale",
+        "level": 4,
+        "scale_integer": "35184372088832",
+        "scale_log2": 45,
+        "component_row_lengths": [
+          [
+            8192,
+            8192,
+            8192,
+            8192,
+            8192
+          ],
+          [
+            8192,
+            8192,
+            8192,
+            8192,
+            8192
+          ]
+        ],
+        "authoritative_row_sha256": [
+          [
+            "2e9ab51edaded680cf1a617fb1aa2b792d9111995f11ae5670f838e2622d77df",
+            "e5cebc3abc347b195a4002936759b7155a75554a1b00b74c40a2debd063a2a15",
+            "94d01a7d0a8117e0478f80aefff881fb7c58567641dc5f383d5c22ff35bdaa35",
+            "645182a89f3019ab19d5f5e37d853e259820e6030e9096543c70e00f28bf9b36"
+          ],
+          [
+            "654cfdc9f0074e9353a43cebe117823b87d848d07e59d10d2bd413d72b14aef8",
+            "ac2383cf265e8ce3298260c185d17548592ea89cce7a6f2a2f43e821cac0b073",
+            "cc01f854d66a421d32c3f1518ccbb9bd55bdffb0087b0559bc921c2c48b4978b",
+            "5369d72ab78efb6488176c7a27368d74cece22083bcbf03ea153e897608b1ef1"
+          ]
+        ],
+        "c1_zero_on_authoritative_rows": false,
+        "fast_compact_prefix_layout": false
+      },
+      {
+        "id": "rotate_level4",
+        "public_api": "ckks.Evaluator.RotateNew(1)",
+        "level": 4,
+        "scale_integer": "35184372088832",
+        "scale_log2": 45,
+        "component_row_lengths": [
+          [
+            8192,
+            8192,
+            8192,
+            8192,
+            8192
+          ],
+          [
+            8192,
+            8192,
+            8192,
+            8192,
+            8192
+          ]
+        ],
+        "authoritative_row_sha256": [
+          [
+            "72afeeb928cbdbda52af73d3d014dd5d34d9b189f1bc8690f6118e12c1e1a62f",
+            "ad61db4cddaf07d0a5bc7bf8fbcf218c2f35d55243f41b93a86560a5d9b5ba68",
+            "9da355da6a43697d3c97edbebee959e1e7edd350bcee366d4754e27da65e259a",
+            "abf3dceb9c51afd27c4efd39c44df8bb5bc86df7b62217570952d87fbb30cc78"
+          ],
+          [
+            "7625a2269bd0c3acb8e0a5a427fde628af1dee4ff109988f744e5df64fc1ead0",
+            "264f946d7f7a85966fe9ab918174f7df5c75f46dc6d249f398c354be71af5105",
+            "46530bb9302e44a09f2f889c441ad68010a7940a888339c0d48423b2b49e2b42",
+            "0a29f60320fd30b868d54e0d3cf3b7bd7ae119c46e153c1f32c292691ea6fc9b"
+          ]
+        ],
+        "c1_zero_on_authoritative_rows": false,
+        "fast_compact_prefix_layout": false
+      },
+      {
+        "id": "drop_level0",
+        "public_api": "ckks.Evaluator.DropLevelNew(4)",
+        "level": 0,
+        "scale_integer": "35184372088832",
+        "scale_log2": 45,
+        "component_row_lengths": [
+          [
+            8192
+          ],
+          [
+            8192
+          ]
+        ],
+        "authoritative_row_sha256": [
+          [
+            "72afeeb928cbdbda52af73d3d014dd5d34d9b189f1bc8690f6118e12c1e1a62f"
+          ],
+          [
+            "7625a2269bd0c3acb8e0a5a427fde628af1dee4ff109988f744e5df64fc1ead0"
+          ]
+        ],
+        "c1_zero_on_authoritative_rows": false,
+        "fast_compact_prefix_layout": true
+      },
+      {
+        "id": "public_bootstrap_output",
+        "public_api": "bootstrapping.Evaluator.Bootstrap",
+        "level": 1,
+        "scale_integer": "35184372088832",
+        "scale_log2": 45,
+        "component_row_lengths": [
+          [
+            8192,
+            8192
+          ],
+          [
+            8192,
+            8192
+          ]
+        ],
+        "authoritative_row_sha256": [
+          [
+            "68eacb401a8735e2a34a4f6121935d3a9a3b670523cc91add9dee23f72045e5c",
+            "965fb94e8e64014c7c40d61f62a466b88d05ea2e52d4dfb44266199e3df03e28"
+          ],
+          [
+            "36961e69dcc1cd2c0fb977727a0cf91edcb72e64c4c05cfa1c9d4c455db10ec3",
+            "e8f2c807bdbb60c3476045754791d4e9b4a90bc13af9d6608b3681f4d43d826d"
+          ]
+        ],
+        "c1_zero_on_authoritative_rows": false,
+        "fast_compact_prefix_layout": true
+      }
+    ],
+    "pre_bootstrap_cleartext_oracle": {
+      "finite": true,
+      "complex_rmse": 1.466359017527355e-11,
+      "max_complex_error": 5.86605418722453e-11,
+      "signal_power": 0.0015892863900969793,
+      "error_power": 8.807255114890405e-19,
+      "snr_db": 152.5636158781992,
+      "snr_state": "finite"
+    },
+    "bootstrap_cleartext_oracle": {
+      "finite": true,
+      "complex_rmse": 4.826764480602127e-9,
+      "max_complex_error": 1.424471312557334e-8,
+      "signal_power": 0.0015892863900969793,
+      "error_power": 9.542719631852468e-14,
+      "snr_db": 102.21530000009507,
+      "snr_state": "finite"
+    }
+  },
+  "fast": {
+    "status": "bootstrap_completed",
+    "backend_commit": "2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac",
+    "backend_ref": "fast-qprefix",
+    "backend_dirty": false,
+    "fast_zero_secret": true,
+    "public_bootstrap_dispatch": "Fast public Bootstrap dispatch selected from frozen zero-secret capability",
+    "bootstrap_calls": 1,
+    "bootstrap_attempted": true,
+    "keyset_identity": "one public GenEvaluationKeys result passed to ckks.NewEvaluator and bootstrapping.NewEvaluator",
+    "bootstrap_secret_full_q_domain": true,
+    "bootstrap_secret_preserves_residual_q0_q1": true,
+    "input_c_scale_q5_integer": "1152921504606830593",
+    "mulrelin_scale_integer": "40564819207302764422326571237376",
+    "rescale_scale_integer": "35184372088832",
+    "primitive_key_accesses": {
+      "evaluator_construction": {
+        "galois_key": 0,
+        "galois_key_list": 1,
+        "relinearization_key": 0
+      },
+      "add": {
+        "galois_key": 0,
+        "galois_key_list": 0,
+        "relinearization_key": 0
+      },
+      "mul_relin": {
+        "galois_key": 0,
+        "galois_key_list": 0,
+        "relinearization_key": 0
+      },
+      "rescale": {
+        "galois_key": 0,
+        "galois_key_list": 0,
+        "relinearization_key": 0
+      },
+      "rotate": {
+        "galois_key": 0,
+        "galois_key_list": 0,
+        "relinearization_key": 0
+      },
+      "bootstrap_internal_key_accesses": "not runtime-instrumented: public Bootstrap uses its existing concrete EvaluationKeys/MemEvaluationKeySet; no claim of zero Bootstrap-internal key access"
+    },
+    "checkpoints": [
+      {
+        "id": "encrypt_a_level5",
+        "public_api": "rlwe.NewEncryptor(...).EncryptNew",
+        "level": 5,
+        "scale_integer": "35184372088832",
+        "scale_log2": 45,
+        "component_row_lengths": [
+          [
+            8192,
+            8192,
+            8192,
+            8192,
+            8192,
+            8192
+          ],
+          [
+            8192,
+            8192,
+            8192,
+            8192,
+            8192,
+            8192
+          ]
+        ],
+        "authoritative_row_sha256": [
+          [
+            "d28e82688ffdbd2cc5a067f0c0919952063278a6fb23c64d8ae2ebcda096cd30",
+            "724917793423a820e00ab221be62d612d194964691521bc5e1f526c3314e8f51",
+            "0e159a22e2eaeb65682f26ab01052c4a2bb9aba79a6fa6ea5b71ca9200396801",
+            "f0f6204c281d8a49465540dfa1062b705f9b070b40fdb741e0f30f8c937d219f"
+          ],
+          [
+            "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+            "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+            "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+            "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+          ]
+        ],
+        "c1_zero_on_authoritative_rows": true,
+        "fast_compact_prefix_layout": false,
+        "capacity": {
+          "authoritative_rows": 4,
+          "prefix_product": "5986308565615587353347023386369277282933624144412673",
+          "independent_B": "2348557866436",
+          "observer_component_max_abs": [
+            "23981091843",
+            "0"
+          ],
+          "strict_2B_less_than_prefix": true,
+          "existing_fast_capacity_observer_invoked": true
+        }
+      },
+      {
+        "id": "encrypt_b_level5",
+        "public_api": "rlwe.NewEncryptor(...).EncryptNew",
+        "level": 5,
+        "scale_integer": "35184372088832",
+        "scale_log2": 45,
+        "component_row_lengths": [
+          [
+            8192,
+            8192,
+            8192,
+            8192,
+            8192,
+            8192
+          ],
+          [
+            8192,
+            8192,
+            8192,
+            8192,
+            8192,
+            8192
+          ]
+        ],
+        "authoritative_row_sha256": [
+          [
+            "408ba5ddf37859fd5e3048f2831e2ded673e40e7c9f0cf650f21075631edfc16",
+            "ea14c70852a7cc4d6bcdb109641e0559d8bc556856c58eab1286e3213157ee6a",
+            "0b506237353a4128854463f38c0a0279b78f2d110954c69285e60d0b38e147e1",
+            "24ea341a176c669ac1f3fc7a706c4a73b5909c8c67154be5b71ef3cb032d27fb"
+          ],
+          [
+            "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+            "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+            "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+            "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+          ]
+        ],
+        "c1_zero_on_authoritative_rows": true,
+        "fast_compact_prefix_layout": false,
+        "capacity": {
+          "authoritative_rows": 4,
+          "prefix_product": "5986308565615587353347023386369277282933624144412673",
+          "independent_B": "1804822278899",
+          "observer_component_max_abs": [
+            "21923318245",
+            "0"
+          ],
+          "strict_2B_less_than_prefix": true,
+          "existing_fast_capacity_observer_invoked": true
+        }
+      },
+      {
+        "id": "encrypt_c_q5_scale_level5",
+        "public_api": "rlwe.NewEncryptor(...).EncryptNew",
+        "level": 5,
+        "scale_integer": "1152921504606830593",
+        "scale_log2": 59.99999999999998,
+        "component_row_lengths": [
+          [
+            8192,
+            8192,
+            8192,
+            8192,
+            8192,
+            8192
+          ],
+          [
+            8192,
+            8192,
+            8192,
+            8192,
+            8192,
+            8192
+          ]
+        ],
+        "authoritative_row_sha256": [
+          [
+            "69d87fce726de01145c433fcbc5b8e9311fd5259635100bf70945bc305f053db",
+            "106233c62f5b40d24946f7ef34b876b08990b2a551bee454d0e1563aae03ca28",
+            "ca0e0a68f04c739433466aae1f691de58a5bebeb2768dac2565894ee5d63cc7d",
+            "40b61947bd484a291ecdf7eb819262637be2c57ed5030332c72270a73759ef2c"
+          ],
+          [
+            "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+            "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+            "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+            "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+          ]
+        ],
+        "c1_zero_on_authoritative_rows": true,
+        "fast_compact_prefix_layout": false,
+        "capacity": {
+          "authoritative_rows": 4,
+          "prefix_product": "5986308565615587353347023386369277282933624144412673",
+          "independent_B": "76957544167327219",
+          "observer_component_max_abs": [
+            "785812417496652",
+            "0"
+          ],
+          "strict_2B_less_than_prefix": true,
+          "existing_fast_capacity_observer_invoked": true
+        }
+      },
+      {
+        "id": "add_level5",
+        "public_api": "ckks.Evaluator.AddNew",
+        "level": 5,
+        "scale_integer": "35184372088832",
+        "scale_log2": 45,
+        "component_row_lengths": [
+          [
+            8192,
+            8192,
+            8192,
+            8192,
+            0,
+            0
+          ],
+          [
+            8192,
+            8192,
+            8192,
+            8192,
+            0,
+            0
+          ]
+        ],
+        "authoritative_row_sha256": [
+          [
+            "2f740566a04d063b804b3f2e97c9fb2659d094c3c13fca9a7ccf12b42d2b86ea",
+            "0b497dfd9111bad625082df3bf4efba999b505562fdc190b41d73d4675291959",
+            "47e3ae359a6465f4b32ec60e2418c0e173ff6c4162b03a63e689c5ea610e89a7",
+            "626312873a777ce2f36526d74ba08ee30c05819b35a52383515e28cf93c5e2fb"
+          ],
+          [
+            "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+            "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+            "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+            "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+          ]
+        ],
+        "c1_zero_on_authoritative_rows": true,
+        "fast_compact_prefix_layout": true,
+        "capacity": {
+          "authoritative_rows": 4,
+          "prefix_product": "5986308565615587353347023386369277282933624144412673",
+          "independent_B": "4153380145335",
+          "observer_component_max_abs": [
+            "37012741828",
+            "0"
+          ],
+          "strict_2B_less_than_prefix": true,
+          "existing_fast_capacity_observer_invoked": true
+        }
+      },
+      {
+        "id": "mulrelin_level5",
+        "public_api": "ckks.Evaluator.MulRelinNew",
+        "level": 5,
+        "scale_integer": "40564819207302764422326571237376",
+        "scale_log2": 104.99999999999999,
+        "component_row_lengths": [
+          [
+            8192,
+            8192,
+            8192,
+            8192,
+            0,
+            0
+          ],
+          [
+            8192,
+            8192,
+            8192,
+            8192,
+            0,
+            0
+          ]
+        ],
+        "authoritative_row_sha256": [
+          [
+            "11f3ee93dff4374f2ff6599671d7cd8f27a3b06f51f8782b6d1f75a56911b34d",
+            "4f8aa51f7922a1981d781e05efd0a34db9f327b7e3a3077db4ed002edb5514b0",
+            "6046471ea7b999228fdca2f9142131aead194f16107b8e4d39bd678d900044c0",
+            "cc8b43f490bb2b4a55589dd8c5fcfe61504eddc3b60cd93e1e8eed15ebb2ad50"
+          ],
+          [
+            "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+            "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+            "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+            "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+          ]
+        ],
+        "c1_zero_on_authoritative_rows": true,
+        "fast_compact_prefix_layout": true,
+        "capacity": {
+          "authoritative_rows": 4,
+          "prefix_product": "5986308565615587353347023386369277282933624144412673",
+          "independent_B": "2618441203534382746900245490606080",
+          "observer_component_max_abs": [
+            "12715179539250835268551717081",
+            "0"
+          ],
+          "strict_2B_less_than_prefix": true,
+          "existing_fast_capacity_observer_invoked": true
+        }
+      },
+      {
+        "id": "rescale_q5_level4",
+        "public_api": "ckks.Evaluator.Rescale",
+        "level": 4,
+        "scale_integer": "35184372088832",
+        "scale_log2": 45,
+        "component_row_lengths": [
+          [
+            8192,
+            8192,
+            8192,
+            8192,
+            0
+          ],
+          [
+            8192,
+            8192,
+            8192,
+            8192,
+            0
+          ]
+        ],
+        "authoritative_row_sha256": [
+          [
+            "1fe05cbcdacd37010dc8f2f0347f9fb7705ea2f4d881d94cf94c1f81170f9fa3",
+            "651918c327297fd91724b1950e8378d3a6e36244fd5ae546e7a6e084771e14d5",
+            "1c167bd5ff90fc0a47e95b77eb401bddc0771ce03154ec7b461547387a364fa7",
+            "db0996d1aaa7ff4506b79e539d6c0d6a948d4b90e31a23f7c6b50bdd5d10f32f"
+          ],
+          [
+            "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+            "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+            "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+            "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+          ]
+        ],
+        "c1_zero_on_authoritative_rows": true,
+        "fast_compact_prefix_layout": true,
+        "capacity": {
+          "authoritative_rows": 4,
+          "prefix_product": "5986308565615587353347023386369277282933624144412673",
+          "independent_B": "2271135713118062",
+          "observer_component_max_abs": [
+            "11028660224",
+            "0"
+          ],
+          "strict_2B_less_than_prefix": true,
+          "existing_fast_capacity_observer_invoked": true
+        }
+      },
+      {
+        "id": "rotate_level4",
+        "public_api": "ckks.Evaluator.RotateNew(1)",
+        "level": 4,
+        "scale_integer": "35184372088832",
+        "scale_log2": 45,
+        "component_row_lengths": [
+          [
+            8192,
+            8192,
+            8192,
+            8192,
+            0
+          ],
+          [
+            8192,
+            8192,
+            8192,
+            8192,
+            0
+          ]
+        ],
+        "authoritative_row_sha256": [
+          [
+            "b3402752992ca1a4b5434b75abac827e8effecbcfd79da5cf371293464e89c20",
+            "50b9ca951fa5c4a9a1ebbdfe3cd82a4e70bc9b67fc6886bfbbd870a73284ec7e",
+            "67fc55cb3e9a58abbd4f3307254226e022ff9fd54209b1dfadadd0494c5e1f4c",
+            "ce7aef9b6c1ac75119724093178a2d02c75963ff3bf928b68f62a9f8d68c105e"
+          ],
+          [
+            "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+            "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+            "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+            "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+          ]
+        ],
+        "c1_zero_on_authoritative_rows": true,
+        "fast_compact_prefix_layout": true,
+        "capacity": {
+          "authoritative_rows": 4,
+          "prefix_product": "5986308565615587353347023386369277282933624144412673",
+          "independent_B": "2271135713118062",
+          "observer_component_max_abs": [
+            "11028660224",
+            "0"
+          ],
+          "strict_2B_less_than_prefix": true,
+          "existing_fast_capacity_observer_invoked": true
+        }
+      },
+      {
+        "id": "drop_level0",
+        "public_api": "ckks.Evaluator.DropLevelNew(4)",
+        "level": 0,
+        "scale_integer": "35184372088832",
+        "scale_log2": 45,
+        "component_row_lengths": [
+          [
+            8192
+          ],
+          [
+            8192
+          ]
+        ],
+        "authoritative_row_sha256": [
+          [
+            "b3402752992ca1a4b5434b75abac827e8effecbcfd79da5cf371293464e89c20"
+          ],
+          [
+            "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+          ]
+        ],
+        "c1_zero_on_authoritative_rows": true,
+        "fast_compact_prefix_layout": true,
+        "capacity": {
+          "authoritative_rows": 1,
+          "prefix_product": "36028797018652673",
+          "independent_B": "2271135713118062",
+          "observer_component_max_abs": [
+            "11028660224",
+            "0"
+          ],
+          "strict_2B_less_than_prefix": true,
+          "existing_fast_capacity_observer_invoked": true
+        }
+      },
+      {
+        "id": "public_bootstrap_output",
+        "public_api": "bootstrapping.Evaluator.Bootstrap",
+        "level": 1,
+        "scale_integer": "35184372088832",
+        "scale_log2": 45,
+        "component_row_lengths": [
+          [
+            8192,
+            8192
+          ],
+          [
+            8192,
+            8192
+          ]
+        ],
+        "authoritative_row_sha256": [
+          [
+            "ddf43c3e145e686670d560761108913c523c65a1ae7d73cc8a4c5be3a1ead264",
+            "68ef43eaaf924220631b35d84ffb8ccc5598c0d18bb4484f47ca6297568dfb76"
+          ],
+          [
+            "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+            "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+          ]
+        ],
+        "c1_zero_on_authoritative_rows": true,
+        "fast_compact_prefix_layout": true
+      }
+    ],
+    "pre_bootstrap_cleartext_oracle": {
+      "finite": true,
+      "complex_rmse": 7.442066238955308e-13,
+      "max_complex_error": 2.1986015127059466e-12,
+      "signal_power": 0.0015892863900969793,
+      "error_power": 2.2685429721087345e-21,
+      "snr_db": 178.45455153965648,
+      "snr_state": "finite"
+    },
+    "bootstrap_cleartext_oracle": {
+      "finite": true,
+      "complex_rmse": 1.1795718406445398e-9,
+      "max_complex_error": 5.7387742390963576e-8,
+      "signal_power": 0.0015892863900969793,
+      "error_power": 5.699132322781379e-15,
+      "snr_db": 114.45393423748425,
+      "snr_state": "finite"
+    }
+  },
+  "bootstrap_calls_total": 2,
+  "fixed_max_error_gate": 0.000001
+}
