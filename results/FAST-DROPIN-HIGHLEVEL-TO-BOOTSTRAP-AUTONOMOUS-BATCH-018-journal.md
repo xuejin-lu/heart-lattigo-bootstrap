@@ -40,10 +40,24 @@ The separate accepted 016 profile is not substituted: it has six Q primes `[55,3
 | Checkpoint | Status | Bootstrap calls | Next action |
 |---|---|---:|---|
 | A — read-only exact profile/Level/Scale/CRT feasibility | PASS | 0 | Build and run matched zero-Bootstrap B preflight |
-| B — matched public high-Level compact preflight | NOT STARTED | 0 | Only after A; stop on any profile, key, capacity, row-authority, native-decrypt or numerical gate failure |
-| C — one-shot public Bootstrap pair | NOT STARTED | 0 | Only after both B runs pass; at most one call per backend |
-| D — artifacts, self-review and safe Primary handoff | NOT STARTED | 0 | Batch boundary only |
+| B — matched public high-Level compact preflight | PASS | 0 | Pair validator passed; only then proceed to the one-shot Bootstrap pair |
+| C — one-shot public Bootstrap pair | PASS | Standard 1/1, Fast 1/1 | Both native output oracles and fixed paired error gate passed; no retries |
+| D — artifacts, self-review and safe Primary handoff | PASS | Standard 1/1, Fast 1/1 | Batch complete; deliver for independent Web review |
 
 ### Runner self-review correction before accepted B evidence
 
 The first paired runner processes reached the explicit Bootstrap wait gate, but the pair validator incorrectly required the full-profile Level-5 `EncryptNew` inputs themselves to have compact backing. The pinned Fast public encryption legitimately produced six active logical rows; the authorized Q-prefix operations are the step that must leave q4+ dormant. Both processes were explicitly aborted at the gate before any Bootstrap call (`Standard=0/1`, `Fast=0/1`). The validator was corrected to require the existing observer and zero-c1 contract on the encryption inputs, and to require compact backing only on the public Add/Rotate/DropLevel outputs. A focused regression test covers this distinction. These aborted raw runs are not accepted measurement evidence; the matched B preflight will be rerun from the corrected clean commit.
+
+### Checkpoint B — accepted matched preflight
+
+**Status: PASS; zero Bootstrap calls.** Both runs used the same clean Primary code commit `86af97092ba666a4a16ab2e7c4dde861ee669a96`, config/workload/frontend/profile/QP hashes, canonical 4096-slot A/B inputs, full E32 key lifecycle, and ordinary public CKKS API chain. Standard pin `5dbffbdea05394de2ca3a432ed5318aa832e3f40` and Fast `fast-qprefix@2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac` were clean. Both residual Level-0 native decrypt/decode cleartext oracles passed the fixed max-error `1e-6` gate. Fast-vs-Standard pre-Bootstrap comparison: complex RMSE `1.5656982925854002e-11`, max `7.13774172628691e-11`.
+
+Fast public `EncryptNew` inputs at full-profile Level 5 have six logical rows; the operation outputs prove the bounded policy: Add and Rotate remain Level 5 / Scale `2^45`, authoritative rows 4, with q4+ backing lengths zero; `DropLevelNew(5)` is Level 0 / unchanged Scale, with one q0 row. Authoritative c1 stayed zero. The existing Fast observer ran at each checkpoint. Independent bounds: `B_A=2348557866436`, `B_B=1804822278899`, and post-Add/Rotate `B=4153380145335`; `2B=8306760290670 < q0=36028797018652673`. The Level-5 q0..q3 prefix product was `5986308565615587353347023386369277282933624144412673`. The independent coefficient bound is for Fast's zero-secret c0 representation only; no such component bound is claimed for Standard ciphertexts.
+
+### Checkpoint C — one-shot public Bootstrap pair
+
+**Status: PASS.** The accepted B processes were held at their local one-shot gates. Standard was called once and passed native post-Bootstrap decryption at Level 1 / Scale `2^45`: cleartext RMSE `4.880485998172208e-9`, max `1.8458745857066216e-8`, SNR `134.4577446217342 dB`. Only after that success, Fast was called once on its in-memory B output and passed: RMSE `1.1829277433501467e-9`, max `5.764906238946737e-8`, SNR `146.76784169515037 dB`. Both outputs had 4096 decoded slots; Fast retained two authoritative rows and zero c1.
+
+Final Fast-vs-Standard Bootstrap output comparison: complex RMSE `4.963927268857064e-9`, max `3.93386413412319e-8`, pass under the unchanged `1e-6` max-error gate. Total actual Bootstrap calls: Standard `1/1`, Fast `1/1`; no benchmark, sweep, LogN16, retry, or Secondary edit was performed. Compact paired evidence is in `FAST-DROPIN-HIGHLEVEL-TO-BOOTSTRAP-AUTONOMOUS-BATCH-018-evidence.json`.
+
+The runner provenance commit is `86af97092ba666a4a16ab2e7c4dde861ee669a96`; Primary was clean during both accepted backend runs. Secondary remained clean and unchanged at `2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac`. Final task status: `BATCH_COMPLETE_READY_FOR_WEB_REVIEW`; artifact commit/push state is included in the completion report.

@@ -1,0 +1,695 @@
+{
+  "schema_version": "fast-dropin-highlevel-bootstrap-batch-018.combined.v1",
+  "status": "BATCH_COMPLETE_READY_FOR_WEB_REVIEW",
+  "created_utc": "2026-10-10T00:27:10.502736Z",
+  "primary_code_commit": "86af97092ba666a4a16ab2e7c4dde861ee669a96",
+  "primary_dirty_during_runs": false,
+  "go_version": "go1.26.4",
+  "os": "darwin",
+  "architecture": "arm64",
+  "config_sha256": "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98",
+  "shared_frontend_sha256": "db231ca613e3ef0a58526a255285c3f57aaa50b5731b00423393915909f20be3",
+  "runner_bundle_sha256": "0ab5b45eab0935e56107d06ba2e51ee46cbdc7b5ff8d969176ea413d1141a37e",
+  "canonical_input_sha256": "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285",
+  "workload_sha256": "a46db0081527dd0153e61299c78b3f3952c3871b20d978a9ed072b9eeef87a60",
+  "effective_profile_sha256": "16a26b4c12e06ed2c6a4774125b286fb64bbdb66ecde8678fb5c7c59a0221359",
+  "effective_qp_sha256": "1f045e603a856968779d62e045a037274bba08cbfce8b1dd3dec2828f1f6a46b",
+  "q_primes": [
+    36028797018652673,
+    549755731969,
+    549756026881,
+    549755486209,
+    549756174337,
+    1152921504606830593,
+    1152921504606748673,
+    1152921504606994433,
+    1152921504606683137,
+    1152921504606601217,
+    1152921504606584833,
+    1152921504607191041,
+    1152921504607223809,
+    72057594037616641,
+    72057594038321153,
+    72057594037370881,
+    72057594037338113
+  ],
+  "p_primes": [
+    2305843009213317121,
+    2305843009213120513,
+    2305843009214414849,
+    2305843009212694529,
+    2305843009214758913
+  ],
+  "residual_max_level": 1,
+  "bootstrap_max_level": 16,
+  "ephemeral_secret_weight": 32,
+  "slots": 4096,
+  "pre_bootstrap_fast_vs_standard": {
+    "rmse": 1.5656982925854002e-11,
+    "max_complex_error": 7.13774172628691e-11,
+    "pass": true
+  },
+  "bootstrap_fast_vs_standard": {
+    "rmse": 4.963927268857064e-9,
+    "max_complex_error": 3.93386413412319e-8,
+    "pass": true
+  },
+  "standard": {
+    "backend_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+    "backend_ref": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+    "backend_dirty": false,
+    "fast_zero_secret": false,
+    "public_bootstrap_dispatch": "standard",
+    "bootstrap_calls": 1,
+    "bootstrap_attempted": true,
+    "keyset_identity": "one btpParams.GenEvaluationKeys result; its MemEvaluationKeySet is passed to ckks.NewEvaluator and the containing same keys object to bootstrapping.NewEvaluator",
+    "bootstrap_secret_matches_residual_q0_q1": true,
+    "checkpoints": [
+      {
+        "id": "encrypt_a_level5",
+        "public_api": "ckks.NewEncryptor(...).EncryptNew",
+        "state": {
+          "level": 5,
+          "degree": 1,
+          "scale_integer": "35184372088832",
+          "scale_log2": 45,
+          "n": 8192,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "qprefix_authoritative_rows": 4,
+          "component_row_lengths": [
+            [
+              8192,
+              8192,
+              8192,
+              8192,
+              8192,
+              8192
+            ],
+            [
+              8192,
+              8192,
+              8192,
+              8192,
+              8192,
+              8192
+            ]
+          ],
+          "component_qprefix_row_sha256": [
+            [
+              "79ff6b77010550f2b362aa2c1dce99bc143f0ece4941ba9c674b5ef02c116c09",
+              "c953f7158648edeedbb45917e60a4ca306b9951ab7de43bba0698d8e6dad57b4",
+              "53fab9335e80cb001f80d48177204a4647e04b4739b08398541146d4aa458ca5",
+              "f244300a2f864b5f848c001f17b198fdfa094caca59535c42606f99a9a448a94"
+            ],
+            [
+              "7d1ea7a5d01bab614598438eea9c764aea7177dff9d9f696ee247972b52e4627",
+              "1f639fc1f99b64cebdf9aa052dee4c5ccc4426f433d7188b285b81200ab0991a",
+              "525284b918c2cf2d708b2e274a9c8e404b3228a232e9f3708f95003586bb51fc",
+              "f41aab54027256c7314fa4aedca40fe3c79e21e87c1aa882868dd410f82cff55"
+            ]
+          ],
+          "c1_zero_on_authoritative_rows": false
+        }
+      },
+      {
+        "id": "encrypt_b_level5",
+        "public_api": "ckks.NewEncryptor(...).EncryptNew",
+        "state": {
+          "level": 5,
+          "degree": 1,
+          "scale_integer": "35184372088832",
+          "scale_log2": 45,
+          "n": 8192,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "qprefix_authoritative_rows": 4,
+          "component_row_lengths": [
+            [
+              8192,
+              8192,
+              8192,
+              8192,
+              8192,
+              8192
+            ],
+            [
+              8192,
+              8192,
+              8192,
+              8192,
+              8192,
+              8192
+            ]
+          ],
+          "component_qprefix_row_sha256": [
+            [
+              "a603a16fde3783e2311d5e84234686a27ec097d1006355efef7aa40f35e860b5",
+              "8e44556893785de95fcd8654393b2afbeeeb8117137d49c5b8aad1d434d31ee1",
+              "0c14fc2cd52d49a6ce15e11828514cb4e68078392edd816be0a549caba05fb5a",
+              "0ad105934fc37dffcf3c13b3b1c86a1d6a03cb4f28461f9e9058205bd2634d28"
+            ],
+            [
+              "1cfa9b5daa6520cd622491f0880a8ad90a5c44fb54808d5850c80c00bef6539b",
+              "4c8e53d0d61d15967510e73d680c0b47e0d328c64d01c9a66c9f9f0b31f06a83",
+              "301050730f48f0441822211524a52859041f5194a6f3e9874dc3c278695559bd",
+              "19c86be2e643d69b53eba6f60d27a4cbe1d64e30e10977291e9707b365acad04"
+            ]
+          ],
+          "c1_zero_on_authoritative_rows": false
+        }
+      },
+      {
+        "id": "add_level5",
+        "public_api": "ckks.Evaluator.AddNew",
+        "state": {
+          "level": 5,
+          "degree": 1,
+          "scale_integer": "35184372088832",
+          "scale_log2": 45,
+          "n": 8192,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "qprefix_authoritative_rows": 4,
+          "component_row_lengths": [
+            [
+              8192,
+              8192,
+              8192,
+              8192,
+              8192,
+              8192
+            ],
+            [
+              8192,
+              8192,
+              8192,
+              8192,
+              8192,
+              8192
+            ]
+          ],
+          "component_qprefix_row_sha256": [
+            [
+              "7a9122f45b0e093af7186620e944fd5f0de19a48fdb2f89827a7d17d3e545653",
+              "ef1a077e61f35d8a7d614b4a731b1a91053577f98cf389b481cf8f2e110d2362",
+              "acbe5396923e5f495002cba762d50e17a1d7716db0d90b25e91a72b11aca435d",
+              "62b96d93aeba917ad1ed440998c27a3bee9a1160e9c8d6e6a3fe322bdc1f2d16"
+            ],
+            [
+              "c5b4d98293d656b770ce889e0f6f00a8986a7f27c69431385182d25e1e550a76",
+              "63b09cd6cf8d4aabd22752e84724bfb82e9e829ad92b900a44b68c295711f286",
+              "3b421ea54fc2e7b40cf0e0ef00d6abf364a2e381a6030fd0028f3813a089b0c4",
+              "c9dd88e4554a82a82a758a4ab0c6f02df65e11b1c02df370146d54a3f789094c"
+            ]
+          ],
+          "c1_zero_on_authoritative_rows": false
+        }
+      },
+      {
+        "id": "rotate_level5",
+        "public_api": "ckks.Evaluator.RotateNew(1)",
+        "state": {
+          "level": 5,
+          "degree": 1,
+          "scale_integer": "35184372088832",
+          "scale_log2": 45,
+          "n": 8192,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "qprefix_authoritative_rows": 4,
+          "component_row_lengths": [
+            [
+              8192,
+              8192,
+              8192,
+              8192,
+              8192,
+              8192
+            ],
+            [
+              8192,
+              8192,
+              8192,
+              8192,
+              8192,
+              8192
+            ]
+          ],
+          "component_qprefix_row_sha256": [
+            [
+              "4dd65ed5e74deca59bdabab860f0a44a26c9a3ee78d754cd9d3ea5b248d29808",
+              "8ddf3a15137f5efd84782785af877f216d38ff20ffd5a4a9d4c8325d787004ea",
+              "6f6fd63567fbbcb5a18fe11069dc5a6681d34215cf9728482fe733cb9596e14e",
+              "a5ed1fd68c0dc356f61f4743d21bbccf7f8ee336c02d5a3912677b085965dd53"
+            ],
+            [
+              "0d34d17954201112d3c3ce23eb553470c95cff241a45f37a623fd9408439923d",
+              "dd5a38e8a88c0ac4f6110b5db9271b287724fd0d5e9fbb814e0f001d996e2d2f",
+              "dab05a2eee86ef4f18bf538d1b118b210c78fdc46c771b91c9379b4ba8f16f05",
+              "4a57a244fc8f92c3741276045eeeb49bd21153bf53dbf9b946095d9cfeb10ba4"
+            ]
+          ],
+          "c1_zero_on_authoritative_rows": false
+        }
+      },
+      {
+        "id": "drop_to_residual_level0",
+        "public_api": "ckks.Evaluator.DropLevelNew(5)",
+        "state": {
+          "level": 0,
+          "degree": 1,
+          "scale_integer": "35184372088832",
+          "scale_log2": 45,
+          "n": 8192,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "qprefix_authoritative_rows": 1,
+          "component_row_lengths": [
+            [
+              8192
+            ],
+            [
+              8192
+            ]
+          ],
+          "component_qprefix_row_sha256": [
+            [
+              "4dd65ed5e74deca59bdabab860f0a44a26c9a3ee78d754cd9d3ea5b248d29808"
+            ],
+            [
+              "0d34d17954201112d3c3ce23eb553470c95cff241a45f37a623fd9408439923d"
+            ]
+          ],
+          "c1_zero_on_authoritative_rows": false
+        }
+      },
+      {
+        "id": "public_bootstrap_output",
+        "public_api": "bootstrapping.Evaluator.Bootstrap",
+        "state": {
+          "level": 1,
+          "degree": 1,
+          "scale_integer": "35184372088832",
+          "scale_log2": 45,
+          "n": 8192,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "qprefix_authoritative_rows": 2,
+          "component_row_lengths": [
+            [
+              8192,
+              8192
+            ],
+            [
+              8192,
+              8192
+            ]
+          ],
+          "component_qprefix_row_sha256": [
+            [
+              "509c1bf3c2a2d4eee907a2221911cb73c5c277e3d22ccf1722ebe0358339a507",
+              "48d7bf00a1042bcdc339159c87ed7d44a5d9b8063eed4c5d193c7339ebfe5b15"
+            ],
+            [
+              "f8ebe07421be9c2390251861d40e80197266f63e54a4b256cebf0b14e4cb9e05",
+              "7441a6abb9eab7b518dd16fc4c9db974004f955b3c71cdaaa2830f8d60c2d700"
+            ]
+          ],
+          "c1_zero_on_authoritative_rows": false
+        }
+      }
+    ],
+    "pre_bootstrap_cleartext_oracle": {
+      "finite": true,
+      "complex_rmse": 1.5679244972259527e-11,
+      "max_complex_error": 7.17959234280332e-11,
+      "snr_db": 184.32050313312314,
+      "snr_state": "finite"
+    },
+    "pre_bootstrap_decoded_sha256": "1182597d425e4b1b5aa9e887336c15cb8da85903103b58f3460fb626e874d624",
+    "bootstrap_cleartext_oracle": {
+      "finite": true,
+      "complex_rmse": 4.880485998172208e-9,
+      "max_complex_error": 1.8458745857066216e-8,
+      "snr_db": 134.4577446217342,
+      "snr_state": "finite"
+    },
+    "bootstrap_decoded_sha256": "7fff2ec69c110bff32ea239f11b6fb198a6646271216638d25dc04ccc4b75dbb"
+  },
+  "fast": {
+    "backend_commit": "2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac",
+    "backend_ref": "fast-qprefix",
+    "backend_dirty": false,
+    "fast_zero_secret": true,
+    "public_bootstrap_dispatch": "bootstrapping.NewEvaluator selected Fast through public GenEvaluationKeys capability",
+    "bootstrap_calls": 1,
+    "bootstrap_attempted": true,
+    "keyset_identity": "one btpParams.GenEvaluationKeys result; its MemEvaluationKeySet is passed to ckks.NewEvaluator and the containing same keys object to bootstrapping.NewEvaluator",
+    "bootstrap_secret_matches_residual_q0_q1": true,
+    "checkpoints": [
+      {
+        "id": "encrypt_a_level5",
+        "public_api": "ckks.NewEncryptor(...).EncryptNew",
+        "state": {
+          "level": 5,
+          "degree": 1,
+          "scale_integer": "35184372088832",
+          "scale_log2": 45,
+          "n": 8192,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "qprefix_authoritative_rows": 4,
+          "component_row_lengths": [
+            [
+              8192,
+              8192,
+              8192,
+              8192,
+              8192,
+              8192
+            ],
+            [
+              8192,
+              8192,
+              8192,
+              8192,
+              8192,
+              8192
+            ]
+          ],
+          "component_qprefix_row_sha256": [
+            [
+              "d28e82688ffdbd2cc5a067f0c0919952063278a6fb23c64d8ae2ebcda096cd30",
+              "724917793423a820e00ab221be62d612d194964691521bc5e1f526c3314e8f51",
+              "0e159a22e2eaeb65682f26ab01052c4a2bb9aba79a6fa6ea5b71ca9200396801",
+              "f0f6204c281d8a49465540dfa1062b705f9b070b40fdb741e0f30f8c937d219f"
+            ],
+            [
+              "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+              "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+              "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+              "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+            ]
+          ],
+          "c1_zero_on_authoritative_rows": true
+        },
+        "capacity": {
+          "rows": 4,
+          "prefix_product": "5986308565615587353347023386369277282933624144412673",
+          "independent_component_bounds": [
+            "2348557866436",
+            "0"
+          ],
+          "observer_centered_max_abs": [
+            "23981091843",
+            "0"
+          ],
+          "strict_2B_less_than_prefix": true,
+          "existing_fast_capacity_observer_invoked": true
+        }
+      },
+      {
+        "id": "encrypt_b_level5",
+        "public_api": "ckks.NewEncryptor(...).EncryptNew",
+        "state": {
+          "level": 5,
+          "degree": 1,
+          "scale_integer": "35184372088832",
+          "scale_log2": 45,
+          "n": 8192,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "qprefix_authoritative_rows": 4,
+          "component_row_lengths": [
+            [
+              8192,
+              8192,
+              8192,
+              8192,
+              8192,
+              8192
+            ],
+            [
+              8192,
+              8192,
+              8192,
+              8192,
+              8192,
+              8192
+            ]
+          ],
+          "component_qprefix_row_sha256": [
+            [
+              "408ba5ddf37859fd5e3048f2831e2ded673e40e7c9f0cf650f21075631edfc16",
+              "ea14c70852a7cc4d6bcdb109641e0559d8bc556856c58eab1286e3213157ee6a",
+              "0b506237353a4128854463f38c0a0279b78f2d110954c69285e60d0b38e147e1",
+              "24ea341a176c669ac1f3fc7a706c4a73b5909c8c67154be5b71ef3cb032d27fb"
+            ],
+            [
+              "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+              "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+              "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+              "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+            ]
+          ],
+          "c1_zero_on_authoritative_rows": true
+        },
+        "capacity": {
+          "rows": 4,
+          "prefix_product": "5986308565615587353347023386369277282933624144412673",
+          "independent_component_bounds": [
+            "1804822278899",
+            "0"
+          ],
+          "observer_centered_max_abs": [
+            "21923318245",
+            "0"
+          ],
+          "strict_2B_less_than_prefix": true,
+          "existing_fast_capacity_observer_invoked": true
+        }
+      },
+      {
+        "id": "add_level5",
+        "public_api": "ckks.Evaluator.AddNew",
+        "state": {
+          "level": 5,
+          "degree": 1,
+          "scale_integer": "35184372088832",
+          "scale_log2": 45,
+          "n": 8192,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "qprefix_authoritative_rows": 4,
+          "component_row_lengths": [
+            [
+              8192,
+              8192,
+              8192,
+              8192,
+              0,
+              0
+            ],
+            [
+              8192,
+              8192,
+              8192,
+              8192,
+              0,
+              0
+            ]
+          ],
+          "component_qprefix_row_sha256": [
+            [
+              "2f740566a04d063b804b3f2e97c9fb2659d094c3c13fca9a7ccf12b42d2b86ea",
+              "0b497dfd9111bad625082df3bf4efba999b505562fdc190b41d73d4675291959",
+              "47e3ae359a6465f4b32ec60e2418c0e173ff6c4162b03a63e689c5ea610e89a7",
+              "626312873a777ce2f36526d74ba08ee30c05819b35a52383515e28cf93c5e2fb"
+            ],
+            [
+              "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+              "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+              "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+              "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+            ]
+          ],
+          "c1_zero_on_authoritative_rows": true
+        },
+        "capacity": {
+          "rows": 4,
+          "prefix_product": "5986308565615587353347023386369277282933624144412673",
+          "independent_component_bounds": [
+            "4153380145335",
+            "0"
+          ],
+          "observer_centered_max_abs": [
+            "37012741828",
+            "0"
+          ],
+          "strict_2B_less_than_prefix": true,
+          "existing_fast_capacity_observer_invoked": true
+        }
+      },
+      {
+        "id": "rotate_level5",
+        "public_api": "ckks.Evaluator.RotateNew(1)",
+        "state": {
+          "level": 5,
+          "degree": 1,
+          "scale_integer": "35184372088832",
+          "scale_log2": 45,
+          "n": 8192,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "qprefix_authoritative_rows": 4,
+          "component_row_lengths": [
+            [
+              8192,
+              8192,
+              8192,
+              8192,
+              0,
+              0
+            ],
+            [
+              8192,
+              8192,
+              8192,
+              8192,
+              0,
+              0
+            ]
+          ],
+          "component_qprefix_row_sha256": [
+            [
+              "4d4e91e4b5304db7417a7e9b71babe39d8f340893d4a0c76beb38f07ee8f3755",
+              "5629289cb04679817a5bfaaa6d5bb761abd8921f43f2d743225e0dc588d16f75",
+              "7efd02465c59091351b59c18e5289dbddfabfbf72e5b0a90fd16d3c1458a1333",
+              "ed8bbe893fc87a0591a6a17d7008bce01ca4df691bb2bef1c1e8d95c5f801885"
+            ],
+            [
+              "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+              "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+              "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+              "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+            ]
+          ],
+          "c1_zero_on_authoritative_rows": true
+        },
+        "capacity": {
+          "rows": 4,
+          "prefix_product": "5986308565615587353347023386369277282933624144412673",
+          "independent_component_bounds": [
+            "4153380145335",
+            "0"
+          ],
+          "observer_centered_max_abs": [
+            "37012741828",
+            "0"
+          ],
+          "strict_2B_less_than_prefix": true,
+          "existing_fast_capacity_observer_invoked": true
+        }
+      },
+      {
+        "id": "drop_to_residual_level0",
+        "public_api": "ckks.Evaluator.DropLevelNew(5)",
+        "state": {
+          "level": 0,
+          "degree": 1,
+          "scale_integer": "35184372088832",
+          "scale_log2": 45,
+          "n": 8192,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "qprefix_authoritative_rows": 1,
+          "component_row_lengths": [
+            [
+              8192
+            ],
+            [
+              8192
+            ]
+          ],
+          "component_qprefix_row_sha256": [
+            [
+              "4d4e91e4b5304db7417a7e9b71babe39d8f340893d4a0c76beb38f07ee8f3755"
+            ],
+            [
+              "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+            ]
+          ],
+          "c1_zero_on_authoritative_rows": true
+        },
+        "capacity": {
+          "rows": 1,
+          "prefix_product": "36028797018652673",
+          "independent_component_bounds": [
+            "4153380145335",
+            "0"
+          ],
+          "observer_centered_max_abs": [
+            "37012741828",
+            "0"
+          ],
+          "strict_2B_less_than_prefix": true,
+          "existing_fast_capacity_observer_invoked": true
+        }
+      },
+      {
+        "id": "public_bootstrap_output",
+        "public_api": "bootstrapping.Evaluator.Bootstrap",
+        "state": {
+          "level": 1,
+          "degree": 1,
+          "scale_integer": "35184372088832",
+          "scale_log2": 45,
+          "n": 8192,
+          "is_ntt": true,
+          "is_montgomery": false,
+          "qprefix_authoritative_rows": 2,
+          "component_row_lengths": [
+            [
+              8192,
+              8192
+            ],
+            [
+              8192,
+              8192
+            ]
+          ],
+          "component_qprefix_row_sha256": [
+            [
+              "8bed5203140c6cde4711748ce5865abafbd45806f5d2dff49ebc8ac56f153289",
+              "2a8a1cef7a817752ee0eaeaff530c562ce29007182278564427ec91d38c9efa7"
+            ],
+            [
+              "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+              "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+            ]
+          ],
+          "c1_zero_on_authoritative_rows": true
+        }
+      }
+    ],
+    "pre_bootstrap_cleartext_oracle": {
+      "finite": true,
+      "complex_rmse": 1.0496953031998535e-12,
+      "max_complex_error": 3.3770666928819113e-12,
+      "snr_db": 207.80574096500314,
+      "snr_state": "finite"
+    },
+    "pre_bootstrap_decoded_sha256": "57f1aaeca6173fbb4dbc8a8d6674af99640245d836bce4d624ae15950ee3e414",
+    "bootstrap_cleartext_oracle": {
+      "finite": true,
+      "complex_rmse": 1.1829277433501467e-9,
+      "max_complex_error": 5.764906238946737e-8,
+      "snr_db": 146.76784169515037,
+      "snr_state": "finite"
+    },
+    "bootstrap_decoded_sha256": "bb8d0ef8513165af3f8313607ca0c09ae7d72e7e90963ae9a21e7033ea1e980d"
+  },
+  "bootstrap_calls_total": 2,
+  "fixed_max_error_gate": 0.000001
+}
