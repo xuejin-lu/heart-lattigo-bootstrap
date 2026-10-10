@@ -30,3 +30,11 @@ Validation before measurement:
 - No reliable peak RSS value was available. Allocation counters and q-backed ciphertext bytes are kept as separate measurements.
 
 Next: source-backed S3 attribution of Fast's Rescale bottleneck using current Secondary source and reusable historical diagnostics; no Bootstrap before S5.
+
+## S3 — current Rescale attribution: COMPLETE
+
+- Current public Fast dispatch and `fastcore.RescaleWorkspace` were reviewed at the frozen, clean Secondary pin `2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac`.
+- S2 identifies Fast Rescale as the largest timed eval-only stage (`1.730 ms` median). A bounded 8-second CPU profile of the existing rows4 LogN13 q0=55 Rescale benchmark measured `1,278,368 ns/op`, `680 B/op`, and `20 allocs/op`; the profile is a max-logical-level attribution proxy, not the public-chain q5 microbenchmark.
+- Profile attribution points at required NTT/INTT and centered-CRT/round/capacity work; source review found no demonstrably redundant representation-neutral allocation/copy. Batched staging would retain the required transforms and arithmetic while changing intermediate liveness/cache behavior, with no evidence of a high-impact mechanical gain.
+- Verdict: `NO_SAFE_OPT_CANDIDATE`. Optional S4 is skipped. No Secondary source was modified; S5 remains on the frozen original Fast commit. Detailed evidence is in `FAST-DROPIN-PUBLIC-CHAIN-PERFORMANCE-AUTONOMOUS-BATCH-020-S3-attribution.md`.
+- Cumulative Bootstrap budget remains Standard `0/1`, Fast `0/1`.
