@@ -1,9 +1,12 @@
 package main
 
 import (
+	"errors"
 	"math/big"
 	"testing"
 )
+
+var stageAllocationSink []byte
 
 func TestBatch019ExactBoundsAndCapacity(t *testing.T) {
 	a, b, c := deterministicInputs(4096)
@@ -68,5 +71,24 @@ func TestBatch019MetricReportsSNR(t *testing.T) {
 	pair, err := pairedValues(ref, actual)
 	if err != nil || pair.SNRDB == nil || !pair.Pass {
 		t.Fatalf("paired SNR/gate evidence: pair=%#v err=%v", pair, err)
+	}
+}
+
+func TestCaptureStageRecordsWallAndOperationAllocationsOnError(t *testing.T) {
+	var result runEvidence
+	wantErr := errors.New("expected stage failure")
+	err := captureStage(&result, "probe", func() error {
+		stageAllocationSink = make([]byte, 1024)
+		return wantErr
+	})
+	if !errors.Is(err, wantErr) {
+		t.Fatalf("captureStage error = %v, want %v", err, wantErr)
+	}
+	if len(result.StageSamples) != 1 {
+		t.Fatalf("recorded %d stage samples, want 1", len(result.StageSamples))
+	}
+	sample := result.StageSamples[0]
+	if sample.Name != "probe" || sample.WallNS < 0 || sample.AllocBytes < 1024 || sample.Allocs == 0 {
+		t.Fatalf("incomplete stage sample: %#v", sample)
 	}
 }

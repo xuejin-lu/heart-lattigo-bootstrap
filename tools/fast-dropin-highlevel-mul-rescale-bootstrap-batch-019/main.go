@@ -39,8 +39,8 @@ const (
 	bootstrapErrorGate  = 1e-6
 	rotation            = 1
 	qPrefixCap          = 4
-	runSchema           = "fast-dropin-highlevel-mul-rescale-batch-019.run.v1"
-	combinedSchema      = "fast-dropin-highlevel-mul-rescale-batch-019.combined.v1"
+	runSchema           = "fast-dropin-public-chain-performance-batch-020.run.v1"
+	combinedSchema      = "fast-dropin-public-chain-performance-batch-020.combined.v1"
 )
 
 type config struct {
@@ -133,16 +133,24 @@ type capacityEvidence struct {
 }
 
 type checkpoint struct {
-	ID       string            `json:"id"`
-	API      string            `json:"public_api"`
-	Level    int               `json:"level"`
-	Scale    string            `json:"scale_integer"`
-	ScaleLog float64           `json:"scale_log2"`
-	Rows     [][]int           `json:"component_row_lengths"`
-	RowHash  [][]string        `json:"authoritative_row_sha256"`
-	C1Zero   bool              `json:"c1_zero_on_authoritative_rows"`
-	Compact  bool              `json:"fast_compact_prefix_layout"`
-	Capacity *capacityEvidence `json:"capacity,omitempty"`
+	ID                 string            `json:"id"`
+	API                string            `json:"public_api"`
+	Level              int               `json:"level"`
+	Scale              string            `json:"scale_integer"`
+	ScaleLog           float64           `json:"scale_log2"`
+	Rows               [][]int           `json:"component_row_lengths"`
+	RowHash            [][]string        `json:"authoritative_row_sha256"`
+	QBackedBytesApprox uint64            `json:"q_backed_bytes_approx"`
+	C1Zero             bool              `json:"c1_zero_on_authoritative_rows"`
+	Compact            bool              `json:"fast_compact_prefix_layout"`
+	Capacity           *capacityEvidence `json:"capacity,omitempty"`
+}
+
+type stageSample struct {
+	Name       string `json:"name"`
+	WallNS     int64  `json:"wall_ns"`
+	AllocBytes uint64 `json:"alloc_bytes"`
+	Allocs     uint64 `json:"allocs"`
 }
 
 type runEvidence struct {
@@ -153,6 +161,10 @@ type runEvidence struct {
 	GoVersion           string         `json:"go_version"`
 	OS                  string         `json:"os"`
 	Architecture        string         `json:"architecture"`
+	NumCPU              int            `json:"num_cpu"`
+	GOMAXPROCS          int            `json:"gomaxprocs"`
+	GOGCEnv             string         `json:"gogc_environment"`
+	GOMEMLIMITEnv       string         `json:"gomemlimit_environment"`
 	PrimaryCommit       string         `json:"primary_commit"`
 	PrimaryDirty        bool           `json:"primary_dirty"`
 	BackendCommit       string         `json:"backend_commit"`
@@ -184,6 +196,9 @@ type runEvidence struct {
 	KeyAccess           keyAccess      `json:"primitive_key_accesses"`
 	BootstrapCalls      int            `json:"bootstrap_calls"`
 	BootstrapAttempted  bool           `json:"bootstrap_attempted"`
+	StageSamples        []stageSample  `json:"stage_samples"`
+	EvalOnlyWallNS      int64          `json:"eval_only_stage_sum_wall_ns"`
+	ProcessActiveWallNS int64          `json:"process_active_wall_ns_excluding_stdin_wait"`
 	Checkpoints         []checkpoint   `json:"checkpoints"`
 	PreOracle           metric         `json:"pre_bootstrap_cleartext_oracle"`
 	PreDecoded          []complexValue `json:"pre_bootstrap_decoded_values,omitempty"`
@@ -198,6 +213,10 @@ type combinedEvidence struct {
 	GoVersion        string        `json:"go_version"`
 	OS               string        `json:"os"`
 	Architecture     string        `json:"architecture"`
+	NumCPU           int           `json:"num_cpu"`
+	GOMAXPROCS       int           `json:"gomaxprocs"`
+	GOGCEnv          string        `json:"gogc_environment"`
+	GOMEMLIMITEnv    string        `json:"gomemlimit_environment"`
 	PrimaryCommit    string        `json:"primary_commit"`
 	PrimaryDirty     bool          `json:"primary_dirty_during_runs"`
 	ConfigSHA256     string        `json:"config_sha256"`
@@ -219,24 +238,27 @@ type combinedEvidence struct {
 }
 
 type runSummary struct {
-	Status              string       `json:"status"`
-	BackendCommit       string       `json:"backend_commit"`
-	BackendRef          string       `json:"backend_ref"`
-	BackendDirty        bool         `json:"backend_dirty"`
-	FastZeroSecret      bool         `json:"fast_zero_secret"`
-	BootstrapDispatch   string       `json:"public_bootstrap_dispatch"`
-	BootstrapCalls      int          `json:"bootstrap_calls"`
-	BootstrapAttempted  bool         `json:"bootstrap_attempted"`
-	KeysetIdentity      string       `json:"keyset_identity"`
-	BootstrapSecretFull bool         `json:"bootstrap_secret_full_q_domain"`
-	BootstrapSecretLow  bool         `json:"bootstrap_secret_preserves_residual_q0_q1"`
-	InputCScale         string       `json:"input_c_scale_q5_integer"`
-	MulScale            string       `json:"mulrelin_scale_integer"`
-	RescaleScale        string       `json:"rescale_scale_integer"`
-	KeyAccess           keyAccess    `json:"primitive_key_accesses"`
-	Checkpoints         []checkpoint `json:"checkpoints"`
-	PreOracle           metric       `json:"pre_bootstrap_cleartext_oracle"`
-	BootstrapOracle     *metric      `json:"bootstrap_cleartext_oracle,omitempty"`
+	Status              string        `json:"status"`
+	BackendCommit       string        `json:"backend_commit"`
+	BackendRef          string        `json:"backend_ref"`
+	BackendDirty        bool          `json:"backend_dirty"`
+	FastZeroSecret      bool          `json:"fast_zero_secret"`
+	BootstrapDispatch   string        `json:"public_bootstrap_dispatch"`
+	BootstrapCalls      int           `json:"bootstrap_calls"`
+	BootstrapAttempted  bool          `json:"bootstrap_attempted"`
+	KeysetIdentity      string        `json:"keyset_identity"`
+	BootstrapSecretFull bool          `json:"bootstrap_secret_full_q_domain"`
+	BootstrapSecretLow  bool          `json:"bootstrap_secret_preserves_residual_q0_q1"`
+	InputCScale         string        `json:"input_c_scale_q5_integer"`
+	MulScale            string        `json:"mulrelin_scale_integer"`
+	RescaleScale        string        `json:"rescale_scale_integer"`
+	KeyAccess           keyAccess     `json:"primitive_key_accesses"`
+	Checkpoints         []checkpoint  `json:"checkpoints"`
+	PreOracle           metric        `json:"pre_bootstrap_cleartext_oracle"`
+	BootstrapOracle     *metric       `json:"bootstrap_cleartext_oracle,omitempty"`
+	StageSamples        []stageSample `json:"stage_samples"`
+	EvalOnlyWallNS      int64         `json:"eval_only_stage_sum_wall_ns"`
+	ProcessActiveWallNS int64         `json:"process_active_wall_ns_excluding_stdin_wait"`
 }
 
 type capacityAudit interface {
@@ -270,6 +292,37 @@ type execution struct {
 	decryptor *rlwe.Decryptor
 	encoder   *ckks.Encoder
 	expected  []complex128
+}
+
+// captureStage keeps heap-stat snapshots outside the timed interval. Each run
+// is a single-process sample; repeated trials are orchestrated as independent
+// processes so compiler time and stdin waiting never enter a stage duration.
+func captureStage(result *runEvidence, name string, operation func() error) error {
+	var before, after runtime.MemStats
+	runtime.ReadMemStats(&before)
+	started := time.Now()
+	err := operation()
+	wallNS := time.Since(started).Nanoseconds()
+	runtime.ReadMemStats(&after)
+	result.StageSamples = append(result.StageSamples, stageSample{
+		Name: name, WallNS: wallNS,
+		AllocBytes: after.TotalAlloc - before.TotalAlloc,
+		Allocs:     after.Mallocs - before.Mallocs,
+	})
+	return err
+}
+
+func sumStageWall(samples []stageSample, names ...string) int64 {
+	var total int64
+	for _, name := range names {
+		for _, sample := range samples {
+			if sample.Name == name {
+				total += sample.WallNS
+				break
+			}
+		}
+	}
+	return total
 }
 
 func main() {
@@ -314,7 +367,7 @@ func runCLI() error {
 	if err = writeJSON(*out, run.result); err != nil {
 		return err
 	}
-	fmt.Fprintln(os.Stderr, "BATCH019_PREFLIGHT_READY — after the paired preflight passes, send exactly `bootstrap` to spend this backend's single Bootstrap allowance; otherwise send `abort`")
+	fmt.Fprintln(os.Stderr, "BATCH020_PREFLIGHT_READY — after the paired preflight passes, send exactly `bootstrap` to spend this backend's single Bootstrap allowance; otherwise send `abort`")
 	line, readErr := bufio.NewReader(os.Stdin).ReadString('\n')
 	if readErr != nil || strings.TrimSpace(line) != "bootstrap" {
 		run.result.Status = "preflight_passed_bootstrap_not_started"
@@ -326,13 +379,18 @@ func runCLI() error {
 		}
 		return nil
 	}
+	bootstrapWorkStarted := time.Now()
 	run.result.BootstrapCalls, run.result.BootstrapAttempted = 1, true
 	run.result.Status = "bootstrap_call_started"
 	if err = writeJSON(*out, run.result); err != nil {
 		return fmt.Errorf("persist one-shot Bootstrap budget before invocation: %w", err)
 	}
-	output, err := run.btpEval.Bootstrap(run.input)
-	if err != nil {
+	var output *rlwe.Ciphertext
+	if err = captureStage(&run.result, "bootstrap", func() error {
+		var bootstrapErr error
+		output, bootstrapErr = run.btpEval.Bootstrap(run.input)
+		return bootstrapErr
+	}); err != nil {
 		run.result.Status, run.result.Error = "bootstrap_failed_after_single_call", err.Error()
 		_ = writeJSON(*out, run.result)
 		return fmt.Errorf("single public Bootstrap call: %w", err)
@@ -342,14 +400,18 @@ func runCLI() error {
 		_ = writeJSON(*out, run.result)
 		return err
 	}
+	run.result.ProcessActiveWallNS += time.Since(bootstrapWorkStarted).Nanoseconds()
 	run.result.Status = "bootstrap_completed"
 	return writeJSON(*out, run.result)
 }
 
 func prepareRun(primaryCommit string, primaryDirty bool, backendCommit, backendRef string, backendDirty bool) (*execution, error) {
+	processStarted := time.Now()
 	run := &execution{result: runEvidence{
 		SchemaVersion: runSchema, CreatedUTC: time.Now().UTC().Format(time.RFC3339Nano),
 		GoVersion: runtime.Version(), OS: runtime.GOOS, Architecture: runtime.GOARCH,
+		NumCPU: runtime.NumCPU(), GOMAXPROCS: runtime.GOMAXPROCS(0),
+		GOGCEnv: os.Getenv("GOGC"), GOMEMLIMITEnv: os.Getenv("GOMEMLIMIT"),
 		PrimaryCommit: primaryCommit, PrimaryDirty: primaryDirty,
 		BackendCommit: backendCommit, BackendRef: backendRef, BackendDirty: backendDirty,
 		FastZeroSecret: isFastBackend(), BootstrapCalls: 0,
@@ -430,10 +492,20 @@ func prepareRun(primaryCommit string, primaryDirty bool, backendCommit, backendR
 		return run, err
 	}
 
-	keygen := rlwe.NewKeyGenerator(residual)
-	sk := keygen.GenSecretKeyNew()
-	keys, bootstrapSecret, err := btp.GenEvaluationKeys(sk)
-	if err != nil {
+	var sk *rlwe.SecretKey
+	if err = captureStage(&run.result, "key_generation", func() error {
+		sk = rlwe.NewKeyGenerator(residual).GenSecretKeyNew()
+		return nil
+	}); err != nil {
+		return run, err
+	}
+	var keys *bootstrapping.EvaluationKeys
+	var bootstrapSecret *rlwe.SecretKey
+	if err = captureStage(&run.result, "evaluation_key_generation", func() error {
+		var keyErr error
+		keys, bootstrapSecret, keyErr = btp.GenEvaluationKeys(sk)
+		return keyErr
+	}); err != nil {
 		return run, fmt.Errorf("public GenEvaluationKeys: %w", err)
 	}
 	if keys == nil || keys.MemEvaluationKeySet == nil || bootstrapSecret == nil {
@@ -448,11 +520,21 @@ func prepareRun(primaryCommit string, primaryDirty bool, backendCommit, backendR
 		return run, errors.New("extended Bootstrap secret does not preserve residual q0/q1")
 	}
 	trackedKeys := &trackingKeySet{EvaluationKeySet: keys.MemEvaluationKeySet}
-	evaluator := ckks.NewEvaluator(full, trackedKeys)
+	var evaluator *ckks.Evaluator
+	if err = captureStage(&run.result, "ckks_evaluator_init", func() error {
+		evaluator = ckks.NewEvaluator(full, trackedKeys)
+		return nil
+	}); err != nil {
+		return run, err
+	}
 	run.result.KeyAccess.EvaluatorConstruction = trackedKeys.lookups
 	trackedKeys.lookups = keyLookups{}
-	btsEval, err := bootstrapping.NewEvaluator(btp, keys)
-	if err != nil {
+	var btsEval *bootstrapping.Evaluator
+	if err = captureStage(&run.result, "bootstrap_evaluator_init", func() error {
+		var initErr error
+		btsEval, initErr = bootstrapping.NewEvaluator(btp, keys)
+		return initErr
+	}); err != nil {
 		return run, fmt.Errorf("public bootstrapping.NewEvaluator: %w", err)
 	}
 	if btsEval == nil || isFastBackend() != (btsEval.Evaluator == nil) {
@@ -464,20 +546,39 @@ func prepareRun(primaryCommit string, primaryDirty bool, backendCommit, backendR
 		run.result.BootstrapDispatch = "genuine Standard public Bootstrap evaluator"
 	}
 	run.result.KeyAccess.BootstrapInternals = "not runtime-instrumented: public Bootstrap uses its existing concrete EvaluationKeys/MemEvaluationKeySet; no claim of zero Bootstrap-internal key access"
-	fullEncoder, residualEncoder := ckks.NewEncoder(full), ckks.NewEncoder(residual)
-	decryptor := rlwe.NewDecryptor(residual, sk)
+	var fullEncoder, residualEncoder *ckks.Encoder
+	var decryptor *rlwe.Decryptor
+	if err = captureStage(&run.result, "codec_init", func() error {
+		fullEncoder, residualEncoder = ckks.NewEncoder(full), ckks.NewEncoder(residual)
+		decryptor = rlwe.NewDecryptor(residual, sk)
+		return nil
+	}); err != nil {
+		return run, err
+	}
 	defaultRLWEScale := rlwe.NewScale(defaultScale)
 	q5Scale := rlwe.NewScale(q5)
-	ctA, err := encryptAtLevel(full, fullEncoder, bootstrapSecret, a, defaultRLWEScale, 5, logSlots)
-	if err != nil {
+	var ctA *rlwe.Ciphertext
+	if err = captureStage(&run.result, "encrypt_a", func() error {
+		var encryptErr error
+		ctA, encryptErr = encryptAtLevel(full, fullEncoder, bootstrapSecret, a, defaultRLWEScale, 5, logSlots)
+		return encryptErr
+	}); err != nil {
 		return run, fmt.Errorf("public EncryptNew(A) Level5: %w", err)
 	}
-	ctB, err := encryptAtLevel(full, fullEncoder, bootstrapSecret, b, defaultRLWEScale, 5, logSlots)
-	if err != nil {
+	var ctB *rlwe.Ciphertext
+	if err = captureStage(&run.result, "encrypt_b", func() error {
+		var encryptErr error
+		ctB, encryptErr = encryptAtLevel(full, fullEncoder, bootstrapSecret, b, defaultRLWEScale, 5, logSlots)
+		return encryptErr
+	}); err != nil {
 		return run, fmt.Errorf("public EncryptNew(B) Level5: %w", err)
 	}
-	ctC, err := encryptAtLevel(full, fullEncoder, bootstrapSecret, c, q5Scale, 5, logSlots)
-	if err != nil {
+	var ctC *rlwe.Ciphertext
+	if err = captureStage(&run.result, "encrypt_c", func() error {
+		var encryptErr error
+		ctC, encryptErr = encryptAtLevel(full, fullEncoder, bootstrapSecret, c, q5Scale, 5, logSlots)
+		return encryptErr
+	}); err != nil {
 		return run, fmt.Errorf("public EncryptNew(C, Scale=q5) Level5: %w", err)
 	}
 	if ctA.Level() != 5 || ctB.Level() != 5 || ctC.Level() != 5 || ctA.Scale.Cmp(defaultRLWEScale) != 0 || ctB.Scale.Cmp(defaultRLWEScale) != 0 || ctC.Scale.Cmp(q5Scale) != 0 {
@@ -507,8 +608,12 @@ func prepareRun(primaryCommit string, primaryDirty bool, backendCommit, backendR
 	}
 
 	keyCountsBefore := trackedKeys.lookups
-	add, err := evaluator.AddNew(ctA, ctB)
-	if err != nil {
+	var add *rlwe.Ciphertext
+	if err = captureStage(&run.result, "add", func() error {
+		var stageErr error
+		add, stageErr = evaluator.AddNew(ctA, ctB)
+		return stageErr
+	}); err != nil {
 		return run, fmt.Errorf("public AddNew: %w", err)
 	}
 	run.result.KeyAccess.Add = subtractLookups(trackedKeys.lookups, keyCountsBefore)
@@ -522,8 +627,12 @@ func prepareRun(primaryCommit string, primaryDirty bool, backendCommit, backendR
 	run.result.Checkpoints = append(run.result.Checkpoints, cp)
 
 	keyCountsBefore = trackedKeys.lookups
-	product, err := evaluator.MulRelinNew(add, ctC)
-	if err != nil {
+	var product *rlwe.Ciphertext
+	if err = captureStage(&run.result, "mul_relin", func() error {
+		var stageErr error
+		product, stageErr = evaluator.MulRelinNew(add, ctC)
+		return stageErr
+	}); err != nil {
 		return run, fmt.Errorf("public MulRelinNew: %w", err)
 	}
 	if product.Level() != 5 || product.Scale.Cmp(rlwe.NewScale(mulScale)) != 0 {
@@ -537,8 +646,11 @@ func prepareRun(primaryCommit string, primaryDirty bool, backendCommit, backendR
 	run.result.Checkpoints = append(run.result.Checkpoints, cp)
 
 	keyCountsBefore = trackedKeys.lookups
-	rescaled := ckks.NewCiphertext(full, 1, 4)
-	if err = evaluator.Rescale(product, rescaled); err != nil {
+	var rescaled *rlwe.Ciphertext
+	if err = captureStage(&run.result, "rescale", func() error {
+		rescaled = ckks.NewCiphertext(full, 1, 4)
+		return evaluator.Rescale(product, rescaled)
+	}); err != nil {
 		return run, fmt.Errorf("public Rescale(logical q5): %w", err)
 	}
 	run.result.KeyAccess.Rescale = subtractLookups(trackedKeys.lookups, keyCountsBefore)
@@ -552,8 +664,12 @@ func prepareRun(primaryCommit string, primaryDirty bool, backendCommit, backendR
 	run.result.Checkpoints = append(run.result.Checkpoints, cp)
 
 	keyCountsBefore = trackedKeys.lookups
-	rotated, err := evaluator.RotateNew(rescaled, rotation)
-	if err != nil {
+	var rotated *rlwe.Ciphertext
+	if err = captureStage(&run.result, "rotate", func() error {
+		var stageErr error
+		rotated, stageErr = evaluator.RotateNew(rescaled, rotation)
+		return stageErr
+	}); err != nil {
 		return run, fmt.Errorf("public RotateNew(1): %w", err)
 	}
 	if rotated.Level() != 4 || rotated.Scale.Cmp(defaultRLWEScale) != 0 {
@@ -568,7 +684,13 @@ func prepareRun(primaryCommit string, primaryDirty bool, backendCommit, backendR
 
 	// This ordinary public DropLevel only projects the already-proven centered
 	// lift. It does not alter Scale or perform a rescale.
-	drop := evaluator.DropLevelNew(rotated, rotated.Level())
+	var drop *rlwe.Ciphertext
+	if err = captureStage(&run.result, "drop_level", func() error {
+		drop = evaluator.DropLevelNew(rotated, rotated.Level())
+		return nil
+	}); err != nil {
+		return run, err
+	}
 	if drop.Level() != 0 || drop.Scale.Cmp(defaultRLWEScale) != 0 {
 		return run, errors.New("DropLevelNew did not yield Level0 / Scale2^45")
 	}
@@ -582,8 +704,11 @@ func prepareRun(primaryCommit string, primaryDirty bool, backendCommit, backendR
 	}
 
 	expected := rotateLeft(multiply(addValues(a, b), c), rotation)
-	decoded := make([]complex128, len(expected))
-	if err = residualEncoder.Decode(decryptor.DecryptNew(drop), decoded); err != nil {
+	var decoded []complex128
+	if err = captureStage(&run.result, "native_decode", func() error {
+		decoded = make([]complex128, len(expected))
+		return residualEncoder.Decode(decryptor.DecryptNew(drop), decoded)
+	}); err != nil {
 		return run, fmt.Errorf("native residual Level0 DecryptNew/Decode: %w", err)
 	}
 	oracle := compareValues(expected, decoded)
@@ -591,6 +716,8 @@ func prepareRun(primaryCommit string, primaryDirty bool, backendCommit, backendR
 		return run, fmt.Errorf("pre-Bootstrap cleartext oracle max %.12g exceeds fixed gate %.12g", oracle.MaxComplex, bootstrapErrorGate)
 	}
 	run.result.PreOracle, run.result.PreDecoded = oracle, toValues(decoded)
+	run.result.EvalOnlyWallNS = sumStageWall(run.result.StageSamples, "add", "mul_relin", "rescale", "rotate", "drop_level", "native_decode")
+	run.result.ProcessActiveWallNS = time.Since(processStarted).Nanoseconds()
 	return &execution{result: run.result, btpEval: btsEval, input: drop, decryptor: decryptor, encoder: residualEncoder, expected: expected}, nil
 }
 
@@ -609,8 +736,11 @@ func recordBootstrapOutput(run *execution, output *rlwe.Ciphertext) error {
 		return errors.New("Fast Bootstrap output violated zero-c1 semantics")
 	}
 	run.result.Checkpoints = append(run.result.Checkpoints, cp)
-	decoded := make([]complex128, len(run.expected))
-	if err = run.encoder.Decode(run.decryptor.DecryptNew(output), decoded); err != nil {
+	var decoded []complex128
+	if err = captureStage(&run.result, "post_bootstrap_decode", func() error {
+		decoded = make([]complex128, len(run.expected))
+		return run.encoder.Decode(run.decryptor.DecryptNew(output), decoded)
+	}); err != nil {
 		return fmt.Errorf("native Bootstrap-output DecryptNew/Decode: %w", err)
 	}
 	metric := compareValues(run.expected, decoded)
@@ -632,6 +762,8 @@ func combine(mode, standardPath, fastPath, outPath string) error {
 	combined := combinedEvidence{
 		SchemaVersion: combinedSchema, CreatedUTC: time.Now().UTC().Format(time.RFC3339Nano),
 		GoVersion: standard.GoVersion, OS: standard.OS, Architecture: standard.Architecture,
+		NumCPU: standard.NumCPU, GOMAXPROCS: standard.GOMAXPROCS,
+		GOGCEnv: standard.GOGCEnv, GOMEMLIMITEnv: standard.GOMEMLIMITEnv,
 		BootstrapGate: bootstrapErrorGate,
 	}
 	combined.Standard, combined.Fast = summarizeRun(standard), summarizeRun(fast)
@@ -700,7 +832,8 @@ func summarizeRun(run runEvidence) runSummary {
 		BootstrapSecretFull: run.BootstrapSecretFull, BootstrapSecretLow: run.BootstrapSecretLow,
 		InputCScale: run.InputCScale, MulScale: run.MulScale, RescaleScale: run.RescaleScale,
 		KeyAccess: run.KeyAccess, Checkpoints: run.Checkpoints, PreOracle: run.PreOracle,
-		BootstrapOracle: run.BootstrapOracle,
+		BootstrapOracle: run.BootstrapOracle, StageSamples: run.StageSamples,
+		EvalOnlyWallNS: run.EvalOnlyWallNS, ProcessActiveWallNS: run.ProcessActiveWallNS,
 	}
 }
 
@@ -746,7 +879,9 @@ func validatePairProvenance(standard, fast runEvidence) error {
 		standard.RescaleScale != defaultScale.String() || fast.RescaleScale != defaultScale.String() {
 		return errors.New("paired runs do not satisfy the exact default*q5/q5 Scale closure")
 	}
-	if standard.GoVersion != fast.GoVersion || standard.OS != fast.OS || standard.Architecture != fast.Architecture {
+	if standard.GoVersion != fast.GoVersion || standard.OS != fast.OS || standard.Architecture != fast.Architecture ||
+		standard.NumCPU != fast.NumCPU || standard.GOMAXPROCS != fast.GOMAXPROCS ||
+		standard.GOGCEnv != fast.GOGCEnv || standard.GOMEMLIMITEnv != fast.GOMEMLIMITEnv {
 		return errors.New("paired run environments differ")
 	}
 	if standard.KeyAccess.MulRelin.Relinearize != 1 || standard.KeyAccess.Rotate.GaloisKey != 1 ||
@@ -772,6 +907,7 @@ func makeCheckpoint(audit capacityAudit, q []uint64, id, api string, ct *rlwe.Ci
 		cp.RowHash[component] = make([]string, rows)
 		for row, coeffs := range polyRows {
 			cp.Rows[component][row] = len(coeffs)
+			cp.QBackedBytesApprox += uint64(cap(coeffs)) * 8
 		}
 		for row := 0; row < rows; row++ {
 			if len(polyRows[row]) != ct.N() {
