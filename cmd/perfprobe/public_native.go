@@ -12,6 +12,7 @@ import (
 	"reflect"
 	"runtime"
 	"slices"
+	"strconv"
 	"time"
 
 	"github.com/tuneinsight/lattigo/v6/circuits/ckks/bootstrapping"
@@ -720,21 +721,36 @@ func validatePublicPairArtifacts(standard, fast publicNativeDocument, standardVe
 	if !samePublicCheckpointNames(standard.Checkpoints, wantNames) || !samePublicCheckpointNames(fast.Checkpoints, wantNames) {
 		return errors.New("paired artifacts do not contain the exact canonical pre-Bootstrap checkpoint set")
 	}
-	for _, checkpoints := range [][]publicCheckpoint{standard.Checkpoints, fast.Checkpoints} {
-		for _, checkpoint := range checkpoints {
-			if !checkpoint.OraclePass || checkpoint.Oracle.MaxComplexDifference > publicNumericalGate {
-				return fmt.Errorf("checkpoint %s failed its per-backend cleartext oracle", checkpoint.Name)
-			}
-		}
+	if !reflect.DeepEqual(standard.Capacity, fast.Capacity) {
+		return errors.New("paired artifacts have mismatched Q0123/q0 capacity evidence")
+	}
+	if err := validatePublicCapacity(standard.Capacity); err != nil {
+		return fmt.Errorf("Standard capacity evidence: %w", err)
+	}
+	if err := validatePublicCapacity(fast.Capacity); err != nil {
+		return fmt.Errorf("Fast capacity evidence: %w", err)
+	}
+	oracles, err := publicOracleCheckpoints(1 << 12)
+	if err != nil {
+		return err
+	}
+	if err := validatePublicBackendEvidence(standard, standardVectors, oracles); err != nil {
+		return fmt.Errorf("Standard public evidence: %w", err)
+	}
+	if err := validatePublicBackendEvidence(fast, fastVectors, oracles); err != nil {
+		return fmt.Errorf("Fast public evidence: %w", err)
 	}
 	for _, checkpoint := range standard.Checkpoints {
-		if checkpoint.FastCompactPrefix || checkpoint.DecodePath != "rlwe.NewDecryptor(...).DecryptNew -> ckks.NewEncoder.Decode" {
+		if checkpoint.FastCompactPrefix || checkpoint.DecodePath != "rlwe.NewDecryptor(...).DecryptNew -> ckks.NewEncoder.Decode" || !checkpoint.C1Nonzero {
 			return errors.New("Standard artifact has an unexpected compact-storage or native-decrypt declaration")
 		}
 	}
+	if !standard.InputC1Nonzero || fast.InputC1Nonzero {
+		return errors.New("paired inputs do not preserve native Standard and Fast zero-secret c1 provenance")
+	}
 	for _, checkpoint := range fast.Checkpoints {
 		wantCompact := checkpoint.Name != "encrypt_a_level5" && checkpoint.Name != "encrypt_b_level5" && checkpoint.Name != "encrypt_c_q5_level5"
-		if checkpoint.FastCompactPrefix != wantCompact {
+		if checkpoint.FastCompactPrefix != wantCompact || checkpoint.C1Nonzero {
 			return fmt.Errorf("Fast checkpoint %s has unexpected compact-prefix declaration", checkpoint.Name)
 		}
 		wantDecode := "Fast c0 projection to the authoritative Q-prefix plaintext (zero-secret measurement adapter)"
@@ -746,6 +762,251 @@ func validatePublicPairArtifacts(standard, fast publicNativeDocument, standardVe
 		}
 	}
 	return nil
+}
+
+func validatePublicBackendEvidence(doc publicNativeDocument, vectors publicVectorDocument, oracles map[string][]complex128) error {
+	wantNames := []string{"encrypt_a_level5", "encrypt_b_level5", "encrypt_c_q5_level5", "add_level5", "mulrelin_level5", "rescale_q5_level4", "rotate_level4", "drop_level0"}
+	if len(vectors.Checkpoints) != len(wantNames) {
+		return fmt.Errorf("decoded vector checkpoint count=%d, want %d", len(vectors.Checkpoints), len(wantNames))
+	}
+	for name := range vectors.Checkpoints {
+		if !slices.Contains(wantNames, name) {
+			return fmt.Errorf("unexpected decoded vector checkpoint %q", name)
+		}
+	}
+	if doc.InputSlots != 1<<12 || doc.Parameters.InputSlots != doc.InputSlots || doc.Parameters.RingN != 1<<13 {
+		return errors.New("public evidence does not describe the frozen 4096-slot LogN13 profile")
+	}
+	if err := validatePublicProfileEvidence(doc); err != nil {
+		return err
+	}
+	if err := validatePublicCapacity(doc.Capacity); err != nil {
+		return err
+	}
+	if doc.Backend == "fast" && doc.InputC1Nonzero {
+		return errors.New("Fast input reports nonzero c1 for the approved zero-secret mode")
+	}
+	for _, checkpoint := range doc.Checkpoints {
+		values, ok := vectors.Checkpoints[checkpoint.Name]
+		if !ok || len(values) != 1<<12 {
+			return fmt.Errorf("checkpoint %s decoded vector has %d slots, want exactly %d", checkpoint.Name, len(values), 1<<12)
+		}
+		decoded := decodeComplexValues(values)
+		if !allFinite(decoded) {
+			return fmt.Errorf("checkpoint %s decoded vector contains NaN or Inf", checkpoint.Name)
+		}
+		if checkpoint.DecodedSHA256 == "" || perfmeasure.Fingerprint(decoded) != checkpoint.DecodedSHA256 {
+			return fmt.Errorf("checkpoint %s decoded vector does not match DecodedSHA256", checkpoint.Name)
+		}
+		oracle, ok := oracles[checkpoint.Name]
+		if !ok || len(oracle) != len(decoded) || !allFinite(oracle) {
+			return fmt.Errorf("checkpoint %s has no canonical finite plaintext oracle", checkpoint.Name)
+		}
+		recomputed := compareVectors(oracle, decoded, publicNumericalGate)
+		recomputedSNR := numericalmetrics.Compare(oracle, decoded)
+		passed := recomputed.MaxComplexDifference <= publicNumericalGate
+		if !passed || checkpoint.OraclePass != passed || !reflect.DeepEqual(checkpoint.Oracle, recomputed) || !reflect.DeepEqual(checkpoint.OracleSNR, recomputedSNR) {
+			return fmt.Errorf("checkpoint %s stored plaintext-oracle metrics do not match the decoded vector", checkpoint.Name)
+		}
+		if err := validatePublicCheckpointState(doc, checkpoint); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func validatePublicProfileEvidence(doc publicNativeDocument) error {
+	parsePrimes := func(label string, values []string) ([]uint64, error) {
+		primes := make([]uint64, len(values))
+		for index, value := range values {
+			prime, err := strconv.ParseUint(value, 10, 64)
+			if err != nil || prime == 0 {
+				return nil, fmt.Errorf("invalid %s[%d] modulus metadata", label, index)
+			}
+			primes[index] = prime
+		}
+		return primes, nil
+	}
+	q, err := parsePrimes("Q", doc.Parameters.QPrimes)
+	if err != nil {
+		return err
+	}
+	p, err := parsePrimes("P", doc.Parameters.PPrimes)
+	if err != nil {
+		return err
+	}
+	if len(q) != len(doc.Parameters.QChainBits) || len(p) != len(doc.Parameters.PBits) || len(q) <= publicMulRescaleInputLvl {
+		return errors.New("public profile modulus counts disagree with effective Q/P metadata")
+	}
+	qpBytes, err := json.Marshal(struct{ Q, P []uint64 }{q, p})
+	if err != nil {
+		return err
+	}
+	qpHash := sha256.Sum256(qpBytes)
+	if hex.EncodeToString(qpHash[:]) != doc.QPSHA256 || doc.QPSHA256 != publicQPSHA {
+		return errors.New("recorded Q/P modulus rows do not match the canonical Q/P fingerprint")
+	}
+	a, b, c, err := perfmeasure.PublicMulRescaleWorkload(doc.InputSlots)
+	if err != nil {
+		return err
+	}
+	if perfmeasure.Fingerprint(a) != doc.InputSHA256 || doc.InputSHA256 != publicInputSHA {
+		return errors.New("recorded public input does not match the canonical workload fingerprint")
+	}
+	workloadHash, err := perfmeasure.PublicMulRescaleWorkloadFingerprint(a, b, c, new(big.Int).SetUint64(q[publicMulRescaleInputLvl]).String())
+	if err != nil {
+		return err
+	}
+	if workloadHash != doc.WorkloadSHA256 || doc.WorkloadSHA256 != publicWorkloadSHA {
+		return errors.New("recorded public workload does not match the canonical workload fingerprint")
+	}
+	capacity, err := perfmeasure.BoundPublicMulRescaleWorkload(a, b, c, q, doc.Parameters.RingN)
+	if err != nil {
+		return fmt.Errorf("recompute canonical Q0123/q0 capacity: %w", err)
+	}
+	if !reflect.DeepEqual(capacity, doc.Capacity) {
+		return errors.New("recorded Q0123/q0 capacity plan does not match recomputed canonical bounds")
+	}
+	return nil
+}
+
+func validatePublicCheckpointState(doc publicNativeDocument, checkpoint publicCheckpoint) error {
+	state := checkpoint.State
+	if state.Degree != 1 || state.Level < 0 || state.Scale == "" {
+		return fmt.Errorf("checkpoint %s has invalid Level/Scale/Degree metadata", checkpoint.Name)
+	}
+	wantLevel := map[string]int{
+		"encrypt_a_level5": 5, "encrypt_b_level5": 5, "encrypt_c_q5_level5": 5,
+		"add_level5": 5, "mulrelin_level5": 5, "rescale_q5_level4": 4,
+		"rotate_level4": 4, "drop_level0": 0,
+	}[checkpoint.Name]
+	if state.Level != wantLevel || state.QPrefixRows != min(state.Level+1, 4) {
+		return fmt.Errorf("checkpoint %s has unexpected Level/Q-prefix row metadata", checkpoint.Name)
+	}
+	wantScale, err := expectedPublicCheckpointScale(doc.Parameters, checkpoint.Name)
+	if err != nil {
+		return err
+	}
+	if state.Scale != wantScale {
+		return fmt.Errorf("checkpoint %s Scale=%s, want frozen workload Scale %s", checkpoint.Name, state.Scale, wantScale)
+	}
+	if len(checkpoint.PhysicalRowLengths) != 2 || len(checkpoint.RowSHA256) != 2 {
+		return fmt.Errorf("checkpoint %s lacks two-component row authority evidence", checkpoint.Name)
+	}
+	wantCompact := doc.Backend == "fast" && checkpoint.Name != "encrypt_a_level5" && checkpoint.Name != "encrypt_b_level5" && checkpoint.Name != "encrypt_c_q5_level5"
+	if checkpoint.FastCompactPrefix != wantCompact {
+		return fmt.Errorf("checkpoint %s has unexpected Fast Q-prefix layout declaration", checkpoint.Name)
+	}
+	activeRows := state.QPrefixRows
+	for component := 0; component < 2; component++ {
+		rowLengths, rowHashes := checkpoint.PhysicalRowLengths[component], checkpoint.RowSHA256[component]
+		if len(rowLengths) < activeRows || len(rowHashes) != activeRows {
+			return fmt.Errorf("checkpoint %s component %d has incomplete active-row evidence", checkpoint.Name, component)
+		}
+		for row := 0; row < activeRows; row++ {
+			if rowLengths[row] != doc.Parameters.RingN || rowHashes[row] == "" {
+				return fmt.Errorf("checkpoint %s component %d q%d active row evidence is invalid", checkpoint.Name, component, row)
+			}
+		}
+		if doc.Backend == "fast" {
+			for row := activeRows; row < len(rowLengths); row++ {
+				if wantCompact && rowLengths[row] != 0 {
+					return fmt.Errorf("checkpoint %s Fast compact component %d retains unauthorized q%d row", checkpoint.Name, component, row)
+				}
+				if !wantCompact && rowLengths[row] != doc.Parameters.RingN {
+					return fmt.Errorf("checkpoint %s Fast native input has unexpected q%d row length", checkpoint.Name, row)
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func expectedPublicCheckpointScale(params effectiveParameters, checkpoint string) (string, error) {
+	if len(params.QPrimes) <= publicMulRescaleInputLvl {
+		return "", errors.New("public profile is missing q5 for checkpoint Scale validation")
+	}
+	defaultValue, _, err := big.ParseFloat(params.DefaultScale, 10, rlwe.ScalePrecision, big.ToNearestEven)
+	if err != nil {
+		return "", fmt.Errorf("parse frozen default Scale: %w", err)
+	}
+	defaultInteger, _ := defaultValue.Int(nil)
+	defaultScale := rlwe.NewScale(defaultInteger)
+	q5, ok := new(big.Int).SetString(params.QPrimes[publicMulRescaleInputLvl], 10)
+	if !ok || q5.Sign() <= 0 {
+		return "", errors.New("public profile has invalid q5 metadata")
+	}
+	q5Scale := rlwe.NewScale(q5)
+	var expected rlwe.Scale
+	switch checkpoint {
+	case "encrypt_c_q5_level5":
+		expected = q5Scale
+	case "mulrelin_level5":
+		expected = rlwe.NewScale(new(big.Int).Mul(defaultScale.BigInt(), q5Scale.BigInt()))
+	case "encrypt_a_level5", "encrypt_b_level5", "add_level5", "rescale_q5_level4", "rotate_level4", "drop_level0":
+		expected = defaultScale
+	default:
+		return "", fmt.Errorf("unknown public checkpoint %q for Scale validation", checkpoint)
+	}
+	return expected.Value.Text('e', 80), nil
+}
+
+func validatePublicCapacity(capacity perfmeasure.PublicCapacityPlan) error {
+	parsePositive := func(name, value string) (*big.Int, error) {
+		bound, ok := new(big.Int).SetString(value, 10)
+		if !ok || bound.Sign() <= 0 {
+			return nil, fmt.Errorf("%s is not a positive integer", name)
+		}
+		return bound, nil
+	}
+	q0123, err := parsePositive("Q0123 product", capacity.Q0123)
+	if err != nil {
+		return err
+	}
+	q0, err := parsePositive("q0", capacity.Q0)
+	if err != nil {
+		return err
+	}
+	for name, raw := range map[string]string{
+		"input A": capacity.InputA, "input B": capacity.InputB, "input C": capacity.InputC,
+		"AddNew": capacity.Add, "MulRelinNew": capacity.MulRelin, "Rescale(q5)": capacity.Rescale,
+	} {
+		bound, err := parsePositive(name+" bound", raw)
+		if err != nil {
+			return err
+		}
+		if new(big.Int).Lsh(bound, 1).Cmp(q0123) >= 0 {
+			return fmt.Errorf("%s bound does not fit strict Q0123 centered capacity", name)
+		}
+	}
+	rescale, _ := new(big.Int).SetString(capacity.Rescale, 10)
+	if new(big.Int).Lsh(rescale, 1).Cmp(q0) >= 0 {
+		return errors.New("Rescale(q5) bound does not fit strict terminal q0 capacity")
+	}
+	if _, err := parsePositive("MulRelin divisor", capacity.MulDivisor); err != nil {
+		return err
+	}
+	return nil
+}
+
+func publicOracleCheckpoints(slots int) (map[string][]complex128, error) {
+	a, b, c, err := perfmeasure.PublicMulRescaleWorkload(slots)
+	if err != nil {
+		return nil, err
+	}
+	add := publicAdd(a, b)
+	product := publicMul(add, c)
+	rotated := publicRotateLeft(product, 1)
+	return map[string][]complex128{
+		"encrypt_a_level5":    a,
+		"encrypt_b_level5":    b,
+		"encrypt_c_q5_level5": c,
+		"add_level5":          add,
+		"mulrelin_level5":     product,
+		"rescale_q5_level4":   product,
+		"rotate_level4":       rotated,
+		"drop_level0":         rotated,
+	}, nil
 }
 
 func samePublicCheckpointNames(checkpoints []publicCheckpoint, want []string) bool {
