@@ -1,25 +1,21 @@
 # Current Task
 
-Task: FAST-DROPIN-PUBLIC-CHAIN-PERFORMANCE-AUTONOMOUS-BATCH-020
+Task: FAST-DROPIN-BOOTSTRAP-PERFORMANCE-ATTRIBUTION-AUTONOMOUS-BATCH-021
 Status: READY_FOR_CODEX
-Mode: TRUE AUTONOMOUS MULTI-MILESTONE PERFORMANCE SPRINT — S1 THROUGH S5
-Handoff: ONE Web review at end or immediate mathematically/architecturally genuine STOP
+Mode: S1–S4 BOUNDED AUTONOMOUS BOOTSTRAP COLD/WARM ATTRIBUTION
+Web review only after S4 or immediate scientific/unsafe STOP.
 
-**Runnable spec:** `specs/FAST-DROPIN-PUBLIC-CHAIN-PERFORMANCE-AUTONOMOUS-BATCH-020.md`
-**Accepted science:** `results/FAST-DROPIN-HIGHLEVEL-MUL-RESCALE-BOOTSTRAP-AUTONOMOUS-BATCH-019-web-review.md`
-**Rules:** both `AGENTS.md`, `docs/RESEARCH_ENGINEERING_WORKFLOW.md` §4A/4B, Secondary `docs/FAST_QPREFIX_SPEC.md`
-**End goal:** `docs/FAST_DROPIN_ZERO_SECRET_GOAL.md`
+**Executable spec:** `specs/FAST-DROPIN-BOOTSTRAP-PERFORMANCE-ATTRIBUTION-AUTONOMOUS-BATCH-021.md`
+**Accepted Batch020 review:** `results/FAST-DROPIN-PUBLIC-CHAIN-PERFORMANCE-AUTONOMOUS-BATCH-020-web-review.md`
+**Workflow:** both AGENTS.md, `docs/RESEARCH_ENGINEERING_WORKFLOW.md` §4A/4B, Secondary FAST_QPREFIX_SPEC.md.
 
-## Why the batch is larger now
+## Why this task
+Batch020 S1–S5 engineering execution and numerical gates accepted. Pre-Bootstrap evaluation-only cheap median: Standard 6.101624 ms, Fast 3.177875 ms (5 samples). One-shot public Bootstrap: Standard 379.015 ms versus Fast 574.403 ms, BUT this comparison is not a fair steady-state result because Standard `NewEvaluator` eagerly builds circuit data while Fast `Bootstrap` lazily builds it on its first call. Likewise first-call allocations 144 MB Standard vs 961 MB Fast conflate initialization boundaries. `NO_SAFE_OPT_CANDIDATE` justified skipping optional S4 under the prior charter.
 
-The previous 020 charter completed only one baseline report before requiring another Web task. This revised charter authorizes the entire **measure → diagnose → optional mechanically safe improvement → remeasure → report** research loop without a Web handoff at each step. Each submilestone self-reviews, safely commits, journals and advances when gates pass.
+## Batch021 S1–S4
+S1: source-backed exact cold/warm measurement design and matched same-source instrumentation, with prior accepted 019/020 math/params/API unchanged; safe checkpoint.
+S2: **at most two real E32 Standard Bootstrap + two Fast Bootstrap total across whole Batch**. First-call and second-call in same backend lifecycle, same logical input, no retries or extra warmups; independent native numerical oracle for every call. Report evaluator-construction time separately.
+S3: independent source-backed attribution of cold/warm wall and Go allocation differences, no further Bootstrap calls or library rewrite; scientific classification.
+S4: immutable compact 021 report/evidence, focused tests/vet, safe Primary-only push, one Web scientific review.
 
-S1: fair reusable same-public-source timing/allocation harness; commit Primary, proceed automatically.
-S2: 5 matched cheap Standard and ORIGINAL pinned Fast `2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac` runs; preserve raw stage samples and numerical/provenance baseline.
-S3: attribute current eval-only bottleneck, reuse historical QPREFIX diagnostic knowledge; source-backed decision whether a **single** safe mechanical candidate exists.
-S4 (conditional): implement at most ONE mechanical, no-math/no-API/no-representation change confined to approved four-file Secondary allowlist and tests; compare before/after >=5% stage improvement with <=3% eval-only-chain regression, no correctness or memory regressions. If no safe candidate or no improvement, skip/revert task-owned diff, retain negative results and continue. Secondary push only for accepted candidate.
-S5: ONLY THEN max one real Standard E32 + one Fast E32 Bootstrap, complete same-source native oracle, timed stages and allocations, final report and Web review. One Bootstrap per backend is one-shot observation, not stable speedup.
-
-**Full freeze:** true Standard `5dbffbdea05394de2ca3a432ed5318aa832e3f40` always read-only; original Fast pin `2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac` for S2; exact accepted 019 LogN13 E32 full Q/P, input, A/B Scale2^45, C Scale=q5, Scale/Level/row/capacity and max error1e-6. Identical public application operation calls, compiler/config/machine conditions. Optional accepted Fast S4 change is tracked by new SHA and is **not** conflated with pinned original in evidence.
-
-**Expense and STOP:** absolute TWO Bootstrap calls total, NO extra/hidden/warmup/retry, no LogN16 or sweeps. One safe mechanical change maximum; no source math, CRT/NTT/Q-prefix/key semantics/ownership/API/security changes; on genuine numeric failure, new crypto contract or unsafe Git STOP for Web. Resume journal on next user `開始` without repeating finished expensive work. Do not invent Batch021.
+**Freeze:** unchanged public application frontend, original LogN13 E32 full Q/P, 4096 slots, A/B Scale2^45, C exact Scale=q5, q-prefix capacity/rows, original max-error1e-6; genuine Standard `5dbffbdea05394de2ca3a432ed5318aa832e3f40` read-only and Fast `xuejin-lu/lattigo fast-qprefix@2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac` read-only. No Secondary optimization in 021, no LogN16/bench sweeps. Never interpret one warm measurement per backend as a statistically stable speedup. Resume journal without repeating expensive calls; do not invent Batch022.
