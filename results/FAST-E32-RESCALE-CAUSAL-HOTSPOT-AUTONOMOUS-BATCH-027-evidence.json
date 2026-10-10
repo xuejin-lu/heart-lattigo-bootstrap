@@ -1,0 +1,175 @@
+{
+  "schema_version": "fast-e32-rescale-causal-hotspot-batch027.v1",
+  "generated_date": "2026-10-11",
+  "classification": "HOTSPOT_NOT_RESOLVED",
+  "handoff": "READY_FOR_WEB_REVIEW",
+  "provenance": {
+    "primary_task_start_commit": "83a2953aca82f38357a43b099aa8b0e5fb3e9ce8",
+    "primary_task_start_clean": true,
+    "secondary_start_commit": "4f2557062cb5c1ffb9a671bc3df67401fd7092b4",
+    "secondary_final_commit": "2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f",
+    "secondary_branch": "fast-qprefix",
+    "secondary_final_equals_origin": true,
+    "secondary_final_clean": true,
+    "secondary_test_files": {
+      "circuits/ckks/bootstrapping/batch027_e32_rescale_test.go": "e477cce75c920eabd346e8ef234332fd231b608414396ce75a1168e875cd38a2",
+      "schemes/ckks/internal/fastcore/rescale_batch027_benchmark_test.go": "fa7e9a307b780d2193b2d248d193e7dd9f7621717c286d29e905abd7541567a5"
+    },
+    "production_arithmetic_changed": false
+  },
+  "historical_batch026_fixture": {
+    "status": "HISTORICAL_FIXTURE_RECIPE_MISSING",
+    "archived_seed": "0x026e32a5d7c19b43",
+    "archived_sha256": "001855dc4aba15d1da02e71df32242cb019c8976fa2ebede386bebad43ab1247",
+    "unsuccessful_reconstruction_sha256": "1652bf4f8441aa6b0d97929efe79ab150d3d39851e06f883201956ff5054d861",
+    "reconstruction_sha_is_not_authenticated": true
+  },
+  "fixture": {
+    "id": "batch027-e32-rescale-synthetic-v1",
+    "seed": "0x027e32c0ffee1234",
+    "generator": {
+      "algorithm": "SplitMix64-v1",
+      "increment": "0x9e3779b97f4a7c15",
+      "mix1": "0xbf58476d1ce4e5b9",
+      "mix2": "0x94d049bb133111eb",
+      "uint64_wraparound": "modulo-2^64",
+      "sample_words": 3,
+      "word_order": "most-significant-word-first",
+      "iteration_order": "component-then-coefficient-then-word",
+      "reduction": "unsigned-192-bit-sample modulo q0*q1*q2*q3; center into [-Q0123/2,Q0123/2]",
+      "domain_conversion": "map signed coefficient to canonical q0..q3 residues, then NTT each row",
+      "montgomery_conversion": "none; IsMontgomery=false"
+    },
+    "config_sha256": "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98",
+    "effective_qp_sha256": "1f045e603a856968779d62e045a037274bba08cbfce8b1dd3dec2828f1f6a46b",
+    "q0_to_q9": [
+      36028797018652673,
+      549755731969,
+      549756026881,
+      549755486209,
+      549756174337,
+      1152921504606830593,
+      1152921504606748673,
+      1152921504606994433,
+      1152921504606683137,
+      1152921504606601217
+    ],
+    "ephemeral_secret_weight": 32,
+    "log_n": 13,
+    "ring_n": 8192,
+    "log_slots": 12,
+    "level_in": 9,
+    "level_out": 8,
+    "degree": 1,
+    "components": ["c0", "c1"],
+    "c0_c1_nonzero": true,
+    "authoritative_rows_in_out": [4, 4],
+    "logical_level_is_backing_row_count": false,
+    "compact_non_authoritative_rows_backed": false,
+    "scale": "2^45",
+    "is_ntt": true,
+    "is_montgomery": false,
+    "is_batched": true,
+    "canonical_digest": {
+      "format": "canonical-ntt-u64le-v1",
+      "domain_separator": "batch027-e32-rescale-synthetic-v1\\0canonical-ntt-u64le-v1\\0",
+      "hash": "SHA-256",
+      "integer_byte_order": "little-endian",
+      "strings": "UTF-8 with uint32-LE byte length",
+      "configuration": "raw decoded 32-byte SHA-256",
+      "parameters": "Q/P SHA string plus complete Q and P arrays as uint64-LE",
+      "coefficient_order": "component, authoritative row, coefficient",
+      "coefficient_bytes": "only c0/c1 q0..q3 NTT residues, uint64-LE; inactive rows excluded",
+      "sha256": "1de1a696fe7b596105cf236e7799b015049ae78e63e09e2ad6314be730dc3cb8"
+    },
+    "reproductions": {
+      "same_seed_runs": 2,
+      "coefficient_arrays_equal": true,
+      "selected_metadata_equal": true,
+      "canonical_digest_equal": true,
+      "seed_plus_one_changes_digest": true
+    },
+    "representation_limit": "synthetic signed-centered Q0123 coefficient distribution; not captured Bootstrap ciphertext"
+  },
+  "correctness": {
+    "fast_public_rescale_calls": 2,
+    "mode_coverage": ["in-place", "out-of-place"],
+    "oracle": "independent math/big centered CRT plus signed nearest-quotient rounding by logical q9",
+    "components_checked": ["c0", "c1"],
+    "output_coefficients_compared": 65536,
+    "all_q0_to_q3_coefficients_equal": true,
+    "level_scale_degree_ntt_state_equal": true,
+    "target_q0123_capacity_strict_gate": "PASS",
+    "compact_backing_gate": "PASS"
+  },
+  "environment": {
+    "go": "go1.26.4",
+    "goos": "darwin",
+    "goarch": "arm64",
+    "cpu": "Apple M4",
+    "kernel": "Darwin 25.6.0",
+    "gomaxprocs": 1,
+    "gogc": "100",
+    "goflags": "",
+    "build_tags": []
+  },
+  "baseline": {
+    "classification": "new synthetic Batch027 baseline; not pooled with Batch026",
+    "command": "GOCACHE=/private/tmp/batch027-gocache GOMAXPROCS=1 GOGC=100 go test ./circuits/ckks/bootstrapping -run '^$' -bench '^BenchmarkBatch027FastPublicRescaleE32SyntheticV1$' -benchtime=1s -count=5 -benchmem",
+    "samples_ns_per_op": [2702420, 2712634, 2719800, 2731379, 2734809],
+    "median_ns_per_op": 2719800,
+    "range_ns_per_op": [2702420, 2734809],
+    "bytes_per_op": [675, 675, 675, 675, 675],
+    "allocs_per_op": [20, 20, 20, 20, 20],
+    "timed_path": "public Fast Rescale -> production RescaleWorkspace.ApplyRows, in-place",
+    "excluded_from_timing": ["fixture construction", "one evaluator scratch warm-up", "copy/reset of 64-input pool"],
+    "cache_note": "scratch warm-up and repeated batch resets may affect cache state; report is a synthetic steady-state local kernel baseline"
+  },
+  "helper_benchmarks": {
+    "command": "GOCACHE=/private/tmp/batch027-gocache GOMAXPROCS=1 GOGC=100 go test ./schemes/ckks/internal/fastcore -run '^$' -bench '^BenchmarkBatch027FastCoreRescaleHelpers$' -benchtime=1s -count=5 -benchmem -v",
+    "fixture_samples": 16384,
+    "timings_are_non_additive": true,
+    "not_full_rescale_percentages": true,
+    "reconstruct_q0123": {
+      "samples_ns_per_op": [56.70, 56.71, 58.37, 56.89, 56.56],
+      "median_ns_per_op": 56.71,
+      "range_ns_per_op": [56.56, 58.37],
+      "allocs_per_op": 0
+    },
+    "rounded_magnitude_q9": {
+      "samples_ns_per_op": [8.548, 8.903, 8.346, 8.092, 8.260],
+      "median_ns_per_op": 8.346,
+      "range_ns_per_op": [8.092, 8.903],
+      "allocs_per_op": 0
+    },
+    "signed_residue_q0123": {
+      "samples_ns_per_op": [9.332, 9.397, 10.19, 10.16, 9.872],
+      "median_ns_per_op": 9.872,
+      "range_ns_per_op": [9.332, 10.19],
+      "allocs_per_op": 0
+    }
+  },
+  "profiler": {
+    "go_tool_pprof": "unavailable: go: no such tool \"pprof\"",
+    "replacement": "bounded source-local production helper benchmarks",
+    "profile_data_collected": false
+  },
+  "decision": {
+    "p2_result": "helper costs measured, but they are non-additive and do not identify a safe, high-confidence optimization target",
+    "p3_candidate_attempted": false,
+    "p3_reason": "no source-backed high-leverage non-mathematical hypothesis; avoiding speculative CRT or rounding edits",
+    "production_arithmetic_delta": false,
+    "fast_bootstrap_calls": 0,
+    "standard_bootstrap_calls": 0,
+    "standard_performance_calls": 0,
+    "p93_runs": 0
+  },
+  "validation_commands": [
+    "GOCACHE=/private/tmp/batch027-gocache GOMAXPROCS=1 GOGC=100 go test ./schemes/ckks/fast -run '^(TestFastRescale.*|TestBatch027E32KernelFixtureUsesCanonicalQPrefix)$' -count=1",
+    "GOCACHE=/private/tmp/batch027-gocache GOMAXPROCS=1 GOGC=100 go test ./schemes/ckks/internal/fastcore -run '^(TestRescale.*|TestBatch027CoreHelperFixtureUsesCanonicalQPrefix)$' -count=1",
+    "GOCACHE=/private/tmp/batch027-gocache GOMAXPROCS=1 GOGC=100 go test ./circuits/ckks/bootstrapping -run '^TestBatch027E32' -count=1",
+    "GOCACHE=/private/tmp/batch027-gocache GOMAXPROCS=1 GOGC=100 go vet ./schemes/ckks/fast ./schemes/ckks/internal/fastcore ./circuits/ckks/bootstrapping",
+    "git diff --check",
+    "gofmt -d circuits/ckks/bootstrapping/batch027_e32_rescale_test.go schemes/ckks/internal/fastcore/rescale_batch027_benchmark_test.go"
+  ]
+}

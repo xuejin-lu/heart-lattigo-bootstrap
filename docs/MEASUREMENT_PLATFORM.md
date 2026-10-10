@@ -271,3 +271,38 @@ Batch026 applied this protocol to the repeated E32 LogN13 Level 9→8, rows
 4→4, in-place path. It found no robust improvement from the one tested
 high-limb-zero modulo fast path; Secondary production code remained unchanged.
 See `results/FAST-E32-RESCALE-COEFFICIENT-OPT-AUTONOMOUS-BATCH-026-{summary.md,journal.md,evidence.json}`.
+
+## Batch027 reproducible E32 Rescale fixture and helper baseline (2026-10-11)
+
+Batch026's archived seed and input SHA did not preserve its RNG, serialization,
+or hashing recipe; that historical ciphertext is therefore not byte-reproducible.
+Keep its reported SHA `001855dc4aba15d1da02e71df32242cb019c8976fa2ebede386bebad43ab1247`
+and the unsuccessful reconstruction SHA `1652bf4f8441aa6b0d97929efe79ab150d3d39851e06f883201956ff5054d861`
+separate and label the historical fixture `HISTORICAL_FIXTURE_RECIPE_MISSING`.
+Neither SHA identifies the new Batch027 fixture.
+
+The retained test-only fixture is `batch027-e32-rescale-synthetic-v1`, generated
+and checked by Secondary commit `2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f`.
+It reconstructs the actual LogN13/E32 Q/P chain through the bootstrapping
+parameter builder and asserts Q/P SHA-256
+`1f045e603a856968779d62e045a037274bba08cbfce8b1dd3dec2828f1f6a46b` plus
+config SHA-256 `919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98`.
+The source generator fully specifies SplitMix64 v1, sampling/reduction order,
+centered Q0123 representation, per-row NTT conversion, and Level 9→8,
+four-authoritative-row compact backing. Its versioned canonical NTT-u64le-v1
+digest is `1de1a696fe7b596105cf236e7799b015049ae78e63e09e2ad6314be730dc3cb8`.
+The fixture is synthetic; it is not a captured Bootstrap ciphertext.
+
+Correctness is checked on the real public Fast `Rescale` path against an
+independent `math/big` centered-CRT/rounding oracle for both components and
+in-place/out-of-place execution. The retained benchmark calls production
+`RescaleWorkspace.ApplyRows`; setup, a scratch warm-up, and in-place reset copies
+are excluded from timing. Because `go tool pprof` is unavailable, a separate
+bounded test-only benchmark measures the actual `fastcore` reconstruction,
+rounding, and residue helpers using the same seeded coefficient distribution.
+These helper timings are non-additive and must not be converted into full
+Rescale percentages. Batch027's synthetic public-Rescale baseline is 2.7198 ms
+median over five one-second samples on Apple M4 / Go 1.26.4 / darwin-arm64;
+it must not be compared or pooled with Batch026's shorter samples. No
+production arithmetic change or P93/Standard performance run is implied.
+See `results/FAST-E32-RESCALE-CAUSAL-HOTSPOT-AUTONOMOUS-BATCH-027-{summary.md,journal.md,evidence.json}`.
