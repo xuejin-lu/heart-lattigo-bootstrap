@@ -199,3 +199,48 @@ detached worktree is currently unavailable/prunable, so a fresh clean-status
 check could not be collected. No Standard run or source modification occurred
 in this final session. The original Fast pinned checkout and the task-local
 diagnostic clone were both clean at final read-only verification.
+
+## Batch025 E32 trace offline salvage (2026-10-11)
+
+The zero-call offline replay revalidated the preserved 539-event Batch024 raw
+trace as `OFFLINE_REVALIDATED_TRACE`; it did not change the source artifact's
+`TRACE_UNVERIFIED` status. The raw SHA-256 remains
+`f922587fa944da7ef07dcb94a9497505018f2fee2bc67e7f87af6d35bc3d1c74`, and the
+recorded Batch024 budget remains exactly 2/2 calls. Batch025 made zero new
+Bootstrap, key-generation, decrypt, or CKKS-operation calls.
+
+The validator now follows the source-defined recursive `SplitDegree` ancestry
+(including T16→T8) and validates the real and imaginary generated-power trees
+independently, so the same powers in the two branches are valid while
+duplicates within one tree are rejected. It also checks all stage parents and
+order, parent cycles/orphans, Q-prefix row/Level metadata, and the nested
+Rescale preflight/materialization component events. The old first mismatch was
+a validator assumption, not a trace or arithmetic defect. The offline replay
+found no structural or provenance anomalies across all 539 events.
+
+Recorded output metadata (not recomputed decrypts) retains the two passed
+native oracle records: each has RMSE `1.1795785978778852e-9`, maximum complex
+difference `5.738790672737443e-8` against the `1e-6` gate, and decoded hash
+matching its held repeatability vector. Both report Level 1, Degree 1, and two
+Q-prefix rows. Captured cold and traced-warm elapsed times were 568.862 ms and
+122.202 ms respectively; these are one diagnostic pair, not a speedup or
+steady-state estimate.
+
+The single warm trace's Bootstrap root was 122.193 ms. Its largest direct
+stages were `evalmod_real` 45.968 ms (37.619%), `evalmod_imag` 45.890 ms
+(37.555%), `coeffs_to_slots` 16.469 ms (13.478%), and `slots_to_coeffs`
+13.363 ms (10.936%). These stage-only Amdahl scenarios are conditional bounds,
+not predictions. The two independent generated-power roots were about 19.5 ms
+each; their root-partitioned Pareto is dominated by the six power `rescale`
+phases. Separately, 35 independent Rescale roots had a median of 3.124 ms
+(range 2.451–3.191 ms). Power/Rescale root shares are not added to Bootstrap
+stage shares because those independent instrumentation trees overlap stage
+wall intervals. No traced Standard comparison or speedup is supported.
+
+The warm CPU profile bytes were present but the original raw contained no
+digest binding them, so they were excluded from attribution; the post-warm
+heap profile was unavailable. Full per-event closures, root-specific Pareto
+and Amdahl details, medians, hashes, and attempt-journal provenance are in
+`results/FAST-DROPIN-E32-TRACE-OFFLINE-SALVAGE-AUTONOMOUS-BATCH-025-{summary.md,journal.md,evidence.json}`.
+The immutable raw and source sidecar remain outside Git. No Secondary
+production code or pinned Standard/Fast backend was changed.
