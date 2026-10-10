@@ -2,6 +2,12 @@
 
 **Status:** ACTIVE ARCHITECTURAL RULE. This document must survive chat/session handoffs and govern all future CKKS Standard/Fast performance, attribution, and numerical comparison tasks. **Read with Primary `AGENTS.md` before a measurement-related spec, not just after a profiler problem appears.**
 
+## Current contract: backend-transparent frontend achieved (2026-10-11)
+
+**Authoritative status:** `docs/BACKEND_TRANSPARENCY_CONTRACT.md`. Current supported CKKS production frontend calls ordinary `ckks.NewEvaluator` and `bootstrapping.NewEvaluator` on **both** backends. Fast dispatch, zero-secret semantics and Q0123 optimized arithmetic are entirely internal to the Fast Lattigo library. Do not use `NewFastEvaluator` as a requirement for the current application/frontend; references below to an old explicit Fast constructor describe **historical tooling debt**, not an unresolved frontend milestone.
+
+**Selection** is solely two builds of the **same** Primary source against pinned, isolated, independently compiled genuine Standard and current Fast Lattigo checkouts. Go dependency selection happens **at compile time**. A Standard API constructed inside a binary linked to Fast checkout is **not genuine Standard**. Require only normal exact-source and binary-provenance checks before measurement, not a new Standard implementation audit. Never add backend-specific branches to the CKKS application operation sequence. This achieved integration does not imply that new LogN16 per-stage numerical RMSE has passed.
+
 ## 1. The existing measurement platform MUST be reused
 
 | Owner / code | Actual reusable capabilities | Intended role |
