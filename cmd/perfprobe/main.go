@@ -141,6 +141,8 @@ type cliOptions struct {
 	mode                    string
 	ephemeralSecretWeight   int
 	bootstrapBudget         int
+	publicBootstrap         bool
+	preflightPair           string
 	inputSmoke              bool
 	outputSmoke             bool
 	fastBootstrapAcceptance bool
@@ -182,6 +184,8 @@ func run() error {
 	flag.StringVar(&opts.mode, "mode", "legacy-diagnostic", "legacy-diagnostic or public-native")
 	flag.IntVar(&opts.ephemeralSecretWeight, "ephemeral-secret-weight", -1, "explicit E for public-native mode; legacy mode remains E=0")
 	flag.IntVar(&opts.bootstrapBudget, "bootstrap-budget", -1, "hard maximum actual Bootstrap attempts for this process; required when mode can invoke Bootstrap")
+	flag.BoolVar(&opts.publicBootstrap, "public-bootstrap", false, "public-native mode: run exactly one cold and one warm Bootstrap after validating --preflight-pair")
+	flag.StringVar(&opts.preflightPair, "preflight-pair", "", "passing zero-call compare-public pair required for --public-bootstrap")
 	flag.BoolVar(&opts.inputSmoke, "input-smoke", false, "bounded input-origin preflight only; no Bootstrap or timing")
 	flag.BoolVar(&opts.outputSmoke, "output-smoke", false, "one public Bootstrap and decoded-output preflight; no timing campaign")
 	flag.BoolVar(&opts.fastBootstrapAcceptance, "fast-bootstrap-acceptance", false, "input smoke only: at most one Fast public Bootstrap acceptance call")
@@ -230,8 +234,17 @@ func run() error {
 		if opts.ephemeralSecretWeight < 0 {
 			return errors.New("public-native mode requires an explicit non-negative --ephemeral-secret-weight")
 		}
-		if opts.bootstrapBudget != 0 {
-			return errors.New("public-native preflight is zero-Bootstrap only; set --bootstrap-budget=0")
+		wantBudget := 0
+		if opts.publicBootstrap {
+			wantBudget = 2
+			if opts.preflightPair == "" {
+				return errors.New("public-native Bootstrap measurement requires a passing zero-call --preflight-pair")
+			}
+		} else if opts.preflightPair != "" {
+			return errors.New("--preflight-pair is only accepted with --public-bootstrap")
+		}
+		if opts.bootstrapBudget != wantBudget {
+			return fmt.Errorf("public-native mode requires --bootstrap-budget=%d", wantBudget)
 		}
 		if opts.inputSmoke || opts.outputSmoke || opts.fastBootstrapAcceptance || opts.vectorsOut == "" {
 			return errors.New("public-native mode requires --vectors-out and does not accept legacy smoke/Bootstrap flags")
@@ -240,7 +253,7 @@ func run() error {
 		if err != nil {
 			return err
 		}
-		return runPublicNativePreflight(opts, configHash, residual, params, effective)
+		return runPublicNative(opts, configHash, residual, params, effective)
 	}
 	if opts.mode != "legacy-diagnostic" {
 		return fmt.Errorf("unsupported --mode %q", opts.mode)
@@ -417,10 +430,22 @@ func run() error {
 
 func validateExecutionLimits(opts cliOptions) error {
 	if opts.mode == "public-native" {
-		if opts.bootstrapBudget != 0 {
-			return errors.New("public-native zero-call preflight requires --bootstrap-budget=0")
+		wantBudget := 0
+		if opts.publicBootstrap {
+			wantBudget = 2
+			if opts.preflightPair == "" {
+				return errors.New("public-native Bootstrap measurement requires a passing zero-call --preflight-pair")
+			}
+		} else if opts.preflightPair != "" {
+			return errors.New("--preflight-pair is only accepted with --public-bootstrap")
+		}
+		if opts.bootstrapBudget != wantBudget {
+			return fmt.Errorf("public-native mode requires --bootstrap-budget=%d", wantBudget)
 		}
 		return nil
+	}
+	if opts.publicBootstrap || opts.preflightPair != "" {
+		return errors.New("--public-bootstrap and --preflight-pair require --mode=public-native")
 	}
 	if opts.inputSmoke || opts.outputSmoke {
 		expected := 0

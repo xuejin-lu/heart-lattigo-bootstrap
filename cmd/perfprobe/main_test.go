@@ -5,9 +5,11 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/tuneinsight/lattigo/v6/core/rlwe"
+	"github.com/tuneinsight/lattigo/v6/schemes/ckks"
 	"github.com/xuejin-lu/heart-lattigo-bootstrap/internal/numericalmetrics"
 	"github.com/xuejin-lu/heart-lattigo-bootstrap/internal/perfmeasure"
 )
@@ -90,6 +92,24 @@ func TestBootstrapBudgetSupportsExplicitTwoAttemptPolicy(t *testing.T) {
 	}
 }
 
+func TestZeroBootstrapBudgetDoesNotReserveOrInvoke(t *testing.T) {
+	journalBase := filepath.Join(t.TempDir(), "zero-budget")
+	budget := &bootstrapBudget{limit: 0, journalBase: journalBase}
+	calls := 0
+	if _, err := budget.invoke("must-not-run", func() (*rlwe.Ciphertext, error) {
+		calls++
+		return nil, nil
+	}); err == nil {
+		t.Fatal("zero-call budget accepted an invocation")
+	}
+	if budget.attempts != 0 || calls != 0 {
+		t.Fatalf("zero-call budget changed state: attempts=%d calls=%d", budget.attempts, calls)
+	}
+	if _, err := os.Stat(journalBase + ".bootstrap-attempt-01.json"); !os.IsNotExist(err) {
+		t.Fatalf("zero-call budget wrote a reservation: stat error=%v", err)
+	}
+}
+
 func TestPublicNativeModeIsExplicitlyZeroBootstrap(t *testing.T) {
 	if err := validateExecutionLimits(cliOptions{mode: "public-native", bootstrapBudget: 0}); err != nil {
 		t.Fatalf("zero-call public-native preflight rejected: %v", err)
@@ -103,6 +123,292 @@ func TestPublicNativeModeIsExplicitlyZeroBootstrap(t *testing.T) {
 	if err := validateExecutionLimits(cliOptions{inputSmoke: true, fastBootstrapAcceptance: true, bootstrapBudget: 1}); err != nil {
 		t.Fatalf("explicit one-call legacy acceptance budget rejected: %v", err)
 	}
+	if err := validateExecutionLimits(cliOptions{mode: "public-native", publicBootstrap: true, preflightPair: "preflight.json", bootstrapBudget: 2}); err != nil {
+		t.Fatalf("exact two-call public-native cold/warm budget rejected: %v", err)
+	}
+	for _, budget := range []int{0, 1, 3} {
+		if err := validateExecutionLimits(cliOptions{mode: "public-native", publicBootstrap: true, preflightPair: "preflight.json", bootstrapBudget: budget}); err == nil {
+			t.Fatalf("public-native cold/warm mode accepted budget=%d, want exactly 2", budget)
+		}
+	}
+	if err := validateExecutionLimits(cliOptions{mode: "public-native", publicBootstrap: true, bootstrapBudget: 2}); err == nil {
+		t.Fatal("public-native cold/warm mode accepted a missing zero-call preflight pair")
+	}
+	if err := validateExecutionLimits(cliOptions{mode: "public-native", preflightPair: "preflight.json", bootstrapBudget: 0}); err == nil {
+		t.Fatal("zero-call mode accepted an unused preflight-pair path")
+	}
+	if err := validateExecutionLimits(cliOptions{mode: "legacy-diagnostic", publicBootstrap: true, preflightPair: "preflight.json", bootstrapBudget: 2}); err == nil {
+		t.Fatal("legacy mode accepted public-native Bootstrap flags")
+	}
+}
+
+func TestPublicBootstrapAttemptsUseIndependentCopiesOfOneHeldInput(t *testing.T) {
+	input := publicTestCiphertext(t)
+	baseFingerprint, err := publicCiphertextFingerprint(input)
+	if err != nil {
+		t.Fatal(err)
+	}
+	budget := &bootstrapBudget{limit: 2, journalBase: filepath.Join(t.TempDir(), "bootstrap")}
+	calls := 0
+	var copyFingerprints []string
+	call := func(callInput *rlwe.Ciphertext) (*rlwe.Ciphertext, error) {
+		calls++
+		fingerprint, err := publicCiphertextFingerprint(callInput)
+		if err != nil {
+			return nil, err
+		}
+		copyFingerprints = append(copyFingerprints, fingerprint)
+		callInput.Value[0].Coeffs[0][0]++ // A fake backend mutates only the per-call copy.
+		return callInput.CopyNew(), nil
+	}
+	validate := func(name string, _ *rlwe.Ciphertext) (publicCheckpoint, []complex128, error) {
+		values := make([]complex128, 1<<12)
+		for i := range values {
+			values[i] = complex(float64(i)/4096, -float64(i)/8192)
+		}
+		return publicCheckpoint{Name: name}, values, nil
+	}
+	results, outputs, phases, err := runTwoPublicBootstrapAttempts(input, budget, call, validate)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if calls != 2 || budget.attempts != 2 || len(results) != 2 || len(outputs) != 2 || len(phases) != 2 {
+		t.Fatalf("cold/warm attempts calls=%d reserved=%d results=%d outputs=%d phases=%d", calls, budget.attempts, len(results), len(outputs), len(phases))
+	}
+	if copyFingerprints[0] != baseFingerprint || copyFingerprints[1] != baseFingerprint || results[0].InputCiphertextSHA256 != results[1].InputCiphertextSHA256 || results[0].InputCiphertextSHA256 != baseFingerprint {
+		t.Fatal("cold and warm did not receive independent copies of the same held ciphertext")
+	}
+	afterFingerprint, err := publicCiphertextFingerprint(input)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if afterFingerprint != baseFingerprint {
+		t.Fatal("fake Bootstrap mutation escaped its per-call ciphertext copy")
+	}
+	if _, err := os.Stat(budget.journalBase + ".bootstrap-attempt-01.json"); err != nil {
+		t.Fatalf("cold reservation missing: %v", err)
+	}
+	if _, err := os.Stat(budget.journalBase + ".bootstrap-attempt-02.json"); err != nil {
+		t.Fatalf("warm reservation missing: %v", err)
+	}
+}
+
+func TestPublicCiphertextFingerprintBindsDomainAndDimensions(t *testing.T) {
+	ciphertext := publicTestCiphertext(t)
+	baseline, err := publicCiphertextFingerprint(ciphertext)
+	if err != nil {
+		t.Fatal(err)
+	}
+	nttVariant := ciphertext.CopyNew()
+	nttVariant.IsNTT = !nttVariant.IsNTT
+	nttFingerprint, err := publicCiphertextFingerprint(nttVariant)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if nttFingerprint == baseline {
+		t.Fatal("ciphertext fingerprint ignored NTT domain metadata")
+	}
+	dimensionsVariant := ciphertext.CopyNew()
+	dimensionsVariant.LogDimensions.Cols++
+	dimensionsFingerprint, err := publicCiphertextFingerprint(dimensionsVariant)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if dimensionsFingerprint == baseline {
+		t.Fatal("ciphertext fingerprint ignored logical dimensions")
+	}
+}
+
+func TestPublicNativeOutputPreflightRejectsAliasesAndExistingArtifacts(t *testing.T) {
+	root := t.TempDir()
+	result := filepath.Join(root, "result.json")
+	vectors := filepath.Join(root, "vectors.json")
+	if err := ensurePublicNativeOutputsAvailable(cliOptions{out: result, vectorsOut: vectors, publicBootstrap: true}); err != nil {
+		t.Fatalf("fresh output paths rejected: %v", err)
+	}
+	if err := ensurePublicNativeOutputsAvailable(cliOptions{out: result, vectorsOut: filepath.Join(root, ".", "result.json"), publicBootstrap: true}); err == nil {
+		t.Fatal("aliased result/vector output paths accepted")
+	}
+	if err := ensurePublicNativeOutputsAvailable(cliOptions{out: filepath.Join(root, "missing", "result.json"), vectorsOut: vectors, publicBootstrap: true}); err == nil {
+		t.Fatal("output path with a missing parent directory accepted")
+	}
+	if err := os.WriteFile(result+".bootstrap-attempt-02.json", []byte("reserved"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if err := ensurePublicNativeOutputsAvailable(cliOptions{out: result, vectorsOut: vectors, publicBootstrap: true}); err == nil {
+		t.Fatal("existing warm-attempt journal accepted before measurement")
+	}
+}
+
+func TestPublicBootstrapGateRequiresExactPassingZeroCallPair(t *testing.T) {
+	wantNames := []string{"encrypt_a_level5", "encrypt_b_level5", "encrypt_c_q5_level5", "add_level5", "mulrelin_level5", "rescale_q5_level4", "rotate_level4", "drop_level0"}
+	base := publicPairDocument{
+		SchemaVersion: "fast-standard-public-native-pair.v1", Status: "PASS", NumericalGate: publicNumericalGate,
+		FastCommit: publicFastSHA, StandardCommit: publicStandardSHA, PrimaryCommit: "primary-sha", SourceSHA256: "source-sha",
+		InputSHA256: publicInputSHA, WorkloadSHA256: publicWorkloadSHA, ConfigSHA256: publicConfigSHA, QPSHA256: publicQPSHA,
+		E: 32, BootstrapCalls: 0, MatchedEnvironment: true,
+	}
+	for _, name := range wantNames {
+		base.Checkpoints = append(base.Checkpoints, publicPairCheckpoint{
+			Name: name, Pass: true, StateMatched: true, Metrics: vectorMetrics{MaxComplexDifference: 0},
+		})
+	}
+	tests := []struct {
+		name   string
+		mutate func(*publicPairDocument)
+		valid  bool
+	}{
+		{name: "canonical passing zero-call pair", valid: true},
+		{name: "contains bootstrap comparisons", mutate: func(pair *publicPairDocument) {
+			pair.Bootstrap = append(pair.Bootstrap, publicPairBootstrapComparison{Phase: "first_cold_bootstrap"})
+		}},
+		{name: "negative error metric", mutate: func(pair *publicPairDocument) {
+			pair.Checkpoints[0].Metrics.MaxComplexDifference = -1
+		}},
+		{name: "failed checkpoint", mutate: func(pair *publicPairDocument) {
+			pair.Checkpoints[0].Pass = false
+		}},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			pair := base
+			pair.Checkpoints = append([]publicPairCheckpoint(nil), base.Checkpoints...)
+			if test.mutate != nil {
+				test.mutate(&pair)
+			}
+			path := filepath.Join(t.TempDir(), "preflight-pair.json")
+			if err := writeExclusiveJSON(path, pair); err != nil {
+				t.Fatal(err)
+			}
+			_, err := validatePublicPreflightGate(path, "primary-sha", "source-sha", publicConfigSHA, publicQPSHA, publicInputSHA, publicWorkloadSHA)
+			if test.valid && err != nil {
+				t.Fatalf("canonical zero-call pair rejected: %v", err)
+			}
+			if !test.valid && err == nil {
+				t.Fatal("invalid preflight pair accepted")
+			}
+		})
+	}
+}
+
+func TestPublicBootstrapAttemptsStopAfterFirstOutputGateFailure(t *testing.T) {
+	input := publicTestCiphertext(t)
+	journalBase := filepath.Join(t.TempDir(), "bootstrap-fail-closed")
+	budget := &bootstrapBudget{limit: 2, journalBase: journalBase}
+	calls := 0
+	call := func(callInput *rlwe.Ciphertext) (*rlwe.Ciphertext, error) {
+		calls++
+		return callInput.CopyNew(), nil
+	}
+	validate := func(string, *rlwe.Ciphertext) (publicCheckpoint, []complex128, error) {
+		return publicCheckpoint{}, nil, errors.New("simulated first-output gate failure")
+	}
+	_, _, _, err := runTwoPublicBootstrapAttempts(input, budget, call, validate)
+	if err == nil || !strings.Contains(err.Error(), "simulated first-output gate failure") {
+		t.Fatalf("failed first output gate not returned: %v", err)
+	}
+	if calls != 1 || budget.attempts != 1 {
+		t.Fatalf("failure incorrectly continued: calls=%d reserved=%d", calls, budget.attempts)
+	}
+	if _, err := os.Stat(journalBase + ".bootstrap-attempt-01.json"); err != nil {
+		t.Fatalf("spent cold reservation missing: %v", err)
+	}
+	if _, err := os.Stat(journalBase + ".bootstrap-attempt-02.json"); !os.IsNotExist(err) {
+		t.Fatalf("warm attempt was reserved after first-call failure: stat error=%v", err)
+	}
+}
+
+func TestPublicBootstrapAttemptErrorReportsWarmReservationPhase(t *testing.T) {
+	input := publicTestCiphertext(t)
+	journalBase := filepath.Join(t.TempDir(), "warm-reservation-collision")
+	if err := os.WriteFile(journalBase+".bootstrap-attempt-02.json", []byte("already reserved"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	budget := &bootstrapBudget{limit: 2, journalBase: journalBase}
+	calls := 0
+	call := func(callInput *rlwe.Ciphertext) (*rlwe.Ciphertext, error) {
+		calls++
+		return callInput.CopyNew(), nil
+	}
+	validate := func(name string, _ *rlwe.Ciphertext) (publicCheckpoint, []complex128, error) {
+		values := make([]complex128, 1<<12)
+		return publicCheckpoint{Name: name}, values, nil
+	}
+	_, _, _, err := runTwoPublicBootstrapAttempts(input, budget, call, validate)
+	var attemptErr *publicBootstrapAttemptError
+	if !errors.As(err, &attemptErr) || attemptErr.Phase != "later_warm_bootstrap" {
+		t.Fatalf("warm reservation failure phase=%v, want later_warm_bootstrap (error=%v)", attemptErr, err)
+	}
+	if calls != 1 || budget.attempts != 1 {
+		t.Fatalf("warm reservation collision invoked extra work: calls=%d reserved=%d", calls, budget.attempts)
+	}
+}
+
+func TestPublicBootstrapPairRequiresBoundedNativeOutputs(t *testing.T) {
+	standard, standardVectors := makePublicBootstrapPairArtifactFixture(t, "standard")
+	fast, fastVectors := makePublicBootstrapPairArtifactFixture(t, "fast")
+	if err := validatePublicBootstrapPairArtifacts(standard, fast, standardVectors, fastVectors); err != nil {
+		t.Fatalf("valid bounded cold/warm output pair rejected: %v", err)
+	}
+	tests := []struct {
+		name   string
+		mutate func(*publicNativeDocument, *publicVectorDocument)
+	}{
+		{
+			name: "output decoded hash mismatch",
+			mutate: func(doc *publicNativeDocument, _ *publicVectorDocument) {
+				doc.BootstrapResults[0].Output.DecodedSHA256 = "tampered"
+			},
+		},
+		{
+			name: "output vector wrong count",
+			mutate: func(_ *publicNativeDocument, vectors *publicVectorDocument) {
+				vectors.BootstrapOutputs["bootstrap_first_cold"] = vectors.BootstrapOutputs["bootstrap_first_cold"][:1]
+			},
+		},
+		{
+			name: "cold and warm input mismatch",
+			mutate: func(doc *publicNativeDocument, _ *publicVectorDocument) {
+				doc.BootstrapResults[1].InputCiphertextSHA256 = "different-input"
+			},
+		},
+		{
+			name: "duplicate phase",
+			mutate: func(doc *publicNativeDocument, _ *publicVectorDocument) {
+				doc.BootstrapResults[1].Phase = doc.BootstrapResults[0].Phase
+			},
+		},
+		{
+			name: "native decode declaration changed",
+			mutate: func(doc *publicNativeDocument, _ *publicVectorDocument) {
+				doc.BootstrapResults[0].Output.DecodePath = "Fast c0 projection"
+			},
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			mutated := clonePublicNativeDocument(standard)
+			mutated.BootstrapResults = append([]publicBootstrapResult(nil), standard.BootstrapResults...)
+			vectors := clonePublicVectorDocument(standardVectors)
+			test.mutate(&mutated, &vectors)
+			if err := validatePublicBootstrapPairArtifacts(mutated, fast, vectors, fastVectors); err == nil {
+				t.Fatal("public Bootstrap comparator accepted invalid cold/warm evidence")
+			}
+		})
+	}
+}
+
+func publicTestCiphertext(t *testing.T) *rlwe.Ciphertext {
+	t.Helper()
+	config, _, err := perfmeasure.LoadConfig(filepath.Join("..", "..", "configs", "bootstrap_config.logN13.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	residual, _, _, err := perfmeasure.ParametersFromConfigWithE(config, 32)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return ckks.NewCiphertext(residual, 1, 0)
 }
 
 func TestPublicPairProvenanceRequiresPinnedCoverageAndCleanSources(t *testing.T) {
@@ -338,7 +644,7 @@ func makePublicPairArtifactFixture(t *testing.T, backend string) (publicNativeDo
 		Profile: "logn13", Backend: backend, BackendCommit: commit, BackendClean: true,
 		PrimaryCommit: "primary-sha", PrimaryClean: true, PrimarySourceSHA256: "source-sha", BuildTag: tag,
 		ConfigSHA256: publicConfigSHA, QPSHA256: publicQPSHA, InputSHA256: publicInputSHA, WorkloadSHA256: publicWorkloadSHA,
-		Parameters: params, EphemeralSecretWeight: 32, InputSlots: 1 << 12, BootstrapBudget: 0, BootstrapCalls: 0,
+		Parameters: params, EphemeralSecretWeight: 32, InputSlots: 1 << 12, NumericalGate: publicNumericalGate, BootstrapBudget: 0, BootstrapCalls: 0,
 		InputC1Nonzero: backend == "standard",
 		Capacity:       capacity,
 		Checkpoints:    checkpoints,
@@ -349,6 +655,50 @@ func makePublicPairArtifactFixture(t *testing.T, backend string) (publicNativeDo
 		QPSHA256: publicQPSHA, InputSHA256: publicInputSHA, WorkloadSHA256: publicWorkloadSHA, E: 32, Checkpoints: vectors,
 	}
 	return doc, vectorDoc
+}
+
+func makePublicBootstrapPairArtifactFixture(t *testing.T, backend string) (publicNativeDocument, publicVectorDocument) {
+	t.Helper()
+	doc, vectors := makePublicPairArtifactFixture(t, backend)
+	doc.SchemaVersion, doc.Mode, doc.Status = "fast-standard-public-native-bootstrap.v1", "public-native-bootstrap", "PASS_PUBLIC_BOOTSTRAP_COLD_WARM"
+	doc.BootstrapBudget, doc.BootstrapCalls, doc.PreflightPairSHA256 = 2, 2, "preflight-pair-sha"
+	vectors.SchemaVersion, vectors.Mode = "fast-standard-public-native-bootstrap-vectors.v1", "public-native-bootstrap"
+	vectors.BootstrapOutputs = make(map[string][]complexValue, 2)
+	preBootstrap := decodeComplexValues(vectors.Checkpoints["drop_level0"])
+	params, _ := publicFixtureParameters(t)
+	for _, item := range []struct {
+		phase string
+		name  string
+	}{
+		{phase: "first_cold_bootstrap", name: "bootstrap_first_cold"},
+		{phase: "later_warm_bootstrap", name: "bootstrap_later_warm"},
+	} {
+		rowLengths, rowHashes := make([][]int, 2), make([][]string, 2)
+		for component := 0; component < 2; component++ {
+			rowLengths[component] = []int{1 << 13, 1 << 13}
+			rowHashes[component] = []string{"q0-row-sha", "q1-row-sha"}
+		}
+		scale, err := expectedPublicCheckpointScale(params, item.name)
+		if err != nil {
+			t.Fatal(err)
+		}
+		checkpoint := publicCheckpoint{
+			Name: item.name, State: ciphertextState{Level: 1, Degree: 1, Scale: scale, QPrefixRows: 2},
+			DecodePath:         "rlwe.NewDecryptor(residual parameters, generated secret).DecryptNew -> ckks.NewEncoder.Decode",
+			PhysicalRowLengths: rowLengths, RowSHA256: rowHashes, FastCompactPrefix: backend == "fast", C1Nonzero: backend == "standard",
+			DecodedSHA256: perfmeasure.Fingerprint(preBootstrap), OraclePass: true,
+			Oracle: compareVectors(preBootstrap, preBootstrap, publicNumericalGate), OracleSNR: numericalmetrics.Compare(preBootstrap, preBootstrap),
+		}
+		if backend == "fast" {
+			checkpoint.DecodePath = "rlwe.NewDecryptor(residual parameters, matching zero-secret-mode secret).DecryptNew -> ckks.NewEncoder.Decode"
+		}
+		doc.BootstrapResults = append(doc.BootstrapResults, publicBootstrapResult{
+			Phase: item.phase, InputCiphertextSHA256: "held-level0-ciphertext-sha",
+			Timing: phaseTiming{Phase: item.phase, ElapsedNS: 100, Samples: 1, Available: true}, Output: checkpoint,
+		})
+		vectors.BootstrapOutputs[item.name] = encodeVector(preBootstrap)
+	}
+	return doc, vectors
 }
 
 func publicFixtureParameters(t *testing.T) (perfmeasure.EffectiveParameters, perfmeasure.PublicCapacityPlan) {
@@ -404,6 +754,10 @@ func clonePublicVectorDocument(doc publicVectorDocument) publicVectorDocument {
 	clone.Checkpoints = make(map[string][]complexValue, len(doc.Checkpoints))
 	for name, values := range doc.Checkpoints {
 		clone.Checkpoints[name] = append([]complexValue(nil), values...)
+	}
+	clone.BootstrapOutputs = make(map[string][]complexValue, len(doc.BootstrapOutputs))
+	for name, values := range doc.BootstrapOutputs {
+		clone.BootstrapOutputs[name] = append([]complexValue(nil), values...)
 	}
 	return clone
 }
