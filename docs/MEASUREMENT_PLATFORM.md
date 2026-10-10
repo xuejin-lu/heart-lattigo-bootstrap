@@ -147,24 +147,55 @@ The one cold and one warm sample are descriptive, not a stable speedup estimate.
 
 Compact result, journal, and provenance/aggregate evidence are in `results/FAST-DROPIN-PUBLIC-NATIVE-COLD-WARM-AUTONOMOUS-BATCH-022-{summary.md,journal.md,evidence.json}`. Raw 4096-slot vectors and temporary alternate modfiles remain outside the repository.
 
-## Batch024 E32 trace status — 2026-10-11
+## Batch024 E32 trace status — final diagnostic outcome (2026-10-11)
 
-The Rescale trace producer repair and S1–S3 zero-call gates passed. The first
-S4 preflight supplied the pre-Bootstrap `fast-vectors.json` rather than the
-required six-output repeatability artifact; that historical validator failure
-and its evidence remain preserved. Web authorized recovery only with the
-actual artifact. The matching
-`fast-repeatability-vectors.json` was found and verified (six named 4096-slot
-finite outputs; original Fast, Primary measurement-source, config, Q/P, input
-and workload fingerprints match the held manifest). The Secondary
-`FASTDIAG_VALIDATE_ONLY=1` fixture test passed with zero Bootstrap calls.
+S1–S3 and the final zero-call gates passed. After the Web-approved fix to
+identify an isolated diagnostic clone by filesystem identity rather than
+lexical path strings, `go test ./cmd/fastdiag -count=1`,
+`go vet ./cmd/fastdiag`, `git diff --check`, and the Secondary
+`FASTDIAG_VALIDATE_ONLY=1` E32 fixture test passed. The verified held fixture
+uses the Batch023 six-output repeatability vectors (SHA-256
+`63ad89ce9ccc70a0b737397810d4f4a15d8a1ed65e82ccd3af0435d1df4d6881`) and
+manifest SHA-256
+`5bc19b1eb6e67997ca3d19f39e6fd781bf93b27ad305a1be733f0c883611b847`.
 
-With a private writable outer `GOCACHE`, the fixed Primary trace CLI passed
-fixture and production-source identity validation but stopped before the
-Secondary test subprocess and attempt reservation: `git worktree add` could
-not create `.git/worktrees/secondary-diagnostic1` (`Operation not permitted`).
-The output base and both reservation journals are absent. Batch024 remains
-**0/2 reserved, 0 Bootstrap calls**; Batch023's **14/14** remain spent and
-untouched. No further retry or permission workaround was attempted; Batch024
-is blocked for Web review. See the Batch024 summary, journal and evidence JSON
-for exact paths, hashes and command status.
+The approved Secondary production delta was limited to guarded event spans in
+`schemes/ckks/internal/fastcore/rescale.go`, around the existing
+RescaleWorkspace.ApplyRows materialization and actual per-row NTT/MForm
+restore work; it did not alter arithmetic or execution order. The Primary
+analysis repair retained per-event closure/Pareto and renderer/test
+interfaces, adding event-type summaries based on parent-minus-direct-child
+elapsed time and partitioned by event-tree root.
+
+The one authorized S4 session reserved and completed exactly two Fast-only
+Bootstrap calls: one cold initialization and one traced warm call. Both
+decoded outputs passed the native oracle (RMSE `1.1795785978778852e-9`,
+maximum complex difference `5.738790672737443e-8` against `1e-6`) and matched
+the held Fast reference. Structural validation then failed at the first
+nonconforming power parent: event sequence 61 (`T8`) points to sequence 60
+(`T16`), whereas the validator requires direct parent sequence 59
+(`generated_powers`). The 539-event raw trace is retained outside Git with
+SHA-256
+`f922587fa944da7ef07dcb94a9497505018f2fee2bc67e7f87af6d35bc3d1c74`; it is
+`TRACE_UNVERIFIED`, with no certified event attribution, Pareto/Amdahl
+analysis, or performance claim. The two calls exhaust Batch024's budget;
+there was no retry. Batch023's separately accepted 4.225x observation remains
+historical and is not a Batch024 finding. Its 14/14 calls were not reused.
+
+Original Standard `5dbffbdea05394de2ca3a432ed5318aa832e3f40` and original
+production Fast `2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac` remain frozen; the
+diagnostic checkout was pinned to Secondary commit
+`4f2557062cb5c1ffb9a671bc3df67401fd7092b4`. No Secondary production code was
+changed during the final diagnostic session. The observed elapsed values are
+raw diagnostic data only and must not be used as a speedup estimate.
+
+Final state: `BATCH_BLOCKED_NEEDS_WEB_REVIEW`. See the compact Batch024
+summary, journal, and evidence JSON for full provenance, attempt journals,
+failure sidecar hash, and the exact first structural mismatch.
+
+Checkout-status qualification: the original Standard commit object
+`5dbffbdea05394de2ca3a432ed5318aa832e3f40` is present, but its registered
+detached worktree is currently unavailable/prunable, so a fresh clean-status
+check could not be collected. No Standard run or source modification occurred
+in this final session. The original Fast pinned checkout and the task-local
+diagnostic clone were both clean at final read-only verification.

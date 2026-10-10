@@ -1,6 +1,6 @@
 # Batch 024 journal — E32 Rescale trace repair
 
-Status: `BATCH_BLOCKED_NEEDS_WEB_REVIEW` — S1–S3 zero-call gates complete; S4 stopped at fixture provenance validation before attempt reservation or Bootstrap.
+Status: `BATCH_BLOCKED_NEEDS_WEB_REVIEW` — S1–S3 complete; the authorized S4 session consumed 2/2 Fast-only calls and stopped at event-tree validation. S5 evidence and documentation are complete; awaiting Web review.
 
 ## Frozen provenance and budget
 
@@ -121,8 +121,8 @@ Status: `BATCH_BLOCKED_NEEDS_WEB_REVIEW` — S1–S3 zero-call gates complete; S
 | S1 source/provenance audit | complete | 0 |
 | S2 regression-first span and raw evidence implementation | complete | 0 |
 | S3 enabled/disabled, committed-source identity, and zero-call validation | complete | 0 |
-| S4 isolated E32 diagnostic trace | blocked before reservations: fixture recovered; isolated worktree creation denied | 0 |
-| S5 aggregate report and Web handoff | blocked; compact blocker evidence recorded for Web review | 0 |
+| S4 isolated E32 diagnostic trace | executed; raw trace preserved, structural validation failed; no retry | 2 |
+| S5 aggregate report and Web handoff | complete; blocked for independent Web review | 2 |
 
 ## S4 zero-call preflight stop
 
@@ -190,3 +190,58 @@ Status: `BATCH_BLOCKED_NEEDS_WEB_REVIEW` — S1–S3 zero-call gates complete; S
 - **STOP:** `BATCH_BLOCKED_NEEDS_WEB_REVIEW`. The exact blocker is sandbox denial
   writing Secondary Git worktree metadata, not the Go build cache or fixture.
   Do not launch another trace until Web provides a new decision.
+
+## 2026-10-11 — path-alias gate passed; S4 calls consumed; trace unverified
+
+- Primary startup synchronization completed on clean `main`; `origin/main` and
+  local HEAD were `4d77c511b27ea303fc5a65870dff1404011d1807`. The first
+  unprivileged fetch and ff-only merge hit Git metadata write denial; formal
+  permission escalation succeeded for both. No task or source files were
+  changed by synchronization.
+- Re-read the synchronized task/spec and latest clone-path Web review.
+  `go test ./cmd/fastdiag -count=1`, `go vet ./cmd/fastdiag`, and
+  `git diff --check` passed. The Secondary validate-only E32 fixture test
+  passed with zero Bootstrap calls. The authentic six-output Batch023 vector
+  artifact and held manifest hashes remained verified; the task-owned
+  independent clone was pinned to diagnostic commit
+  `4f2557062cb5c1ffb9a671bc3df67401fd7092b4`.
+- The single authorized S4 invocation reserved attempt 1
+  (`diagnostic_fast_cold`) and attempt 2 (`diagnostic_fast_traced_warm`)
+  before each call. Both records are `irrevocably_reserved_before_call`.
+  Exactly two Fast-only calls completed; this exhausts the Batch024 budget.
+  No Standard call, formal performance run, retry, or further Bootstrap ran.
+- Both decoded calls passed the native oracle: RMSE
+  `1.1795785978778852e-9`, maximum complex difference
+  `5.738790672737443e-8` against gate `1e-6`. Their Fast-reference RMSE and
+  maximum complex difference were both zero. These output checks do not
+  certify the event trace.
+- Raw trace retained outside Git:
+  `/var/folders/dn/6p3z5ctd50v_2dzzh2y4nvyc0000gn/T/fastdiag-public-e32-2533882906/raw-trace-unverified.json`,
+  177,696 bytes, 539 events, SHA-256
+  `f922587fa944da7ef07dcb94a9497505018f2fee2bc67e7f87af6d35bc3d1c74`.
+  Failure sidecar:
+  `/var/folders/dn/6p3z5ctd50v_2dzzh2y4nvyc0000gn/T/fastdiag-public-e32-2533882906/trace-failure.json`,
+  SHA-256 `59a872b2df18ca32859f4753650c3f1e14633dd79d1358b283204c4445b3f907`.
+- First structural mismatch: event sequence `61` is power `T8` with parent
+  sequence `60`, which is power `T16`; expected direct parent is the
+  `generated_powers` event sequence `59`. Validator error:
+  `power event is not nested under generated_powers`. Trace status is
+  `TRACE_UNVERIFIED`; no certified result or stage/power/rescale attribution,
+  Pareto ranking, Amdahl estimate, or performance claim is made. Observed
+  elapsed values remain raw diagnostics only.
+- Batch023 remains 14/14 spent and untouched; its separately accepted 4.225x
+  observation is historical and is not a Batch024 result. Original Standard
+  pin `5dbffbdea05394de2ca3a432ed5318aa832e3f40` and original production Fast
+  pin `2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac` remain read-only. Secondary
+  diagnostic source was not modified in this final session.
+- Final read-only repository check: Secondary `fast-qprefix` is clean at
+  `4f2557062cb5c1ffb9a671bc3df67401fd7092b4`, equal to
+  `origin/fast-qprefix`; the original Fast pinned checkout is clean at
+  `2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac`, and the task-local diagnostic
+  clone is clean. The genuine Standard commit object is present, but its old
+  registered detached checkout is unavailable/prunable, so its current
+  worktree cleanliness could not be rechecked. No Standard code or run was
+  touched in this final session.
+- Final status: `BATCH_BLOCKED_NEEDS_WEB_REVIEW`. S5 report, compact evidence,
+  and source-supported measurement-platform update are complete. Do not retry,
+  change event semantics, or spend further calls without Web direction.
