@@ -87,10 +87,10 @@ from current events. Later reports must label these visibility limits. S1 spent
 
 | Lane | Reserved/used | Maximum | Status |
 |---|---:|---:|---|
-| Standard public E32 | 0 | 6 | not started |
-| Original Fast public E32 | 0 | 6 | not started |
-| Fast-only E32 internal trace | 0 | 2 | not started |
-| **Total** | **0** | **14** | within budget |
+| Standard public E32 | 6 | 6 | spent; six outputs passed oracle |
+| Original Fast public E32 | 6 | 6 | spent; six outputs passed oracle |
+| Fast-only E32 internal trace | 2 | 2 | spent; event-tree gate failed after both calls |
+| **Total** | **14** | **14** | exhausted; do not retry |
 
 ## Checkpoint journal
 
@@ -101,10 +101,10 @@ from current events. Later reports must label these visibility limits. S1 spent
 ## S2 — reusable six-sample and public E32 trace adapters (zero Bootstrap calls)
 
 **Status:** implementation and zero-call tests complete; Secondary test-only
-adapter and its pre-reservation fixture-validation gate are committed and
-pushed through `196c6839284eb1bf59715d1fe46fe31772edc875`. Primary S2 core is
-locally committed as `8a059e54379a41c3d8aff06ba27016bc74201d1e`; a follow-up
-Primary checkpoint finalizes the zero-call validation ordering.
+adapter and pre-reservation fixture-validation gate are committed and pushed
+through `f7eb9f88d0c877331e62287508c541a1e1147bdc`. Primary S2 core is locally
+committed as `8a059e54379a41c3d8aff06ba27016bc74201d1e`, with validation-order
+follow-up `6e938918442c409faa6d32e159c7a3f7a1041f7a`.
 No Bootstrap was invoked. The only Secondary source change is a new
 `fastdiag`-tagged test file; no non-test Secondary source, API, arithmetic,
 Standard code, `AGENTS.md`, or `CURRENT_TASK.md` was changed.
@@ -194,4 +194,71 @@ outside Git, with Level 0, degree 1, Scale `2^45`, one active Q-prefix row,
 preliminary only: the subsequent Primary validate-only ordering repair changes
 the Primary commit, so S3 must regenerate and revalidate preflight artifacts
 against the final committed Primary source before any expensive Bootstrap call.
-No call tokens were reserved; the global ledger remains **0/14**.
+No call tokens were reserved in this preliminary run. Its output is superseded
+by the final provenance-bound run below.
+
+### S3 final preflight and bounded repeatability result — Primary `6e93891`
+
+The final zero-call preflight was regenerated after the Primary source commit.
+Both backends recorded exactly the eight required checkpoints, all individual
+oracles passed, and `compare-public` returned `PASS` with matched environment
+and 8/8 matched states. Both had `bootstrap_budget=0` and
+`actual_bootstrap_calls=0`. Provenance: Standard
+`5dbffbdea05394de2ca3a432ed5318aa832e3f40`; original production Fast
+`2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac`; diagnostic Secondary
+`f7eb9f88d0c877331e62287508c541a1e1147bdc`; Primary
+`6e938918442c409faa6d32e159c7a3f7a1041f7a`. The shared LogN13/E32, 4096-slot
+environment was Go 1.26.4 / darwin-arm64 / Apple M4 / NumCPU 10 /
+GOMAXPROCS 10 with GOGC, GOMEMLIMIT and GODEBUG at runtime defaults. The
+capacity gate has `rescale_bound=2271135713118062`, `q0=36028797018652673`,
+and `2*B < q0`.
+
+The uninstrumented formal lanes completed their exact six calls each. Every
+Standard and Fast output passed its native plaintext oracle and ended at
+Level 1, Scale `2^45`, two Q-prefix rows; each lane used copies of one held
+input fingerprint. The six paired Bootstrap comparisons all passed the
+`1e-6` max-complex gate with matched state. The worst paired max-complex
+difference was `4.062428762032295e-8` (RMSE `5.0361026156396345e-9`). Warm
+timing samples (ns) were:
+
+| Backend | Cold (ns) | Warm samples (ns) | Warm median (ns) | Warm allocation median |
+|---|---:|---|---:|---:|
+| Standard | 356006584 | 303893791, 305669291, 306636208, 309936084, 310854375 | 306636208 | 91750008 B / 35024 allocs |
+| Fast | 527153500 | 72302458, 74076542, 72580250, 72008291, 73113500 | 72580250 | 7505112 B / 8085 allocs |
+
+The warm median ratio is `4.225x` for this pinned profile/environment only;
+Fast remains the intentionally insecure zero-secret backend and this is not a
+secure-FHE equivalence claim. Standard `GenEvaluationKeys` / CKKS evaluator /
+Bootstrap evaluator construction were 403513666 / 1861250 / 354975917 ns;
+Fast construction was 823817666 / 900958 / 2498792 ns.
+
+### S3 trace lane — BLOCKED; reservation fully consumed
+
+The first unsandboxed launch failed before creating a detached checkout and
+before reserving tokens; a formal permission escalation then allowed the
+trace runner to create an isolated, clean checkout at diagnostic commit
+`f7eb9f88d0c877331e62287508c541a1e1147bdc`. Its validate-only fixture gate
+passed. The runner reserved both diagnostic tokens before launching the test.
+The test completed its untraced cold and traced warm Bootstrap calls, and both
+outputs passed their decoded-oracle and Fast-reference checks. It then failed
+the first Rescale event-tree assertion: the Rescale parent had only one direct
+child, `preflight`; the validator required exactly `preflight` and
+`materialization`. The failure occurred at
+`circuits/ckks/bootstrapping/fastdiag_public_e32_test.go:328` / `:492`, before
+the raw event JSON was written. The two reserved calls are irrevocably spent;
+the global 14-call budget is exhausted and this trace must not be retried.
+
+Preserved diagnostic checkout:
+`/var/folders/dn/6p3z5ctd50v_2dzzh2y4nvyc0000gn/T/fastdiag-public-e32-4268150718/secondary-diagnostic`
+(clean, HEAD `f7eb9f88d0c877331e62287508c541a1e1147bdc`). The warm CPU profile
+was written before the event validation failed at
+`/var/folders/dn/6p3z5ctd50v_2dzzh2y4nvyc0000gn/T/fastdiag-public-e32-4268150718/profiles/warm-cpu.pprof`
+(3131 bytes, SHA-256
+`c12b7e3bcb63fe935e5750573f5019a4cb102640328f90b5d63cbebc35755162`). No raw
+event JSON or post-warm heap profile was produced. Since the accepted event
+tree and Rescale closure are unavailable, no stage/power/rescale Pareto,
+closure, pprof attribution, or Amdahl bound is reported. Classification:
+`BATCH_BLOCKED_NEEDS_WEB_REVIEW`; no more Bootstrap calls are authorized.
+
+The earlier S2 statement that the ledger remained 0/14 describes its state at
+that checkpoint only; the final authoritative ledger above is 14/14.

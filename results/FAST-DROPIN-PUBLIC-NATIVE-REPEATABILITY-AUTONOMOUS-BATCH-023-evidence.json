@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "task": "FAST-DROPIN-PUBLIC-NATIVE-REPEATABILITY-AUTONOMOUS-BATCH-023",
+  "status": "BATCH_BLOCKED_NEEDS_WEB_REVIEW",
+  "provenance": {
+    "primary_commit": "6e938918442c409faa6d32e159c7a3f7a1041f7a",
+    "primary_measurement_source_sha256": "b63fef5bbbdfe1e679b2e50ab66e0a5c43afefc526bd2228b16b7541ae01ea63",
+    "standard_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+    "formal_fast_commit": "2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac",
+    "diagnostic_secondary_commit": "f7eb9f88d0c877331e62287508c541a1e1147bdc",
+    "diagnostic_production_go_tree_sha256": "a1ddabc7bfcdefcb8e0e0e2028966184f24d3fc4c68530f8e2919f0507a3aa00",
+    "diagnostic_test_adapter_sha256": "43bf6e467c9e6f4f86ad54c0fa29f708747bc76c7aa78c470671d8323b88c0bb",
+    "config_sha256": "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98",
+    "workload_sha256": "00b70a2e77887c7d6a41db1859246f6513f2c984915de648734e5dd8c584cf74",
+    "q_prefix_sha256": "1f045e603a856968779d62e045a037274bba08cbfce8b1dd3dec2828f1f6a46b",
+    "input_sha256": "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285"
+  },
+  "environment": {
+    "go": "1.26.4",
+    "os_arch": "darwin/arm64",
+    "cpu": "Apple M4",
+    "num_cpu": 10,
+    "gomaxprocs": 10,
+    "gc_settings": "runtime defaults"
+  },
+  "bootstrap_budget": {
+    "standard": {"calls": 6, "limit": 6, "oracles": "pass"},
+    "formal_fast": {"calls": 6, "limit": 6, "oracles": "pass"},
+    "diagnostic_fast": {"calls": 2, "limit": 2, "oracles": "pass; event validation failed afterward"},
+    "total": {"calls": 14, "limit": 14, "exhausted": true}
+  },
+  "preflight": {
+    "standard_checkpoints_passed": 8,
+    "fast_checkpoints_passed": 8,
+    "matched_pair": true,
+    "bound_b": 2271135713118062,
+    "q0": 36028797018652673,
+    "two_b_below_q0": true
+  },
+  "formal_repeatability": {
+    "status": "PASS",
+    "paired_comparisons": {"passed": 6, "total": 6, "max_complex_gate": 1e-6},
+    "state": {"level": 1, "scale_log2": 45, "q_prefix_rows": 2},
+    "complex_rmse": 5.0361026156396345e-9,
+    "max_complex_difference": 4.062428762032295e-8,
+    "worst_slot": 0,
+    "standard": {
+      "cold_ns": 356006584,
+      "warm_ns": [303893791, 305669291, 306636208, 309936084, 310854375],
+      "warm_median_ns": 306636208,
+      "warm_median_bytes": 91750008,
+      "warm_median_allocs": 35024,
+      "constructors_ns": [403513666, 1861250, 354975917]
+    },
+    "fast": {
+      "cold_ns": 527153500,
+      "warm_ns": [72302458, 74076542, 72580250, 72008291, 73113500],
+      "warm_median_ns": 72580250,
+      "warm_median_bytes": 7505112,
+      "warm_median_allocs": 8085,
+      "constructors_ns": [823817666, 900958, 2498792]
+    },
+    "warm_median_ratio": 4.225
+  },
+  "trace": {
+    "build_tag": "fastdiag",
+    "first_failure": {
+      "event": "rescale",
+      "observed_children": ["preflight"],
+      "expected_children": ["preflight", "materialization"],
+      "test": "circuits/ckks/bootstrapping/fastdiag_public_e32_test.go:328",
+      "assertion": "circuits/ckks/bootstrapping/fastdiag_public_e32_test.go:492",
+      "raw_event_json_written": false
+    },
+    "trace_overhead": null,
+    "event_closure": null,
+    "pareto": null,
+    "amdahl": null,
+    "warm_cpu_profile": {
+      "bytes": 3131,
+      "sha256": "c12b7e3bcb63fe935e5750573f5019a4cb102640328f90b5d63cbebc35755162"
+    },
+    "heap_profile": "not produced",
+    "blocker": "Evidence does not distinguish a missing span from an overly strict validator."
+  },
+  "tests": {
+    "primary_focused_tests": "PASS",
+    "primary_focused_vet": "PASS",
+    "primary_perf_standard_tagged": "PASS",
+    "primary_perf_fast_tagged": "PASS",
+    "secondary_synthetic_event_test": "PASS",
+    "secondary_fastdiag_compile_only": "PASS",
+    "report_diff_check": "PASS",
+    "measurement_platform_updated": false
+  },
+  "web_review_candidate": "Inspect the first Rescale event producer and validator expectation, followed by zero-call event-shape tests. Any new Bootstrap requires explicit new task/budget authorization."
+}
