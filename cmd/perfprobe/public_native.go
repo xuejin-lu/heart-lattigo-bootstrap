@@ -51,6 +51,7 @@ type publicBackend struct {
 type publicCheckpoint struct {
 	Name               string               `json:"name"`
 	State              ciphertextState      `json:"state"`
+	DecodePath         string               `json:"decode_path"`
 	PhysicalRowLengths [][]int              `json:"physical_row_lengths_by_component"`
 	RowSHA256          [][]string           `json:"active_row_sha256_by_component"`
 	FastCompactPrefix  bool                 `json:"fast_compact_prefix_layout"`
@@ -220,8 +221,11 @@ func runPublicNativePreflight(opts cliOptions, configHash string, residual ckks.
 	checkpoints := make([]publicCheckpoint, 0, 8)
 	vectorMap := make(map[string][]complexValue, 8)
 	addCheckpoint := func(name string, ct *rlwe.Ciphertext, expected []complex128, fastCompactOutput bool) error {
-		decoded, phase, decodeErr := measurePublicPhase("native_decrypt_decode_"+name, func() ([]complex128, error) {
-			return backend.decode(ct)
+		var decodePath string
+		decoded, phase, decodeErr := measurePublicPhase("checkpoint_decode_"+name, func() ([]complex128, error) {
+			values, path, err := backend.decode(ct)
+			decodePath = path
+			return values, err
 		})
 		if decodeErr != nil {
 			return fmt.Errorf("native Level/Scale decode %s: %w", name, decodeErr)
@@ -231,6 +235,7 @@ func runPublicNativePreflight(opts cliOptions, configHash string, residual ckks.
 		if cpErr != nil {
 			return cpErr
 		}
+		cp.DecodePath = decodePath
 		if !cp.OraclePass {
 			return fmt.Errorf("%s cleartext oracle max %.12g exceeds %.12g", name, cp.Oracle.MaxComplexDifference, publicNumericalGate)
 		}
@@ -483,23 +488,58 @@ func (b *publicBackend) encryptAtLevel(values []complex128, scale rlwe.Scale, le
 	return ct, phase, err
 }
 
-func (b *publicBackend) decode(ct *rlwe.Ciphertext) ([]complex128, error) {
+func (b *publicBackend) decode(ct *rlwe.Ciphertext) ([]complex128, string, error) {
 	if ct == nil || ct.MetaData == nil || ct.Level() < 0 || ct.Degree() < 1 {
-		return nil, errors.New("native decode requires a non-nil ciphertext with metadata")
+		return nil, "", errors.New("native decode requires a non-nil ciphertext with metadata")
 	}
 	params, secret := b.full, b.bootstrapSecret
 	if ct.Level() <= b.residual.MaxLevel() {
 		params, secret = b.residual, b.secret
 	}
+	if b.name == "fast" {
+		c1Nonzero, err := isCiphertextComponentNonzero(ct, 1)
+		if err != nil {
+			return nil, "", err
+		}
+		if c1Nonzero {
+			return nil, "", errors.New("Fast zero-secret checkpoint has a nonzero c1 component")
+		}
+	}
+	if b.name == "fast" && ct.Level() > 0 {
+		if len(ct.Value) != 2 || !ct.IsNTT || ct.IsMontgomery {
+			return nil, "", errors.New("Fast Q-prefix checkpoint requires degree-one NTT non-Montgomery ciphertext storage")
+		}
+		rows := min(ct.Level()+1, 4)
+		prefixLevel := rows - 1
+		plain := ckks.NewPlaintext(b.full, prefixLevel)
+		*plain.MetaData = *ct.MetaData
+		if len(ct.Value[0].Coeffs) < rows || len(plain.Value.Coeffs) < rows {
+			return nil, "", errors.New("Fast Q-prefix decode has incomplete authoritative c0 rows")
+		}
+		for row := 0; row < rows; row++ {
+			if len(ct.Value[0].Coeffs[row]) != ct.N() || len(plain.Value.Coeffs[row]) != ct.N() {
+				return nil, "", fmt.Errorf("Fast Q-prefix decode q%d row length does not match N=%d", row, ct.N())
+			}
+			copy(plain.Value.Coeffs[row], ct.Value[0].Coeffs[row])
+		}
+		decoded := make([]complex128, b.full.MaxSlots())
+		if err := ckks.NewEncoder(b.full).Decode(plain, decoded); err != nil {
+			return nil, "", err
+		}
+		if len(decoded) < b.maxSlots {
+			return nil, "", errors.New("Fast Q-prefix Decode returned fewer slots than the frozen fixture")
+		}
+		return decoded[:b.maxSlots], "Fast c0 projection to the authoritative Q-prefix plaintext (zero-secret measurement adapter)", nil
+	}
 	plain := rlwe.NewDecryptor(params, secret).DecryptNew(ct)
 	decoded := make([]complex128, params.MaxSlots())
 	if err := ckks.NewEncoder(params).Decode(plain, decoded); err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	if len(decoded) < b.maxSlots {
-		return nil, errors.New("native Decode returned fewer slots than the frozen fixture")
+		return nil, "", errors.New("native Decode returned fewer slots than the frozen fixture")
 	}
-	return decoded[:b.maxSlots], nil
+	return decoded[:b.maxSlots], "rlwe.NewDecryptor(...).DecryptNew -> ckks.NewEncoder.Decode", nil
 }
 
 func makePublicCheckpoint(backend *publicBackend, name string, ct *rlwe.Ciphertext, decoded, expected []complex128, q []uint64, fastCompactOutput bool) (publicCheckpoint, error) {
@@ -688,14 +728,21 @@ func validatePublicPairArtifacts(standard, fast publicNativeDocument, standardVe
 		}
 	}
 	for _, checkpoint := range standard.Checkpoints {
-		if checkpoint.FastCompactPrefix {
-			return errors.New("Standard artifact incorrectly claims Fast compact-prefix storage")
+		if checkpoint.FastCompactPrefix || checkpoint.DecodePath != "rlwe.NewDecryptor(...).DecryptNew -> ckks.NewEncoder.Decode" {
+			return errors.New("Standard artifact has an unexpected compact-storage or native-decrypt declaration")
 		}
 	}
 	for _, checkpoint := range fast.Checkpoints {
 		wantCompact := checkpoint.Name != "encrypt_a_level5" && checkpoint.Name != "encrypt_b_level5" && checkpoint.Name != "encrypt_c_q5_level5"
 		if checkpoint.FastCompactPrefix != wantCompact {
 			return fmt.Errorf("Fast checkpoint %s has unexpected compact-prefix declaration", checkpoint.Name)
+		}
+		wantDecode := "Fast c0 projection to the authoritative Q-prefix plaintext (zero-secret measurement adapter)"
+		if checkpoint.Name == "drop_level0" {
+			wantDecode = "rlwe.NewDecryptor(...).DecryptNew -> ckks.NewEncoder.Decode"
+		}
+		if checkpoint.DecodePath != wantDecode {
+			return fmt.Errorf("Fast checkpoint %s has unexpected decode path", checkpoint.Name)
 		}
 	}
 	return nil

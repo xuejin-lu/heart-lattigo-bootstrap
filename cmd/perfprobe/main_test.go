@@ -74,7 +74,11 @@ func TestPublicPairProvenanceRequiresPinnedCoverageAndCleanSources(t *testing.T)
 		vectors := make(map[string][]complexValue, len(checkpointNames))
 		for _, name := range checkpointNames {
 			compact := backend == "fast" && name != "encrypt_a_level5" && name != "encrypt_b_level5" && name != "encrypt_c_q5_level5"
-			checkpoints = append(checkpoints, publicCheckpoint{Name: name, FastCompactPrefix: compact, OraclePass: true, Oracle: vectorMetrics{MaxComplexDifference: 0}})
+			decodePath := "rlwe.NewDecryptor(...).DecryptNew -> ckks.NewEncoder.Decode"
+			if backend == "fast" && name != "drop_level0" {
+				decodePath = "Fast c0 projection to the authoritative Q-prefix plaintext (zero-secret measurement adapter)"
+			}
+			checkpoints = append(checkpoints, publicCheckpoint{Name: name, DecodePath: decodePath, FastCompactPrefix: compact, OraclePass: true, Oracle: vectorMetrics{MaxComplexDifference: 0}})
 			vectors[name] = []complexValue{{Real: 0.25}}
 		}
 		params := perfmeasure.EffectiveParameters{EphemeralSecretWeight: 32, InputSlots: 1 << 12}
