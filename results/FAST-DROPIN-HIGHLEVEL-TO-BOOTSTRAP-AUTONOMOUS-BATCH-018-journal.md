@@ -43,3 +43,7 @@ The separate accepted 016 profile is not substituted: it has six Q primes `[55,3
 | B — matched public high-Level compact preflight | NOT STARTED | 0 | Only after A; stop on any profile, key, capacity, row-authority, native-decrypt or numerical gate failure |
 | C — one-shot public Bootstrap pair | NOT STARTED | 0 | Only after both B runs pass; at most one call per backend |
 | D — artifacts, self-review and safe Primary handoff | NOT STARTED | 0 | Batch boundary only |
+
+### Runner self-review correction before accepted B evidence
+
+The first paired runner processes reached the explicit Bootstrap wait gate, but the pair validator incorrectly required the full-profile Level-5 `EncryptNew` inputs themselves to have compact backing. The pinned Fast public encryption legitimately produced six active logical rows; the authorized Q-prefix operations are the step that must leave q4+ dormant. Both processes were explicitly aborted at the gate before any Bootstrap call (`Standard=0/1`, `Fast=0/1`). The validator was corrected to require the existing observer and zero-c1 contract on the encryption inputs, and to require compact backing only on the public Add/Rotate/DropLevel outputs. A focused regression test covers this distinction. These aborted raw runs are not accepted measurement evidence; the matched B preflight will be rerun from the corrected clean commit.

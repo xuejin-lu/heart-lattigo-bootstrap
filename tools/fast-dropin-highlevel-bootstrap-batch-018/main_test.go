@@ -39,6 +39,32 @@ func TestStrictCapacityRejectsEquality(t *testing.T) {
 	}
 }
 
+func TestFastCheckpointAllowsFullProfileInputsButRequiresCompactOperationOutputs(t *testing.T) {
+	fullRows := []int{8192, 8192, 8192, 8192, 8192, 8192}
+	input := checkpoint{
+		ID: "encrypt_a_level5",
+		State: state{
+			Level: 5, Degree: 1, Scale: "35184372088832", AuthoritativeRows: 4,
+			RowLengths: [][]int{fullRows, fullRows}, C1Zero: true,
+		},
+		Capacity: &capacityEvidence{Rows: 4, StrictFit: true, ObserverInvoked: true},
+	}
+	if err := validateFastCheckpoint(input, false, 1<<13); err != nil {
+		t.Fatalf("full-profile encryption input should be valid before Q-prefix operations: %v", err)
+	}
+	if err := validateFastCheckpoint(input, true, 1<<13); err == nil {
+		t.Fatal("full-profile encryption input must not be mistaken for a compact operation output")
+	}
+
+	compactRows := []int{8192, 8192, 8192, 8192, 0, 0}
+	output := input
+	output.ID = "add_level5"
+	output.State.RowLengths = [][]int{compactRows, compactRows}
+	if err := validateFastCheckpoint(output, true, 1<<13); err != nil {
+		t.Fatalf("Q-prefix Add output should be compact: %v", err)
+	}
+}
+
 func TestBatch018ProfileMatchesCanonical017(t *testing.T) {
 	originalDir, err := os.Getwd()
 	if err != nil {

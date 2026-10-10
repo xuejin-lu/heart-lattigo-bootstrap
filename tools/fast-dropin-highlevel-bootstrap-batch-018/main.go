@@ -821,9 +821,29 @@ func validateRunPair(standard, fast runEvidence) error {
 	}
 	for _, id := range []string{"encrypt_a_level5", "encrypt_b_level5", "add_level5", "rotate_level5", "drop_to_residual_level0"} {
 		cp, ok := findCheckpoint(fast.Checkpoints, id)
-		if !ok || !cp.State.C1Zero || !compactAtPrefix(cp.State, 1<<13) || cp.Capacity == nil || !cp.Capacity.ObserverInvoked || !cp.Capacity.StrictFit {
-			return fmt.Errorf("Fast checkpoint %s did not prove compact q-prefix, zero c1 and strict observed capacity", id)
+		if !ok {
+			return fmt.Errorf("Fast checkpoint %s is missing", id)
 		}
+		requireCompact := id != "encrypt_a_level5" && id != "encrypt_b_level5"
+		if err := validateFastCheckpoint(cp, requireCompact, 1<<13); err != nil {
+			return fmt.Errorf("Fast checkpoint %s: %w", id, err)
+		}
+	}
+	return nil
+}
+
+func validateFastCheckpoint(cp checkpoint, requireCompact bool, n int) error {
+	if cp.State.Level < 0 || cp.State.AuthoritativeRows != qPrefixWidth(cp.State.Level) {
+		return errors.New("logical Level and authoritative Q-prefix width disagree")
+	}
+	if !cp.State.C1Zero {
+		return errors.New("authoritative c1 rows are not zero")
+	}
+	if requireCompact && !compactAtPrefix(cp.State, n) {
+		return errors.New("output did not leave non-authoritative Q rows dormant")
+	}
+	if cp.Capacity == nil || cp.Capacity.Rows != cp.State.AuthoritativeRows || !cp.Capacity.ObserverInvoked || !cp.Capacity.StrictFit {
+		return errors.New("existing Q-prefix capacity observer did not prove strict fit")
 	}
 	return nil
 }
