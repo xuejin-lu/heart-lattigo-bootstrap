@@ -1,0 +1,28 @@
+# Independent Web review — Measurement Platform Repair Batch 021
+
+**Date:** 2026-10-10 (Asia/Taipei).
+**Verdict:** **ACCEPT BOUNDED PLATFORM REPAIR + ZERO-BOOTSTRAP PUBLIC-NATIVE E32 NUMERICAL PREFLIGHT; REQUIRE PAIR-ARTIFACT INTEGRITY REPAIR BEFORE NEW EXPENSIVE BOOTSTRAP.**
+**Primary reviewed:** `main@b82f24d4c14483b0a4635e8e7b135ccd08eb3f3a` (verified remote head).
+**Fast production pin:** `2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac` (reported pinned detached, clean); current Secondary branch HEAD `d463c336d511646994ba72f8dcfda5179431c430` is **AGENTS-only** beyond the original production pin.
+**True Standard:** `5dbffbdea05394de2ca3a432ed5318aa832e3f40` read-only.
+**Method:** GitHub code and artifact review, NOT independent Go execution or raw-vector regeneration.
+
+## Scope accepted
+
+Six Primary commits from `208da8bbb3b4213744e607d70428bb48888f03a2` through `b82f24d...` extend the existing Primary `cmd/perfprobe`, `internal/perfmeasure` and `internal/numericalmetrics`; they do not add a new independent benchmark repo or modify Secondary production/Standard. The accepted public/native formal mode is explicitly `--mode public-native --ephemeral-secret-weight 32 --bootstrap-budget 0` with the exact frozen Batch019 LogN13 E32 Q/P, 4096-slot input and operation sequence. Historical E0/direct-c0/`NewFastEvaluator` path remains explicitly labelled `legacy-diagnostic`; separate input-only no-Bootstrap smoke passed. `ParametersFromConfigWithE` supports an explicit E while present **Fast source** accepts E=0/32; the current formal preflight fixture is **fixed E32**, not a demonstration of arbitrary E support.
+
+Standard and Fast use the *same Primary source* via separately pinned temporary Go modfiles / `GOWORK=off`, matching source/config/QP/input/workload fingerprints; no Standard code changes or removal of measurement tools during checkout switch. Formal Standard genuine native encryption/keygen and Fast public zero-secret EncryptNew/CKKS evaluator/GenEvaluationKeys/NewEvaluator dispatch were exercised and checked; Fast c1=0 is observed, not manually patched. Fast high-level q4/q5 compact authority begins at Add; high-level measurement uses zero-secret prefix decoder, native DecryptNew only at Level0. No high-Level-native decrypt compatibility proof.
+
+Eight checkpoint pairs pass original 1e-6 oracle gate with reported direct max RMSE `1.474977190390055e-11`, max complex difference `5.611470433440537e-11`. Terminal conservative `2B=4542271426236124 < q0=36028797018652673`; all q0123 intermediate bounds pass. Go tests/vet and both build-tag tests reported passing. Actual Bootstrap calls **zero**, so there is no public Bootstrap numerical acceptance, cold/warm timing or internal Fast E32 trace proof from this batch.
+
+The platform now has `bootstrapBudget.invoke` which reserves exclusive per-attempt JSON before a call, counts errors as attempts, and explicit mode budgets; stub tests cover 0/1/2 attempts. Legacy full measurement still requires its historical warmups/repetitions/trials, but now separately demands a sufficient explicit budget. The platform refit is meaningful; do NOT treat the old `perfprobe` legacy/direct-c0 timings as a new formal Standard-vs-Fast comparison.
+
+## Independently found artifact-integrity weakness
+
+The committed `cmd/perfprobe/public_native.go` records `publicCheckpoint.DecodedSHA256` for every decoded vector. But `validatePublicPairArtifacts` and `runPublicCompare` do **not** verify that a vector loaded from the separately persisted `publicVectorDocument.Checkpoints[name]` matches the corresponding checkpoint's `DecodedSHA256`. The pair comparator also checks only that decoded vectors are nonempty and have equal lengths; it does not require the frozen 4096 slots. Current `TestPublicPairProvenanceRequiresPinnedCoverageAndCleanSources` constructs **single-element vectors** with no matching checkpoint hash and still accepts the fixture. This is **P1 evidence-integrity debt**, not direct evidence that real 021 arithmetic failed. Fix before accepting future paired numerical evidence as independently reproducible.
+
+The 895-line new `cmd/perfprobe/public_native.go` is a workload/mode adapter within the existing package and reuses `compareVectors`, `perfmeasure`, `numericalmetrics`; nonetheless it now owns significant mode-specific orchestration/serialization. Future work should refactor common metric/provenance helpers rather than growing a second parallel stopwatch/report system. `fastdiag` E32 in-circuit stage tracing remains explicitly unsupported, not secretly replaced by a Standard-hook shim.
+
+## Web decision and next authority
+
+Accept 021 within its stated **zero-call public preflight** scope. Preserve historical 021 source and evidence. Next bounded autonomous Batch022 must (A) add fail-closed 4096-length and per-checkpoint `DecodedSHA256` binding (and regression tests) *first*, and only then (B) extend existing public-native `perfprobe` Bootstrap path using the existing `bootstrapBudget` + `measurePhase`/phase metadata, with exactly at most two E32 Public Bootstrap calls per backend total: cold first-call acceptance and warmed second-call measurement on logically identical cloned inputs; (C) compare real native outputs with current 1e-6 gates and matched source hashes, clean call budget, no library changes; and (D) report cold+warm/constructor time and Go allocations with proper lazy Fast vs eager Standard interpretation. **No additional separate acceptance smoke** which would spend a fifth/future call. One warm call per backend is descriptive, not statistical speedup. If A/B have blockers, stop without expensive calls.
