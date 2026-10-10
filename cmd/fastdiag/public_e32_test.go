@@ -1,0 +1,204 @@
+package main
+
+import (
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
+	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
+
+	"github.com/stretchr/testify/require"
+	"github.com/xuejin-lu/heart-lattigo-bootstrap/internal/perfmeasure"
+)
+
+func TestValidatePublicE32FixturePinsHeldInputAndFastVectors(t *testing.T) {
+	root := t.TempDir()
+	parameters := []byte("serialized public E32 parameters")
+	ciphertext := []byte("serialized held Level0 ciphertext")
+	require.NoError(t, os.WriteFile(filepath.Join(root, "parameters.bin"), parameters, 0o600))
+	require.NoError(t, os.WriteFile(filepath.Join(root, "ciphertext.bin"), ciphertext, 0o600))
+	parametersSum, ciphertextSum := sha256.Sum256(parameters), sha256.Sum256(ciphertext)
+	decoded := make([]complex128, 1<<12)
+	input := make([]publicE32Vector, len(decoded))
+	for index := range decoded {
+		input[index] = publicE32Vector{Real: real(decoded[index]), Imag: imag(decoded[index])}
+	}
+	vectors := publicE32Vectors{
+		SchemaVersion: "fast-standard-public-native-repeatability-vectors.v1", Mode: "public-native-repeatability",
+		Backend: "fast", BackendCommit: e32ProductionFastCommit, PrimaryCommit: "primary",
+		SourceSHA256: "source", ConfigSHA256: "config", QPSHA256: "qp", InputSHA256: "input", WorkloadSHA256: "workload",
+		Checkpoints:      map[string][]publicE32Vector{"drop_level0": input},
+		BootstrapOutputs: map[string][]publicE32Vector{},
+	}
+	for _, name := range []string{"bootstrap_first_cold", "bootstrap_warm_01", "bootstrap_warm_02", "bootstrap_warm_03", "bootstrap_warm_04", "bootstrap_warm_05"} {
+		vectors.BootstrapOutputs[name] = input
+	}
+	vectorsBytes, err := json.Marshal(vectors)
+	require.NoError(t, err)
+	vectorsPath := filepath.Join(root, "vectors.json")
+	require.NoError(t, os.WriteFile(vectorsPath, vectorsBytes, 0o600))
+	manifest := publicE32FixtureManifest{
+		SchemaVersion: "fast-public-e32-trace-fixture.v1", Profile: "logn13-e32-public-native", Backend: "fast",
+		BackendCommit: e32ProductionFastCommit, PrimaryCommit: "primary", PrimarySourceSHA256: "source",
+		ConfigSHA256: "config", QPSHA256: "qp", InputSHA256: "input", WorkloadSHA256: "workload",
+		ParametersFile: "parameters.bin", ParametersSHA256: hex.EncodeToString(parametersSum[:]),
+		CiphertextFile: "ciphertext.bin", CiphertextSHA256: hex.EncodeToString(ciphertextSum[:]),
+		DecodedSHA256: perfmeasure.Fingerprint(decoded), State: publicE32CipherState{Level: 0, Degree: 1, QPrefixRows: 1, Scale: "2^45", PrefixQ: "q0"},
+		NumericalGate: 1e-6, EphemeralSecretWeight: 32,
+	}
+	manifestBytes, err := json.Marshal(manifest)
+	require.NoError(t, err)
+	manifestPath := filepath.Join(root, "manifest.json")
+	require.NoError(t, os.WriteFile(manifestPath, manifestBytes, 0o600))
+	gotManifestBytes, gotManifest, gotVectorsBytes, gotVectors, err := validatePublicE32Fixture(manifestPath, vectorsPath, "primary")
+	require.NoError(t, err)
+	require.Equal(t, manifestBytes, gotManifestBytes)
+	require.Equal(t, manifest.CiphertextSHA256, gotManifest.CiphertextSHA256)
+	require.Equal(t, vectorsBytes, gotVectorsBytes)
+	require.Len(t, gotVectors.BootstrapOutputs, 6)
+
+	vectors.BackendCommit = "wrong-fast-commit"
+	vectorsBytes, err = json.Marshal(vectors)
+	require.NoError(t, err)
+	require.NoError(t, os.WriteFile(vectorsPath, vectorsBytes, 0o600))
+	_, _, _, _, err = validatePublicE32Fixture(manifestPath, vectorsPath, "primary")
+	require.ErrorContains(t, err, "do not match")
+}
+
+func TestPublicE32TraceReservationsPrecedeSubprocess(t *testing.T) {
+	base := filepath.Join(t.TempDir(), "trace")
+	launched := false
+	err := runReservedPublicE32Trace(base, func() error {
+		launched = true
+		for index := 1; index <= 2; index++ {
+			path := fmt.Sprintf("%s.bootstrap-attempt-%02d.json", base, index)
+			data, readErr := os.ReadFile(path)
+			require.NoError(t, readErr)
+			var reservation struct {
+				SchemaVersion string `json:"schema_version"`
+				Index         int    `json:"attempt_index"`
+				Budget        int    `json:"bootstrap_budget"`
+				Status        string `json:"status"`
+			}
+			require.NoError(t, json.Unmarshal(data, &reservation))
+			require.Equal(t, index, reservation.Index)
+			require.Equal(t, 2, reservation.Budget)
+			require.Equal(t, "irrevocably_reserved_before_call", reservation.Status)
+		}
+		return nil
+	})
+	require.NoError(t, err)
+	require.True(t, launched)
+
+	blockedBase := filepath.Join(t.TempDir(), "blocked")
+	secondPath := blockedBase + ".bootstrap-attempt-02.json"
+	require.NoError(t, os.WriteFile(secondPath, []byte("preserve"), 0o600))
+	launched = false
+	err = runReservedPublicE32Trace(blockedBase, func() error { launched = true; return nil })
+	require.Error(t, err)
+	require.False(t, launched)
+	firstBytes, readErr := os.ReadFile(blockedBase + ".bootstrap-attempt-01.json")
+	require.NoError(t, readErr, "the first token remains irrevocably consumed after partial reservation")
+	require.NotEmpty(t, firstBytes)
+	secondBytes, readErr := os.ReadFile(secondPath)
+	require.NoError(t, readErr)
+	require.Equal(t, "preserve", string(secondBytes))
+}
+
+func TestReadProfileArtifactChecksPathAndDigest(t *testing.T) {
+	dir := t.TempDir()
+	data := []byte("scoped profile fixture")
+	path := filepath.Join(dir, "warm-cpu.pprof")
+	require.NoError(t, os.WriteFile(path, data, 0o600))
+	sum := sha256.Sum256(data)
+	gotPath, err := readProfileArtifact(dir, filepath.Base(path), hex.EncodeToString(sum[:]))
+	require.NoError(t, err)
+	require.Equal(t, path, gotPath)
+	_, err = readProfileArtifact(dir, "../warm-cpu.pprof", hex.EncodeToString(sum[:]))
+	require.ErrorContains(t, err, "filename")
+	_, err = readProfileArtifact(dir, filepath.Base(path), strings.Repeat("0", 64))
+	require.ErrorContains(t, err, "SHA-256 mismatch")
+}
+
+func TestValidatePublicE32EventsChecksHierarchyAndRequiredPowers(t *testing.T) {
+	events := publicE32TestEvents()
+	require.NoError(t, validatePublicE32Events(events))
+
+	missingParent := append([]Event(nil), events...)
+	missingParent[len(missingParent)-1].ParentSequence = 999
+	require.ErrorContains(t, validatePublicE32Events(missingParent), "missing parent")
+
+	missingPower := append([]Event(nil), events...)
+	for index := range missingPower {
+		if missingPower[index].Scope == "power" && missingPower[index].Power != nil && *missingPower[index].Power == 16 {
+			missingPower = append(missingPower[:index], missingPower[index+1:]...)
+			break
+		}
+	}
+	require.ErrorContains(t, validatePublicE32Events(missingPower), "missing generated Chebyshev power T16")
+
+	duplicateSequence := append([]Event(nil), events...)
+	duplicateSequence[len(duplicateSequence)-1].Sequence = duplicateSequence[0].Sequence
+	require.ErrorContains(t, validatePublicE32Events(duplicateSequence), "duplicate fastdiag event sequence")
+}
+
+func TestValidatePublicE32RawTraceRequiresExactMatchedTwoCalls(t *testing.T) {
+	manifest := publicE32FixtureManifest{
+		SchemaVersion: "fast-public-e32-trace-fixture.v1", Profile: "logn13-e32-public-native", Backend: "fast",
+		BackendCommit: e32ProductionFastCommit, PrimaryCommit: "primary", PrimarySourceSHA256: "source",
+		ConfigSHA256: "config", QPSHA256: "qp", InputSHA256: "input", WorkloadSHA256: "workload",
+		CiphertextSHA256: "ciphertext", DecodedSHA256: "decoded", State: publicE32CipherState{Scale: "scale"},
+	}
+	vectors := publicE32Vectors{BootstrapOutputs: map[string][]publicE32Vector{
+		"bootstrap_first_cold": make([]publicE32Vector, 1<<12),
+		"bootstrap_warm_01":    make([]publicE32Vector, 1<<12),
+		"bootstrap_warm_02":    make([]publicE32Vector, 1<<12),
+		"bootstrap_warm_03":    make([]publicE32Vector, 1<<12),
+		"bootstrap_warm_04":    make([]publicE32Vector, 1<<12),
+		"bootstrap_warm_05":    make([]publicE32Vector, 1<<12),
+	}}
+	raw := publicE32RawTrace{
+		SchemaVersion: "fastdiag.public-e32.trace.v1", Profile: "logn13-e32-public-native", Mode: "test-only-public-e32-fast",
+		PrimaryCommit: "primary", PrimarySourceSHA256: "source", ProductionFastCommit: e32ProductionFastCommit,
+		DiagnosticHead: "diagnostic", ConfigSHA256: "config", QPSHA256: "qp", InputSHA256: "input", WorkloadSHA256: "workload",
+		FixtureManifestSHA256: "manifest", CiphertextSHA256: "ciphertext", ExpectedInputSHA256: "decoded",
+		CallBudget: 2, ActualCalls: 2, CPUProfileFile: "warm-cpu.pprof", CPUProfileSHA256: strings.Repeat("a", 64),
+		HeapProfileFile: "post-warm-heap.pprof", HeapProfileSHA256: strings.Repeat("b", 64),
+		NumericalGate: 1e-6, GoVersion: "go1.26.4", OS: "darwin", Arch: "arm64", NumCPU: 10, GOMAXPROCS: 10,
+		GOGC: "runtime-default", GOMEMLIMIT: "runtime-default", GODEBUG: "runtime-default",
+		Runs: []publicE32Run{
+			{Index: 1, Phase: "first_cold_bootstrap", DecodedSHA256: "cold", OracleMaxComplex: 0, FastReferenceWorstMax: 0, Level: 1, Degree: 1, QPrefixRows: 2, Scale: "scale"},
+			{Index: 2, Phase: "warm_bootstrap_01", DecodedSHA256: "warm", OracleMaxComplex: 0, FastReferenceWorstMax: 0, Level: 1, Degree: 1, QPrefixRows: 2, Scale: "scale"},
+		},
+		Events: publicE32TestEvents(),
+	}
+	require.NoError(t, validatePublicE32RawTrace(raw, manifest, vectors, "primary", "diagnostic", "manifest"))
+	raw.ActualCalls = 3
+	require.ErrorContains(t, validatePublicE32RawTrace(raw, manifest, vectors, "primary", "diagnostic", "manifest"), "exact 2-call budget")
+}
+
+func publicE32TestEvents() []Event {
+	var events []Event
+	stageNames := []string{"bootstrap", "pack_n1_to_n2", "scale_down", "mod_up_trace", "coeffs_to_slots", "evalmod_real", "evalmod_imag", "slots_to_coeffs", "unpack_n2_to_n1", "public_finalization"}
+	for index, name := range stageNames {
+		sequence, parent := uint64(index+1), uint64(0)
+		if name != "bootstrap" {
+			parent = 1
+		}
+		events = append(events, Event{Scope: "stage", Name: name, Sequence: sequence, ParentSequence: parent})
+	}
+	events = append(events, Event{Scope: "power", Name: "generated_powers", Sequence: 11})
+	for index, power := range []int{2, 3, 4, 6, 8, 16} {
+		p, splitA, splitB := power, power/2, power/2
+		events = append(events, Event{Scope: "power", Name: "power", Sequence: uint64(12 + index), ParentSequence: 11, Power: &p, SplitA: &splitA, SplitB: &splitB})
+	}
+	events = append(events,
+		Event{Scope: "rescale", Name: "rescale", Sequence: 18, ParentSequence: 6},
+		Event{Scope: "rescale", Name: "preflight", Sequence: 19, ParentSequence: 18},
+		Event{Scope: "rescale", Name: "materialization", Sequence: 20, ParentSequence: 18},
+	)
+	return events
+}

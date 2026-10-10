@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"math"
 	"os"
 	"path/filepath"
@@ -126,6 +127,9 @@ func TestPublicNativeModeIsExplicitlyZeroBootstrap(t *testing.T) {
 	if err := validateExecutionLimits(cliOptions{mode: "public-native", publicBootstrap: true, preflightPair: "preflight.json", bootstrapBudget: 2}); err != nil {
 		t.Fatalf("exact two-call public-native cold/warm budget rejected: %v", err)
 	}
+	if err := validateExecutionLimits(cliOptions{mode: "public-native", publicRepeatability: true, preflightPair: "preflight.json", bootstrapBudget: 6}); err != nil {
+		t.Fatalf("exact six-call public-native repeatability budget rejected: %v", err)
+	}
 	for _, budget := range []int{0, 1, 3} {
 		if err := validateExecutionLimits(cliOptions{mode: "public-native", publicBootstrap: true, preflightPair: "preflight.json", bootstrapBudget: budget}); err == nil {
 			t.Fatalf("public-native cold/warm mode accepted budget=%d, want exactly 2", budget)
@@ -134,11 +138,128 @@ func TestPublicNativeModeIsExplicitlyZeroBootstrap(t *testing.T) {
 	if err := validateExecutionLimits(cliOptions{mode: "public-native", publicBootstrap: true, bootstrapBudget: 2}); err == nil {
 		t.Fatal("public-native cold/warm mode accepted a missing zero-call preflight pair")
 	}
+	for _, budget := range []int{0, 2, 5, 7} {
+		if err := validateExecutionLimits(cliOptions{mode: "public-native", publicRepeatability: true, preflightPair: "preflight.json", bootstrapBudget: budget}); err == nil {
+			t.Fatalf("public-native repeatability mode accepted budget=%d, want exactly 6", budget)
+		}
+	}
 	if err := validateExecutionLimits(cliOptions{mode: "public-native", preflightPair: "preflight.json", bootstrapBudget: 0}); err == nil {
 		t.Fatal("zero-call mode accepted an unused preflight-pair path")
 	}
 	if err := validateExecutionLimits(cliOptions{mode: "legacy-diagnostic", publicBootstrap: true, preflightPair: "preflight.json", bootstrapBudget: 2}); err == nil {
 		t.Fatal("legacy mode accepted public-native Bootstrap flags")
+	}
+}
+
+func TestPublicRepeatabilityUsesSixIndependentCopiesAndReservations(t *testing.T) {
+	input := publicTestCiphertext(t)
+	baseFingerprint, err := publicCiphertextFingerprint(input)
+	if err != nil {
+		t.Fatal(err)
+	}
+	base := filepath.Join(t.TempDir(), "six-attempt-run")
+	budget := &bootstrapBudget{limit: 6, journalBase: base}
+	calls := 0
+	var inputFingerprints []string
+	call := func(callInput *rlwe.Ciphertext) (*rlwe.Ciphertext, error) {
+		calls++
+		fingerprint, err := publicCiphertextFingerprint(callInput)
+		if err != nil {
+			return nil, err
+		}
+		inputFingerprints = append(inputFingerprints, fingerprint)
+		callInput.Value[0].Coeffs[0][0]++
+		return callInput.CopyNew(), nil
+	}
+	validate := func(name string, _ *rlwe.Ciphertext) (publicCheckpoint, []complex128, error) {
+		values := make([]complex128, 1<<12)
+		return publicCheckpoint{Name: name}, values, nil
+	}
+	results, outputs, phases, err := runPublicBootstrapAttempts(input, budget, call, validate)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if calls != 6 || budget.attempts != 6 || len(results) != 6 || len(outputs) != 6 || len(phases) != 6 {
+		t.Fatalf("repeatability calls=%d reserved=%d results=%d outputs=%d phases=%d", calls, budget.attempts, len(results), len(outputs), len(phases))
+	}
+	for index := range results {
+		if inputFingerprints[index] != baseFingerprint || results[index].InputCiphertextSHA256 != baseFingerprint {
+			t.Fatalf("attempt %d did not receive an independent copy of the held input", index+1)
+		}
+		wantPhase, wantName := fmt.Sprintf("warm_bootstrap_%02d", index), fmt.Sprintf("bootstrap_warm_%02d", index)
+		if index == 0 {
+			wantPhase, wantName = "first_cold_bootstrap", "bootstrap_first_cold"
+		}
+		if results[index].Phase != wantPhase || results[index].Output.Name != wantName {
+			t.Fatalf("attempt %d phase/output=(%s,%s), want (%s,%s)", index+1, results[index].Phase, results[index].Output.Name, wantPhase, wantName)
+		}
+		if _, err := os.Stat(fmt.Sprintf("%s.bootstrap-attempt-%02d.json", base, index+1)); err != nil {
+			t.Fatalf("attempt %d reservation missing: %v", index+1, err)
+		}
+	}
+	if _, err := budget.invoke("over-budget", func() (*rlwe.Ciphertext, error) { return call(input.CopyNew()) }); err == nil || calls != 6 {
+		t.Fatalf("six-call budget allowed extra invocation: err=%v calls=%d", err, calls)
+	}
+	restarted := &bootstrapBudget{limit: 6, journalBase: base}
+	if _, _, _, err := runPublicBootstrapAttempts(input, restarted, call, validate); err == nil || calls != 6 {
+		t.Fatalf("existing six-call journal was reused after restart: err=%v calls=%d", err, calls)
+	}
+}
+
+func TestPublicRepeatabilityStopsAtEveryFailedOrInterruptedAttempt(t *testing.T) {
+	for failAt := 1; failAt <= 6; failAt++ {
+		t.Run(fmt.Sprintf("call_failure_%d", failAt), func(t *testing.T) {
+			input := publicTestCiphertext(t)
+			base := filepath.Join(t.TempDir(), "six-failure")
+			budget := &bootstrapBudget{limit: 6, journalBase: base}
+			calls := 0
+			call := func(callInput *rlwe.Ciphertext) (*rlwe.Ciphertext, error) {
+				calls++
+				if calls == failAt {
+					return nil, errors.New("simulated Bootstrap process/call failure")
+				}
+				return callInput.CopyNew(), nil
+			}
+			validate := func(name string, output *rlwe.Ciphertext) (publicCheckpoint, []complex128, error) {
+				return publicCheckpoint{Name: name}, make([]complex128, 1<<12), nil
+			}
+			_, _, _, err := runPublicBootstrapAttempts(input, budget, call, validate)
+			if err == nil || calls != failAt || budget.attempts != failAt {
+				t.Fatalf("failure at %d did not stop exactly at the reserved call: calls=%d reserved=%d err=%v", failAt, calls, budget.attempts, err)
+			}
+			for index := 1; index <= 6; index++ {
+				path := fmt.Sprintf("%s.bootstrap-attempt-%02d.json", base, index)
+				_, statErr := os.Stat(path)
+				if index <= failAt && statErr != nil {
+					t.Fatalf("spent attempt %d is missing its reservation: %v", index, statErr)
+				}
+				if index > failAt && !os.IsNotExist(statErr) {
+					t.Fatalf("attempt %d was reserved after failure at %d: %v", index, failAt, statErr)
+				}
+			}
+			resumed := &bootstrapBudget{limit: 6, journalBase: base}
+			if _, _, _, resumeErr := runPublicBootstrapAttempts(input, resumed, call, validate); resumeErr == nil || calls != failAt {
+				t.Fatalf("restart reused a spent six-call journal: calls=%d err=%v", calls, resumeErr)
+			}
+		})
+	}
+
+	input := publicTestCiphertext(t)
+	base := filepath.Join(t.TempDir(), "interrupted-six-run")
+	if err := os.WriteFile(base+".bootstrap-attempt-04.json", []byte("interrupted reservation"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	budget := &bootstrapBudget{limit: 6, journalBase: base}
+	calls := 0
+	call := func(callInput *rlwe.Ciphertext) (*rlwe.Ciphertext, error) {
+		calls++
+		return callInput.CopyNew(), nil
+	}
+	validate := func(name string, _ *rlwe.Ciphertext) (publicCheckpoint, []complex128, error) {
+		return publicCheckpoint{Name: name}, make([]complex128, 1<<12), nil
+	}
+	if _, _, _, err := runPublicBootstrapAttempts(input, budget, call, validate); err == nil || calls != 3 || budget.attempts != 3 {
+		t.Fatalf("interrupted attempt reservation was reused or exceeded: calls=%d reserved=%d err=%v", calls, budget.attempts, err)
 	}
 }
 
@@ -223,19 +344,35 @@ func TestPublicNativeOutputPreflightRejectsAliasesAndExistingArtifacts(t *testin
 	root := t.TempDir()
 	result := filepath.Join(root, "result.json")
 	vectors := filepath.Join(root, "vectors.json")
-	if err := ensurePublicNativeOutputsAvailable(cliOptions{out: result, vectorsOut: vectors, publicBootstrap: true}); err != nil {
+	if err := ensurePublicNativeOutputsAvailable(cliOptions{out: result, vectorsOut: vectors, publicBootstrap: true, bootstrapBudget: 2}); err != nil {
 		t.Fatalf("fresh output paths rejected: %v", err)
 	}
-	if err := ensurePublicNativeOutputsAvailable(cliOptions{out: result, vectorsOut: filepath.Join(root, ".", "result.json"), publicBootstrap: true}); err == nil {
+	fixtureBase := filepath.Join(root, "fast-e32-trace")
+	ciphertextPath, parametersPath, manifestPath := publicTraceFixtureArtifactPaths(fixtureBase)
+	if filepath.Base(ciphertextPath) != "fast-e32-trace.ciphertext.bin" ||
+		filepath.Base(parametersPath) != "fast-e32-trace.parameters.bin" ||
+		filepath.Base(manifestPath) != "fast-e32-trace.manifest.json" {
+		t.Fatalf("unexpected E32 fixture artifact paths: %q %q %q", ciphertextPath, parametersPath, manifestPath)
+	}
+	if err := ensurePublicNativeOutputsAvailable(cliOptions{out: filepath.Join(root, "preflight.json"), vectorsOut: filepath.Join(root, "preflight-vectors.json"), traceFixtureOut: fixtureBase}); err != nil {
+		t.Fatalf("fresh E32 trace fixture paths rejected: %v", err)
+	}
+	if err := os.WriteFile(ciphertextPath, []byte("reserved"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if err := ensurePublicNativeOutputsAvailable(cliOptions{out: filepath.Join(root, "second-preflight.json"), vectorsOut: filepath.Join(root, "second-vectors.json"), traceFixtureOut: fixtureBase}); err == nil {
+		t.Fatal("existing E32 held-ciphertext fixture path was accepted")
+	}
+	if err := ensurePublicNativeOutputsAvailable(cliOptions{out: result, vectorsOut: filepath.Join(root, ".", "result.json"), publicBootstrap: true, bootstrapBudget: 2}); err == nil {
 		t.Fatal("aliased result/vector output paths accepted")
 	}
-	if err := ensurePublicNativeOutputsAvailable(cliOptions{out: filepath.Join(root, "missing", "result.json"), vectorsOut: vectors, publicBootstrap: true}); err == nil {
+	if err := ensurePublicNativeOutputsAvailable(cliOptions{out: filepath.Join(root, "missing", "result.json"), vectorsOut: vectors, publicBootstrap: true, bootstrapBudget: 2}); err == nil {
 		t.Fatal("output path with a missing parent directory accepted")
 	}
 	if err := os.WriteFile(result+".bootstrap-attempt-02.json", []byte("reserved"), 0o600); err != nil {
 		t.Fatal(err)
 	}
-	if err := ensurePublicNativeOutputsAvailable(cliOptions{out: result, vectorsOut: vectors, publicBootstrap: true}); err == nil {
+	if err := ensurePublicNativeOutputsAvailable(cliOptions{out: result, vectorsOut: vectors, publicBootstrap: true, bootstrapBudget: 2}); err == nil {
 		t.Fatal("existing warm-attempt journal accepted before measurement")
 	}
 }
@@ -655,6 +792,45 @@ func makePublicPairArtifactFixture(t *testing.T, backend string) (publicNativeDo
 		QPSHA256: publicQPSHA, InputSHA256: publicInputSHA, WorkloadSHA256: publicWorkloadSHA, E: 32, Checkpoints: vectors,
 	}
 	return doc, vectorDoc
+}
+
+func TestPublicRepeatabilityPairAcceptsExactlySixMatchedOutputs(t *testing.T) {
+	standard, standardVectors := makePublicBootstrapPairArtifactFixture(t, "standard")
+	fast, fastVectors := makePublicBootstrapPairArtifactFixture(t, "fast")
+	standard, standardVectors = promotePublicBootstrapFixtureToRepeatability(t, standard, standardVectors)
+	fast, fastVectors = promotePublicBootstrapFixtureToRepeatability(t, fast, fastVectors)
+	if err := validatePublicBootstrapPairArtifacts(standard, fast, standardVectors, fastVectors); err != nil {
+		t.Fatalf("valid six-sample repeatability pair rejected: %v", err)
+	}
+	fast.BootstrapResults = append([]publicBootstrapResult(nil), fast.BootstrapResults...)
+	fast.BootstrapResults[5].InputCiphertextSHA256 = "different-held-input"
+	if err := validatePublicBootstrapPairArtifacts(standard, fast, standardVectors, fastVectors); err == nil {
+		t.Fatal("six-sample pair accepted a changed held-input fingerprint")
+	}
+}
+
+func promotePublicBootstrapFixtureToRepeatability(t *testing.T, doc publicNativeDocument, vectors publicVectorDocument) (publicNativeDocument, publicVectorDocument) {
+	t.Helper()
+	doc.SchemaVersion, doc.Mode, doc.Status = "fast-standard-public-native-repeatability.v1", "public-native-repeatability", "PASS_PUBLIC_BOOTSTRAP_1COLD_5WARM"
+	doc.BootstrapBudget, doc.BootstrapCalls = 6, 6
+	base := doc.BootstrapResults[0]
+	baseValues := vectors.BootstrapOutputs["bootstrap_first_cold"]
+	doc.BootstrapResults = make([]publicBootstrapResult, 0, 6)
+	vectors.SchemaVersion, vectors.Mode = "fast-standard-public-native-repeatability-vectors.v1", "public-native-repeatability"
+	vectors.BootstrapOutputs = make(map[string][]complexValue, 6)
+	attempts, err := publicBootstrapAttemptSpecs(6)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, attempt := range attempts {
+		result := base
+		result.Phase = attempt.phase
+		result.Timing.Phase = attempt.phase
+		result.Output.Name = attempt.name
+		doc.BootstrapResults = append(doc.BootstrapResults, result)
+		vectors.BootstrapOutputs[attempt.name] = append([]complexValue(nil), baseValues...)
+	}
+	return doc, vectors
 }
 
 func makePublicBootstrapPairArtifactFixture(t *testing.T, backend string) (publicNativeDocument, publicVectorDocument) {

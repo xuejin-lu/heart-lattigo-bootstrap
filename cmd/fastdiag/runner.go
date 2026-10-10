@@ -63,6 +63,20 @@ func execute(args []string) error {
 		return nil
 	}
 	if opts.mode == "trace" {
+		if opts.profile == publicE32Profile {
+			doc, err := tracePublicE32(primaryRoot, secondaryRoot, primaryMeta, opts, paths)
+			if err != nil {
+				return err
+			}
+			if err := writeJSON(paths.json, doc); err != nil {
+				return err
+			}
+			if err := writeNewFile(paths.markdown, []byte(renderPublicE32Summary(doc)), 0o644); err != nil {
+				return err
+			}
+			fmt.Printf("Public E32 Trace JSON：%s\n摘要：%s\n", paths.json, paths.markdown)
+			return nil
+		}
 		doc, err := traceCurrent(primaryRoot, secondaryRoot, primaryMeta, opts)
 		if err != nil {
 			return err

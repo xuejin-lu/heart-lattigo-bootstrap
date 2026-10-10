@@ -142,7 +142,9 @@ type cliOptions struct {
 	ephemeralSecretWeight   int
 	bootstrapBudget         int
 	publicBootstrap         bool
+	publicRepeatability     bool
 	preflightPair           string
+	traceFixtureOut         string
 	inputSmoke              bool
 	outputSmoke             bool
 	fastBootstrapAcceptance bool
@@ -185,7 +187,9 @@ func run() error {
 	flag.IntVar(&opts.ephemeralSecretWeight, "ephemeral-secret-weight", -1, "explicit E for public-native mode; legacy mode remains E=0")
 	flag.IntVar(&opts.bootstrapBudget, "bootstrap-budget", -1, "hard maximum actual Bootstrap attempts for this process; required when mode can invoke Bootstrap")
 	flag.BoolVar(&opts.publicBootstrap, "public-bootstrap", false, "public-native mode: run exactly one cold and one warm Bootstrap after validating --preflight-pair")
+	flag.BoolVar(&opts.publicRepeatability, "public-repeatability", false, "public-native mode: run exactly one cold and five warm Bootstrap calls after validating --preflight-pair")
 	flag.StringVar(&opts.preflightPair, "preflight-pair", "", "passing zero-call compare-public pair required for --public-bootstrap")
+	flag.StringVar(&opts.traceFixtureOut, "trace-fixture-out", "", "public-native Fast zero-call preflight: export held ciphertext/parameter manifest for the test-only E32 tracer")
 	flag.BoolVar(&opts.inputSmoke, "input-smoke", false, "bounded input-origin preflight only; no Bootstrap or timing")
 	flag.BoolVar(&opts.outputSmoke, "output-smoke", false, "one public Bootstrap and decoded-output preflight; no timing campaign")
 	flag.BoolVar(&opts.fastBootstrapAcceptance, "fast-bootstrap-acceptance", false, "input smoke only: at most one Fast public Bootstrap acceptance call")
@@ -235,13 +239,22 @@ func run() error {
 			return errors.New("public-native mode requires an explicit non-negative --ephemeral-secret-weight")
 		}
 		wantBudget := 0
-		if opts.publicBootstrap {
+		if opts.publicBootstrap || opts.publicRepeatability {
+			if opts.publicBootstrap && opts.publicRepeatability {
+				return errors.New("--public-bootstrap and --public-repeatability are mutually exclusive")
+			}
 			wantBudget = 2
+			if opts.publicRepeatability {
+				wantBudget = 6
+			}
 			if opts.preflightPair == "" {
 				return errors.New("public-native Bootstrap measurement requires a passing zero-call --preflight-pair")
 			}
 		} else if opts.preflightPair != "" {
 			return errors.New("--preflight-pair is only accepted with --public-bootstrap")
+		}
+		if opts.traceFixtureOut != "" && (opts.backendCommit != publicFastSHA || opts.bootstrapBudget != 0 || opts.publicBootstrap || opts.publicRepeatability) {
+			return errors.New("--trace-fixture-out is only accepted for the pinned Fast zero-Bootstrap public-native preflight")
 		}
 		if opts.bootstrapBudget != wantBudget {
 			return fmt.Errorf("public-native mode requires --bootstrap-budget=%d", wantBudget)
@@ -431,21 +444,30 @@ func run() error {
 func validateExecutionLimits(opts cliOptions) error {
 	if opts.mode == "public-native" {
 		wantBudget := 0
-		if opts.publicBootstrap {
+		if opts.publicBootstrap || opts.publicRepeatability {
+			if opts.publicBootstrap && opts.publicRepeatability {
+				return errors.New("--public-bootstrap and --public-repeatability are mutually exclusive")
+			}
 			wantBudget = 2
+			if opts.publicRepeatability {
+				wantBudget = 6
+			}
 			if opts.preflightPair == "" {
 				return errors.New("public-native Bootstrap measurement requires a passing zero-call --preflight-pair")
 			}
 		} else if opts.preflightPair != "" {
-			return errors.New("--preflight-pair is only accepted with --public-bootstrap")
+			return errors.New("--preflight-pair is only accepted with a public Bootstrap mode")
+		}
+		if opts.traceFixtureOut != "" && (opts.bootstrapBudget != 0 || opts.publicBootstrap || opts.publicRepeatability) {
+			return errors.New("--trace-fixture-out requires a zero-Bootstrap public-native preflight")
 		}
 		if opts.bootstrapBudget != wantBudget {
 			return fmt.Errorf("public-native mode requires --bootstrap-budget=%d", wantBudget)
 		}
 		return nil
 	}
-	if opts.publicBootstrap || opts.preflightPair != "" {
-		return errors.New("--public-bootstrap and --preflight-pair require --mode=public-native")
+	if opts.publicBootstrap || opts.publicRepeatability || opts.preflightPair != "" || opts.traceFixtureOut != "" {
+		return errors.New("public-native Bootstrap/trace fixture flags require --mode=public-native")
 	}
 	if opts.inputSmoke || opts.outputSmoke {
 		expected := 0
@@ -828,14 +850,7 @@ func gitOutput(root string, args ...string) (string, error) {
 }
 
 func cpuModel() string {
-	if runtime.GOOS == "darwin" {
-		if output, err := exec.Command("sysctl", "-n", "machdep.cpu.brand_string").Output(); err == nil {
-			if model := strings.TrimSpace(string(output)); model != "" {
-				return model
-			}
-		}
-	}
-	return runtime.GOARCH
+	return perfmeasure.CPUModel()
 }
 
 func writeExclusiveJSON(path string, value any) error {

@@ -96,4 +96,80 @@ from current events. Later reports must label these visibility limits. S1 spent
 
 | Checkpoint | Status | Commit / verification | Next |
 |---|---|---|---|
-| S1 source map | complete | zero-call source audit; Primary compact journal commit pending | extend reusable tools and add zero-call tests |
+| S1 source map | complete | Primary `94ba05366bd7b2b28b1e1f962eb592cfd08786f9`; pushed and clean before S2 | extend reusable tools and add zero-call tests |
+
+## S2 — reusable six-sample and public E32 trace adapters (zero Bootstrap calls)
+
+**Status:** implementation and zero-call tests complete; Secondary test-only
+adapter is committed and pushed as `37adeb273815dbce039b657a45e9e7e88dbf6cc6`;
+Primary S2 commit/push follows.
+No Bootstrap was invoked. The only Secondary source change is a new
+`fastdiag`-tagged test file; no non-test Secondary source, API, arithmetic,
+Standard code, `AGENTS.md`, or `CURRENT_TASK.md` was changed.
+
+- Primary `cmd/perfprobe` now accepts `--public-repeatability` with the exact
+  budget six and records one `first_cold_bootstrap` plus five
+  `warm_bootstrap_01..05` samples on independent copies of the exact held input.
+  It preserves the old exact-two mode and schemas. Fake-call regression tests
+  cover the six calls, immutable held input, per-attempt reservation, output
+  naming, budget exhaustion, each of six failure positions, reservation
+  collision/restart behavior, and output-path collisions.
+- An explicit zero-call Fast `--trace-fixture-out` option writes the exact held
+  Level0 ciphertext, binary serialized public bootstrapping parameters, and a
+  compact provenance/state/hash manifest. The artifacts contain no keys and
+  are created exclusively with owner-only permissions.
+- Existing `cmd/fastdiag trace` now has the bounded `logn13-e32-public`
+  profile. It validates the fixture and six-output vectors, exact Primary and
+  pinned production-Fast identities, clean Primary `main` descended from its
+  synchronized `origin/main`, clean/pushed Secondary `fast-qprefix`, and equality
+  of all non-test production Go source hashes plus `go.mod`/`go.sum` before
+  reserving both diagnostic attempt journals. Only then does it invoke the
+  Secondary test-only adapter. Its raw event tree remains in a task-owned temp
+  directory outside Git; the final command emits a compact summary. The same
+  already-budgeted warm traced call is wrapped by Go's built-in CPU profiler;
+  a post-warm in-use heap snapshot is emitted after the call. Both profiles are
+  outside Git and SHA-bound. Profiling overhead is confined to the separate
+  instrumented diagnostic lane and is never folded into production timings.
+- Secondary `TestFastDiagPublicE32Trace` reads the exact serialized held
+  ciphertext/parameters, verifies hashes, metadata, Level0/Q-prefix row
+  authority, zero-c1 semantics and decoded input identity, then constructs the
+  ordinary public `GenEvaluationKeys` / `NewEvaluator` path. When invoked by
+  the parent tool it runs exactly one untraced cold and one traced warm call,
+  validating both against the decoded plaintext oracle and all six original
+  Fast repeatability outputs. The legacy P93 test remains unchanged.
+- Pure tests validate trace parent/child structure and required generated
+  powers; existing `cmd/fastdiag` aggregate tests continue to cover immediate-
+  child closure normalization. Reservation tests prove both tokens exist
+  before the subprocess callback and that a partial collision prevents launch.
+
+Zero-call verification:
+
+```text
+GOWORK=off go test ./cmd/perfprobe ./cmd/fastdiag ./internal/perfmeasure ./internal/numericalmetrics -count=1 — PASS
+GOWORK=off go vet ./cmd/perfprobe ./cmd/fastdiag ./internal/perfmeasure ./internal/numericalmetrics — PASS
+GOWORK=off go test -modfile=/private/tmp/fast-dropin-batch022-egbOuI/standard.mod -tags=perf_standard ./cmd/perfprobe ./internal/perfmeasure -run '^$' -count=1 — PASS (compile-only)
+GOWORK=off go test -modfile=/private/tmp/fast-dropin-batch022-egbOuI/fast.mod -tags=perf_fast ./cmd/perfprobe ./internal/perfmeasure -run '^$' -count=1 — PASS (compile-only)
+GOWORK=off go test -modfile=/private/tmp/fast-dropin-batch022-egbOuI/standard.mod -tags=perf_standard ./cmd/perfprobe ./internal/perfmeasure ./internal/numericalmetrics -count=1 — PASS
+GOWORK=off go test -modfile=/private/tmp/fast-dropin-batch022-egbOuI/fast.mod -tags=perf_fast ./cmd/perfprobe ./internal/perfmeasure ./internal/numericalmetrics -count=1 — PASS
+go test -tags fastdiag ./circuits/ckks/bootstrapping -run '^TestFastDiagPublicE32EventValidatorAcceptsSourceShapedTree$' -count=1 — PASS
+go test -tags fastdiag ./circuits/ckks/bootstrapping -run '^$' -count=1 — PASS (compile-only)
+```
+
+Two test-harness misfires were fail-closed and spent zero Bootstrap calls:
+an early Standard-tag test used Primary's default Fast dependency and correctly
+failed the native nontrivial-c1 assertion; it was replaced with the exact
+Standard modfile compile-only check above. A broad Secondary test regex entered
+the E32 tracer without fixture variables and failed before evaluator setup or
+Bootstrap; subsequent runs used only the synthetic event-tree test and
+compile-only mode. Neither failure changed files or spent a call token.
+
+S2 self-review unified the serialized-parameters payload, manifest filename,
+and preflight reservation at `.parameters.bin` (with a path regression check),
+strengthened fixture/vector provenance and finite-value checks, ensured public
+output state is Level1/Scale-preserving/two-row, and verified production-source
+identity before any test process can launch. It also requires the frozen
+Go/macOS/Apple-M4/CPU-count/GOMAXPROCS environment and records/matches
+GOGC/GOMEMLIMIT/GODEBUG across the trace parent and child. CPU model detection
+now reuses a shared metadata helper that safely reads only the `Chip:` line
+from `system_profiler` when `sysctl` is unavailable. Primary
+`git diff --check` passes. The expensive-call ledger remains **0/14**.

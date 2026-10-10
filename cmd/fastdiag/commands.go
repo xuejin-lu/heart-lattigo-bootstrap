@@ -7,10 +7,11 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"runtime"
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/xuejin-lu/heart-lattigo-bootstrap/internal/perfmeasure"
 )
 
 const hooksUnavailable = "DIAGNOSTIC_HOOKS_UNAVAILABLE_AT_REF"
@@ -167,15 +168,7 @@ func gitRun(root string, args ...string) error {
 }
 
 func cpuModel() string {
-	if runtime.GOOS == "darwin" {
-		if output, err := exec.Command("sysctl", "-n", "machdep.cpu.brand_string").Output(); err == nil {
-			return strings.TrimSpace(string(output))
-		}
-	}
-	if output, err := exec.Command("uname", "-m").Output(); err == nil {
-		return strings.TrimSpace(string(output))
-	}
-	return runtime.GOARCH
+	return perfmeasure.CPUModel()
 }
 
 func makeOutputPaths(requested, mode string) (outputPaths, error) {
