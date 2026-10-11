@@ -1,0 +1,206 @@
+{
+  "schema_version": 1,
+  "task": "FAST-CURRENT-DUAL-BACKEND-NUMERICAL-REVALIDATION-002",
+  "classification": "DUAL_BACKEND_NUMERICAL_PARTIAL",
+  "status": "MEASURED",
+  "classification_reason": "Both terminal numerical gates and all eight public replay checkpoints per profile pass. Requested Fast internal checkpoints have no independently comparable hooks in genuine original Standard, so internal stage parity remains unavailable.",
+  "provenance": {
+    "primary": {
+      "repository": "xuejin-lu/heart-lattigo-bootstrap",
+      "branch": "main",
+      "commit": "590bcb89f831c582de0566472daca37d2e02cdc1",
+      "clean": true,
+      "measurement_source_sha256": "1d33c100dfa77545334e6dc5fbff2b14d00132db73672dd48d013288e9919a3c",
+      "task_commits_ahead_of_origin_at_measurement": [
+        "2658a4d",
+        "7cef264",
+        "7d1189f",
+        "033d551",
+        "590bcb8"
+      ]
+    },
+    "environment": {
+      "go_version": "go1.26.4",
+      "os": "darwin",
+      "arch": "arm64",
+      "primary_build_vcs_modified": false,
+      "same_primary_source_built_twice": true,
+      "gowork_off": true,
+      "primary_go_mod_modified": false
+    },
+    "standard": {
+      "ref": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+      "commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+      "clean_detached_checkout": true,
+      "checkout": "/private/tmp/current-dual-numerical-002.MRXp6T/lattigo-standard",
+      "modfile": "/private/tmp/current-dual-numerical-002.MRXp6T/standard.mod",
+      "modfile_sha256": "48550d3b4e161be92fdce1fcdc1aad20488de6b8f2ddec7abd5fd9ae273f8dae",
+      "module_replace_target": "/private/tmp/current-dual-numerical-002.MRXp6T/lattigo-standard",
+      "compiled_module_path": "/private/tmp/current-dual-numerical-002.MRXp6T/lattigo-standard",
+      "build_tag": "perf_standard",
+      "binary": "perfprobe-standard-590bcb8",
+      "binary_sha256": "89a88a424769a73b542e85d5962e8fe337b327047cee8b524cc80dc8178e1d7c",
+      "dispatch": "bootstrapping.NewEvaluator genuine Standard evaluator",
+      "fast_zero_secret_symbol_found": false
+    },
+    "fast": {
+      "ref": "2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f",
+      "commit": "2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f",
+      "clean_detached_checkout": true,
+      "checkout": "/private/tmp/current-dual-numerical-002.MRXp6T/lattigo-fast",
+      "modfile": "/private/tmp/current-dual-numerical-002.MRXp6T/fast.mod",
+      "modfile_sha256": "a3e8b6c80ad886772a6e05dd3c024f21a1a75a0d524ce2b78c6b223b4cb29edd",
+      "module_replace_target": "/private/tmp/current-dual-numerical-002.MRXp6T/lattigo-fast",
+      "compiled_module_path": "/private/tmp/current-dual-numerical-002.MRXp6T/lattigo-fast",
+      "build_tag": "perf_fast",
+      "binary": "perfprobe-fast-590bcb8",
+      "binary_sha256": "092cbf1ef203372529a3fdfc5da968d0162c19eec772155324ae6557038ee358",
+      "dispatch": "ordinary bootstrapping.NewEvaluator wrapper; pinned Fast zero-secret capability selects internal Fast dispatch"
+    },
+    "fastdiag": {
+      "build_tag": "fastdiag",
+      "binary": "fastdiag-fast-590bcb8",
+      "binary_sha256": "0ee1e36fcbcbf9a3aa41eef403e87a012d463f1e0ad86694796c9eba79f0d7ed"
+    }
+  },
+  "measurement_contract": {
+    "input_kind": "diagnostic-encoded-c0-c1-zero-v1",
+    "input_constructor": "ckks.Encode at residual Level0; c0=encoded plaintext; c1=0",
+    "formal_public_e32_lifecycle": false,
+    "production_arithmetic_modified": false,
+    "metric": "shared internal/numericalmetrics complex RMSE, max complex difference and SNR",
+    "public_stage_method": "separate public-stage replay without Bootstrap; replay-derived and not represented as in-circuit checkpoints",
+    "rmse_gate": 1e-7,
+    "max_difference_is_gate": false,
+    "fresh_bootstrap_budget": 4,
+    "fresh_bootstrap_calls": 4,
+    "attempt_accounting": "one Standard and one Fast call per profile; each journal records RESERVED then COMPLETED; no retries or warmups",
+    "previous_task_attempts": "The earlier three invalid-comparator LogN16 calls remain charged to the earlier task and were not reused or relabeled."
+  },
+  "profiles": [
+    {
+      "profile": "logn13",
+      "effective_parameters": {
+        "log_n": 13,
+        "log_slots": 12,
+        "slots": 4096,
+        "ring_n": 8192,
+        "q_prime_count": 17,
+        "q0_config_target_bits": 55,
+        "q0_actual_bits": 55,
+        "p_prime_count": 5,
+        "q_prefix_rows_at_max_level": 4,
+        "mod1_log_scale": 60,
+        "mod1_degree": 30,
+        "double_angle_rounds": 3,
+        "default_scale_exact": "35184372088832 (2^45)"
+      },
+      "fingerprints": {
+        "config_sha256": "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98",
+        "input_sha256": "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285",
+        "input_metadata_sha256": "9171dac4a79b97f7f916001d0ea5805f6137711527d364f8dfcd8e71ed2764f6",
+        "qp_sha256": "1f045e603a856968779d62e045a037274bba08cbfce8b1dd3dec2828f1f6a46b"
+      },
+      "public_stage_replay": {
+        "status": "PREFLIGHT_PASS",
+        "comparable_checkpoints": 8,
+        "logical_level_scale_degree_dimensions_match_all": true,
+        "checkpoints": [
+          {"name":"input","level":0,"degree":1,"scale_exact":"35184372088832 (2^45)","standard_prefix_rows":1,"fast_prefix_rows":1,"standard_ntt":true,"fast_ntt":true,"standard_montgomery":false,"fast_montgomery":false,"rmse":0,"max_complex_difference":0,"snr_db":null,"snr_status":"POSITIVE_INFINITY"},
+          {"name":"scale_down","level":0,"degree":1,"scale_exact":"35184372088832 (2^45)","standard_prefix_rows":1,"fast_prefix_rows":1,"standard_ntt":true,"fast_ntt":true,"standard_montgomery":false,"fast_montgomery":false,"rmse":0,"max_complex_difference":0,"snr_db":null,"snr_status":"POSITIVE_INFINITY"},
+          {"name":"mod_up","level":16,"degree":1,"scale_exact":"1125899906842624 (2^50)","standard_prefix_rows":17,"fast_prefix_rows":4,"standard_ntt":true,"fast_ntt":true,"standard_montgomery":false,"fast_montgomery":true,"rmse":0,"max_complex_difference":0,"snr_db":null,"snr_status":"POSITIVE_INFINITY"},
+          {"name":"c2s_real","level":12,"degree":1,"scale_exact":"1125899906842624 (2^50)","standard_prefix_rows":13,"fast_prefix_rows":4,"standard_ntt":true,"fast_ntt":true,"standard_montgomery":false,"fast_montgomery":true,"rmse":2.3964363961731316e-14,"max_complex_difference":9.1850748469742e-14,"snr_db":175.43291024140183,"snr_status":"FINITE"},
+          {"name":"c2s_imag","level":12,"degree":1,"scale_exact":"1125899906842624 (2^50)","standard_prefix_rows":13,"fast_prefix_rows":4,"standard_ntt":true,"fast_ntt":true,"standard_montgomery":false,"fast_montgomery":true,"rmse":2.4095676473593568e-14,"max_complex_difference":9.768350882409342e-14,"snr_db":175.35874442697173,"snr_status":"FINITE"},
+          {"name":"evalmod_real","level":4,"degree":1,"scale_exact":"35184372088832 (2^45)","standard_prefix_rows":5,"fast_prefix_rows":4,"standard_ntt":true,"fast_ntt":true,"standard_montgomery":false,"fast_montgomery":true,"rmse":5.095135038373601e-11,"max_complex_difference":1.60298267715131e-10,"snr_db":163.06651362820782,"snr_status":"FINITE"},
+          {"name":"evalmod_imag","level":4,"degree":1,"scale_exact":"35184372088832 (2^45)","standard_prefix_rows":5,"fast_prefix_rows":4,"standard_ntt":true,"fast_ntt":true,"standard_montgomery":false,"fast_montgomery":true,"rmse":5.135616506107663e-11,"max_complex_difference":1.7541738200899104e-10,"snr_db":162.97107437864028,"snr_status":"FINITE"},
+          {"name":"s2c","level":1,"degree":1,"scale_exact":"35184372088832 (2^45)","standard_prefix_rows":2,"fast_prefix_rows":2,"standard_ntt":true,"fast_ntt":true,"standard_montgomery":false,"fast_montgomery":true,"rmse":1.4468089544345387e-10,"max_complex_difference":4.675260603879638e-10,"snr_db":163.01897348253942,"snr_status":"FINITE"}
+        ]
+      },
+      "bootstrap": {
+        "standard": {"calls":1,"status":"BOOTSTRAP_COMPLETE","output_level":1,"output_scale_exact":"35184372088832 (2^45)","output_vs_input_rmse":1.1903936621664996e-9,"output_vs_input_max_complex_difference":5.805495741185792e-8,"output_vs_input_snr_db":144.71338512805514,"real_components_above_1e-7":0,"imag_components_above_1e-7":0},
+        "fast": {"calls":1,"status":"BOOTSTRAP_COMPLETE","output_level":1,"output_scale_exact":"35184372088832 (2^45)","output_vs_input_rmse":1.1907546782784477e-9,"output_vs_input_max_complex_difference":5.805793207821362e-8,"output_vs_input_snr_db":144.7107513180764,"real_components_above_1e-7":0,"imag_components_above_1e-7":0},
+        "fast_vs_genuine_standard": {"slots_compared":4096,"rmse":1.4468089544345387e-10,"max_complex_difference":4.675260603879638e-10,"snr_db":163.01897348253942,"rmse_gate_pass":true}
+      },
+      "fast_internal_trace": {
+        "status":"FAST_ONLY_TRACE_COMPLETE",
+        "bootstrap_calls":0,
+        "branches":[
+          {"name":"real","checkpoints":20,"generated_powers":["T1","T2","T3","T4","T6","T8","T16"],"qprefix_capacity_observations":73,"strict_2b_lt_sq_pass":true,"internal_replay_vs_public_evalmod_rmse":0,"genuine_standard_comparison":"NOT_COMPARABLE_TO_GENUINE_STANDARD"},
+          {"name":"imag","checkpoints":20,"generated_powers":["T1","T2","T3","T4","T6","T8","T16"],"qprefix_capacity_observations":73,"strict_2b_lt_sq_pass":true,"internal_replay_vs_public_evalmod_rmse":0,"genuine_standard_comparison":"NOT_COMPARABLE_TO_GENUINE_STANDARD"}
+        ],
+        "limitation":"Original Standard has no corresponding Fast private internal instrumentation; no in-tree Standard trace was promoted."
+      }
+    },
+    {
+      "profile": "logn16",
+      "effective_parameters": {
+        "log_n": 16,
+        "log_slots": 15,
+        "slots": 32768,
+        "ring_n": 65536,
+        "q_prime_count": 17,
+        "q0_config_target_bits": 55,
+        "q0_actual_bits": 56,
+        "p_prime_count": 5,
+        "q_prefix_rows_at_max_level": 4,
+        "mod1_log_scale": 60,
+        "mod1_degree": 30,
+        "double_angle_rounds": 3,
+        "default_scale_exact": "35184372088832 (2^45)"
+      },
+      "fingerprints": {
+        "config_sha256": "16e62fdea2dc5ac32240a33cc256cdf60b935aa00b4a16aa004474d2c3033b02",
+        "input_sha256": "659fc59c899341a8253887270f1ae3478528fd864d66aca14bba918550ce8ccf",
+        "input_metadata_sha256": "58b699119d1ca2d73cfe8812e6ae776f77d4267ff4c25e67229d7b140a6cf44f",
+        "qp_sha256": "6c82ca724cbfdce2083b2ef2c18d53f81e658a6f28ff283e9a671d276710ec5f"
+      },
+      "public_stage_replay": {
+        "status": "PREFLIGHT_PASS",
+        "comparable_checkpoints": 8,
+        "logical_level_scale_degree_dimensions_match_all": true,
+        "checkpoints": [
+          {"name":"input","level":0,"degree":1,"scale_exact":"35184372088832 (2^45)","standard_prefix_rows":1,"fast_prefix_rows":1,"standard_ntt":true,"fast_ntt":true,"standard_montgomery":false,"fast_montgomery":false,"rmse":0,"max_complex_difference":0,"snr_db":null,"snr_status":"POSITIVE_INFINITY"},
+          {"name":"scale_down","level":0,"degree":1,"scale_exact":"35184372088832 (2^45)","standard_prefix_rows":1,"fast_prefix_rows":1,"standard_ntt":true,"fast_ntt":true,"standard_montgomery":false,"fast_montgomery":false,"rmse":0,"max_complex_difference":0,"snr_db":null,"snr_status":"POSITIVE_INFINITY"},
+          {"name":"mod_up","level":16,"degree":1,"scale_exact":"1125899906842624 (2^50)","standard_prefix_rows":17,"fast_prefix_rows":4,"standard_ntt":true,"fast_ntt":true,"standard_montgomery":false,"fast_montgomery":true,"rmse":0,"max_complex_difference":0,"snr_db":null,"snr_status":"POSITIVE_INFINITY"},
+          {"name":"c2s_real","level":12,"degree":1,"scale_exact":"1125899906842624 (2^50)","standard_prefix_rows":13,"fast_prefix_rows":4,"standard_ntt":true,"fast_ntt":true,"standard_montgomery":false,"fast_montgomery":true,"rmse":0,"max_complex_difference":0,"snr_db":null,"snr_status":"POSITIVE_INFINITY"},
+          {"name":"c2s_imag","level":12,"degree":1,"scale_exact":"1125899906842624 (2^50)","standard_prefix_rows":13,"fast_prefix_rows":4,"standard_ntt":true,"fast_ntt":true,"standard_montgomery":false,"fast_montgomery":true,"rmse":0,"max_complex_difference":0,"snr_db":null,"snr_status":"POSITIVE_INFINITY"},
+          {"name":"evalmod_real","level":4,"degree":1,"scale_exact":"35184372088832 (2^45)","standard_prefix_rows":5,"fast_prefix_rows":4,"standard_ntt":true,"fast_ntt":true,"standard_montgomery":false,"fast_montgomery":true,"rmse":0,"max_complex_difference":0,"snr_db":null,"snr_status":"POSITIVE_INFINITY"},
+          {"name":"evalmod_imag","level":4,"degree":1,"scale_exact":"35184372088832 (2^45)","standard_prefix_rows":5,"fast_prefix_rows":4,"standard_ntt":true,"fast_ntt":true,"standard_montgomery":false,"fast_montgomery":true,"rmse":0,"max_complex_difference":0,"snr_db":null,"snr_status":"POSITIVE_INFINITY"},
+          {"name":"s2c","level":1,"degree":1,"scale_exact":"35184372088832 (2^45)","standard_prefix_rows":2,"fast_prefix_rows":2,"standard_ntt":true,"fast_ntt":true,"standard_montgomery":false,"fast_montgomery":true,"rmse":0,"max_complex_difference":0,"snr_db":null,"snr_status":"POSITIVE_INFINITY"}
+        ]
+      },
+      "standard_c2s_capacity_audit": {
+        "status":"PASS",
+        "mod_up_before_c2s_group0":{"level":16,"scale_log2":50,"active_q_rows":"q0..q16","rows_per_component":17,"row_length":65536,"ntt":true,"montgomery":false},
+        "after_group0_rescale":{"level":15,"scale_log2":50,"active_q_rows":"q0..q15","rows_per_component":16,"row_length":65536,"ntt":true,"montgomery":false},
+        "next_c2s_matrix":"succeeded at Level 15 with all 16 active rows present"
+      },
+      "bootstrap": {
+        "standard": {"calls":1,"status":"BOOTSTRAP_COMPLETE","output_level":1,"output_scale_exact":"35184372088832 (2^45)","output_vs_input_rmse":5.808193349077692e-9,"output_vs_input_max_complex_difference":4.7088049150256786e-7,"output_vs_input_snr_db":130.94764728940336,"real_components_above_1e-7":0,"imag_components_above_1e-7":2},
+        "fast": {"calls":1,"status":"BOOTSTRAP_COMPLETE","output_level":1,"output_scale_exact":"35184372088832 (2^45)","output_vs_input_rmse":5.808193349077692e-9,"output_vs_input_max_complex_difference":4.7088049150256786e-7,"output_vs_input_snr_db":130.94764728940336,"real_components_above_1e-7":0,"imag_components_above_1e-7":2},
+        "fast_vs_genuine_standard": {"slots_compared":32768,"rmse":0,"max_complex_difference":0,"snr_db":null,"snr_status":"POSITIVE_INFINITY","rmse_gate_pass":true},
+        "interpretation_guard":"RMSE is the specified 1e-7 gate. The maximum difference is separately reported; the 2 imaginary input-oracle components above 1e-7 are not a change to the RMSE gate."
+      },
+      "fast_internal_trace": {
+        "status":"FAST_ONLY_TRACE_COMPLETE",
+        "bootstrap_calls":0,
+        "branches":[
+          {"name":"real","checkpoints":20,"generated_powers":["T1","T2","T3","T4","T6","T8","T16"],"qprefix_capacity_observations":73,"strict_2b_lt_sq_pass":true,"internal_replay_vs_public_evalmod_rmse":0,"genuine_standard_comparison":"NOT_COMPARABLE_TO_GENUINE_STANDARD"},
+          {"name":"imag","checkpoints":20,"generated_powers":["T1","T2","T3","T4","T6","T8","T16"],"qprefix_capacity_observations":73,"strict_2b_lt_sq_pass":true,"internal_replay_vs_public_evalmod_rmse":0,"genuine_standard_comparison":"NOT_COMPARABLE_TO_GENUINE_STANDARD"}
+        ],
+        "limitation":"Original Standard has no corresponding Fast private internal instrumentation; no in-tree Standard trace was promoted."
+      }
+    }
+  ],
+  "old_result_handling": {
+    "previous_task_classification": "LOGN16_CURRENT_REVALIDATION_BLOCKED",
+    "cause": "The prior Standard-looking executable linked the Fast checkout; it was not genuine Standard.",
+    "historical_artifacts_modified_or_reused": false
+  },
+  "limitations": [
+    "This is a diagnostic encoded-c0/zero-c1 comparison, not the formal E32 native EncryptNew lifecycle or a security-equivalence claim.",
+    "The eight named public checkpoints are replay-derived and not in-circuit snapshots.",
+    "Fast generated-power and DoubleAngle internal traces have no comparable private trace from pristine original Standard; those checkpoints remain unavailable for Standard-vs-Fast stage accuracy.",
+    "No performance benchmark or optimization was run."
+  ]
+}
