@@ -1,13 +1,8 @@
-# CURRENT TASK — Generalize and consolidate the CKKS measurement platform
+# CURRENT TASK — Complete measurement platform acceptance repair
 
-Task: `CKKS-MEASUREMENT-PLATFORM-GENERALIZATION-001`
-Status: `READY_FOR_WEB_REVIEW` (Codex checkpoints completed; independent review pending)
-Authoritative spec: `specs/CKKS-MEASUREMENT-PLATFORM-GENERALIZATION-001.md`
+Task: `CKKS-MEASUREMENT-PLATFORM-ACCEPTANCE-REPAIR-002`
+Status: READY_FOR_CODEX
+Authoritative spec: `specs/CKKS-MEASUREMENT-PLATFORM-ACCEPTANCE-REPAIR-002.md`
+Previous Task `CKKS-MEASUREMENT-PLATFORM-GENERALIZATION-001` at `7fc06031e5a8ca499c083814159e10ffea325baa`: implementation and 188-file historical runner retirement accepted as completed engineering work, subject to the targeted acceptance gaps in this task. Do not recreate or roll back the retired tools.
 
-Extend only the maintained Primary platform (`cmd/perfprobe`, `cmd/fastdiag`, `internal/perfmeasure`, `internal/numericalmetrics`) so generic profile metadata derives from effective CKKS parameters and common logic covers LogN13–16, with unsupported backend/profile cases explicit. Revalidate the existing Task006 539-event trace offline by reusing Batch025's recursive event-tree analyzer. Audit and retire confirmed superseded root/`tools/` runner, adapter, and CLI code while preserving independent math/security regression tests and all historical results/specs/configs.
-
-Codex checkpoints are complete. Review the task report and compact evidence under `results/CKKS-MEASUREMENT-PLATFORM-GENERALIZATION-001-*`.
-
-No CKKS production arithmetic or security semantics changes; the frontend remains backend-transparent. Task005 performance measurements are not repeated. Task006's existing raw trace is preferred; only if immutable raw evidence is unavailable, the spec permits a separately journaled, no-retry capture of at most one cold and one traced-warm Fast Bootstrap after zero-call validation.
-
-Execute the sequential checkpoints in the authoritative spec autonomously, commit the spec/rules/pointer before implementation, then commit and safely fast-forward push the completed Primary work. Secondary remains read-only. Stop for an actual math/security decision, unresolved correctness/evidence failure, or unsafe Git state.
+When user says `開始`, follow the mandatory safe Git startup preflight in `AGENTS.md`, then **continue autonomously** with the new spec. A remote source check that has not yet been performed is not a reason to stop or ask the user to repeat instructions; perform it. Existing local authorized changes must be inspected and preserved. Stop only on demonstrated math/security/evidence/Git blockers under the normal workflow. No new Bootstrap calls authorized for this engineering closeout. Preserve Secondary and previous Task005/006 raw evidence. Target: parameter-driven common tools, full compact Task006 per-stage attribution, correct live trace validation, targeted retired-test safety review, and compile-only package check. Finish with safe Primary fast-forward push and READY_FOR_WEB_REVIEW or NEEDS_WEB_REVIEW.
