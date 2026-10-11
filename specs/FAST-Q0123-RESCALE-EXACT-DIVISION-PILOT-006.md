@@ -1,0 +1,33 @@
+# FAST-Q0123-RESCALE-EXACT-DIVISION-PILOT-006
+
+Status: READY_FOR_CODEX
+Class: bounded single-hypothesis implementation/experiment pilot, no new production CKKS math decision
+Authority: AGENTS.md, docs/MEASUREMENT_PLATFORM.md and docs/RESEARCH_ENGINEERING_WORKFLOW.md
+Accepted baseline: Task004 measured trace instrumentation cost; Task005 at e9661df0f33b2650a5f1d7641d7690c267833d75 REJECTED simple invariant-precomputation as a Rescale optimization (zero c1 16.279 ms baseline / 16.365 ms candidate; nonzero c1 21.139 / 21.893 ms candidate). Never revive or iterate the rejected patch. Secondary fast-qprefix stays pinned at 2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f and untouched in its production checkout.
+
+## Scientific objective
+
+The remaining promising independent mechanism is **fixed-divisor word division / remainder in the Q0123 coefficient arithmetic**, rather than hoisting already invariant metadata. Current source `schemes/ckks/internal/fastcore/rescale.go` invokes `crtQ01`, `mod128By64`, `mod192By64`, `roundedMagnitude192` and `signedResidue192`. Trace-on data found coefficient loops expensive but heavily perturbed by per-coefficient timers; Task004 uninstrumented shape-matched fast Rescale is the accepted baseline. The purpose is to establish a precise division-operation cost hypothesis and evaluate at most ONE mathematically bit-exact prototype, or stop if an exact safe transformation is unsupported.
+
+DO NOT assume this source mechanism dominates uninstrumented performance without measurements. Do not optimize only c1=0 (an intentionally insecure zero-secret simulation feature); preserve all c1 distributions. Do not identify zero-secret acceleration as genuine secure FHE speedup.
+
+## A. Reuse, inspect and establish exact boundaries
+
+1. Follow AGENTS.md safe status/fetch/ancestry; inspect artifact size before reading. Read Task004 benchmark patch and Task005 compact report, then the existing `fastcore/rescale.go` and Batch027 helper benchmarks/oracles. Reuse *their* testing.B, fixture, BigInt oracle and pinned Q/P; DO NOT add standalone runner, timer framework, second stats implementation, clone fixture or new generic profiler.
+2. Trace the specific unsigned 128/192-bit divisions and remainders executed by `reconstructQPrefix`, `roundedMagnitude192`, `signedResidue192` at sourceRows=4 / targetRows=4 / one rescale, including centered sign/capacity constraints. For each candidate specialization, give exact mathematical preconditions: uint64 divisor, limb ranges, quotient/remainder correction bounds, overflow guards. Existing x86/ARM architectures and Go `math/bits` semantics must remain correct.
+3. Use existing Batch027 helper benches and the Task004 shape-matched LogN16 Q/P benchmark to identify whether division/remainder accounts for a plausible optimization opportunity without tracing per coefficient. A low-cost focused subbenchmark in the same existing test file is allowed only if the existing hooks cannot distinguish the hypothesis. Treat helpers vs E2E percentage as separate.
+4. If no sound exact algorithm and measurable plausible opportunity exists, finish `NO_SAFE_DIVISION_CANDIDATE` and stop. Do not implement speculative approximations or relax capacity checks.
+
+## B. One reversible isolated prototype, if justified
+
+1. Only one narrow source transformation is permitted, confined to the integer division/remainder helper path (e.g. exact precomputed divisor reduction) in a detached isolated Secondary copy, never committed/pushed to live Secondary. If no bit-exact mathematical proof can be given, do not change arithmetic. No skip-c1 shortcut, no reduced q0..q3 authority, no widened unsafe product, no modified rounding or capacity logic, no changed Level/Scale/NTT/Montgomery, frontend or zero-secret semantics.
+2. Prove exactness with existing BigInt differential tests and stress directed/edge cases: all Q-prefix widths 1-4, positive/negative/zero, sign crossing, half-modulus tie, divisor half-round boundary, quotient overflow, highest supported Q/P, failure transactionality, in-place vs out-of-place, both zero and nonzero c1. Run existing tests of Standard differential and all maintained relevant oracles. Any failure is `REJECT`, do not paper over the oracle or change the workload.
+3. Matched source Q/P and fixture: N=65536; logical L12->L11; rows 4->4; Scale ~2^120->2^60; NTT=true/Montgomery=false, in-place. Retain Task004 provenance and Task005 zero-c1/nonzero-c1 fixture; verify hashes before each comparison. Test the exact same no-fastdiag-tag baseline vs isolated candidate, at least five finite independent low-cost samples per state, with setup out of timed region, report full sample ranges and allocations. The effect must exceed noise in a convincing repeatable way; no fabricated speedups from traced runs. Keep a strict finite sample plan, no campaign. Do not run Bootstrap in this task.
+4. If both correctness and robust performance hold, save a compact prototype-only patch in Primary results and recommend `PROMOTE_FOR_WEB_REVIEW`; do NOT silently promote to Secondary main/fast-qprefix. If not, `REJECT` and do not keep a failed code patch or launch another optimization approach. Negative outcome explicitly closes this single division candidate, preventing a sequence of ad hoc variants.
+
+## C. Deliverable and lifecycle discipline
+
+- File: `results/FAST-Q0123-RESCALE-EXACT-DIVISION-PILOT-006-summary.md`. Include bounded per-helper vs full Rescale evidence, exact mathematical argument if implemented, baseline and candidate samples (if implemented), oracle matrix, environment/codes/commit hashes, limitations and unequivocal `PROMOTE_FOR_WEB_REVIEW` / `REJECT` / `NO_SAFE_DIVISION_CANDIDATE` / `INCONCLUSIVE`.
+- Existing two baseline MulRelin **error-message assertion** failures were already reproduced on pristine Secondary in Task005; do not change unrelated MulRelin semantics. Still rerun focused relevant tests and vet. If a new correctness failure appears, stop and identify separately.
+- 0 full Bootstrap calls; no new permanent benchmark architecture; no historical artifact rewrite; no production Secondary commit/push. Safe Primary fast-forward commit/push. Update BOTH `CURRENT_TASK.md` and this spec from READY_FOR_CODEX to READY_FOR_WEB_REVIEW on actual completion. Do not report done if the task pointer still points to unfinished execution. Web review may authorize promotion separately.
+- At the end, explicitly state whether the next research direction should shift away from Q0123 coefficient-level micro-optimizations if this candidate fails. Do not default to another micro-optimization batch.
