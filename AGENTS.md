@@ -15,33 +15,39 @@ When the user says `開始`, `start`, `continue`, or otherwise asks to begin the
 Before deciding whether there is work to do:
 
 1. Go to the primary repository `heart-lattigo-bootstrap`.
-2. Check the current branch and `git status --short`.
-3. If the worktree is dirty, the branch is not `main`, or another unsafe local condition exists, stop and report it. Never reset, stash, overwrite, discard, or switch away from user work automatically.
-4. If the worktree is clean and the branch is `main`, run:
-   - `git fetch origin`
-   - `git merge --ff-only origin/main`
-   After a successful fetch, use the fetched `origin/main` for the merge; **do not run `git pull`**, because it performs another fetch.
-5. After the merge, verify `git rev-parse HEAD` equals `git rev-parse origin/main`. If fetch or fast-forward merge fails, stop and report the exact failure. Do not continue from stale local instructions.
-   Distinguish a Git command that ran and failed to write Git metadata (for example `.git/FETCH_HEAD: Operation not permitted`) from a tool failure to create the execution process. For a process-creation failure, first verify the working-directory and Git executable paths; do not retry indefinitely. Use the formal permission-escalation mechanism for a Git metadata write denial when available. Never work around either failure with `sudo` or arbitrary permission changes.
+2. Check the current branch, `git status --short`, and `git rev-parse HEAD`. If the branch is not `main`, stop and report it. Do not infer task status from local `CURRENT_TASK.md` yet.
+3. Inventory local changes before synchronization. A dirty worktree is **not automatically unsafe**: expected task outputs or implementation files may be legitimate checkpoints from the current task. Do not reset, stash, overwrite, discard, or switch away from any local work.
+4. After recording that inventory, run `git fetch origin` even if there are untracked files or reviewed task changes. Fetch updates Git metadata and remote-tracking refs; it does not check out or overwrite worktree files. If fetch fails, stop and report the exact error.
+5. After a successful fetch, read the remote-authoritative instructions and task pointer without checking files out:
+   - `git show origin/main:AGENTS.md`
+   - `git show origin/main:CURRENT_TASK.md`
+   - the referenced spec from `origin/main` (for example, `git show origin/main:specs/<name>.md`)
+   Inspect local-only commits and local changes as well; preserve a verified in-progress task checkpoint when it is authorized by the active task.
+6. Classify every local change against the remote task and spec. Inspect tracked diffs and, for untracked results, their exact paths, sizes, hashes, timestamps, compact required fields, provenance, and any attempt journal/budget. The path checker is only a scope guard, not proof that file contents are valid:
+   - `python3 scripts/task_worktree_policy.py --repo . --allow-task-path <verified-task-path> ...`
+   - `python3 -m unittest discover -s scripts -p 'test_task_worktree_policy.py' -v`
+   Continue with task-owned changes only when their content and provenance are verified and every changed path is explicitly expected by the active task. If any path or modification is unknown, unrelated, unsafe, or cannot be verified, stop and report it without changing it.
+7. Compare local `HEAD` and fetched `origin/main` ancestry before any merge:
+   - If `origin/main` is a descendant of local `HEAD`, first compare the paths changed by `HEAD..origin/main` with every local changed path. Treat case-only path differences as overlaps on case-insensitive filesystems. If any path overlaps, stop; otherwise run `git merge --ff-only origin/main`. This check is mandatory when untracked files are present so a fast-forward cannot overwrite them.
+   - If `HEAD` equals `origin/main`, no merge is needed.
+   - If `origin/main` is an ancestor of local `HEAD`, inspect every local-only commit. Continue only when those commits are verified as authorized current-task work; do not rewrite or discard them.
+   - If neither commit is an ancestor of the other, stop and report the local-only and remote-only commits. Do not merge, rebase, reset, or force push.
+8. Verify synchronization after the decision: when no verified local-only commits remain, confirm `git rev-parse HEAD` equals `git rev-parse origin/main`; when authorized task commits are ahead, confirm `origin/main` is an ancestor of `HEAD` and report the ahead count. In all cases, confirm every reviewed task file remains present and unchanged across any fast-forward.
+9. **Only after fetch and safe synchronization/ancestry checks**, re-read the effective `AGENTS.md`, `CURRENT_TASK.md`, and authoritative spec. A remote task update supersedes stale local instructions; verified authorized local task commits remain part of the resumable checkpoint.
+
+Never use `git pull`; after a successful fetch, use the fetched `origin/main` for any fast-forward. Never use `sudo`, arbitrary permission changes, reset, rebase, stash, force push, or history rewriting to get past a failed or unsafe synchronization.
+
+A previous local `CURRENT_TASK.md` saying `COMPLETE` is never sufficient reason to skip the startup fetch. If the synchronized task requires work in the secondary `lattigo` repository, perform that repository's own safe synchronization procedure before reading or editing task-relevant files.
+
 ### Process-launch failure recovery for routine fast-forward sync
 
 A process-launch error such as `No such file or directory` while invoking the **permission-escalation wrapper** is not evidence that `git merge` ran or failed. Do not classify it as Git divergence or treat it as a CKKS task blocker requiring mathematical review.
 
-If `git fetch origin` succeeded, `main` and the worktree are clean, and `origin/main` is a descendant of local HEAD, execute `git merge --ff-only origin/main` once using the normal available shell execution channel and the repository's real absolute working directory. Do not request escalated permissions unless a normal Git command **actually returns a relevant permission error**. A previous wrapper process-launch failure does not itself require escalation.
+If `git fetch origin` succeeded, the branch is `main`, all local changes have been verified as task-owned, and `origin/main` is a descendant of local `HEAD`, first confirm the remote-changed paths do not overlap reviewed local changes, then execute `git merge --ff-only origin/main` once using the normal available shell execution channel and the repository's real absolute working directory. Do not request escalated permissions unless a normal Git command **actually returns a relevant permission error**. A previous wrapper process-launch failure does not itself require escalation.
 
-After an ordinary Git metadata permission failure, use the formal escalation mechanism once when available. If that wrapper itself cannot launch a process, do not repeatedly invoke the same broken wrapper. Verify paths and tools once. If the ordinary channel is also unable to launch or Git still cannot write metadata, stop with `ENVIRONMENT_SYNC_BLOCKED`, report the exact attempted command/error, and provide the smallest safe manual `git merge --ff-only origin/main` command for a user terminal; never pretend synchronization occurred.
+After an ordinary Git metadata permission failure, use the formal escalation mechanism once when available. If that wrapper itself cannot launch a process, do not repeatedly invoke the same broken wrapper. Verify paths and tools once. If the ordinary channel is also unable to launch or Git still cannot write metadata, stop with `ENVIRONMENT_SYNC_BLOCKED`, report the exact attempted command/error, and provide the smallest safe manual command for a user terminal; never pretend synchronization occurred.
 
-Verify `HEAD == origin/main` and then resume from the newly synchronized instructions. No `sudo`, `reset`, `rebase`, `stash`, `force`, `pull`, history rewriting, or modifications to an unclean worktree. Never skip the startup synchronization requirement merely to get past tool failure.
-
-6. **Only after the remote sync succeeds**, re-read the freshly synchronized:
-   - `AGENTS.md`
-   - `CURRENT_TASK.md`
-   - the specification referenced by `CURRENT_TASK.md`
-7. Only now may you decide that the current task is `READY`, `COMPLETE`, superseded, or otherwise actionable.
-
-A previous local `CURRENT_TASK.md` saying `COMPLETE` is never sufficient reason to skip the startup fetch.
-
-If the synchronized task requires work in the secondary `lattigo` repository, then perform the secondary repository's own safe synchronization procedure before reading or editing its task-relevant files.
+No `sudo`, arbitrary permission changes, `pull`, reset, rebase, stash, force push, history rewriting, or modifications to unreviewed local work. Never skip the startup fetch merely to get past tool failure. Do not repeat completed expensive measurements: resume from the verified task artifact/journal and enforce the task-wide attempt budget across sessions. Bootstrap reservations and actual calls are durable task-scoped totals; a new Codex session never resets them, and the journal/results must be reconciled before another expensive call.
 
 ## Mandatory measurement-platform reuse (all chats and Codex sessions)
 

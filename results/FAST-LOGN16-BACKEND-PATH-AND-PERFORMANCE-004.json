@@ -1,0 +1,115 @@
+{
+  "schema_version": "fast-logn16-backend-path-performance-004.v1",
+  "task": "FAST-LOGN16-BACKEND-PATH-AND-PERFORMANCE-004",
+  "classification": "CURRENT_PERFORMANCE_BLOCKED",
+  "blocker": "PUBLIC_NATIVE_LOGN16_PROFILE_BLOCKED",
+  "handoff": "NEEDS_WEB_REVIEW",
+  "primary": {
+    "measurement_source_commit": "b5fe32d4be57a507f656c6a28ceac973bcc2ba12",
+    "measurement_source_sha256": "0339ac39c74cbd8cce6feb62dd60089546d0d2581acea35d9add991c67c5da35",
+    "current_task_start_head": "d53564f56b684b80c2b285219c398a77ae307556",
+    "worktree_clean_for_measurement": true
+  },
+  "backend_pins": {
+    "standard": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+    "fast": "2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f",
+    "secondary_branch": "fast-qprefix",
+    "secondary_worktree_clean": true,
+    "primary_source_same_for_both_builds": true,
+    "isolated_modfiles_and_gowork_off": true
+  },
+  "phase_a": {
+    "zero_full_bootstrap_calls": true,
+    "logn13_public_native_preflight_exercised": [
+      "ordinary ckks.NewEvaluator AddNew",
+      "ordinary ckks.NewEvaluator MulRelinNew",
+      "ordinary ckks.NewEvaluator Rescale(q5)",
+      "ordinary ckks.NewEvaluator RotateNew(1)"
+    ],
+    "fast_dispatch_evidence": "The perf_fast public-native artifact records bootstrapping.NewEvaluator wrapper dispatch; zero-c1 input and compact Q-prefix operation outputs are observed. Pinned source routes these ordinary CKKS operations to shared fastcore workspaces.",
+    "logn16_source_path": "The current source has the same Fast-compatible GenEvaluationKeys predicate and public Evaluator.fast forwarding independent of LogN. LogN16 runtime key/evaluator construction and primitive execution were not reached because the public-native capacity gate stops first.",
+    "q_prefix_policy": "QPrefixWidth(level)=min(level+1,4)",
+    "c2s_compression": {
+      "logn13": {
+        "source_gate_expected_active": true,
+        "runtime_observed": false,
+        "basis": "Canonical LogN13 dimensions and Q bit schedule satisfy matchesFastLogN13C2SProfile; lazy Fast circuit initialization was not invoked by the zero-Bootstrap public-native preflight."
+      },
+      "logn16": {
+        "source_gate_expected_active": false,
+        "runtime_observed": false,
+        "basis": "matchesFastLogN13C2SProfile immediately rejects bootstrap.LogN()!=13."
+      }
+    },
+    "bootstrap_kernel_families": {
+      "fast_dft_c2s_s2c": "Source routes to dft.FastEvaluator Q-prefix transforms/rescales; not executed in this task.",
+      "fast_evalmod": "Source routes to EvaluateNewQPrefixRows; not executed in this task.",
+      "fast_core_add_mul_rescale_rotate": "Source routes to shared fastcore ApplyRows; exercised by LogN13 public-native checkpoints, not reached for LogN16."
+    }
+  },
+  "phase_b": {
+    "logn13": {
+      "status": "PASS_ZERO_BOOTSTRAP_PREBOOTSTRAP_CHAIN",
+      "profile": "LogN13/E32",
+      "input_slots": 4096,
+      "config_sha256": "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98",
+      "input_sha256": "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285",
+      "workload_sha256": "00b70a2e77887c7d6a41db1859246f6513f2c984915de648734e5dd8c584cf74",
+      "qp_sha256": "1f045e603a856968779d62e045a037274bba08cbfce8b1dd3dec2828f1f6a46b",
+      "pair_sha256": "4c22b173002a5f94397142e249e0d0488b943b86737bc71941c7dc446c3abb1a",
+      "matched_environment": true,
+      "bootstrap_calls": 0,
+      "numerical_gate_max_complex": 1e-6,
+      "max_fast_vs_standard_complex_rmse": 1.467903563887731e-11,
+      "max_fast_vs_standard_complex_difference": 5.930347959824538e-11,
+      "worst_pair_checkpoint": "rotate_level4 (same decoded values propagate to drop_level0)",
+      "checkpoints": [
+        {"name":"encrypt_a_level5","level":5,"scale_log2":45,"degree":1,"q_prefix_rows":4,"complex_rmse":8.268373061552182e-12,"max_complex_difference":2.2029381053639323e-11,"pass":true},
+        {"name":"encrypt_b_level5","level":5,"scale_log2":45,"degree":1,"q_prefix_rows":4,"complex_rmse":8.363954287958416e-12,"max_complex_difference":2.3785862667163578e-11,"pass":true},
+        {"name":"encrypt_c_q5_level5","level":5,"scale_log2":59.99999999999998,"degree":1,"q_prefix_rows":4,"complex_rmse":2.5338463741002153e-16,"max_complex_difference":6.938742113942858e-16,"pass":true},
+        {"name":"add_level5","level":5,"scale_log2":45,"degree":1,"q_prefix_rows":4,"complex_rmse":1.170284374242679e-11,"max_complex_difference":3.297358722995745e-11,"pass":true},
+        {"name":"mulrelin_level5","level":5,"scale_log2":104.99999999999999,"degree":1,"q_prefix_rows":4,"complex_rmse":2.394140088465216e-13,"max_complex_difference":8.961590950557055e-13,"pass":true},
+        {"name":"rescale_q5_level4","level":4,"scale_log2":45,"degree":1,"q_prefix_rows":4,"complex_rmse":1.0401957370102809e-11,"max_complex_difference":5.032792551822055e-11,"pass":true},
+        {"name":"rotate_level4","level":4,"scale_log2":45,"degree":1,"q_prefix_rows":4,"complex_rmse":1.467903563887731e-11,"max_complex_difference":5.930347959824538e-11,"pass":true},
+        {"name":"drop_level0","level":0,"scale_log2":45,"degree":1,"q_prefix_rows":1,"complex_rmse":1.467903563887731e-11,"max_complex_difference":5.930347959824538e-11,"pass":true}
+      ],
+      "fast_input_kind": "fast_zero_secret_public_encrypt_v1",
+      "fast_c1_nonzero": false,
+      "fast_compact_outputs": "Add/MulRelin Level5, Rescale/Rotate Level4, and Drop Level0 contain only authoritative Q-prefix rows; native encryptions initially retain full backing.",
+      "capacity": {"rescale_bound":"2271135713118062","q0123_product":"5986308565615587353347023386369277282933624144412673","q0":"36028797018652673"}
+    },
+    "logn16": {
+      "status": "PUBLIC_NATIVE_LOGN16_PROFILE_BLOCKED",
+      "profile": "LogN16/E32",
+      "input_slots": 32768,
+      "config_sha256": "16e62fdea2dc5ac32240a33cc256cdf60b935aa00b4a16aa004474d2c3033b02",
+      "input_sha256": "659fc59c899341a8253887270f1ae3478528fd864d66aca14bba918550ce8ccf",
+      "qp_sha256": "6c82ca724cbfdce2083b2ef2c18d53f81e658a6f28ff283e9a671d276710ec5f",
+      "standard_preflight_error": "terminal Level0 q0 capacity failure: B=18169085704944493 q0=36028797019488257 deficit=309374390400729",
+      "fast_preflight_error": "terminal Level0 q0 capacity failure: B=18169085704944493 q0=36028797019488257 deficit=309374390400729",
+      "backend_constructed": false,
+      "ckks_operations_executed": false,
+      "bootstrap_calls": 0,
+      "q0123_capacity_gate": "passed before the terminal q0 check; the fixed Level0 centered-capacity condition 2B<q0 fails by 309374390400729."
+    }
+  },
+  "phase_c": {
+    "status": "NOT_RUN_PHASE_B_BLOCKED",
+    "authorized_max_bootstrap_calls": 16,
+    "reserved_calls": 0,
+    "actual_calls": 0,
+    "timings_allocations_and_bootstrap_output_oracles": "not measured"
+  },
+  "historical_evidence": {
+    "logn16_exact_zero_audit": "FAST-DUAL-LOGN16-EXACT-ZERO-EVIDENCE-AUDIT-003 used diagnostic-encoded-c0-c1-zero-v1, not native Standard E32; its terminal equality is not this task's formal workload or a causal explanation.",
+    "old_logn13_speed": "Batch023's 4.225x warm ratio used historical Fast 2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac; not reused as current performance evidence.",
+    "old_logn16_panic": "FAST-LOGN16-CURRENT-NUMERICAL-REVALIDATION-001 linked the Fast checkout into its purported Standard lane; it is not a genuine pinned-Standard panic result."
+  },
+  "tests": {
+    "primary_default": "go test ./cmd/perfprobe -count=1; go vet ./cmd/perfprobe; git diff --check — PASS",
+    "primary_standard_tag": "GOWORK=off go test -modfile=<isolated-standard.mod> -tags=perf_standard ./cmd/perfprobe -count=1; go vet — PASS",
+    "primary_fast_tag": "GOWORK=off go test -modfile=<isolated-fast.mod> -tags=perf_fast ./cmd/perfprobe -count=1; go vet — PASS",
+    "secondary_c2s_no_bootstrap_test": "TestFastLogN13C2SCompressionPreparation and TestFastLogN13C2SCompressionGuardRejectsChangedProfile — PASS; no Secondary files changed."
+  },
+  "secondary_production_changes": false
+}
