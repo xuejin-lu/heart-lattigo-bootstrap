@@ -30,14 +30,48 @@ import (
 const (
 	publicStandardSHA        = "5dbffbdea05394de2ca3a432ed5318aa832e3f40"
 	publicFastSHA            = "2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac"
+	publicCurrentFastSHA     = "2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f"
 	publicConfigSHA          = "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98"
 	publicInputSHA           = "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285"
 	publicWorkloadSHA        = "00b70a2e77887c7d6a41db1859246f6513f2c984915de648734e5dd8c584cf74"
 	publicQPSHA              = "1f045e603a856968779d62e045a037274bba08cbfce8b1dd3dec2828f1f6a46b"
+	publicLogN16ConfigSHA    = "16e62fdea2dc5ac32240a33cc256cdf60b935aa00b4a16aa004474d2c3033b02"
+	publicLogN16InputSHA     = "659fc59c899341a8253887270f1ae3478528fd864d66aca14bba918550ce8ccf"
+	publicLogN16QPSHA        = "6c82ca724cbfdce2083b2ef2c18d53f81e658a6f28ff283e9a671d276710ec5f"
 	publicNumericalGate      = 1e-6
 	publicTerminalLevel      = 0
 	publicMulRescaleInputLvl = 5
 )
+
+type publicProfileContract struct {
+	Name           string
+	LogN           int
+	InputSlots     int
+	RingN          int
+	ConfigSHA256   string
+	InputSHA256    string
+	WorkloadSHA256 string
+	QPSHA256       string
+}
+
+func publicProfileFor(name string) (publicProfileContract, error) {
+	switch name {
+	case "logn13":
+		return publicProfileContract{
+			Name: name, LogN: 13, InputSlots: 1 << 12, RingN: 1 << 13,
+			ConfigSHA256: publicConfigSHA, InputSHA256: publicInputSHA,
+			WorkloadSHA256: publicWorkloadSHA, QPSHA256: publicQPSHA,
+		}, nil
+	case "logn16":
+		return publicProfileContract{
+			Name: name, LogN: 16, InputSlots: 1 << 15, RingN: 1 << 16,
+			ConfigSHA256: publicLogN16ConfigSHA, InputSHA256: publicLogN16InputSHA,
+			QPSHA256: publicLogN16QPSHA,
+		}, nil
+	default:
+		return publicProfileContract{}, fmt.Errorf("unsupported public-native profile %q", name)
+	}
+}
 
 type publicBackend struct {
 	name            string
@@ -230,11 +264,15 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 	if err := ensurePublicNativeOutputsAvailable(opts); err != nil {
 		return err
 	}
-	if opts.profile != "logn13" || opts.ephemeralSecretWeight != 32 || effective.InputSlots != 1<<12 {
-		return errors.New("public-native Batch021 fixture is frozen to LogN13, 4096 slots, and E=32")
+	profile, err := publicProfileFor(opts.profile)
+	if err != nil {
+		return err
 	}
-	if configHash != publicConfigSHA {
-		return fmt.Errorf("canonical Batch019/020 config SHA mismatch: got %s want %s", configHash, publicConfigSHA)
+	if opts.ephemeralSecretWeight != 32 || effective.InputSlots != profile.InputSlots || effective.LogN != profile.LogN || effective.RingN != profile.RingN {
+		return fmt.Errorf("public-native %s profile requires LogN=%d, %d slots, RingN=%d, and E=32", profile.Name, profile.LogN, profile.InputSlots, profile.RingN)
+	}
+	if configHash != profile.ConfigSHA256 {
+		return fmt.Errorf("canonical public-native %s config SHA mismatch: got %s want %s", profile.Name, configHash, profile.ConfigSHA256)
 	}
 	if err := validatePublicEphemeralWeight(opts.ephemeralSecretWeight); err != nil {
 		return err
@@ -250,7 +288,7 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 	if err != nil {
 		return fmt.Errorf("backend provenance: %w", err)
 	}
-	if err := validatePublicBackendPin(publicBackendName(), secondaryCommit); err != nil {
+	if err := validatePublicBackendPin(publicBackendName(), secondaryCommit, profile.Name); err != nil {
 		return err
 	}
 	sourceHash, err := primaryMeasurementSourceFingerprint(primaryRoot)
@@ -262,8 +300,8 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 		return err
 	}
 	inputHash := perfmeasure.Fingerprint(valuesA)
-	if inputHash != publicInputSHA {
-		return fmt.Errorf("canonical Batch019/020 input fingerprint mismatch: %s", inputHash)
+	if inputHash != profile.InputSHA256 {
+		return fmt.Errorf("canonical public-native %s input fingerprint mismatch: %s", profile.Name, inputHash)
 	}
 	full := params.BootstrappingParameters
 	q, p := full.Q(), full.P()
@@ -273,16 +311,16 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 	}
 	qpSum := sha256.Sum256(qpBytes)
 	qpHash := hex.EncodeToString(qpSum[:])
-	if qpHash != publicQPSHA {
-		return fmt.Errorf("canonical Batch019/020 Q/P fingerprint mismatch: %s", qpHash)
+	if qpHash != profile.QPSHA256 {
+		return fmt.Errorf("canonical public-native %s Q/P fingerprint mismatch: %s", profile.Name, qpHash)
 	}
 	q5Scale := rlwe.NewScale(q[5])
 	workloadHash, err := perfmeasure.PublicMulRescaleWorkloadFingerprint(valuesA, valuesB, valuesC, q5Scale.BigInt().String())
 	if err != nil {
 		return err
 	}
-	if workloadHash != publicWorkloadSHA {
-		return fmt.Errorf("canonical Batch019 workload fingerprint mismatch: %s", workloadHash)
+	if profile.WorkloadSHA256 != "" && workloadHash != profile.WorkloadSHA256 {
+		return fmt.Errorf("canonical public-native %s workload fingerprint mismatch: %s", profile.Name, workloadHash)
 	}
 	capacity, err := perfmeasure.BoundPublicMulRescaleWorkload(valuesA, valuesB, valuesC, q, full.N())
 	if err != nil {
@@ -290,7 +328,7 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 	}
 	preflightPairSHA := ""
 	if opts.publicBootstrap || opts.publicRepeatability {
-		preflightPairSHA, err = validatePublicPreflightGate(opts.preflightPair, primaryCommit, sourceHash, configHash, qpHash, inputHash, workloadHash)
+		preflightPairSHA, err = validatePublicPreflightGateForProfile(opts.preflightPair, primaryCommit, sourceHash, profile.Name, opts.backendCommit, configHash, qpHash, inputHash, workloadHash)
 		if err != nil {
 			return fmt.Errorf("public Bootstrap preflight gate: %w", err)
 		}
@@ -304,8 +342,8 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 		return fmt.Errorf("build tag/backend mismatch: adapter=%s selected=%s", backend.name, publicBackendName())
 	}
 	defaultScale := residual.DefaultScale()
-	if full.LogDefaultScale() != 45 || residual.MaxLevel() != 1 || full.MaxLevel() != 16 || len(q) <= 5 {
-		return errors.New("effective public-native parameters do not match frozen LogN13/E32 fixture")
+	if full.LogN() != profile.LogN || full.N() != profile.RingN || full.LogDefaultScale() != 45 || residual.MaxLevel() != 1 || full.MaxLevel() != 16 || len(q) <= publicMulRescaleInputLvl {
+		return fmt.Errorf("effective public-native parameters do not match the frozen LogN%d/E32 profile", profile.LogN)
 	}
 	phaseTimings := append([]phaseTiming(nil), backend.construction...)
 	checkpoints := make([]publicCheckpoint, 0, 8)
@@ -538,7 +576,7 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 			schemaVersion, mode, status = "fast-standard-public-native-repeatability.v1", "public-native-repeatability", "PASS_PUBLIC_BOOTSTRAP_1COLD_5WARM"
 			vectorSchema = "fast-standard-public-native-repeatability-vectors.v1"
 			limitations = []string{
-				"One cold plus five warm samples describe this pinned LogN13/E32 profile; they do not establish secure-FHE equivalence or general hardware performance.",
+				fmt.Sprintf("One cold plus five warm samples describe only this pinned %s/E32 profile; they do not establish secure-FHE equivalence or general hardware performance.", profile.Name),
 				"Standard uses genuine native key generation/encryption and Fast uses the pinned intentionally insecure zero-secret mode.",
 				"Fast internal trace is a separate instrumented diagnostic lane; its timing is not included in these uninstrumented samples.",
 			}
@@ -803,7 +841,7 @@ func runPublicBootstrapAttempts(
 			err = fmt.Errorf("%s output validation: %w", attempt.phase, err)
 			return results, outputs, phases, &publicBootstrapAttemptError{Phase: attempt.phase, Err: err}
 		}
-		if checkpoint.Name != attempt.name || len(decoded) != 1<<12 || !allFinite(decoded) {
+		if checkpoint.Name != attempt.name || len(decoded) != input.N()/2 || !allFinite(decoded) {
 			err = fmt.Errorf("%s output validator returned an invalid checkpoint/vector", attempt.phase)
 			return results, outputs, phases, &publicBootstrapAttemptError{Phase: attempt.phase, Err: err}
 		}
@@ -861,16 +899,26 @@ func publicCiphertextFingerprint(ct *rlwe.Ciphertext) (string, error) {
 }
 
 func validatePublicPreflightGate(path, primaryCommit, sourceSHA256, configSHA256, qpSHA256, inputSHA256, workloadSHA256 string) (string, error) {
+	return validatePublicPreflightGateForProfile(path, primaryCommit, sourceSHA256, "logn13", publicFastSHA,
+		configSHA256, qpSHA256, inputSHA256, workloadSHA256)
+}
+
+func validatePublicPreflightGateForProfile(path, primaryCommit, sourceSHA256, profileName, fastCommit, configSHA256, qpSHA256, inputSHA256, workloadSHA256 string) (string, error) {
 	var pair publicPairDocument
 	if err := readJSON(path, &pair); err != nil {
 		return "", fmt.Errorf("read passing compare-public pair %s: %w", path, err)
 	}
-	if pair.SchemaVersion != "fast-standard-public-native-pair.v1" || pair.Status != "PASS" || !pair.MatchedEnvironment || pair.BootstrapCalls != 0 || len(pair.Bootstrap) != 0 || pair.E != 32 || pair.NumericalGate != publicNumericalGate {
-		return "", errors.New("preflight pair is not a passing zero-Bootstrap LogN13/E32 pair")
+	profile, err := publicProfileFor(profileName)
+	if err != nil {
+		return "", err
 	}
-	if pair.PrimaryCommit != primaryCommit || pair.SourceSHA256 != sourceSHA256 || pair.StandardCommit != publicStandardSHA || pair.FastCommit != publicFastSHA ||
-		pair.ConfigSHA256 != configSHA256 || pair.ConfigSHA256 != publicConfigSHA || pair.QPSHA256 != qpSHA256 || pair.QPSHA256 != publicQPSHA ||
-		pair.InputSHA256 != inputSHA256 || pair.InputSHA256 != publicInputSHA || pair.WorkloadSHA256 != workloadSHA256 || pair.WorkloadSHA256 != publicWorkloadSHA {
+	if pair.SchemaVersion != "fast-standard-public-native-pair.v1" || pair.Status != "PASS" || !pair.MatchedEnvironment || pair.BootstrapCalls != 0 || len(pair.Bootstrap) != 0 || pair.E != 32 || pair.NumericalGate != publicNumericalGate {
+		return "", fmt.Errorf("preflight pair is not a passing zero-Bootstrap %s/E32 pair", profileName)
+	}
+	if pair.PrimaryCommit != primaryCommit || pair.SourceSHA256 != sourceSHA256 || pair.StandardCommit != publicStandardSHA || pair.FastCommit != fastCommit ||
+		pair.ConfigSHA256 != configSHA256 || pair.ConfigSHA256 != profile.ConfigSHA256 || pair.QPSHA256 != qpSHA256 || pair.QPSHA256 != profile.QPSHA256 ||
+		pair.InputSHA256 != inputSHA256 || pair.InputSHA256 != profile.InputSHA256 || pair.WorkloadSHA256 != workloadSHA256 ||
+		(profile.WorkloadSHA256 != "" && pair.WorkloadSHA256 != profile.WorkloadSHA256) {
 		return "", errors.New("preflight pair provenance does not match the current Primary source, pins, config, Q/P, input, and workload")
 	}
 	wantNames := []string{"encrypt_a_level5", "encrypt_b_level5", "encrypt_c_q5_level5", "add_level5", "mulrelin_level5", "rescale_q5_level4", "rotate_level4", "drop_level0"}
@@ -1202,12 +1250,12 @@ func runPublicCompare(args []string) error {
 		pair.BootstrapCalls = standard.BootstrapCalls + fast.BootstrapCalls
 		if standard.Mode == "public-native-repeatability" {
 			pair.Limitations = []string{
-				"One cold plus five warm public Bootstrap samples characterize only this pinned LogN13/E32 profile and environment.",
+				fmt.Sprintf("One cold plus five warm public Bootstrap samples characterize only this pinned %s/E32 profile and environment.", standard.Profile),
 				"Standard uses genuine native encryption while Fast uses the pinned intentionally insecure zero-secret mode; security equivalence is not claimed.",
 			}
 		} else {
 			pair.Limitations = []string{
-				"Exactly one cold and one warm Bootstrap sample per backend are descriptive, not a statistically stable speedup estimate.",
+				fmt.Sprintf("Exactly one cold and one warm Bootstrap sample per backend for %s are descriptive, not a statistically stable speedup estimate.", standard.Profile),
 				"Standard uses genuine native encryption while Fast uses the pinned intentionally insecure zero-secret mode; security equivalence is not claimed.",
 			}
 		}
@@ -1273,25 +1321,30 @@ func runPublicCompare(args []string) error {
 }
 
 func validatePublicPairArtifacts(standard, fast publicNativeDocument, standardVectors, fastVectors publicVectorDocument) error {
+	profile, err := publicProfileFor(standard.Profile)
+	if err != nil {
+		return err
+	}
 	if standard.SchemaVersion != "fast-standard-public-native-preflight.v1" || fast.SchemaVersion != standard.SchemaVersion || standard.Status != "PASS_ZERO_BOOTSTRAP_PREBOOTSTRAP_CHAIN" || fast.Status != standard.Status {
 		return errors.New("paired inputs are not successful public-native preflight artifacts")
 	}
-	if standard.Backend != "standard" || fast.Backend != "fast" || standard.Profile != "logn13" || fast.Profile != standard.Profile ||
-		standard.EphemeralSecretWeight != 32 || fast.EphemeralSecretWeight != 32 || standard.InputSlots != 1<<12 || fast.InputSlots != standard.InputSlots ||
+	if standard.Backend != "standard" || fast.Backend != "fast" || fast.Profile != standard.Profile ||
+		standard.EphemeralSecretWeight != 32 || fast.EphemeralSecretWeight != 32 || standard.InputSlots != profile.InputSlots || fast.InputSlots != standard.InputSlots ||
 		standard.BootstrapCalls != 0 || fast.BootstrapCalls != 0 || standard.BootstrapBudget != 0 || fast.BootstrapBudget != 0 ||
 		!standard.PrimaryClean || !fast.PrimaryClean || !standard.BackendClean || !fast.BackendClean {
-		return errors.New("paired artifacts violate pinned LogN13/E32 clean-provenance zero-Bootstrap contract")
+		return fmt.Errorf("paired artifacts violate pinned %s/E32 clean-provenance zero-Bootstrap contract", profile.Name)
 	}
-	if err := validatePublicBackendPin(standard.Backend, standard.BackendCommit); err != nil {
+	if err := validatePublicBackendPin(standard.Backend, standard.BackendCommit, profile.Name); err != nil {
 		return err
 	}
-	if err := validatePublicBackendPin(fast.Backend, fast.BackendCommit); err != nil {
+	if err := validatePublicBackendPin(fast.Backend, fast.BackendCommit, profile.Name); err != nil {
 		return err
 	}
 	if standard.BuildTag != "perf_standard" || fast.BuildTag != "perf_fast" ||
 		standard.PrimaryCommit == "" || standard.PrimaryCommit != fast.PrimaryCommit || standard.PrimarySourceSHA256 == "" || standard.PrimarySourceSHA256 != fast.PrimarySourceSHA256 ||
-		standard.ConfigSHA256 != publicConfigSHA || fast.ConfigSHA256 != publicConfigSHA || standard.QPSHA256 != publicQPSHA || fast.QPSHA256 != publicQPSHA ||
-		standard.InputSHA256 != publicInputSHA || fast.InputSHA256 != publicInputSHA || standard.WorkloadSHA256 != publicWorkloadSHA || fast.WorkloadSHA256 != publicWorkloadSHA ||
+		standard.ConfigSHA256 != profile.ConfigSHA256 || fast.ConfigSHA256 != profile.ConfigSHA256 || standard.QPSHA256 != profile.QPSHA256 || fast.QPSHA256 != profile.QPSHA256 ||
+		standard.InputSHA256 != profile.InputSHA256 || fast.InputSHA256 != profile.InputSHA256 || standard.WorkloadSHA256 != fast.WorkloadSHA256 ||
+		(profile.WorkloadSHA256 != "" && standard.WorkloadSHA256 != profile.WorkloadSHA256) ||
 		!reflect.DeepEqual(standard.Parameters, fast.Parameters) {
 		return errors.New("paired artifacts have mismatched or noncanonical Primary source, pins, config, parameters, input, or workload provenance")
 	}
@@ -1320,7 +1373,7 @@ func validatePublicPairArtifacts(standard, fast publicNativeDocument, standardVe
 	if err := validatePublicCapacity(fast.Capacity); err != nil {
 		return fmt.Errorf("Fast capacity evidence: %w", err)
 	}
-	oracles, err := publicOracleCheckpoints(1 << 12)
+	oracles, err := publicOracleCheckpoints(profile.InputSlots)
 	if err != nil {
 		return err
 	}
@@ -1410,6 +1463,10 @@ func validatePublicBootstrapPairArtifacts(standard, fast publicNativeDocument, s
 }
 
 func validatePublicBootstrapOutputEvidence(doc publicNativeDocument, vectors publicVectorDocument, base publicNativeDocument, baseVectors publicVectorDocument) error {
+	profile, err := publicProfileFor(doc.Profile)
+	if err != nil {
+		return err
+	}
 	wantPhases, err := publicBootstrapAttemptSpecs(doc.BootstrapBudget)
 	if err != nil {
 		return err
@@ -1418,7 +1475,7 @@ func validatePublicBootstrapOutputEvidence(doc publicNativeDocument, vectors pub
 		return errors.New("Bootstrap evidence must contain exactly cold and warm outputs")
 	}
 	baseInput, ok := baseVectors.Checkpoints["drop_level0"]
-	if !ok || len(baseInput) != 1<<12 {
+	if !ok || len(baseInput) != profile.InputSlots {
 		return errors.New("held pre-Bootstrap Level0 decoded vector is missing or has an invalid length")
 	}
 	input := decodeComplexValues(baseInput)
@@ -1441,8 +1498,8 @@ func validatePublicBootstrapOutputEvidence(doc publicNativeDocument, vectors pub
 			return fmt.Errorf("Bootstrap phase %s has output checkpoint %q, want %q", want.phase, checkpoint.Name, want.name)
 		}
 		values, exists := vectors.BootstrapOutputs[checkpoint.Name]
-		if !exists || len(values) != 1<<12 {
-			return fmt.Errorf("Bootstrap output %s has %d decoded slots, want exactly %d", checkpoint.Name, len(values), 1<<12)
+		if !exists || len(values) != profile.InputSlots {
+			return fmt.Errorf("Bootstrap output %s has %d decoded slots, want exactly %d", checkpoint.Name, len(values), profile.InputSlots)
 		}
 		decoded := decodeComplexValues(values)
 		if !allFinite(decoded) || checkpoint.DecodedSHA256 == "" || perfmeasure.Fingerprint(decoded) != checkpoint.DecodedSHA256 {
@@ -1483,6 +1540,10 @@ func publicBootstrapResultByPhase(results []publicBootstrapResult, phase string)
 }
 
 func validatePublicBackendEvidence(doc publicNativeDocument, vectors publicVectorDocument, oracles map[string][]complex128) error {
+	profile, err := publicProfileFor(doc.Profile)
+	if err != nil {
+		return err
+	}
 	wantNames := []string{"encrypt_a_level5", "encrypt_b_level5", "encrypt_c_q5_level5", "add_level5", "mulrelin_level5", "rescale_q5_level4", "rotate_level4", "drop_level0"}
 	if len(vectors.Checkpoints) != len(wantNames) {
 		return fmt.Errorf("decoded vector checkpoint count=%d, want %d", len(vectors.Checkpoints), len(wantNames))
@@ -1492,8 +1553,8 @@ func validatePublicBackendEvidence(doc publicNativeDocument, vectors publicVecto
 			return fmt.Errorf("unexpected decoded vector checkpoint %q", name)
 		}
 	}
-	if doc.InputSlots != 1<<12 || doc.Parameters.InputSlots != doc.InputSlots || doc.Parameters.RingN != 1<<13 {
-		return errors.New("public evidence does not describe the frozen 4096-slot LogN13 profile")
+	if doc.InputSlots != profile.InputSlots || doc.Parameters.InputSlots != doc.InputSlots || doc.Parameters.RingN != profile.RingN {
+		return fmt.Errorf("public evidence does not describe the frozen %d-slot %s profile", profile.InputSlots, profile.Name)
 	}
 	if err := validatePublicProfileEvidence(doc); err != nil {
 		return err
@@ -1506,8 +1567,8 @@ func validatePublicBackendEvidence(doc publicNativeDocument, vectors publicVecto
 	}
 	for _, checkpoint := range doc.Checkpoints {
 		values, ok := vectors.Checkpoints[checkpoint.Name]
-		if !ok || len(values) != 1<<12 {
-			return fmt.Errorf("checkpoint %s decoded vector has %d slots, want exactly %d", checkpoint.Name, len(values), 1<<12)
+		if !ok || len(values) != profile.InputSlots {
+			return fmt.Errorf("checkpoint %s decoded vector has %d slots, want exactly %d", checkpoint.Name, len(values), profile.InputSlots)
 		}
 		decoded := decodeComplexValues(values)
 		if !allFinite(decoded) {
@@ -1534,6 +1595,14 @@ func validatePublicBackendEvidence(doc publicNativeDocument, vectors publicVecto
 }
 
 func validatePublicProfileEvidence(doc publicNativeDocument) error {
+	profile, err := publicProfileFor(doc.Profile)
+	if err != nil {
+		return err
+	}
+	if doc.ConfigSHA256 != profile.ConfigSHA256 || doc.InputSlots != profile.InputSlots ||
+		doc.Parameters.LogN != profile.LogN || doc.Parameters.RingN != profile.RingN {
+		return fmt.Errorf("recorded dimensions/config do not match the frozen %s public-native profile", profile.Name)
+	}
 	parsePrimes := func(label string, values []string) ([]uint64, error) {
 		primes := make([]uint64, len(values))
 		for index, value := range values {
@@ -1561,21 +1630,21 @@ func validatePublicProfileEvidence(doc publicNativeDocument) error {
 		return err
 	}
 	qpHash := sha256.Sum256(qpBytes)
-	if hex.EncodeToString(qpHash[:]) != doc.QPSHA256 || doc.QPSHA256 != publicQPSHA {
+	if hex.EncodeToString(qpHash[:]) != doc.QPSHA256 || doc.QPSHA256 != profile.QPSHA256 {
 		return errors.New("recorded Q/P modulus rows do not match the canonical Q/P fingerprint")
 	}
 	a, b, c, err := perfmeasure.PublicMulRescaleWorkload(doc.InputSlots)
 	if err != nil {
 		return err
 	}
-	if perfmeasure.Fingerprint(a) != doc.InputSHA256 || doc.InputSHA256 != publicInputSHA {
+	if perfmeasure.Fingerprint(a) != doc.InputSHA256 || doc.InputSHA256 != profile.InputSHA256 {
 		return errors.New("recorded public input does not match the canonical workload fingerprint")
 	}
 	workloadHash, err := perfmeasure.PublicMulRescaleWorkloadFingerprint(a, b, c, new(big.Int).SetUint64(q[publicMulRescaleInputLvl]).String())
 	if err != nil {
 		return err
 	}
-	if workloadHash != doc.WorkloadSHA256 || doc.WorkloadSHA256 != publicWorkloadSHA {
+	if workloadHash != doc.WorkloadSHA256 || (profile.WorkloadSHA256 != "" && doc.WorkloadSHA256 != profile.WorkloadSHA256) {
 		return errors.New("recorded public workload does not match the canonical workload fingerprint")
 	}
 	capacity, err := perfmeasure.BoundPublicMulRescaleWorkload(a, b, c, q, doc.Parameters.RingN)
@@ -1770,12 +1839,29 @@ func samePublicCheckpointNames(checkpoints []publicCheckpoint, want []string) bo
 	return true
 }
 
-func validatePublicBackendPin(backend, commit string) error {
-	want := map[string]string{"standard": publicStandardSHA, "fast": publicFastSHA}[backend]
-	if want == "" || commit != want {
-		return fmt.Errorf("%s backend commit %s differs from approved Batch021 pin %s", backend, commit, want)
+func validatePublicBackendPin(backend, commit string, profileNames ...string) error {
+	profileName := "logn13"
+	if len(profileNames) > 0 {
+		profileName = profileNames[0]
 	}
-	return nil
+	profile, err := publicProfileFor(profileName)
+	if err != nil {
+		return err
+	}
+	switch backend {
+	case "standard":
+		if commit == publicStandardSHA {
+			return nil
+		}
+		return fmt.Errorf("Standard backend commit %s differs from pinned Standard %s", commit, publicStandardSHA)
+	case "fast":
+		if commit == publicCurrentFastSHA || (profile.LogN == 13 && commit == publicFastSHA) {
+			return nil
+		}
+		return fmt.Errorf("Fast backend commit %s is not approved for %s (current=%s; historical LogN13=%s)", commit, profile.Name, publicCurrentFastSHA, publicFastSHA)
+	default:
+		return fmt.Errorf("unsupported public-native backend %q", backend)
+	}
 }
 
 func publicInputContract(backend string) (kind, constructor string) {

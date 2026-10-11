@@ -250,7 +250,7 @@ func run() error {
 		} else if opts.preflightPair != "" {
 			return errors.New("--preflight-pair is only accepted with --public-bootstrap")
 		}
-		if opts.traceFixtureOut != "" && (opts.backendCommit != publicFastSHA || opts.bootstrapBudget != 0 || opts.publicBootstrap || opts.publicRepeatability) {
+		if opts.traceFixtureOut != "" && ((opts.backendCommit != publicFastSHA && opts.backendCommit != publicCurrentFastSHA) || opts.profile != "logn13" || opts.bootstrapBudget != 0 || opts.publicBootstrap || opts.publicRepeatability) {
 			return errors.New("--trace-fixture-out is only accepted for the pinned Fast zero-Bootstrap public-native preflight")
 		}
 		if opts.bootstrapBudget != wantBudget {

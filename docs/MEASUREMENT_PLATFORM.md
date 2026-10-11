@@ -312,3 +312,29 @@ median over five one-second samples on Apple M4 / Go 1.26.4 / darwin-arm64;
 it must not be compared or pooled with Batch026's shorter samples. No
 production arithmetic change or P93/Standard performance run is implied.
 See `results/FAST-E32-RESCALE-CAUSAL-HOTSPOT-AUTONOMOUS-BATCH-027-{summary.md,journal.md,evidence.json}`.
+
+## FAST-LOGN16-BACKEND-PATH-AND-PERFORMANCE-004 public-native profile extension
+
+The existing `cmd/perfprobe --mode=public-native` adapter is profile-aware for
+the frozen LogN13/E32 fixture and the canonical LogN16/E32 config. LogN13
+retains its historical config/input/QP/workload fingerprints and accepts the
+historical public Fast pin for immutable prior artifacts; current public-native
+runs can also bind to Fast `2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f`. LogN16
+is pinned to config SHA-256
+`16e62fdea2dc5ac32240a33cc256cdf60b935aa00b4a16aa004474d2c3033b02`, the
+canonical 32,768-slot deterministic input SHA-256
+`659fc59c899341a8253887270f1ae3478528fd864d66aca14bba918550ce8ccf`, and
+Q/P SHA-256
+`6c82ca724cbfdce2083b2ef2c18d53f81e658a6f28ff283e9a671d276710ec5f`.
+Its Fast pin is current-only; the old LogN13 pin is not accepted for LogN16.
+
+This is profile support in the shared serializer/validator, not evidence that
+the LogN16 workload passes. The unchanged canonical LogN16/E32 public
+Mul/Rescale workload currently fails the existing hard centered-capacity check
+at terminal Level0 q0 (`B=18169085704944493`, `q0=36028797019488257`, deficit
+`309374390400729`). The runner stops before backend construction or any CKKS
+operation; do not change the workload, parameters, or capacity threshold to
+force acceptance. Therefore no LogN16 public-native pair or Bootstrap timing
+is established, and no Bootstrap attempt may proceed from this failed
+preflight. A future task must resolve/authorize the profile-capacity question
+before treating LogN16 as a comparable formal workload.

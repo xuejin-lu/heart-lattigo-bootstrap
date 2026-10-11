@@ -428,6 +428,28 @@ func TestPublicBootstrapGateRequiresExactPassingZeroCallPair(t *testing.T) {
 	}
 }
 
+func TestPublicBootstrapGateBindsTheCurrentFastLogN13Pin(t *testing.T) {
+	pair := publicPairDocument{
+		SchemaVersion: "fast-standard-public-native-pair.v1", Status: "PASS", NumericalGate: publicNumericalGate,
+		FastCommit: publicCurrentFastSHA, StandardCommit: publicStandardSHA, PrimaryCommit: "primary-sha", SourceSHA256: "source-sha",
+		InputSHA256: publicInputSHA, WorkloadSHA256: publicWorkloadSHA, ConfigSHA256: publicConfigSHA, QPSHA256: publicQPSHA,
+		E: 32, BootstrapCalls: 0, MatchedEnvironment: true,
+	}
+	for _, name := range []string{"encrypt_a_level5", "encrypt_b_level5", "encrypt_c_q5_level5", "add_level5", "mulrelin_level5", "rescale_q5_level4", "rotate_level4", "drop_level0"} {
+		pair.Checkpoints = append(pair.Checkpoints, publicPairCheckpoint{
+			Name: name, Pass: true, StateMatched: true, Metrics: vectorMetrics{MaxComplexDifference: 0},
+		})
+	}
+	path := filepath.Join(t.TempDir(), "current-fast-preflight-pair.json")
+	if err := writeExclusiveJSON(path, pair); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := validatePublicPreflightGateForProfile(path, "primary-sha", "source-sha", "logn13", publicCurrentFastSHA,
+		publicConfigSHA, publicQPSHA, publicInputSHA, publicWorkloadSHA); err != nil {
+		t.Fatalf("current pinned Fast preflight pair rejected: %v", err)
+	}
+}
+
 func TestPublicBootstrapAttemptsStopAfterFirstOutputGateFailure(t *testing.T) {
 	input := publicTestCiphertext(t)
 	journalBase := filepath.Join(t.TempDir(), "bootstrap-fail-closed")
@@ -554,6 +576,12 @@ func TestPublicPairProvenanceRequiresPinnedCoverageAndCleanSources(t *testing.T)
 	if err := validatePublicPairArtifacts(standard, fast, standardVectors, fastVectors); err != nil {
 		t.Fatalf("canonical public pair rejected: %v", err)
 	}
+	currentFast, currentFastVectors := fast, fastVectors
+	currentFast.BackendCommit = publicCurrentFastSHA
+	currentFastVectors.BackendCommit = publicCurrentFastSHA
+	if err := validatePublicPairArtifacts(standard, currentFast, standardVectors, currentFastVectors); err != nil {
+		t.Fatalf("current Fast LogN13 pair rejected: %v", err)
+	}
 
 	missing := fast
 	missing.Checkpoints = append([]publicCheckpoint(nil), fast.Checkpoints[:len(fast.Checkpoints)-1]...)
@@ -574,6 +602,39 @@ func TestPublicPairProvenanceRequiresPinnedCoverageAndCleanSources(t *testing.T)
 	duplicate.Checkpoints = append(append([]publicCheckpoint(nil), fast.Checkpoints...), fast.Checkpoints[0])
 	if err := validatePublicPairArtifacts(standard, duplicate, standardVectors, fastVectors); err == nil {
 		t.Fatal("public comparator accepted a duplicate checkpoint")
+	}
+}
+
+func TestLogN16PublicNativeProfileStopsAtTerminalQ0CapacityGate(t *testing.T) {
+	profile, err := publicProfileFor("logn16")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if profile.InputSlots != 1<<15 || profile.RingN != 1<<16 || profile.ConfigSHA256 != publicLogN16ConfigSHA || profile.InputSHA256 != publicLogN16InputSHA || profile.QPSHA256 != publicLogN16QPSHA {
+		t.Fatalf("LogN16 contract differs from its frozen canonical profile: %+v", profile)
+	}
+	if err := validatePublicBackendPin("fast", publicCurrentFastSHA, "logn16"); err != nil {
+		t.Fatalf("current Fast source rejected for LogN16: %v", err)
+	}
+	if err := validatePublicBackendPin("fast", publicFastSHA, "logn16"); err == nil {
+		t.Fatal("historical LogN13 Fast source accepted for LogN16")
+	}
+	config, _, err := perfmeasure.LoadConfig(filepath.Join("..", "..", "configs", "bootstrap_config.logN16.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, params, effective, err := perfmeasure.ParametersFromConfigWithE(config, 32)
+	if err != nil {
+		t.Fatal(err)
+	}
+	a, b, c, err := perfmeasure.PublicMulRescaleWorkload(effective.InputSlots)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = perfmeasure.BoundPublicMulRescaleWorkload(a, b, c, params.BootstrappingParameters.Q(), params.BootstrappingParameters.N())
+	const wantBlocker = "terminal Level0 q0 capacity failure: B=18169085704944493 q0=36028797019488257 deficit=309374390400729"
+	if err == nil || err.Error() != wantBlocker {
+		t.Fatalf("LogN16 E32 workload capacity result = %v, want exact blocker %q", err, wantBlocker)
 	}
 }
 
