@@ -25,6 +25,16 @@ func TestParsePublicE32OfflineArgsRequiresFrozenInputs(t *testing.T) {
 	require.ErrorContains(t, err, "--out-prefix")
 	_, err = parsePublicE32OfflineArgs(append(args, "--trace", "all"))
 	require.Error(t, err, "offline mode must reject online-trace flags")
+
+	task006Args := []string{
+		"--raw", "raw.json", "--sidecar", "failure.json", "--task006-summary", "task006.json", "--task006-ledger", "ledger.json",
+		"--attempt-01", "attempt-01.json", "--attempt-02", "attempt-02.json", "--out-prefix", "results/task006-offline",
+	}
+	task006Opts, err := parsePublicE32OfflineArgs(task006Args)
+	require.NoError(t, err)
+	require.Equal(t, "task006.json", task006Opts.task006Summary)
+	_, err = parsePublicE32OfflineArgs(append(task006Args, "--manifest", "batch025.json"))
+	require.ErrorContains(t, err, "不接受 Batch025")
 }
 
 func TestReadPublicE32OfflineRawRejectsTampering(t *testing.T) {
@@ -104,4 +114,39 @@ func TestPublicE32OfflineReplayFrozenCaptureWithoutBootstrap(t *testing.T) {
 	require.Equal(t, 539, doc.EventCount)
 	require.Empty(t, doc.ValidationAnomalies)
 	require.Contains(t, journal, "New Standard/Fast Bootstrap calls: **0**")
+}
+
+func TestTask006OfflineReplayCapturedTraceWithoutBootstrap(t *testing.T) {
+	rawPath := os.Getenv("FASTDIAG_TASK006_RAW")
+	if rawPath == "" {
+		t.Skip("set FASTDIAG_TASK006_RAW and FASTDIAG_TASK006_SIDECAR to revalidate the preserved 539-event Task006 capture")
+	}
+	root, err := findPrimaryRoot(".")
+	require.NoError(t, err)
+	secondaryRoot, err := resolveSecondaryRoot(root)
+	require.NoError(t, err)
+	primaryMeta, err := repositoryMetadata(root, "")
+	require.NoError(t, err)
+	opts := publicE32OfflineOptions{
+		rawPath: rawPath, sidecarPath: os.Getenv("FASTDIAG_TASK006_SIDECAR"),
+		task006Summary: filepath.Join(root, "results", task006SummaryFile),
+		task006Ledger:  filepath.Join(root, "results", "FAST-LOGN16-INTEGRATED-PERFPROBE-FASTDIAG-006-attempt-ledger.json"),
+		attemptOne:     filepath.Join(root, "results", "FAST-LOGN16-INTEGRATED-PERFPROBE-FASTDIAG-006.json.diagnostic-fast.bootstrap-attempt-01.json"),
+		attemptTwo:     filepath.Join(root, "results", "FAST-LOGN16-INTEGRATED-PERFPROBE-FASTDIAG-006.json.diagnostic-fast.bootstrap-attempt-02.json"),
+	}
+	require.NotEmpty(t, opts.sidecarPath)
+	doc, journal, err := replayPublicE32Task006Offline(root, secondaryRoot, primaryMeta, opts)
+	require.NoError(t, err)
+	require.Empty(t, doc.ValidationAnomalies)
+	require.Equal(t, "OFFLINE_RECURSIVE_TRACE_REVALIDATED", doc.Classification)
+	require.Equal(t, "TRACE_UNVERIFIED", doc.OriginalTraceStatus)
+	require.False(t, doc.OriginalRawRelabeled)
+	require.Zero(t, doc.NewBootstrapCalls)
+	require.Equal(t, 539, doc.EventCount)
+	require.Equal(t, []task006PowerRoot{{Branch: "real", Sequence: 59}, {Branch: "imag", Sequence: 279}}, doc.GeneratedPowerRoots)
+	require.Equal(t, []uint64{63, 62, 61, 60, 59}, doc.RecursivePowerAncestry)
+	require.Equal(t, 16, doc.EffectiveParameters.LogN)
+	require.Equal(t, 15, doc.EffectiveParameters.LogSlots)
+	require.True(t, doc.DiagnosticPatchMatches)
+	require.Contains(t, journal, "New Bootstrap calls: `0`")
 }

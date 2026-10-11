@@ -4,7 +4,6 @@ import (
 	"crypto/sha256"
 	"encoding/binary"
 	"encoding/hex"
-	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
@@ -95,6 +94,18 @@ func publicProfileFor(name string) (publicProfileContract, error) {
 	default:
 		return publicProfileContract{}, fmt.Errorf("unsupported public-native profile %q", name)
 	}
+}
+
+func publicNativeProfileForEffective(name string, effective perfmeasure.EffectiveParameters) (publicProfileContract, error) {
+	effectiveName, err := perfmeasure.ResolveProfileName(name, effective)
+	if err != nil {
+		return publicProfileContract{}, err
+	}
+	profile, err := publicProfileFor(effectiveName)
+	if err != nil {
+		return publicProfileContract{}, fmt.Errorf("UNSUPPORTED_EFFECTIVE_PROFILE: %s (LogSlots=%d, slots=%d, E=%d) has no frozen public-native config/Q/P/input/workload contract: %w", effectiveName, effective.LogSlots, effective.InputSlots, effective.EphemeralSecretWeight, err)
+	}
+	return profile, nil
 }
 
 type publicBackend struct {
@@ -305,7 +316,7 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 	if err := ensurePublicNativeOutputsAvailable(opts); err != nil {
 		return err
 	}
-	profile, err := publicProfileFor(opts.profile)
+	profile, err := publicNativeProfileForEffective(opts.profile, effective)
 	if err != nil {
 		return err
 	}
@@ -330,7 +341,7 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 		return fmt.Errorf("backend provenance: %w", err)
 	}
 	if err := validatePublicBackendPin(publicBackendName(), secondaryCommit, profile.Name); err != nil {
-		return err
+		return fmt.Errorf("UNSUPPORTED_BACKEND_PROFILE: %s for %s: %w", publicBackendName(), profile.Name, err)
 	}
 	sourceHash, err := primaryMeasurementSourceFingerprint(primaryRoot)
 	if err != nil {
@@ -346,12 +357,7 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 	}
 	full := params.BootstrappingParameters
 	q, p := full.Q(), full.P()
-	qpBytes, err := json.Marshal(struct{ Q, P []uint64 }{q, p})
-	if err != nil {
-		return err
-	}
-	qpSum := sha256.Sum256(qpBytes)
-	qpHash := hex.EncodeToString(qpSum[:])
+	qpHash := perfmeasure.QPFingerprint(q, p)
 	if qpHash != profile.QPSHA256 {
 		return fmt.Errorf("canonical public-native %s Q/P fingerprint mismatch: %s", profile.Name, qpHash)
 	}
@@ -1741,12 +1747,8 @@ func validatePublicProfileEvidence(doc publicNativeDocument) error {
 	if len(q) != len(doc.Parameters.QChainBits) || len(p) != len(doc.Parameters.PBits) || len(q) <= publicMulRescaleInputLvl {
 		return errors.New("public profile modulus counts disagree with effective Q/P metadata")
 	}
-	qpBytes, err := json.Marshal(struct{ Q, P []uint64 }{q, p})
-	if err != nil {
-		return err
-	}
-	qpHash := sha256.Sum256(qpBytes)
-	if hex.EncodeToString(qpHash[:]) != doc.QPSHA256 || doc.QPSHA256 != profile.QPSHA256 {
+	qpHash := perfmeasure.QPFingerprint(q, p)
+	if qpHash != doc.QPSHA256 || doc.QPSHA256 != profile.QPSHA256 {
 		return errors.New("recorded Q/P modulus rows do not match the canonical Q/P fingerprint")
 	}
 	a, b, c, err := perfmeasure.PublicMulRescaleWorkload(doc.InputSlots)

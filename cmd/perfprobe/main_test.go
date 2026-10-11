@@ -800,6 +800,32 @@ func TestLogN16PublicNativeProfileUsesOnlyObservedOracleCapacityPolicy(t *testin
 	}
 }
 
+func TestPublicNativeExplicitlyRejectsUnvalidatedEffectiveLogN(t *testing.T) {
+	effective := perfmeasure.EffectiveParameters{LogN: 14, LogSlots: 13, InputSlots: 1 << 13, EphemeralSecretWeight: 32}
+	_, err := publicNativeProfileForEffective("logn14", effective)
+	if err == nil || !strings.Contains(err.Error(), "UNSUPPORTED_EFFECTIVE_PROFILE") ||
+		!strings.Contains(err.Error(), "LogSlots=13") || !strings.Contains(err.Error(), "no frozen public-native") {
+		t.Fatalf("unsupported effective profile was not reported explicitly: %v", err)
+	}
+	if _, err := publicNativeProfileForEffective("logn13", effective); err == nil || !strings.Contains(err.Error(), "does not match effective profile") {
+		t.Fatalf("profile label inconsistent with effective LogN was not rejected: %v", err)
+	}
+}
+
+func TestPublicRotateLeftMatchesCKKSSlotConvention(t *testing.T) {
+	input := []complex128{1 + 2i, 3 + 4i, 5 + 6i, 7 + 8i}
+	want := []complex128{3 + 4i, 5 + 6i, 7 + 8i, 1 + 2i}
+	got := publicRotateLeft(input, 1)
+	if len(got) != len(want) {
+		t.Fatalf("rotation length=%d, want %d", len(got), len(want))
+	}
+	for index := range want {
+		if got[index] != want[index] {
+			t.Fatalf("rotation[%d]=%v, want %v", index, got[index], want[index])
+		}
+	}
+}
+
 func TestPublicPairRejectsDecodedVectorIntegrityFailures(t *testing.T) {
 	standard, standardVectors := makePublicPairArtifactFixture(t, "standard")
 	fast, fastVectors := makePublicPairArtifactFixture(t, "fast")

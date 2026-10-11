@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"math"
 	"os"
 	"path/filepath"
 	"strings"
@@ -129,6 +130,29 @@ func TestReadProfileArtifactChecksPathAndDigest(t *testing.T) {
 func TestValidatePublicE32EventsChecksHierarchyAndRequiredPowers(t *testing.T) {
 	events := publicE32TestEvents()
 	require.NoError(t, validatePublicE32Events(events))
+	branches, err := publicE32GeneratedPowerBranchRoots(events)
+	require.NoError(t, err)
+	require.Len(t, branches, 2)
+	require.Equal(t, "real", branches[0].Branch)
+	require.Equal(t, "imag", branches[1].Branch)
+	var realStage, imagStage, s2cStage uint64
+	for _, event := range events {
+		if event.Scope != "stage" {
+			continue
+		}
+		switch event.Name {
+		case "evalmod_real":
+			realStage = event.Sequence
+		case "evalmod_imag":
+			imagStage = event.Sequence
+		case "slots_to_coeffs":
+			s2cStage = event.Sequence
+		}
+	}
+	require.Greater(t, branches[0].Root.Sequence, realStage)
+	require.Less(t, branches[0].Root.Sequence, imagStage)
+	require.Greater(t, branches[1].Root.Sequence, imagStage)
+	require.Less(t, branches[1].Root.Sequence, s2cStage)
 
 	missingParent := append([]Event(nil), events...)
 	missingParent[len(missingParent)-1].ParentSequence = 999
@@ -217,6 +241,20 @@ func TestValidatePublicE32EventsRejectsDuplicatePowerWithinRoot(t *testing.T) {
 	events = append(events, duplicate)
 
 	require.ErrorContains(t, validatePublicE32Events(events), "duplicate generated power T2")
+}
+
+func TestValidatePublicE32ObservedMetadataRejectsInvalidLevelDegreeAndScale(t *testing.T) {
+	negativeLevel, zeroDegree, nonFiniteScale := -1, 0, math.NaN()
+	var problems []string
+	validatePublicE32ObservedMetadata(Event{
+		Sequence: 7, LevelIn: &negativeLevel, DegreeOut: &zeroDegree, ScaleLog2In: &nonFiniteScale,
+	}, func(format string, args ...any) {
+		problems = append(problems, fmt.Sprintf(format, args...))
+	})
+	joined := strings.Join(problems, "\n")
+	require.Contains(t, joined, "negative input Level")
+	require.Contains(t, joined, "invalid output degree")
+	require.Contains(t, joined, "non-finite input log2(Scale)")
 }
 
 func TestValidatePublicE32RawTraceRequiresExactMatchedTwoCalls(t *testing.T) {
@@ -438,15 +476,8 @@ func TestAnalyzePublicE32EventsPreservesMeasuredClosureAndBounds(t *testing.T) {
 func publicE32TestEvents() []Event {
 	var events []Event
 	stageNames := []string{"bootstrap", "pack_n1_to_n2", "scale_down", "mod_up_trace", "coeffs_to_slots", "evalmod_real", "evalmod_imag", "slots_to_coeffs", "unpack_n2_to_n1", "public_finalization"}
-	for index, name := range stageNames {
-		sequence, parent := uint64(index+1), uint64(0)
-		if name != "bootstrap" {
-			parent = 1
-		}
-		events = append(events, Event{Scope: "stage", Name: name, Sequence: sequence, ParentSequence: parent})
-	}
-	sequence := uint64(len(events) + 1)
-	for range 2 {
+	sequence := uint64(1)
+	appendGeneratedPowers := func() {
 		rootSequence := sequence
 		sequence++
 		events = append(events, Event{Scope: "power", Name: "generated_powers", Sequence: rootSequence})
@@ -471,6 +502,18 @@ func publicE32TestEvents() []Event {
 		}
 		addPower(16, rootSequence)
 		addPower(6, rootSequence)
+	}
+	for _, name := range stageNames {
+		parent := uint64(0)
+		if name != "bootstrap" {
+			parent = 1
+		}
+		events = append(events, Event{Scope: "stage", Name: name, Sequence: sequence, ParentSequence: parent})
+		sequence++
+		switch name {
+		case "evalmod_real", "evalmod_imag":
+			appendGeneratedPowers()
+		}
 	}
 	levelIn, levelOut, rowsIn, rowsOut := 4, 3, 4, 4
 	makeRescaleEvent := func(name, component string, parent uint64, elapsed int64) Event {

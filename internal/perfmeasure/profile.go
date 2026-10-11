@@ -145,6 +145,43 @@ func ParametersFromConfigWithE(cfg Config, ephemeralSecretWeight int) (ckks.Para
 	return residual, params, effective, nil
 }
 
+// EffectiveProfileName derives the human-readable profile label from the
+// constructed parameter metadata, rather than trusting a config filename.
+func EffectiveProfileName(parameters EffectiveParameters) (string, error) {
+	if parameters.LogN <= 0 {
+		return "", fmt.Errorf("invalid effective LogN %d", parameters.LogN)
+	}
+	return fmt.Sprintf("logn%d", parameters.LogN), nil
+}
+
+// ResolveProfileName accepts a caller label only when it matches the LogN
+// derived from constructed parameters. An empty label resolves to that name.
+func ResolveProfileName(requested string, parameters EffectiveParameters) (string, error) {
+	effectiveName, err := EffectiveProfileName(parameters)
+	if err != nil {
+		return "", err
+	}
+	if requested == "" {
+		return effectiveName, nil
+	}
+	if requested != effectiveName {
+		return "", fmt.Errorf("profile label %q does not match effective profile %q (LogN=%d)", requested, effectiveName, parameters.LogN)
+	}
+	return effectiveName, nil
+}
+
+// QPFingerprint returns the stable SHA-256 used to bind measurement artifacts
+// to the exact ordered Q and P prime chains. Callers must pass constructed
+// effective primes, not requested bit-size hints.
+func QPFingerprint(q, p []uint64) string {
+	data, _ := json.Marshal(struct {
+		Q []uint64
+		P []uint64
+	}{Q: q, P: p})
+	sum := sha256.Sum256(data)
+	return hex.EncodeToString(sum[:])
+}
+
 func DeterministicInput(slots int) []complex128 {
 	values := make([]complex128, slots)
 	for j := range values {

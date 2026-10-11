@@ -47,6 +47,8 @@ Prefer offline recovery. The Task006 raw currently exists at the expected path/h
 3. Before removing old tests, identify independent mathematical, input-integrity, backend-provenance, capacity, row-authority, and security/key-semantics regression value. Move required tests into existing maintained packages and shared test helpers. Do not port whole historical experiment runners merely to retain their old test harness.
 4. Do not remove current Q0123 arithmetic, Rescale, NTT, Chebyshev, Bootstrap boundary, numerical-metric, or safety regression coverage. Do not delete historical result/spec artifacts as cleanup.
 
+Regression migration boundary: Primary config strictness and effective-prime sensitivity belong in `internal/perfmeasure`; public rotation orientation belongs in `cmd/perfprobe`. Historical CRT/Rescale/Q-prefix/capacity/row-authority/zero-secret security tests stay with the maintained Secondary arithmetic and Bootstrap packages (including the Q0123/Batch027 and keyless zero-secret regression suites); do not copy those backend tests into experiment CLIs. Tests that only assert historical runner classifications, JSON schemas, or obsolete Q01/P93 workarounds are retired with those runners.
+
 ## Checkpoints and implementation order
 
 This is one approved autonomous integration task. Complete sequentially without waiting for per-checkpoint review:

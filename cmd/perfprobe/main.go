@@ -190,7 +190,7 @@ func run() error {
 	flag.BoolVar(&opts.inputSmoke, "input-smoke", false, "bounded input-origin preflight only; no Bootstrap or timing")
 	flag.BoolVar(&opts.outputSmoke, "output-smoke", false, "one public Bootstrap and decoded-output preflight; no timing campaign")
 	flag.BoolVar(&opts.fastBootstrapAcceptance, "fast-bootstrap-acceptance", false, "input smoke only: at most one Fast public Bootstrap acceptance call")
-	flag.StringVar(&opts.profile, "profile", "", "logn13 or logn16")
+	flag.StringVar(&opts.profile, "profile", "", "optional lognN label; defaults to the effective LogN derived from --config")
 	flag.StringVar(&opts.config, "config", "", "bootstrap config JSON")
 	flag.StringVar(&opts.out, "out", "", "compact result JSON")
 	flag.StringVar(&opts.vectorsOut, "vectors-out", "", "ephemeral decoded vectors JSON")
@@ -201,9 +201,6 @@ func run() error {
 	flag.IntVar(&opts.repetitions, "repetitions", 7, "timed full Bootstrap repetitions")
 	flag.IntVar(&opts.standardTrials, "standard-trials", 3, "independent Standard secret/evaluation-key numerical trials")
 	flag.Parse()
-	if opts.profile != "logn13" && opts.profile != "logn16" {
-		return fmt.Errorf("--profile must be logn13 or logn16")
-	}
 	if opts.config == "" || opts.out == "" || opts.backendCommit == "" || opts.secondaryRoot == "" || opts.backendRef == "" {
 		return errors.New("--config, --out, --backend-commit, --backend-ref, and --secondary-root are required")
 	}
@@ -224,13 +221,6 @@ func run() error {
 		return err
 	}
 	configHash := hex.EncodeToString(configSum[:])
-	profileLogN := 13
-	if opts.profile == "logn16" {
-		profileLogN = 16
-	}
-	if cfg.LogN != profileLogN {
-		return fmt.Errorf("%s profile requires config log_n=%d, got %d", opts.profile, profileLogN, cfg.LogN)
-	}
 	if opts.mode == "public-native" {
 		if opts.ephemeralSecretWeight < 0 {
 			return errors.New("public-native mode requires an explicit non-negative --ephemeral-secret-weight")
@@ -250,11 +240,6 @@ func run() error {
 		} else if opts.preflightPair != "" {
 			return errors.New("--preflight-pair is only accepted with --public-bootstrap")
 		}
-		if opts.traceFixtureOut != "" {
-			if err := validateTraceFixtureRequest(opts); err != nil {
-				return err
-			}
-		}
 		if opts.bootstrapBudget != wantBudget {
 			return fmt.Errorf("public-native mode requires --bootstrap-budget=%d", wantBudget)
 		}
@@ -265,6 +250,15 @@ func run() error {
 		if err != nil {
 			return err
 		}
+		opts.profile, err = perfmeasure.ResolveProfileName(opts.profile, effective)
+		if err != nil {
+			return err
+		}
+		if opts.traceFixtureOut != "" {
+			if err := validateTraceFixtureRequest(opts); err != nil {
+				return err
+			}
+		}
 		return runPublicNative(opts, configHash, residual, params, effective)
 	}
 	if opts.mode != "legacy-diagnostic" {
@@ -274,6 +268,10 @@ func run() error {
 		return errors.New("legacy-diagnostic mode is fixed to historical E=0; select public-native for explicit E")
 	}
 	residual, params, effective, err := perfmeasure.ParametersFromConfig(cfg)
+	if err != nil {
+		return err
+	}
+	opts.profile, err = perfmeasure.ResolveProfileName(opts.profile, effective)
 	if err != nil {
 		return err
 	}

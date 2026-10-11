@@ -146,11 +146,7 @@ func executeNumericalFastOnlyTrace(args []string) error {
 	if inputMetadata != wantMetadata {
 		return fmt.Errorf("historical input metadata fingerprint mismatch: got=%s want=%s", inputMetadata, wantMetadata)
 	}
-	qpJSON, err := json.Marshal(struct{ Q, P []uint64 }{params.BootstrappingParameters.Q(), params.BootstrappingParameters.P()})
-	if err != nil {
-		return err
-	}
-	qpSum := sha256.Sum256(qpJSON)
+	qpHash := perfmeasure.QPFingerprint(params.BootstrappingParameters.Q(), params.BootstrappingParameters.P())
 	fastEval, err := bootstrapping.NewFastEvaluator(params)
 	if err != nil {
 		return err
@@ -197,7 +193,7 @@ func executeNumericalFastOnlyTrace(args []string) error {
 		Timestamp: time.Now().UTC(), Profile: *profile, Primary: primary, Secondary: secondary,
 		PrimarySourceSHA: primarySource, BinarySHA256: binaryHash, BuildTag: buildTag, ModulePath: modulePath,
 		GoVersion: runtime.Version(), OS: runtime.GOOS, Arch: runtime.GOARCH, ConfigPath: configPath,
-		ConfigSHA256: configHash, InputSHA256: inputHash, InputMetadataSHA: inputMetadata, QPSHA256: hex.EncodeToString(qpSum[:]),
+		ConfigSHA256: configHash, InputSHA256: inputHash, InputMetadataSHA: inputMetadata, QPSHA256: qpHash,
 		Parameters: effective, BootstrapBudget: 0, BootstrapCalls: 0, Stages: branches,
 		Limitations: []string{"Fast-only replay; no genuine Standard internal reference exists in this source build.", "All internal checkpoints are explicitly NOT_COMPARABLE_TO_GENUINE_STANDARD.", "Replay-derived from public C2S branch inputs; no Bootstrap was invoked."},
 	}

@@ -29,13 +29,15 @@ const (
 )
 
 type publicE32OfflineOptions struct {
-	rawPath      string
-	sidecarPath  string
-	manifestPath string
-	vectorsPath  string
-	attemptOne   string
-	attemptTwo   string
-	outPrefix    string
+	rawPath        string
+	sidecarPath    string
+	manifestPath   string
+	vectorsPath    string
+	task006Summary string
+	task006Ledger  string
+	attemptOne     string
+	attemptTwo     string
+	outPrefix      string
 }
 
 type publicE32AttemptJournal struct {
@@ -162,6 +164,8 @@ func parsePublicE32OfflineArgs(args []string) (publicE32OfflineOptions, error) {
 	flags.StringVar(&opts.sidecarPath, "sidecar", "", "failure sidecar JSON")
 	flags.StringVar(&opts.manifestPath, "manifest", "", "E32 fixture manifest JSON")
 	flags.StringVar(&opts.vectorsPath, "vectors", "", "凍結 Fast repeatability vectors JSON")
+	flags.StringVar(&opts.task006Summary, "task006-summary", "", "Task006 compact summary JSON (uses its recorded fixture/provenance)")
+	flags.StringVar(&opts.task006Ledger, "task006-ledger", "", "Task006 attempt ledger JSON")
 	flags.StringVar(&opts.attemptOne, "attempt-01", "", "Batch024 attempt-01 journal JSON")
 	flags.StringVar(&opts.attemptTwo, "attempt-02", "", "Batch024 attempt-02 journal JSON")
 	flags.StringVar(&opts.outPrefix, "out-prefix", "", "結果檔前綴（產生 -summary.md、-journal.md、-evidence.json）")
@@ -171,13 +175,30 @@ func parsePublicE32OfflineArgs(args []string) (publicE32OfflineOptions, error) {
 	if flags.NArg() != 0 {
 		return publicE32OfflineOptions{}, fmt.Errorf("offline-e32 不接受位置參數：%s", strings.Join(flags.Args(), " "))
 	}
-	for name, value := range map[string]string{
-		"--raw": opts.rawPath, "--sidecar": opts.sidecarPath, "--manifest": opts.manifestPath,
-		"--vectors": opts.vectorsPath, "--attempt-01": opts.attemptOne, "--attempt-02": opts.attemptTwo,
-		"--out-prefix": opts.outPrefix,
-	} {
+	for name, value := range map[string]string{"--raw": opts.rawPath, "--sidecar": opts.sidecarPath, "--out-prefix": opts.outPrefix} {
 		if strings.TrimSpace(value) == "" {
 			return publicE32OfflineOptions{}, fmt.Errorf("offline-e32 需要 %s", name)
+		}
+	}
+	if opts.task006Summary != "" {
+		for name, value := range map[string]string{
+			"--task006-ledger": opts.task006Ledger, "--attempt-01": opts.attemptOne, "--attempt-02": opts.attemptTwo,
+		} {
+			if strings.TrimSpace(value) == "" {
+				return publicE32OfflineOptions{}, fmt.Errorf("Task006 offline-e32 需要 %s", name)
+			}
+		}
+		if opts.manifestPath != "" || opts.vectorsPath != "" {
+			return publicE32OfflineOptions{}, errors.New("Task006 offline-e32 使用 summary 內的 frozen provenance，不接受 Batch025 --manifest/--vectors")
+		}
+	} else {
+		for name, value := range map[string]string{"--manifest": opts.manifestPath, "--vectors": opts.vectorsPath, "--attempt-01": opts.attemptOne, "--attempt-02": opts.attemptTwo} {
+			if strings.TrimSpace(value) == "" {
+				return publicE32OfflineOptions{}, fmt.Errorf("offline-e32 需要 %s", name)
+			}
+		}
+		if opts.task006Ledger != "" {
+			return publicE32OfflineOptions{}, errors.New("--task006-ledger requires --task006-summary")
 		}
 	}
 	if filepath.Clean(opts.attemptOne) == filepath.Clean(opts.attemptTwo) {
@@ -226,6 +247,23 @@ func executePublicE32Offline(args []string) error {
 	primaryMeta, err := repositoryMetadata(primaryRoot, "")
 	if err != nil {
 		return err
+	}
+	if opts.task006Summary != "" {
+		doc, journal, err := replayPublicE32Task006Offline(primaryRoot, secondaryRoot, primaryMeta, opts)
+		if err != nil {
+			return err
+		}
+		if err := writeJSON(paths.evidence, doc); err != nil {
+			return fmt.Errorf("寫入 Task006 離線 evidence 失敗：%w", err)
+		}
+		if err := writeNewFile(paths.summary, []byte(renderPublicE32Task006OfflineSummary(doc)), 0o644); err != nil {
+			return fmt.Errorf("寫入 Task006 離線 summary 失敗：%w", err)
+		}
+		if err := writeNewFile(paths.journal, []byte(journal), 0o644); err != nil {
+			return fmt.Errorf("寫入 Task006 離線 journal 失敗：%w", err)
+		}
+		fmt.Printf("分類：%s\nSummary：%s\nJournal：%s\nEvidence：%s\n", doc.Classification, paths.summary, paths.journal, paths.evidence)
+		return nil
 	}
 	doc, journal, err := replayPublicE32Offline(primaryRoot, secondaryRoot, primaryMeta, opts)
 	if err != nil {

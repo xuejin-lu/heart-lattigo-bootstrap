@@ -1025,6 +1025,7 @@ func collectPublicE32EventAnomalies(events []Event) []string {
 		if event.ParentSequence != 0 {
 			children[event.ParentSequence] = append(children[event.ParentSequence], event)
 		}
+		validatePublicE32ObservedMetadata(event, add)
 		validatePublicE32ObservedRows(event, add)
 		switch {
 		case event.Scope == "stage" && event.Name == "bootstrap":
@@ -1061,6 +1062,9 @@ func collectPublicE32EventAnomalies(events []Event) []string {
 	}
 	if len(generatedRoots) != 2 {
 		add("trace must contain two independent generated_powers roots (real and imag branches); got %d", len(generatedRoots))
+	}
+	if _, err := publicE32GeneratedPowerBranchRoots(events); err != nil {
+		add("generated_powers branch association: %v", err)
 	}
 
 	// Resolve every event to its independent root, detecting cycles across all
@@ -1224,6 +1228,92 @@ func collectPublicE32EventAnomalies(events []Event) []string {
 		validatePublicE32RescaleTree(root, children, add)
 	}
 	return problems
+}
+
+type publicE32GeneratedPowerBranch struct {
+	Branch string
+	Root   Event
+}
+
+func publicE32GeneratedPowerBranchRoots(events []Event) ([]publicE32GeneratedPowerBranch, error) {
+	var realStage, imagStage, s2cStage *Event
+	var roots []Event
+	for index := range events {
+		event := events[index]
+		if event.Scope == "stage" {
+			switch event.Name {
+			case "evalmod_real":
+				realStage = &events[index]
+			case "evalmod_imag":
+				imagStage = &events[index]
+			case "slots_to_coeffs":
+				s2cStage = &events[index]
+			}
+		}
+		if event.Scope == "power" && event.Name == "generated_powers" {
+			roots = append(roots, event)
+		}
+	}
+	if realStage == nil || imagStage == nil || s2cStage == nil {
+		return nil, errors.New("trace is missing EvalMod real/imag or SlotsToCoeffs stage anchors")
+	}
+	if !(realStage.Sequence < imagStage.Sequence && imagStage.Sequence < s2cStage.Sequence) {
+		return nil, errors.New("EvalMod real/imag and SlotsToCoeffs sequence anchors are not ordered")
+	}
+	branches := []publicE32GeneratedPowerBranch{}
+	for _, root := range roots {
+		switch {
+		case root.Sequence > realStage.Sequence && root.Sequence < imagStage.Sequence:
+			branches = append(branches, publicE32GeneratedPowerBranch{Branch: "real", Root: root})
+		case root.Sequence > imagStage.Sequence && root.Sequence < s2cStage.Sequence:
+			branches = append(branches, publicE32GeneratedPowerBranch{Branch: "imag", Root: root})
+		default:
+			return nil, fmt.Errorf("generated_powers root #%d does not fall inside either EvalMod branch interval", root.Sequence)
+		}
+	}
+	if len(branches) != 2 || branches[0].Branch != "real" || branches[1].Branch != "imag" {
+		return nil, fmt.Errorf("expected one independent real and imag generated_powers root in sequence order; got %v", func() []string {
+			names := make([]string, len(branches))
+			for index, branch := range branches {
+				names[index] = fmt.Sprintf("%s#%d", branch.Branch, branch.Root.Sequence)
+			}
+			return names
+		}())
+	}
+	return branches, nil
+}
+
+func validatePublicE32ObservedMetadata(event Event, add func(string, ...any)) {
+	for _, value := range []struct {
+		name  string
+		value *int
+	}{
+		{"input", event.LevelIn}, {"output", event.LevelOut},
+	} {
+		if value.value != nil && *value.value < 0 {
+			add("event %d has negative %s Level %d", event.Sequence, value.name, *value.value)
+		}
+	}
+	for _, value := range []struct {
+		name  string
+		value *int
+	}{
+		{"input", event.DegreeIn}, {"output", event.DegreeOut},
+	} {
+		if value.value != nil && *value.value < 1 {
+			add("event %d has invalid %s degree %d", event.Sequence, value.name, *value.value)
+		}
+	}
+	for _, value := range []struct {
+		name  string
+		value *float64
+	}{
+		{"input", event.ScaleLog2In}, {"output", event.ScaleLog2Out},
+	} {
+		if value.value != nil && (math.IsNaN(*value.value) || math.IsInf(*value.value, 0)) {
+			add("event %d has non-finite %s log2(Scale)", event.Sequence, value.name)
+		}
+	}
 }
 
 func validatePublicE32ObservedRows(event Event, add func(string, ...any)) {

@@ -546,12 +546,8 @@ func loadDualCurrentProfile(opts dualCurrentOptions) (ckks.Parameters, bootstrap
 	if inputHash != wantInput || len(values) != 1<<effective.LogSlots {
 		return ckks.Parameters{}, bootstrapping.Parameters{}, perfmeasure.EffectiveParameters{}, nil, "", "", fmt.Errorf("%s canonical diagnostic input mismatch: SHA256=%s slots=%d", opts.profile, inputHash, len(values))
 	}
-	qpJSON, err := json.Marshal(struct{ Q, P []uint64 }{params.BootstrappingParameters.Q(), params.BootstrappingParameters.P()})
-	if err != nil {
-		return ckks.Parameters{}, bootstrapping.Parameters{}, perfmeasure.EffectiveParameters{}, nil, "", "", err
-	}
-	qpSum := sha256.Sum256(qpJSON)
-	return residual, params, effective, values, configHash, hex.EncodeToString(qpSum[:]), nil
+	qpHash := perfmeasure.QPFingerprint(params.BootstrappingParameters.Q(), params.BootstrappingParameters.P())
+	return residual, params, effective, values, configHash, qpHash, nil
 }
 
 func newDualCurrentBackend(opts dualCurrentOptions, params bootstrapping.Parameters, residual ckks.Parameters, configHash, qpHash string, effective perfmeasure.EffectiveParameters) (*publicBackend, dualCurrentDocument, error) {

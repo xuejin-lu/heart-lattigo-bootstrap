@@ -1,8 +1,11 @@
 package perfmeasure
 
 import (
+	"fmt"
 	"math/big"
+	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -43,6 +46,98 @@ func TestEffectiveConfigProfiles(t *testing.T) {
 			}
 			if cfg.Mod1Degree != 30 || cfg.Mod1DoubleAngle != 3 || cfg.Mod1K != 16 || cfg.LogMessageRatio != 10 {
 				t.Fatalf("config does not meet the frozen EvalMod profile: %+v", cfg)
+			}
+		})
+	}
+}
+
+func TestLoadConfigRejectsRemovedLegacyFields(t *testing.T) {
+	for _, field := range []string{"q_circuit_slots", "q_eval_mod", "log_bsgs_ratio"} {
+		t.Run(field, func(t *testing.T) {
+			path := filepath.Join(t.TempDir(), "config.json")
+			if err := os.WriteFile(path, []byte(`{"`+field+`":1}`), 0o600); err != nil {
+				t.Fatal(err)
+			}
+			if _, _, err := LoadConfig(path); err == nil || !strings.Contains(err.Error(), "unknown field") {
+				t.Fatalf("LoadConfig error = %v, want unknown legacy field %q", err, field)
+			}
+		})
+	}
+}
+
+func TestChangingConfiguredPrimeScaleChangesEffectiveModulus(t *testing.T) {
+	cfg, _, err := LoadConfig(filepath.Join("..", "..", "configs", "bootstrap_config.logN13.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, base, _, err := ParametersFromConfig(cfg)
+	if err != nil {
+		t.Fatal(err)
+	}
+	changed := cfg
+	changed.QCoeffsToSlots = append([]int(nil), cfg.QCoeffsToSlots...)
+	changed.QCoeffsToSlots[0]--
+	_, modified, _, err := ParametersFromConfig(changed)
+	if err != nil {
+		t.Fatal(err)
+	}
+	baseBits := base.BootstrappingParameters.LogQi()
+	changedBits := modified.BootstrappingParameters.LogQi()
+	const firstCoeffsToSlotsIndex = 2 + 3 + 8
+	if len(baseBits) != len(changedBits) || baseBits[firstCoeffsToSlotsIndex] == changedBits[firstCoeffsToSlotsIndex] {
+		t.Fatalf("configured C2S prime scale did not alter its effective Q prime: base=%v changed=%v", baseBits, changedBits)
+	}
+}
+
+func TestSharedParameterBuilderDerivesLogN13Through16FromEffectiveParameters(t *testing.T) {
+	cfg, _, err := LoadConfig(filepath.Join("..", "..", "configs", "bootstrap_config.logN13.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for logN := 13; logN <= 16; logN++ {
+		t.Run(fmt.Sprintf("logn%d", logN), func(t *testing.T) {
+			profileConfig := cfg
+			profileConfig.LogN = logN
+			profileConfig.LogSlots = -1
+
+			residual, bootstrap, effective, err := ParametersFromConfigWithE(profileConfig, 32)
+			if err != nil {
+				t.Fatalf("shared parameter construction rejected LogN%d: %v", logN, err)
+			}
+			if effective.LogN != bootstrap.BootstrappingParameters.LogN() || effective.LogN != logN ||
+				effective.LogSlots != bootstrap.CoeffsToSlotsParameters.LogSlots || effective.LogSlots != logN-1 ||
+				effective.InputSlots != 1<<effective.LogSlots || effective.RingN != 1<<logN ||
+				effective.ResidualRingN != residual.N() || effective.EphemeralSecretWeight != 32 {
+				t.Fatalf("effective profile is not derived from constructed parameters: %+v", effective)
+			}
+			if len(effective.QPrimes) != len(bootstrap.BootstrappingParameters.Q()) ||
+				len(effective.PPrimes) != len(bootstrap.BootstrappingParameters.P()) ||
+				len(effective.QChainBits) != len(effective.QPrimes) || len(effective.PBits) != len(effective.PPrimes) {
+				t.Fatalf("effective Q/P metadata does not describe the constructed profile: %+v", effective)
+			}
+			defaultScale := residual.DefaultScale()
+			if effective.DefaultScale != defaultScale.Value.Text('e', 80) {
+				t.Fatalf("effective scale=%s, constructed residual scale=%s", effective.DefaultScale, defaultScale.Value.Text('e', 80))
+			}
+			if got, err := EffectiveProfileName(effective); err != nil || got != fmt.Sprintf("logn%d", logN) {
+				t.Fatalf("effective profile name=%q err=%v", got, err)
+			}
+			if got, err := ResolveProfileName("", effective); err != nil || got != fmt.Sprintf("logn%d", logN) {
+				t.Fatalf("empty profile label did not resolve from effective parameters: %q err=%v", got, err)
+			}
+			if _, err := ResolveProfileName("logn13", effective); logN != 13 && err == nil {
+				t.Fatalf("mismatched profile label was accepted for effective LogN%d", logN)
+			}
+			q, p := bootstrap.BootstrappingParameters.Q(), bootstrap.BootstrappingParameters.P()
+			qpHash := QPFingerprint(q, p)
+			if qpHash == "" || qpHash != QPFingerprint(q, p) {
+				t.Fatalf("Q/P fingerprint is not deterministic: %q", qpHash)
+			}
+			reorderedQ := append([]uint64(nil), q...)
+			reorderedQ[0], reorderedQ[1] = reorderedQ[1], reorderedQ[0]
+			if QPFingerprint(reorderedQ, p) == qpHash {
+				t.Fatal("Q/P fingerprint did not bind prime order")
 			}
 		})
 	}
