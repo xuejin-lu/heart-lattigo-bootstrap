@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"math"
 	"math/cmplx"
+	"os"
 	"path/filepath"
 	"runtime"
 	"runtime/debug"
@@ -167,11 +168,11 @@ func verifyCompiledBackendSource(expected string) error {
 			if dependency.Replace == nil {
 				return fmt.Errorf("compiled Lattigo has no local source replacement")
 			}
-			actual, err := filepath.EvalSymlinks(dependency.Replace.Path)
+			actual, err := canonicalBackendSourcePath(dependency.Replace.Path)
 			if err != nil {
-				return err
+				return fmt.Errorf("resolve compiled Lattigo replacement %q: %w", dependency.Replace.Path, err)
 			}
-			wanted, err := filepath.EvalSymlinks(expected)
+			wanted, err := canonicalBackendSourcePath(expected)
 			if err != nil {
 				return err
 			}
@@ -182,6 +183,49 @@ func verifyCompiledBackendSource(expected string) error {
 		}
 	}
 	return fmt.Errorf("compiled Lattigo dependency is absent from Go build info")
+}
+
+func canonicalBackendSourcePath(path string) (string, error) {
+	if !filepath.IsAbs(path) {
+		root, err := primaryModuleRoot()
+		if err != nil {
+			return "", err
+		}
+		path = filepath.Join(root, path)
+	}
+	absolute, err := filepath.Abs(path)
+	if err != nil {
+		return "", fmt.Errorf("resolve backend source path %q: %w", path, err)
+	}
+	resolved, err := filepath.EvalSymlinks(absolute)
+	if err != nil {
+		return "", fmt.Errorf("resolve backend source symlinks %q (from %q): %w", absolute, path, err)
+	}
+	return resolved, nil
+}
+
+func primaryModuleRoot() (string, error) {
+	starts := make([]string, 0, 2)
+	if _, source, _, ok := runtime.Caller(0); ok && filepath.IsAbs(source) {
+		starts = append(starts, filepath.Dir(source))
+	}
+	workingDirectory, err := os.Getwd()
+	if err != nil {
+		return "", fmt.Errorf("resolve Primary module root from working directory: %w", err)
+	}
+	starts = append(starts, workingDirectory)
+	for _, start := range starts {
+		for directory := start; ; directory = filepath.Dir(directory) {
+			if _, err := os.Stat(filepath.Join(directory, "go.mod")); err == nil {
+				return directory, nil
+			}
+			parent := filepath.Dir(directory)
+			if parent == directory {
+				break
+			}
+		}
+	}
+	return "", fmt.Errorf("could not locate Primary go.mod above the current source or working directory")
 }
 
 func runInputSmoke(opts cliOptions, configHash string, residual ckks.Parameters, params bootstrapping.Parameters, effective perfmeasure.EffectiveParameters, values []complex128) error {

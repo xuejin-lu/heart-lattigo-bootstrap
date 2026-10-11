@@ -15,6 +15,16 @@ import (
 	"github.com/xuejin-lu/heart-lattigo-bootstrap/internal/perfmeasure"
 )
 
+func TestVerifyCompiledBackendSourceResolvesRelativeReplacePath(t *testing.T) {
+	expected, err := filepath.Abs(filepath.Join("..", "..", "..", "lattigo"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := verifyCompiledBackendSource(expected); err != nil {
+		t.Fatalf("relative build-info replacement did not resolve to the pinned Secondary source: %v", err)
+	}
+}
+
 func TestDeterministicLogN13InputKeepsCanonicalFingerprint(t *testing.T) {
 	if got := perfmeasure.Fingerprint(perfmeasure.DeterministicInput(1 << 12)); got != canonicalLogN13InputSHA256 {
 		t.Fatalf("LogN13 input SHA-256 = %s, want %s", got, canonicalLogN13InputSHA256)
