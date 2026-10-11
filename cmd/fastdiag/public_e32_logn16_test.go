@@ -116,6 +116,37 @@ func TestVerifyCurrentFastTestOnlyCloneAgainstIsolatedAdapter(t *testing.T) {
 	require.Equal(t, []string{logN16E32TestAdapterPath}, paths)
 }
 
+func TestApplyCurrentFastLogN16AdapterCommitsOnlyTestFile(t *testing.T) {
+	sourceRoot := os.Getenv("FASTDIAG_LOGN16_SECONDARY_ROOT")
+	if sourceRoot == "" {
+		t.Skip("set FASTDIAG_LOGN16_SECONDARY_ROOT to validate the task-owned isolated test adapter")
+	}
+	require.NoError(t, requireCleanWorktree(sourceRoot))
+	head, err := gitOutput(sourceRoot, "rev-parse", "HEAD")
+	require.NoError(t, err)
+	require.Equal(t, e32LogN16ProductionFastCommit, head)
+
+	workingDirectory, err := os.Getwd()
+	require.NoError(t, err)
+	primaryRoot, err := findPrimaryRoot(workingDirectory)
+	require.NoError(t, err)
+	diagnosticRoot := filepath.Join(t.TempDir(), "lattigo")
+	require.NoError(t, createPublicE32IsolatedClone(sourceRoot, diagnosticRoot, head))
+	adapterCommit, patchSHA, err := applyPublicE32LogN16TestAdapter(diagnosticRoot, primaryRoot)
+	require.NoError(t, err)
+	require.Equal(t, "3ad46f934d597472caac0f0810719425dec75bde0064342cc0b05278510b50ae", patchSHA)
+	require.NotEqual(t, head, adapterCommit)
+	parent, err := gitOutput(diagnosticRoot, "rev-parse", "HEAD^")
+	require.NoError(t, err)
+	require.Equal(t, head, parent)
+	paths, err := gitOutput(diagnosticRoot, "diff-tree", "--no-commit-id", "--name-only", "-r", adapterCommit)
+	require.NoError(t, err)
+	require.Equal(t, logN16E32TestAdapterPath, strings.TrimSpace(paths))
+	status, err := gitOutput(diagnosticRoot, "status", "--porcelain")
+	require.NoError(t, err)
+	require.Empty(t, status)
+}
+
 func TestTask006AttemptLedgerBindsReservationsAndTask005Exhaustion(t *testing.T) {
 	root := t.TempDir()
 	outputJSON := filepath.Join(root, "trace.json")

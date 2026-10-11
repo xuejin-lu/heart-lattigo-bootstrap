@@ -70,6 +70,16 @@ func applyPublicE32LogN16TestAdapter(diagnosticRoot, primaryRoot string) (string
 	if strings.TrimSpace(paths) != logN16E32TestAdapterPath {
 		return "", "", fmt.Errorf("isolated LogN16 adapter changed unexpected paths: %q", paths)
 	}
+	if err := gitRun(diagnosticRoot, "add", "--", logN16E32TestAdapterPath); err != nil {
+		return "", "", fmt.Errorf("stage isolated LogN16 test-only adapter: %w", err)
+	}
+	stagedPaths, err := gitOutput(diagnosticRoot, "diff", "--cached", "--name-only")
+	if err != nil {
+		return "", "", err
+	}
+	if strings.TrimSpace(stagedPaths) != logN16E32TestAdapterPath {
+		return "", "", fmt.Errorf("isolated LogN16 adapter staged unexpected paths: %q", stagedPaths)
+	}
 	if err := gitRun(diagnosticRoot, "-c", "user.name=Codex Diagnostic Adapter", "-c", "user.email=codex-diagnostic-adapter@invalid", "commit", "-m", "test: adapt isolated E32 trace for LogN16"); err != nil {
 		return "", "", fmt.Errorf("commit isolated test-only adapter: %w", err)
 	}
