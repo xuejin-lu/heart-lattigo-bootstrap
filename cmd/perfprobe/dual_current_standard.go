@@ -28,8 +28,8 @@ func auditDualCurrentC2SGroup(backend *publicBackend, modUp *rlwe.Ciphertext) (d
 	if modUp.Level() != backend.full.MaxLevel() || modUp.Level()+1 != len(q) {
 		return dualCurrentC2SAudit{}, fmt.Errorf("ModUp level=%d active rows=%d, expected full Standard Q level=%d rows=%d", modUp.Level(), modUp.Level()+1, backend.full.MaxLevel(), len(q))
 	}
-	if backend.full.LogN() == 16 && (len(q) != 16 || modUp.Level() != 15) {
-		return dualCurrentC2SAudit{}, fmt.Errorf("LogN16 genuine Standard full-Q preflight expected q0..q15 at level 15; got QCount=%d Level=%d", len(q), modUp.Level())
+	if backend.full.LogN() == 16 && (len(q) != 17 || modUp.Level() != 16) {
+		return dualCurrentC2SAudit{}, fmt.Errorf("LogN16 genuine Standard full-Q preflight expected q0..q16 at level 16; got QCount=%d Level=%d", len(q), modUp.Level())
 	}
 	before, err := dualCurrentAuditShape(backend, "mod_up_before_c2s_group0", modUp)
 	if err != nil {
