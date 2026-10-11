@@ -83,6 +83,17 @@ func TestValidatePublicE32LogN16FixtureBindsZeroCallVectorsAndHashes(t *testing.
 	require.Equal(t, manifest.CiphertextSHA256, gotManifest.CiphertextSHA256)
 	require.Equal(t, vectorsBytes, gotVectorsBytes)
 	require.Len(t, gotVectors.Checkpoints, 8)
+	for _, omittedField := range []string{"bootstrap_budget", "actual_bootstrap_calls"} {
+		var fields map[string]json.RawMessage
+		require.NoError(t, json.Unmarshal(manifestBytes, &fields))
+		delete(fields, omittedField)
+		malformed, err := json.Marshal(fields)
+		require.NoError(t, err)
+		require.NoError(t, os.WriteFile(manifestPath, malformed, 0o600))
+		_, _, _, _, err = validatePublicE32LogN16Fixture(manifestPath, vectorsPath, manifest.PrimaryCommit, manifest.PrimarySourceSHA256)
+		require.ErrorContains(t, err, "must explicitly record")
+	}
+	require.NoError(t, os.WriteFile(manifestPath, manifestBytes, 0o600))
 
 	vectors.SchemaVersion = "fast-standard-public-native-repeatability-vectors.v1"
 	vectorsBytes, err = json.Marshal(vectors)

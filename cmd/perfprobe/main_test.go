@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"math"
@@ -430,6 +431,23 @@ func TestTraceFixtureRequestIsVersionedAndLogN16IsCurrentFastOnly(t *testing.T) 
 	}
 	if _, err := publicTraceFixtureContractFor("unsupported"); err == nil {
 		t.Fatal("unsupported profile unexpectedly has a trace-fixture contract")
+	}
+}
+
+func TestLogN16TraceFixtureEmitsExplicitZeroCallCounts(t *testing.T) {
+	manifest := publicTraceFixtureManifest{BootstrapBudget: 0, BootstrapCalls: 0}
+	data, err := json.Marshal(manifest)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var fields map[string]json.RawMessage
+	if err := json.Unmarshal(data, &fields); err != nil {
+		t.Fatal(err)
+	}
+	for _, name := range []string{"bootstrap_budget", "actual_bootstrap_calls"} {
+		if got := string(fields[name]); got != "0" {
+			t.Errorf("fixture %s = %q, want explicit numeric zero", name, got)
+		}
 	}
 }
 

@@ -58,8 +58,8 @@ type publicE32FixtureManifest struct {
 	InputKind                   string                          `json:"input_kind,omitempty"`
 	InputConstructor            string                          `json:"input_constructor,omitempty"`
 	PublicDispatch              string                          `json:"public_evaluator_dispatch,omitempty"`
-	BootstrapBudget             int                             `json:"bootstrap_budget,omitempty"`
-	BootstrapCalls              int                             `json:"actual_bootstrap_calls,omitempty"`
+	BootstrapBudget             int                             `json:"bootstrap_budget"`
+	BootstrapCalls              int                             `json:"actual_bootstrap_calls"`
 }
 
 type publicE32CipherState struct {

@@ -9,6 +9,7 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/xuejin-lu/heart-lattigo-bootstrap/internal/perfmeasure"
 )
@@ -39,6 +40,11 @@ func validatePublicE32LogN16Fixture(
 	var manifest publicE32FixtureManifest
 	if err := json.Unmarshal(manifestBytes, &manifest); err != nil {
 		return nil, publicE32FixtureManifest{}, nil, publicE32Vectors{}, fmt.Errorf("decode LogN16 E32 fixture manifest: %w", err)
+	}
+	if manifest.SchemaVersion == "fast-public-e32-trace-fixture.v2" {
+		if err := validateExplicitLogN16ZeroCallFields(manifestBytes); err != nil {
+			return nil, publicE32FixtureManifest{}, nil, publicE32Vectors{}, err
+		}
 	}
 	if err := validateLogN16E32Manifest(manifest, fixturePrimaryCommit, measurementSourceHash); err != nil {
 		return nil, publicE32FixtureManifest{}, nil, publicE32Vectors{}, err
@@ -87,6 +93,20 @@ func validatePublicE32LogN16Fixture(
 		return nil, publicE32FixtureManifest{}, nil, publicE32Vectors{}, errors.New("LogN16 fixture decoded hash does not match its held drop_level0 vector")
 	}
 	return manifestBytes, manifest, vectorsBytes, vectors, nil
+}
+
+func validateExplicitLogN16ZeroCallFields(manifestBytes []byte) error {
+	var fields map[string]json.RawMessage
+	if err := json.Unmarshal(manifestBytes, &fields); err != nil {
+		return fmt.Errorf("decode LogN16 fixture field presence: %w", err)
+	}
+	for _, name := range []string{"bootstrap_budget", "actual_bootstrap_calls"} {
+		value, ok := fields[name]
+		if !ok || strings.TrimSpace(string(value)) != "0" {
+			return fmt.Errorf("LogN16 fixture must explicitly record %s as numeric zero", name)
+		}
+	}
+	return nil
 }
 
 func validateLogN16E32Manifest(manifest publicE32FixtureManifest, fixturePrimaryCommit, measurementSourceHash string) error {
