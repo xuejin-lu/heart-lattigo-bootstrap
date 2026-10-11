@@ -18,6 +18,9 @@ func execute(args []string) error {
 	if len(args) > 0 && args[0] == "offline-e32" {
 		return executePublicE32Offline(args[1:])
 	}
+	if len(args) > 0 && args[0] == "numerical-trace-only" {
+		return executeNumericalFastOnlyTrace(args[1:])
+	}
 	opts, err := parseArgs(args)
 	if err != nil {
 		return err
