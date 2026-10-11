@@ -212,7 +212,7 @@ func runDualCurrentPreflight(opts dualCurrentOptions) error {
 	if err != nil {
 		return err
 	}
-	inputDecoded, _, err := backend.decode(input)
+	inputDecoded, _, err := decodeDualCurrentStage(backend, "input", input)
 	if err != nil {
 		return fmt.Errorf("decode diagnostic input: %w", err)
 	}
@@ -395,7 +395,7 @@ func runDualCurrentBootstrapOnce(opts dualCurrentOptions) error {
 	if err := ensureDualCurrentOutputAbsent(opts.out); err != nil {
 		return err
 	}
-	preValues, _, err := backend.decode(input)
+	preValues, _, err := decodeDualCurrentStage(backend, "input", input)
 	if err != nil {
 		return fmt.Errorf("decode pre-Bootstrap input: %w", err)
 	}
@@ -415,7 +415,7 @@ func runDualCurrentBootstrapOnce(opts dualCurrentOptions) error {
 		_ = finishDualCurrentAttempt(journal, "FAILED", "Bootstrap returned nil ciphertext")
 		return errors.New("the single authorized public Bootstrap call returned nil and is consumed")
 	}
-	decoded, _, err := backend.decode(output)
+	decoded, _, err := decodeDualCurrentStage(backend, "final_public_output", output)
 	if err != nil {
 		_ = finishDualCurrentAttempt(journal, "FAILED", "decode output: "+err.Error())
 		return fmt.Errorf("Bootstrap succeeded once but output decode failed (call consumed): %w", err)
@@ -636,7 +636,7 @@ func validateDualCurrentInput(profile, configHash, inputHash, metadataHash strin
 }
 
 func appendDualCurrentStage(backend *publicBackend, doc *dualCurrentDocument, name string, ct *rlwe.Ciphertext) error {
-	decoded, method, err := backend.decode(ct)
+	decoded, method, err := decodeDualCurrentStage(backend, name, ct)
 	if err != nil {
 		return fmt.Errorf("decode %s: %w", name, err)
 	}

@@ -9,6 +9,13 @@ import (
 	"github.com/tuneinsight/lattigo/v6/schemes/ckks"
 )
 
+func decodeDualCurrentStage(backend *publicBackend, _ string, ct *rlwe.Ciphertext) ([]complex128, string, error) {
+	if backend == nil {
+		return nil, "", fmt.Errorf("genuine Standard decoder is unavailable")
+	}
+	return backend.decode(ct)
+}
+
 func auditDualCurrentC2SGroup(backend *publicBackend, modUp *rlwe.Ciphertext) (dualCurrentC2SAudit, error) {
 	if backend == nil || backend.bootstrapEval == nil || backend.bootstrapEval.DFTEvaluator == nil || modUp == nil {
 		return dualCurrentC2SAudit{}, fmt.Errorf("genuine Standard C2S observer is incomplete")

@@ -2,7 +2,22 @@
 
 package main
 
-import "github.com/tuneinsight/lattigo/v6/core/rlwe"
+import (
+	"fmt"
+
+	"github.com/tuneinsight/lattigo/v6/core/rlwe"
+)
+
+func decodeDualCurrentStage(backend *publicBackend, name string, ct *rlwe.Ciphertext) ([]complex128, string, error) {
+	if backend == nil {
+		return nil, "", fmt.Errorf("Fast stage decoder is unavailable")
+	}
+	if name == "bootstrap_output" {
+		name = "final_public_output"
+	}
+	adapter := fastBackend{residual: backend.residual, bootstrappingParams: backend.full}
+	return adapter.DecodeStage(ct, name)
+}
 
 func auditDualCurrentC2SGroup(_ *publicBackend, _ *rlwe.Ciphertext) (dualCurrentC2SAudit, error) {
 	return dualCurrentC2SAudit{
