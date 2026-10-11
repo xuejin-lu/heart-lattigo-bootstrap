@@ -1,19 +1,17 @@
-# CURRENT TASK — LogN16 capacity-safe native E32 performance, inherited budget
+# CURRENT TASK — Original-input LogN16/E32 native oracle + performance
 
 Task: FAST-LOGN16-PUBLIC-NATIVE-CAPACITY-SAFE-PERFORMANCE-005
 Status: READY_FOR_CODEX
-Authoritative specification: `specs/FAST-LOGN16-PUBLIC-NATIVE-CAPACITY-SAFE-PERFORMANCE-005.md`
+Authoritative spec: `specs/FAST-LOGN16-PUBLIC-NATIVE-CAPACITY-SAFE-PERFORMANCE-005.md`
 
-## Web review disposition
+## Scientific correction (2026-10-11)
 
-Task 004 completed as `CURRENT_PERFORMANCE_BLOCKED` / `PUBLIC_NATIVE_LOGN16_PROFILE_BLOCKED`, with **0/16** full Bootstrap attempts spent. This is not a proven coefficient overflow: `internal/perfmeasure.BoundPublicMulRescaleWorkload` found a conservative centered-capacity bound `B=18169085704944493` for original LogN16 public-native E32 workload; `q0=36028797019488257`, so `2B-q0=309374390400729` (about 0.859% of q0). Keep the old failure and guard intact. No proof yet of current LogN16 Fast kernel runtime or speed.
+The earlier 005 proposal to scale workload C by 15/16 **IS CANCELLED**. The user correctly questioned whether a conservative coefficient capacity bound should dictate a modified CNN-like plaintext. The original configs use `log_default_scale=45`, LogN16 effective `q0=36028797019488257`, and canonical tiny plaintext values. The old sufficient-coefficient `2B<q0` gate failed by `309374390400729`, but this means its pessimistic proof is unavailable, **not that an actual plaintext coefficient overflow or CKKS error was observed**.
 
-## New safe experiment and authorization
+Maintain the same unmodified LogN16/E32 A/B/C workload, original input/workload/config/Q/P hashes, q0, Scale, frontend operation chain and genuine Standard / current Fast backend pins. Keep exact old bound and warning. FIRST explain the mathematical bound assumptions and establish whether, for this specified profile, the complete eight-stage native public-operation output against independent plaintext oracle (including actual Level0 after DropLevelNew) can safely serve as an observed-workload gate. Never interpret centered residues alone as proof of no wraparound; preserve legacy LogN13 strict behavior. Do not implement a generic unsafe `--skip-capacity`.
 
-Create a **separately named** LogN16/E32 public-native workload `logn16-e32-c15over16-v1` in our existing `perfprobe`/`perfmeasure` platform, with original A/B and C scaled exactly by `15/16`. Keep Q/P, Scale, E32, full identical public CKKS frontend and original genuine Standard/Fast pins unchanged; change only the named benchmark's input C **for both backends equally**, and regenerate its own workload SHA/oracle. Never alter the frozen original LogN13/E32 fixture or original failing LogN16 case, silently bypass the `2B<q0` gate, or claim these two LogN16 workloads are identical.
+Zero Bootstrap phase: source/static audit and matched genuine Standard/Fast formal E32, full 32768-slot preflight with numerical/metadata/oracle/provenance gates, plus real LogN16 Fast kernel-path evidence. If anything fails, do not invoke Bootstrap.
 
-First require zero Bootstrap capacity recomputation, canonical hashes, full matched original Standard and Fast native public E32 preflights, all eight checkpoints, dispatch/kernel evidence and focused tests. If any preflight fails or Fast optimized execution cannot be established, STOP and spend **zero** calls; no Secondary changes.
+Performance phase only if zero-call gates pass: **TRANSFER original 004 allowance** (0/16 consumed so far), not an additional allowance: LogN16 Standard/Fast each 1 cold+5 warm; frozen LogN13 Standard/Fast each 1 cold+1 warm. Total ceiling remains 16; no implicit calls, repeats, profiler calls or unauthorized math/Secondary changes. Use shared perfprobe/fastdiag/perfmeasure/numericalmetrics, track timings/allocations and matched error; report true Fast dispatch and honest limitations.
 
-Only AFTER those gates pass: **TRANSFER, not add to, task 004's unspent total allowance**. Across 004+005 maximum stays 16 full Bootstrap calls: LogN16 Standard 1 cold+5 warm, Fast 1 cold+5 warm (12); LogN13 frozen original Standard 1 cold+1 warm, Fast 1 cold+1 warm (4). Durable task-wide cumulative reservation journal, failures consume calls, no implicit warmups or repetitions, no retries, no extra profiler Bootstrap. Reuse existing timers/alloc counters and `fastdiag`, measure paired native numerical oracles plus speed; report exact Fast kernel path and construction vs cold vs warm cost. No mathematics, backend, parameter or optimization modifications authorized.
-
-Produce new `results/FAST-LOGN16-PUBLIC-NATIVE-CAPACITY-SAFE-PERFORMANCE-005.md` and `.json`, preserve 002/003/004, safe push Primary only and READY_FOR_WEB_REVIEW/NEEDS_WEB_REVIEW. Follow latest AGENTS/workflow and backend transparency contract. User need only type `開始` in Codex.
+Original 002/003/004 artifacts immutable. Output updated task-005 summary/JSON plus journal, safe commit/push and READY_FOR_WEB_REVIEW or NEEDS_WEB_REVIEW. Continue normal Codex `開始` → Web `review` workflow.
