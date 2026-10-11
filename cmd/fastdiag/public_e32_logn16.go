@@ -197,7 +197,14 @@ func validatePublicE32LogN16RawTrace(raw publicE32RawTrace, manifest publicE32Fi
 	if len(vectors.Checkpoints) != len(logN16PublicCheckpointNames) || len(reference.Vectors.BootstrapOutputs) != 6 {
 		return errors.New("LogN16 trace is missing current preflight checkpoints or validated Task005 output references")
 	}
-	return validatePublicE32Events(raw.Events)
+	return validatePublicE32LogN16EventTree(raw.Events)
+}
+
+// The live LogN16 adapter is retired below; retained raw artifacts are still
+// validated by the same maintained recursive event-tree validator as the
+// general public E32 trace path.
+func validatePublicE32LogN16EventTree(events []Event) error {
+	return validatePublicE32Events(events)
 }
 
 func finiteNonNegativeE32(value float64) bool {

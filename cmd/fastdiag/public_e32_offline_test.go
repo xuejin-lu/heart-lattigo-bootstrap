@@ -84,6 +84,49 @@ func TestPublicE32OfflineClassificationNeverCertifiesOrMutatesRaw(t *testing.T) 
 	require.Equal(t, "OFFLINE_PARTIAL_UNVERIFIED", publicE32OfflineClassification("TRACE_UNVERIFIED", 1, true))
 }
 
+func TestTask006StageTimingProjectionUsesOnlyDirectBootstrapChildren(t *testing.T) {
+	events := publicE32TestEvents()
+	for i := range events {
+		if events[i].Scope == "stage" && events[i].Name == "bootstrap" {
+			events[i].ElapsedNS = 1000
+		} else if events[i].Scope == "stage" {
+			events[i].ElapsedNS = 100
+		}
+	}
+	analysis, err := analyzePublicE32Events(events)
+	require.NoError(t, err)
+	root := task006BootstrapRootSequence(analysis.Closures)
+	stages, err := task006BootstrapStageTimings(analysis, root)
+	require.NoError(t, err)
+	require.Len(t, stages, 9)
+	var total float64
+	seen := make(map[string]bool)
+	for _, stage := range stages {
+		require.Equal(t, 1, stage.Count)
+		require.Equal(t, float64(100), stage.InclusiveNS)
+		seen[stage.Name] = true
+		total += stage.InclusiveNS
+	}
+	require.Equal(t, float64(900), total)
+	for _, name := range []string{"coeffs_to_slots", "evalmod_real", "evalmod_imag", "slots_to_coeffs", "public_finalization"} {
+		require.True(t, seen[name], "missing direct stage %s", name)
+	}
+	for _, stage := range stages {
+		require.NotEqual(t, "power", stage.Name)
+		require.NotEqual(t, "rescale", stage.Name)
+	}
+
+	for i := range events {
+		if events[i].Scope == "stage" && events[i].Name != "bootstrap" {
+			events[i].ElapsedNS = 200
+		}
+	}
+	analysis, err = analyzePublicE32Events(events)
+	require.NoError(t, err)
+	_, err = task006BootstrapStageTimings(analysis, task006BootstrapRootSequence(analysis.Closures))
+	require.ErrorContains(t, err, "nonoverlap is not established")
+}
+
 func TestPublicE32OfflineReplayFrozenCaptureWithoutBootstrap(t *testing.T) {
 	rawPath := os.Getenv("FASTDIAG_BATCH025_RAW")
 	if rawPath == "" {
@@ -144,13 +187,34 @@ func TestTask006OfflineReplayCapturedTraceWithoutBootstrap(t *testing.T) {
 	require.False(t, doc.OriginalRawRelabeled)
 	require.Zero(t, doc.NewBootstrapCalls)
 	require.Equal(t, 539, doc.EventCount)
-	require.Equal(t, []task006PowerRoot{{Branch: "real", Sequence: 59}, {Branch: "imag", Sequence: 279}}, doc.GeneratedPowerRoots)
+	require.Len(t, doc.GeneratedPowerRoots, 2)
+	require.Equal(t, "real", doc.GeneratedPowerRoots[0].Branch)
+	require.Equal(t, uint64(59), doc.GeneratedPowerRoots[0].Sequence)
+	require.Equal(t, "imag", doc.GeneratedPowerRoots[1].Branch)
+	require.Equal(t, uint64(279), doc.GeneratedPowerRoots[1].Sequence)
+	for _, root := range doc.GeneratedPowerRoots {
+		require.Positive(t, root.InclusiveNS)
+	}
 	require.Equal(t, []uint64{63, 62, 61, 60, 59}, doc.RecursivePowerAncestry)
 	require.Equal(t, 16, doc.EffectiveParameters.LogN)
 	require.Equal(t, 15, doc.EffectiveParameters.LogSlots)
 	require.True(t, doc.DiagnosticPatchMatches)
 	require.NotNil(t, doc.Analysis)
 	require.Equal(t, 539, doc.Analysis.EventTypeRootRecords)
+	require.Len(t, doc.Analysis.BootstrapStages, 9)
+	require.Len(t, doc.Analysis.RescaleDiagnosticRoots, 35)
+	stageNames := make(map[string]bool, len(doc.Analysis.BootstrapStages))
+	var directStageTotal float64
+	for _, stage := range doc.Analysis.BootstrapStages {
+		stageNames[stage.Name] = true
+		require.Equal(t, 1, stage.Count)
+		require.Positive(t, stage.InclusiveNS)
+		directStageTotal += stage.InclusiveNS
+	}
+	for _, name := range []string{"coeffs_to_slots", "evalmod_real", "evalmod_imag", "slots_to_coeffs", "public_finalization"} {
+		require.True(t, stageNames[name], "missing direct Bootstrap stage %s", name)
+	}
+	require.LessOrEqual(t, directStageTotal, doc.Analysis.RootElapsedNS)
 	encoded, err := json.Marshal(doc)
 	require.NoError(t, err)
 	require.Less(t, len(encoded), 64*1024, "offline evidence must remain compact and omit per-event analyzer arrays")

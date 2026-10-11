@@ -798,19 +798,101 @@ func TestLogN16PublicNativeProfileUsesOnlyObservedOracleCapacityPolicy(t *testin
 	if err == nil || err.Error() != wantBlocker {
 		t.Fatalf("LogN16 E32 workload capacity result = %v, want exact blocker %q", err, wantBlocker)
 	}
+	parameterized, err := publicNativeProfileForEffectiveConfig("logn16", effective, "noncanonical-config-sha")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if parameterized.Kind != publicProfileKindParameterized || parameterized.CapacityPolicy != publicCapacityPolicyStrict {
+		t.Fatalf("noncanonical LogN16 config inherited a frozen observed-oracle exception: %+v", parameterized)
+	}
+	if _, err := assessPublicCapacityForProfile(parameterized, a, b, c, params.BootstrappingParameters.Q(), params.BootstrappingParameters.N()); err == nil || err.Error() != wantBlocker {
+		t.Fatalf("parameterized LogN16 did not stop at its explicit strict capacity limit: %v", err)
+	}
 }
 
-func TestPublicNativeExplicitlyRejectsUnvalidatedEffectiveLogN(t *testing.T) {
-	effective := perfmeasure.EffectiveParameters{LogN: 14, LogSlots: 13, InputSlots: 1 << 13, EphemeralSecretWeight: 32}
-	_, err := publicNativeProfileForEffective("logn14", effective)
-	if err == nil || !strings.Contains(err.Error(), "UNSUPPORTED_EFFECTIVE_PROFILE") ||
-		!strings.Contains(err.Error(), "LogSlots=13") || !strings.Contains(err.Error(), "no frozen public-native") {
-		t.Fatalf("unsupported effective profile was not reported explicitly: %v", err)
-	}
-	if _, err := publicNativeProfileForEffective("logn13", effective); err == nil || !strings.Contains(err.Error(), "does not match effective profile") {
-		t.Fatalf("profile label inconsistent with effective LogN was not rejected: %v", err)
+func TestPublicNativeProfilesResolveFromEffectiveLogN(t *testing.T) {
+	for _, logN := range []int{13, 14, 15, 16} {
+		name := fmt.Sprintf("logn%d", logN)
+		effective := perfmeasure.EffectiveParameters{
+			LogN: logN, LogSlots: logN - 1, InputSlots: 1 << (logN - 1), RingN: 1 << logN,
+			EphemeralSecretWeight: 32,
+		}
+		profile, err := publicNativeProfileForEffective(name, effective)
+		if err != nil || profile.Kind != publicProfileKindParameterized || profile.LogN != logN || profile.InputSlots != effective.InputSlots {
+			t.Fatalf("parameterized LogN%d profile was not derived from effective parameters: profile=%+v err=%v", logN, profile, err)
+		}
+		mismatchedLabel := "logn14"
+		if logN == 14 {
+			mismatchedLabel = "logn13"
+		}
+		if _, err := publicNativeProfileForEffective(mismatchedLabel, effective); err == nil || !strings.Contains(err.Error(), "does not match effective profile") {
+			t.Fatalf("profile label inconsistent with effective LogN was not rejected: %v", err)
+		}
 	}
 }
+
+func TestPublicNativeProfileConstructionUsesEffectiveParametersAcrossLogN13To16(t *testing.T) {
+	primaryRoot := filepath.Join("..", "..")
+	base, _, err := perfmeasure.LoadConfig(filepath.Join(primaryRoot, "configs", "bootstrap_config.logN13.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, logN := range []int{13, 14, 15, 16} {
+		cfg := base
+		cfg.LogN, cfg.LogSlots = logN, logN-1
+		_, params, effective, err := perfmeasure.ParametersFromConfigWithE(cfg, 32)
+		if err != nil {
+			t.Fatalf("construct LogN%d test parameters: %v", logN, err)
+		}
+		profile, err := publicNativeProfileForEffective(nameForLogN(logN), effective)
+		if err != nil {
+			t.Fatalf("resolve LogN%d profile: %v", logN, err)
+		}
+		if profile.Kind != publicProfileKindParameterized || params.BootstrappingParameters.LogN() != logN ||
+			profile.LogN != effective.LogN || profile.InputSlots != effective.InputSlots || profile.RingN != effective.RingN {
+			t.Fatalf("LogN%d profile does not follow constructed parameters: profile=%+v effective=%+v", logN, profile, effective)
+		}
+	}
+}
+
+func TestPublicNativeFrozenProfilesRequireTheirCanonicalConfigHash(t *testing.T) {
+	root := filepath.Join("..", "..")
+	for _, profileName := range []string{"logn13", "logn16"} {
+		configPath := filepath.Join(root, "configs", "bootstrap_config."+profileName+".json")
+		cfg, sum, err := perfmeasure.LoadConfig(configPath)
+		if err != nil {
+			t.Fatal(err)
+		}
+		_, _, effective, err := perfmeasure.ParametersFromConfigWithE(cfg, 32)
+		if err != nil {
+			t.Fatal(err)
+		}
+		canonicalHash := fmt.Sprintf("%x", sum)
+		frozen, err := publicNativeProfileForEffectiveConfig(profileName, effective, canonicalHash)
+		if err != nil || frozen.Kind != publicProfileKindFrozen {
+			t.Fatalf("canonical %s fixture did not remain frozen: profile=%+v err=%v", profileName, frozen, err)
+		}
+		parameterized, err := publicNativeProfileForEffectiveConfig(profileName, effective, "noncanonical-config-sha")
+		if err != nil || parameterized.Kind != publicProfileKindParameterized || parameterized.CapacityPolicy != publicCapacityPolicyStrict {
+			t.Fatalf("noncanonical %s config inherited historical fixture policy: profile=%+v err=%v", profileName, parameterized, err)
+		}
+	}
+}
+
+func TestParameterizedPublicPairValidatesAgainstItsEffectiveMetadata(t *testing.T) {
+	standard, standardVectors := makePublicPairArtifactFixture(t, "standard")
+	fast, fastVectors := makePublicPairArtifactFixture(t, "fast")
+	standard.ProfileKind, fast.ProfileKind = publicProfileKindParameterized, publicProfileKindParameterized
+	if err := validatePublicPairArtifacts(standard, fast, standardVectors, fastVectors); err != nil {
+		t.Fatalf("parameterized pair with matching effective metadata was rejected: %v", err)
+	}
+	fast.ConfigSHA256 = "different-config"
+	if err := validatePublicPairArtifacts(standard, fast, standardVectors, fastVectors); err == nil {
+		t.Fatal("parameterized pair with mismatched config provenance was accepted")
+	}
+}
+
+func nameForLogN(logN int) string { return fmt.Sprintf("logn%d", logN) }
 
 func TestPublicRotateLeftMatchesCKKSSlotConvention(t *testing.T) {
 	input := []complex128{1 + 2i, 3 + 4i, 5 + 6i, 7 + 8i}

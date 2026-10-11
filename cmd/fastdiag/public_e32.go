@@ -244,6 +244,9 @@ type publicE32GCEnvironment struct {
 }
 
 func tracePublicE32(primaryRoot, secondaryRoot string, primary RepositoryMetadata, opts options, outputs outputPaths) (publicE32TraceDocument, error) {
+	if opts.profile == publicE32LogN16Profile {
+		return publicE32TraceDocument{}, errors.New("LIVE_LOGN16_E32_TRACE_ADAPTER_RETIRED: reuse the preserved Task006 raw capture through offline-e32")
+	}
 	if runtime.Version() != "go1.26.4" || runtime.GOOS != "darwin" || runtime.GOARCH != "arm64" ||
 		runtime.NumCPU() != 10 || runtime.GOMAXPROCS(0) != 10 || cpuModel() != "Apple M4" {
 		return publicE32TraceDocument{}, fmt.Errorf("public E32 trace environment mismatch: Go=%s OS/Arch=%s/%s CPU=%s NumCPU=%d GOMAXPROCS=%d; require go1.26.4 darwin/arm64 Apple M4 NumCPU=10 GOMAXPROCS=10",

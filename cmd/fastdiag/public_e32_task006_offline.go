@@ -131,18 +131,38 @@ type task006OfflineRunCheck struct {
 }
 
 type task006PowerRoot struct {
-	Branch   string `json:"branch"`
-	Sequence uint64 `json:"root_sequence"`
+	Branch      string  `json:"branch"`
+	Sequence    uint64  `json:"root_sequence"`
+	InclusiveNS float64 `json:"inclusive_ns"`
+	ChildrenNS  float64 `json:"immediate_children_ns"`
+	ResidualNS  float64 `json:"signed_unattributed_ns"`
+}
+
+type task006StageTiming struct {
+	Name        string  `json:"stage"`
+	Count       int     `json:"count"`
+	InclusiveNS float64 `json:"inclusive_ns"`
+	Share       float64 `json:"share_of_bootstrap_root"`
+}
+
+type task006RescaleRootTiming struct {
+	Sequence    uint64  `json:"root_sequence"`
+	EventCount  int     `json:"tree_event_count"`
+	InclusiveNS float64 `json:"inclusive_ns"`
+	ChildrenNS  float64 `json:"immediate_children_ns"`
+	ResidualNS  float64 `json:"signed_unattributed_ns"`
 }
 
 type task006OfflineAnalysis struct {
-	RootElapsedNS            float64 `json:"bootstrap_root_elapsed_ns"`
-	RootImmediateChildrenNS  float64 `json:"bootstrap_direct_children_ns"`
-	RootUnattributedNS       float64 `json:"bootstrap_unattributed_ns"`
-	RootUnattributedFraction float64 `json:"bootstrap_unattributed_fraction"`
-	EventTypeRootRecords     int     `json:"event_type_root_record_count"`
-	PositiveExclusiveGroups  int     `json:"positive_exclusive_group_count"`
-	AmdahlScenarioCount      int     `json:"amdahl_scenario_count"`
+	RootElapsedNS            float64                    `json:"bootstrap_root_elapsed_ns"`
+	RootImmediateChildrenNS  float64                    `json:"bootstrap_direct_children_ns"`
+	RootUnattributedNS       float64                    `json:"bootstrap_unattributed_ns"`
+	RootUnattributedFraction float64                    `json:"bootstrap_unattributed_fraction"`
+	EventTypeRootRecords     int                        `json:"event_type_root_record_count"`
+	PositiveExclusiveGroups  int                        `json:"positive_exclusive_group_count"`
+	AmdahlScenarioCount      int                        `json:"amdahl_scenario_count"`
+	BootstrapStages          []task006StageTiming       `json:"nonoverlapping_bootstrap_direct_stages"`
+	RescaleDiagnosticRoots   []task006RescaleRootTiming `json:"independent_rescale_diagnostic_roots"`
 }
 
 type task006OfflineEvidence struct {
@@ -425,9 +445,26 @@ func replayPublicE32Task006Offline(primaryRoot, secondaryRoot string, primaryMet
 			}
 		}
 	}
-	if branches, branchErr := publicE32GeneratedPowerBranchRoots(raw.Events); branchErr == nil {
+	doc.RootClosures = publicE32OfflineRootClosures(raw.Events)
+	doc.IndependentRootCount = len(doc.RootClosures)
+	if branches, branchErr := publicE32GeneratedPowerBranchRoots(raw.Events); branchErr != nil {
+		addAnomaly("cannot project generated-power roots: %v", branchErr)
+	} else {
+		seenBranches := make(map[string]bool, len(branches))
 		for _, branch := range branches {
-			doc.GeneratedPowerRoots = append(doc.GeneratedPowerRoots, task006PowerRoot{Branch: branch.Branch, Sequence: branch.Root.Sequence})
+			root := findTask006RootClosure(doc.RootClosures, branch.Root.Sequence)
+			if root.Sequence == 0 || seenBranches[branch.Branch] {
+				addAnomaly("generated-power branch %q has no unique independent root closure", branch.Branch)
+				continue
+			}
+			seenBranches[branch.Branch] = true
+			doc.GeneratedPowerRoots = append(doc.GeneratedPowerRoots, task006PowerRoot{
+				Branch: branch.Branch, Sequence: branch.Root.Sequence,
+				InclusiveNS: root.InclusiveNS, ChildrenNS: root.ChildrenNS, ResidualNS: root.SignedResidual,
+			})
+		}
+		if len(branches) != 2 || !seenBranches["real"] || !seenBranches["imag"] {
+			addAnomaly("Task006 generated-power projection must contain exactly one real and one imag root")
 		}
 	}
 	for _, event := range raw.Events {
@@ -439,14 +476,29 @@ func replayPublicE32Task006Offline(primaryRoot, secondaryRoot string, primaryMet
 	if analysis, analysisErr := analyzePublicE32Events(raw.Events); analysisErr != nil {
 		addAnomaly("Batch025 root-partitioned analyzer rejected the Task006 event tree: %v", analysisErr)
 	} else {
+		rootSequence := task006BootstrapRootSequence(analysis.Closures)
+		stages, stageErr := task006BootstrapStageTimings(analysis, rootSequence)
+		if stageErr != nil {
+			addAnomaly("cannot project nonoverlapping direct Bootstrap stage timings: %v", stageErr)
+		}
+		rescaleRoots := make([]task006RescaleRootTiming, 0, 35)
+		for _, closure := range doc.RootClosures {
+			if closure.Scope == "rescale" {
+				rescaleRoots = append(rescaleRoots, task006RescaleRootTiming{
+					Sequence: closure.Sequence, EventCount: closure.EventCount,
+					InclusiveNS: closure.InclusiveNS, ChildrenNS: closure.ChildrenNS, ResidualNS: closure.SignedResidual,
+				})
+			}
+		}
+		if len(rescaleRoots) != 35 {
+			addAnomaly("Task006 expected 35 independent Rescale diagnostic roots, got %d", len(rescaleRoots))
+		}
 		doc.Analysis = &task006OfflineAnalysis{
 			RootElapsedNS: analysis.RootElapsedNS, RootImmediateChildrenNS: analysis.RootImmediateChildrenNS,
 			RootUnattributedNS: analysis.RootUnattributedNS, RootUnattributedFraction: analysis.RootUnattributedFraction,
 			EventTypeRootRecords: len(analysis.EventTypeSummaries), PositiveExclusiveGroups: len(analysis.PositiveExclusiveByType),
-			AmdahlScenarioCount: len(analysis.AmdahlScenarios),
+			AmdahlScenarioCount: len(analysis.AmdahlScenarios), BootstrapStages: stages, RescaleDiagnosticRoots: rescaleRoots,
 		}
-		doc.RootClosures = publicE32OfflineRootClosures(raw.Events)
-		doc.IndependentRootCount = len(doc.RootClosures)
 	}
 	doc.RecursivePowerAncestry = task006RecursivePowerAncestry(raw.Events)
 	if len(doc.RecursivePowerAncestry) == 0 {
@@ -458,6 +510,54 @@ func replayPublicE32Task006Offline(primaryRoot, secondaryRoot string, primaryMet
 		doc.Classification = "OFFLINE_PARTIAL_UNVERIFIED"
 	}
 	return doc, renderPublicE32Task006OfflineJournal(doc), nil
+}
+
+func findTask006RootClosure(closures []publicE32OfflineRootClosure, sequence uint64) publicE32OfflineRootClosure {
+	for _, closure := range closures {
+		if closure.Sequence == sequence {
+			return closure
+		}
+	}
+	return publicE32OfflineRootClosure{}
+}
+
+func task006BootstrapRootSequence(closures []publicE32EventClosure) uint64 {
+	for _, closure := range closures {
+		if closure.ParentSequence == 0 && closure.Scope == "stage" && closure.Name == "bootstrap" {
+			return closure.Sequence
+		}
+	}
+	return 0
+}
+
+func task006BootstrapStageTimings(analysis publicE32TraceAnalysis, rootSequence uint64) ([]task006StageTiming, error) {
+	if rootSequence == 0 || analysis.RootElapsedNS <= 0 {
+		return nil, errors.New("missing positive Bootstrap root timing")
+	}
+	rows := make([]task006StageTiming, 0, 10)
+	seen := make(map[string]bool)
+	var directStageTotal float64
+	for _, summary := range analysis.EventTypeSummaries {
+		if summary.TreeRootSequence != rootSequence || summary.Scope != "stage" || summary.ParentType != "stage/bootstrap" || summary.Name == "bootstrap" {
+			continue
+		}
+		if summary.Count != 1 || seen[summary.Name] || summary.InclusiveMedianNS <= 0 {
+			return nil, fmt.Errorf("direct stage %q has count=%d duplicate=%t or invalid timing", summary.Name, summary.Count, seen[summary.Name])
+		}
+		seen[summary.Name] = true
+		share := summary.InclusiveMedianNS / analysis.RootElapsedNS
+		rows = append(rows, task006StageTiming{Name: summary.Name, Count: summary.Count, InclusiveNS: summary.InclusiveMedianNS, Share: share})
+		directStageTotal += summary.InclusiveMedianNS
+	}
+	for _, required := range []string{"coeffs_to_slots", "evalmod_real", "evalmod_imag", "slots_to_coeffs", "public_finalization"} {
+		if !seen[required] {
+			return nil, fmt.Errorf("required direct Bootstrap stage %q is missing", required)
+		}
+	}
+	if directStageTotal > analysis.RootElapsedNS {
+		return nil, fmt.Errorf("direct Bootstrap stage spans total %.0f ns exceed root %.0f ns; nonoverlap is not established", directStageTotal, analysis.RootElapsedNS)
+	}
+	return rows, nil
 }
 
 func normalizedEvidencePath(root, path string) string {
@@ -565,6 +665,19 @@ func renderPublicE32Task006OfflineSummary(doc task006OfflineEvidence) string {
 	fmt.Fprintf(&out, "# Task006 LogN16/E32 offline recursive trace revalidation\n\n- Classification: `%s`\n- Original classification/status: `%s` / `%s` (unchanged)\n- New Bootstrap calls: **%d**\n- Event count: **%d**; independent event roots: **%d**\n- Generated-power branch roots: `%v`\n- Raw SHA-256: `%s`\n- Failure-sidecar SHA-256: `%s`\n- Task006 ledger SHA-256: `%s`\n- Captured Fast production / diagnostic adapter commits: `%s` / `%s`\n- Adapter patch digest matches committed patch: **%t**\n- Historical adapter commit object currently available: **%t**\n\n", doc.Classification, doc.OriginalClassification, doc.OriginalTraceStatus, doc.NewBootstrapCalls, doc.EventCount, doc.IndependentRootCount, doc.GeneratedPowerRoots, doc.RawSHA256, doc.SidecarSHA256, doc.LedgerSHA256, doc.ProductionFastCommit, doc.DiagnosticAdapterCommit, doc.DiagnosticPatchMatches, doc.DiagnosticCommitAvailable)
 	if doc.Analysis != nil {
 		fmt.Fprintf(&out, "- Bootstrap root timing: inclusive %.0f ns; direct children %.0f ns; signed residual %.0f ns (%.2f%%)\n- Existing analyzer detail counts: event-type/root records %d; positive-exclusive groups %d; Amdahl scenarios %d\n\n", doc.Analysis.RootElapsedNS, doc.Analysis.RootImmediateChildrenNS, doc.Analysis.RootUnattributedNS, 100*doc.Analysis.RootUnattributedFraction, doc.Analysis.EventTypeRootRecords, doc.Analysis.PositiveExclusiveGroups, doc.Analysis.AmdahlScenarioCount)
+		out.WriteString("## Nonoverlapping direct Bootstrap stages\n\nThe table contains only direct child stage spans from the Bootstrap root. Nested power and Rescale instrumentation roots are reported separately below and are not added to this wall-time table.\n\n| Stage | Count | Inclusive (ns) | Inclusive (ms) | Share of Bootstrap root |\n|---|---:|---:|---:|---:|\n")
+		for _, stage := range doc.Analysis.BootstrapStages {
+			fmt.Fprintf(&out, "| %s | %d | %.0f | %.6f | %.2f%% |\n", stage.Name, stage.Count, stage.InclusiveNS, stage.InclusiveNS/1e6, 100*stage.Share)
+		}
+		out.WriteString("\n## Independent generated-power and Rescale diagnostic roots\n\nThese are separate instrumentation trees that overlap Bootstrap wall-time measurement; their durations must not be summed with each other or with direct stage spans.\n\nGenerated-power branches:\n\n| Branch | Root sequence | Inclusive (ns) | Inclusive (ms) | Direct children (ns) | Signed residual (ns) |\n|---|---:|---:|---:|---:|---:|\n")
+		for _, root := range doc.GeneratedPowerRoots {
+			fmt.Fprintf(&out, "| %s | %d | %.0f | %.6f | %.0f | %.0f |\n", root.Branch, root.Sequence, root.InclusiveNS, root.InclusiveNS/1e6, root.ChildrenNS, root.ResidualNS)
+		}
+		out.WriteString("\nRescale diagnostic roots:\n\n| Root sequence | Events | Inclusive (ns) | Inclusive (ms) | Direct children (ns) | Signed residual (ns) |\n|---:|---:|---:|---:|---:|---:|\n")
+		for _, root := range doc.Analysis.RescaleDiagnosticRoots {
+			fmt.Fprintf(&out, "| %d | %d | %.0f | %.6f | %.0f | %.0f |\n", root.Sequence, root.EventCount, root.InclusiveNS, root.InclusiveNS/1e6, root.ChildrenNS, root.ResidualNS)
+		}
+		out.WriteByte('\n')
 	}
 	out.WriteString("## Recorded numerical outputs (metadata only; no decrypt repeated)\n\n| Call | Level | Scale log2 | Degree | Q-prefix rows | Oracle RMSE | Oracle max | Task005 Fast-reference max | Gate |\n|---|---:|---:|---:|---:|---:|---:|---:|---|\n")
 	for _, run := range doc.RunChecks {

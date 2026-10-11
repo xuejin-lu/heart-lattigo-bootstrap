@@ -66,6 +66,42 @@ func TestNumericalProfilesUseCanonicalEffectiveParameters(t *testing.T) {
 		perfmeasure.CiphertextStateFingerprint(perfmeasure.CiphertextStateOf(logN16Input, logN16.BootstrappingParameters.Q(), 1)))
 }
 
+func TestParameterizedNumericalProfileUsesEffectiveLogNAndSlots(t *testing.T) {
+	root := filepath.Join("..", "..")
+	base, _, err := perfmeasure.LoadConfig(filepath.Join(root, "configs", "bootstrap_config.logN13.json"))
+	require.NoError(t, err)
+	tempRoot := t.TempDir()
+	for _, logN := range []int{13, 14, 15, 16} {
+		t.Run(fmt.Sprintf("logn%d", logN), func(t *testing.T) {
+			cfg := base
+			cfg.LogN, cfg.LogSlots = logN, logN-1
+			data, err := json.Marshal(cfg)
+			require.NoError(t, err)
+			configPath := filepath.Join(tempRoot, fmt.Sprintf("logn%d.json", logN))
+			require.NoError(t, os.WriteFile(configPath, data, 0o600))
+			params, residual, values, effective, _, _, err := numericalProfileFromConfig(fmt.Sprintf("logn%d", logN), configPath, 32, root)
+			require.NoError(t, err)
+			require.Equal(t, logN, effective.LogN)
+			require.Equal(t, 1<<(logN-1), effective.InputSlots)
+			require.Equal(t, effective.InputSlots, len(values))
+			require.Equal(t, 32, effective.EphemeralSecretWeight)
+			require.Equal(t, logN, params.BootstrappingParameters.LogN())
+			require.Equal(t, logN-1, params.CoeffsToSlotsParameters.LogSlots)
+			require.Equal(t, effective.ResidualRingN, residual.N())
+		})
+	}
+	t.Run("mismatched label", func(t *testing.T) {
+		cfg := base
+		cfg.LogN, cfg.LogSlots = 14, 13
+		data, err := json.Marshal(cfg)
+		require.NoError(t, err)
+		configPath := filepath.Join(tempRoot, "mismatched.json")
+		require.NoError(t, os.WriteFile(configPath, data, 0o600))
+		_, _, _, _, _, _, err = numericalProfileFromConfig("logn13", configPath, 32, root)
+		require.ErrorContains(t, err, "does not match effective profile")
+	})
+}
+
 func TestNumericalFastRevisionModesFailClosed(t *testing.T) {
 	require.NoError(t, validateNumericalFastReference(numericalFastRevisionHistorical, "fast-qprefix", correctedFastCommitSHA, ""))
 	require.ErrorContains(t, validateNumericalFastReference(numericalFastRevisionHistorical, "fast-qprefix", "2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f", ""), "historical-pinned")

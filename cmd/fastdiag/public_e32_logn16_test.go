@@ -44,6 +44,27 @@ func TestValidateLogN16E32ManifestFailsClosed(t *testing.T) {
 	}
 }
 
+func TestLogN16AdapterUsesSharedRecursiveEventValidator(t *testing.T) {
+	events := publicE32TestEvents()
+	require.NoError(t, validatePublicE32LogN16EventTree(events))
+
+	mutated := append([]Event(nil), events...)
+	var t8Sequence uint64
+	for _, event := range mutated {
+		if event.Scope == "power" && event.Name == "power" && event.Power != nil && *event.Power == 8 {
+			t8Sequence = event.Sequence
+			break
+		}
+	}
+	require.NotZero(t, t8Sequence)
+	for i := range mutated {
+		if mutated[i].Sequence == t8Sequence {
+			mutated[i].ParentSequence = 5 // a stage ancestor is not a recursive power parent
+		}
+	}
+	require.ErrorContains(t, validatePublicE32LogN16EventTree(mutated), "non-power ancestor")
+}
+
 func TestValidatePublicE32LogN16FixtureBindsZeroCallVectorsAndHashes(t *testing.T) {
 	root := t.TempDir()
 	parameters, ciphertext := []byte("parameters"), []byte("held native level0 ciphertext")

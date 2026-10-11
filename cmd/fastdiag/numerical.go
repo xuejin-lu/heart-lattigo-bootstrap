@@ -250,22 +250,37 @@ func numericalReference(secondaryRoot string, primary RepositoryMetadata, opts o
 		return NumericalDocument{}, fmt.Errorf("Secondary 在 provenance 擷取後變為 dirty，拒絕執行 numerical comparison")
 	}
 
-	params, residual, values, effective, configPath, configHash, err := numericalProfile(opts.profile, primary.Path)
+	var params bootstrapping.Parameters
+	var residual ckks.Parameters
+	var values []complex128
+	var effective perfmeasure.EffectiveParameters
+	var configPath, configHash string
+	if opts.config != "" {
+		params, residual, values, effective, configPath, configHash, err = numericalProfileFromConfig(opts.profile, opts.config, opts.ephemeralSecretWeight, primary.Path)
+		if err == nil {
+			opts.profile, err = perfmeasure.EffectiveProfileName(effective)
+		}
+	} else {
+		params, residual, values, effective, configPath, configHash, err = numericalProfile(opts.profile, primary.Path)
+	}
 	if err != nil {
 		return NumericalDocument{}, err
 	}
 	inputHash := fastStandardInputFingerprint(values)
-	expectedInputHash, expectedInputMetadataHash, err := numericalInputFingerprints(opts.profile)
-	if err != nil {
-		return NumericalDocument{}, err
-	}
-	if inputHash != expectedInputHash {
-		return NumericalDocument{}, fmt.Errorf("%s historical numerical input fingerprint 不符：%s", opts.profile, inputHash)
+	expectedInputHash, expectedInputMetadataHash := "", ""
+	if opts.config == "" {
+		expectedInputHash, expectedInputMetadataHash, err = numericalInputFingerprints(opts.profile)
+		if err != nil {
+			return NumericalDocument{}, err
+		}
+		if inputHash != expectedInputHash {
+			return NumericalDocument{}, fmt.Errorf("%s historical numerical input fingerprint 不符：%s", opts.profile, inputHash)
+		}
 	}
 	if len(values) != effective.InputSlots || params.BootstrappingParameters.LogN() != effective.LogN || params.CoeffsToSlotsParameters.LogSlots != effective.LogSlots {
 		return NumericalDocument{}, fmt.Errorf("%s effective profile mismatch: slots=%d LogN=%d LogSlots=%d", opts.profile, len(values), params.BootstrappingParameters.LogN(), params.CoeffsToSlotsParameters.LogSlots)
 	}
-	if opts.profile == supportedProfile && effective.Q0Bits != 55 {
+	if opts.config == "" && opts.profile == supportedProfile && effective.Q0Bits != 55 {
 		return NumericalDocument{}, fmt.Errorf("canonical P93 effective q0 changed: q0bits=%d", effective.Q0Bits)
 	}
 	input, err := fastStandardEncodedInput(residual, params.CoeffsToSlotsParameters.LogSlots, values)
@@ -273,7 +288,7 @@ func numericalReference(secondaryRoot string, primary RepositoryMetadata, opts o
 		return NumericalDocument{}, err
 	}
 	inputMetadataHash := perfmeasure.CiphertextStateFingerprint(perfmeasure.CiphertextStateOf(input, params.BootstrappingParameters.Q(), input.Level()+1))
-	if inputMetadataHash != expectedInputMetadataHash {
+	if expectedInputMetadataHash != "" && inputMetadataHash != expectedInputMetadataHash {
 		return NumericalDocument{}, fmt.Errorf("%s historical encoded-input metadata fingerprint 不符：%s", opts.profile, inputMetadataHash)
 	}
 	preFastDecoded, err := fastStandardDecodeFast(residual, input)
@@ -567,6 +582,43 @@ func numericalProfile(profile, primaryRoot string) (bootstrapping.Parameters, ck
 		return bootstrapping.Parameters{}, ckks.Parameters{}, nil, perfmeasure.EffectiveParameters{}, "", "", fmt.Errorf("LogN16 canonical config SHA-256 mismatch: %s", hex.EncodeToString(configSum[:]))
 	}
 	return params, residual, perfmeasure.DeterministicInput(effective.InputSlots), effective, filepath.Join("configs", configName), hex.EncodeToString(configSum[:]), nil
+}
+
+func numericalProfileFromConfig(profile, config string, ephemeralSecretWeight int, primaryRoot string) (bootstrapping.Parameters, ckks.Parameters, []complex128, perfmeasure.EffectiveParameters, string, string, error) {
+	primaryRoot, err := filepath.Abs(primaryRoot)
+	if err != nil {
+		return bootstrapping.Parameters{}, ckks.Parameters{}, nil, perfmeasure.EffectiveParameters{}, "", "", err
+	}
+	configPath := config
+	if !filepath.IsAbs(configPath) {
+		configPath = filepath.Join(primaryRoot, configPath)
+	}
+	cfg, configSum, err := perfmeasure.LoadConfig(configPath)
+	if err != nil {
+		return bootstrapping.Parameters{}, ckks.Parameters{}, nil, perfmeasure.EffectiveParameters{}, "", "", fmt.Errorf("load parameterized numerical config: %w", err)
+	}
+	residual, params, effective, err := perfmeasure.ParametersFromConfigWithE(cfg, ephemeralSecretWeight)
+	if err != nil {
+		return bootstrapping.Parameters{}, ckks.Parameters{}, nil, perfmeasure.EffectiveParameters{}, "", "", err
+	}
+	label := profile
+	switch profile {
+	case "":
+		label = ""
+	case supportedProfile:
+		label = "logn13"
+	case logN16Profile:
+		label = "logn16"
+	}
+	if _, err := perfmeasure.ResolveProfileName(label, effective); err != nil {
+		return bootstrapping.Parameters{}, ckks.Parameters{}, nil, perfmeasure.EffectiveParameters{}, "", "", err
+	}
+	relativeConfigPath, err := filepath.Rel(primaryRoot, configPath)
+	if err != nil {
+		return bootstrapping.Parameters{}, ckks.Parameters{}, nil, perfmeasure.EffectiveParameters{}, "", "", err
+	}
+	values := perfmeasure.DeterministicInput(effective.InputSlots)
+	return params, residual, values, effective, filepath.ToSlash(relativeConfigPath), hex.EncodeToString(configSum[:]), nil
 }
 
 func fastStandardP93Values() []complex128 {
