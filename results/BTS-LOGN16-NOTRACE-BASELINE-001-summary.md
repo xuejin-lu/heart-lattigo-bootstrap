@@ -93,4 +93,4 @@ Raw logs are preserved (and contain the stock BTS console output, not profiler t
 - [Fast failed run](BTS-LOGN16-NOTRACE-FAST-001.log), 3,592 bytes; SHA-256 `433f0b13764785d09cadd5cdaaaf31ddb7add41a735614970b2bf9b2baee2ef7`.
 - [Execution journal](BTS-LOGN16-NOTRACE-BASELINE-001-journal.md) records the per-backend call budget and resume checkpoint.
 
-No test suite, Bootstrap warmup, trace capture, or additional diagnostic was run. Final status: `NEEDS_WEB_REVIEW` because Fast failed before producing a numerical output; the one-call-per-backend budget is exhausted.
+No CKKS/BTS test suite, Bootstrap warmup, trace capture, or additional diagnostic was run. The AGENTS-mandated worktree-policy unit tests passed 2/2 and invoke no Bootstrap. Final status: `NEEDS_WEB_REVIEW` because Fast failed before producing a numerical output; the one-call-per-backend budget is exhausted.
