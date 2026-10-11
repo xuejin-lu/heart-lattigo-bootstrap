@@ -107,7 +107,7 @@ func TestDualCurrentCheckpointCompareKeepsRealAndImagBranchesSeparate(t *testing
 	}
 }
 
-func TestDualCurrentCheckpointCompareRejectsDifferentRepresentationMetadata(t *testing.T) {
+func TestDualCurrentCheckpointCompareRequiresMatchingLogicalMetadata(t *testing.T) {
 	base := dualCurrentCheckpoint{
 		Name: "evalmod_real", State: ciphertextState{Level: 7, Degree: 1, Scale: "1.25e+20", LogRows: 0, LogCols: 12, QPrefixRows: 4},
 		IsNTT: true, IsMontgomery: false, DecodedValues: encodeVector([]complex128{1, 2}),
@@ -120,15 +120,13 @@ func TestDualCurrentCheckpointCompareRejectsDifferentRepresentationMetadata(t *t
 		{name: "scale", mutate: func(cp *dualCurrentCheckpoint) { cp.State.Scale = "1.2501e+20" }},
 		{name: "degree", mutate: func(cp *dualCurrentCheckpoint) { cp.State.Degree++ }},
 		{name: "dimensions", mutate: func(cp *dualCurrentCheckpoint) { cp.State.LogCols++ }},
-		{name: "ntt", mutate: func(cp *dualCurrentCheckpoint) { cp.IsNTT = false }},
-		{name: "montgomery", mutate: func(cp *dualCurrentCheckpoint) { cp.IsMontgomery = true }},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			fast := base
 			fast.DecodedValues = append([]complexValue(nil), base.DecodedValues...)
 			test.mutate(&fast)
 			comparisons := compareDualCurrentCheckpoints([]dualCurrentCheckpoint{base}, []dualCurrentCheckpoint{fast})
-			if len(comparisons) != 1 || comparisons[0].Comparable || comparisons[0].StateMatched {
+			if len(comparisons) != 1 || comparisons[0].Comparable || comparisons[0].LogicalStateMatched {
 				t.Fatalf("metadata mismatch was accepted as comparable: %+v", comparisons)
 			}
 		})
@@ -140,8 +138,17 @@ func TestDualCurrentCheckpointCompareRejectsDifferentRepresentationMetadata(t *t
 	fast.State.QPrefixRows = 16
 	fast.State.PrefixQ = "different full-Q product"
 	comparisons := compareDualCurrentCheckpoints([]dualCurrentCheckpoint{base}, []dualCurrentCheckpoint{fast})
-	if len(comparisons) != 1 || !comparisons[0].Comparable || !comparisons[0].StateMatched {
+	if len(comparisons) != 1 || !comparisons[0].Comparable || !comparisons[0].LogicalStateMatched {
 		t.Fatalf("backend-specific Q-prefix metadata blocked comparison: %+v", comparisons)
+	}
+
+	// Backend-specific NTT/Montgomery flags are reported but may differ when
+	// each backend adapter validly decodes its own storage representation.
+	fast = base
+	fast.IsMontgomery = true
+	comparisons = compareDualCurrentCheckpoints([]dualCurrentCheckpoint{base}, []dualCurrentCheckpoint{fast})
+	if len(comparisons) != 1 || !comparisons[0].Comparable || !comparisons[0].LogicalStateMatched || comparisons[0].RepresentationFlagsMatched {
+		t.Fatalf("valid backend-specific storage flags blocked semantic comparison: %+v", comparisons)
 	}
 }
 

@@ -103,18 +103,19 @@ type dualCurrentDocument struct {
 }
 
 type dualCurrentStageComparison struct {
-	Name               string               `json:"name"`
-	StateMatched       bool                 `json:"level_scale_degree_and_representation_matched"`
-	Comparable         bool                 `json:"comparable"`
-	Reason             string               `json:"reason,omitempty"`
-	Standard           ciphertextState      `json:"standard_state"`
-	Fast               ciphertextState      `json:"fast_state"`
-	StandardIsNTT      bool                 `json:"standard_is_ntt"`
-	FastIsNTT          bool                 `json:"fast_is_ntt"`
-	StandardMontgomery bool                 `json:"standard_is_montgomery"`
-	FastMontgomery     bool                 `json:"fast_is_montgomery"`
-	FastVsStd          vectorMetrics        `json:"fast_vs_standard_error_metrics"`
-	SNR                numericalmetrics.SNR `json:"fast_vs_standard_snr"`
+	Name                       string               `json:"name"`
+	LogicalStateMatched        bool                 `json:"level_scale_degree_dimensions_matched"`
+	RepresentationFlagsMatched bool                 `json:"ntt_montgomery_flags_matched"`
+	Comparable                 bool                 `json:"comparable"`
+	Reason                     string               `json:"reason,omitempty"`
+	Standard                   ciphertextState      `json:"standard_state"`
+	Fast                       ciphertextState      `json:"fast_state"`
+	StandardIsNTT              bool                 `json:"standard_is_ntt"`
+	FastIsNTT                  bool                 `json:"fast_is_ntt"`
+	StandardMontgomery         bool                 `json:"standard_is_montgomery"`
+	FastMontgomery             bool                 `json:"fast_is_montgomery"`
+	FastVsStd                  vectorMetrics        `json:"fast_vs_standard_error_metrics"`
+	SNR                        numericalmetrics.SNR `json:"fast_vs_standard_snr"`
 }
 
 type dualCurrentBootstrapComparison struct {
@@ -805,18 +806,22 @@ func compareDualCurrentCheckpoints(standard, fast []dualCurrentCheckpoint) []dua
 		result.Fast = got.State
 		result.StandardIsNTT, result.FastIsNTT = std.IsNTT, got.IsNTT
 		result.StandardMontgomery, result.FastMontgomery = std.IsMontgomery, got.IsMontgomery
-		if !dualCurrentStageStateMatches(std, got) {
-			result.Reason = "Level/Scale/Degree/dimensions or NTT/Montgomery representation differs"
+		result.LogicalStateMatched = dualCurrentStageStateMatches(std, got)
+		result.RepresentationFlagsMatched = std.IsNTT == got.IsNTT && std.IsMontgomery == got.IsMontgomery
+		if !result.LogicalStateMatched {
+			result.Reason = "logical Level/Scale/Degree/dimensions differ"
 		} else if std.DecodedValues == nil || got.DecodedValues == nil {
 			result.Reason = "decoded stage values missing"
 		} else if len(std.DecodedValues) != len(got.DecodedValues) {
 			result.Reason = "decoded slot count differs"
 		} else {
-			result.StateMatched = true
 			result.Comparable = true
 			standardValues, fastValues := decodeDualValues(std.DecodedValues), decodeDualValues(got.DecodedValues)
 			result.FastVsStd = compareVectors(standardValues, fastValues, 1e-7)
 			result.SNR = numericalmetrics.Compare(standardValues, fastValues)
+			if !result.RepresentationFlagsMatched {
+				result.Reason = "backend-specific NTT/Montgomery flags were decoded with their respective backend adapters"
+			}
 		}
 		comparisons = append(comparisons, result)
 	}
@@ -826,8 +831,7 @@ func compareDualCurrentCheckpoints(standard, fast []dualCurrentCheckpoint) []dua
 func dualCurrentStageStateMatches(standard, fast dualCurrentCheckpoint) bool {
 	a, b := standard.State, fast.State
 	return a.Level == b.Level && a.Degree == b.Degree && a.Scale == b.Scale &&
-		a.LogRows == b.LogRows && a.LogCols == b.LogCols &&
-		standard.IsNTT == fast.IsNTT && standard.IsMontgomery == fast.IsMontgomery
+		a.LogRows == b.LogRows && a.LogCols == b.LogCols
 }
 
 func decodeDualValues(values []complexValue) []complex128 {
