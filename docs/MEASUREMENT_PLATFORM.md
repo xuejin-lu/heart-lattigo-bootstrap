@@ -21,6 +21,18 @@
 
 **Preflight checklist (mandatory):** inventory these locations and read the relevant current implementation and tests; map each requested metric or oracle to reusable functions; document only true capability gaps and their minimum extension points. New one-off `tools/batchNNN/*` timing/metrics/stats code is **prohibited by default** when the same capability already exists. A workload-specific adapter or small fixture may be added only when it delegates measurement/provenance/metrics to these existing modules; any unavoidable new helper should land in the shared platform, with tests and a documented reason. Reuse existing numerical checks; never infer successful comparison from empty vectors.
 
+### Platform generalization and maintenance authority (2026-10-12)
+
+The maintained measurement platform is exactly `cmd/perfprobe`, `cmd/fastdiag`, `internal/perfmeasure`, and `internal/numericalmetrics` (plus the narrowly scoped `scripts/fastdiag` orchestration and Secondary instrumentation hooks). New or repaired workflows must extend these owners; do not create another runner, aggregate-statistics implementation, profile calculator, or event-tree validator.
+
+Generic profile metadata and shared algorithms are parameterized from the **effective constructed CKKS/bootstrapping parameters**, including LogN, LogSlots, slots, Scale, Q/P, and E. Historical profile names, hashes, gates, and backend pins remain explicit fixture constraints only; they must not become a global LogN allowlist. The same common profile logic must be exercised at LogN14/LogN15 when effective parameter construction is valid. If a profile is invalid or a backend rejects it, report `UNSUPPORTED`/`NOT_PROVEN` with the failed parameter or gate; do not silently emulate support or weaken numerical/capacity criteria.
+
+For recursive stage/power/Rescale evidence, reuse the Task025-accepted `cmd/fastdiag` event-tree validator, analysis and root-partitioned closure logic. A second validator that encodes a narrower parent rule is a regression. Historical root-level runners, duplicate adapters, and obsolete CLI entry points may be removed after reference/dependency review. Preserve independent math/security regression tests in the maintained packages before deleting their old runner tests; result/spec/config artifacts and their hashes remain historical evidence and need not be deleted or kept executable through a compatibility layer.
+
+Experiment budgets are **task-scoped**, durable and fail-closed; an exhausted Task005 or Task006 reservation is historical evidence, not a permanent ban on later explicitly authorized work. Never reuse a spent reservation or rerun a completed performance campaign. Any newly authorized trace capture gets its own bounded attempt journal, numerical stop gate, and no-retry policy.
+
+The public CKKS frontend remains backend-transparent: compile the same application source separately against genuine Standard and Fast dependencies. Backend-specific behavior stays behind the build/dependency boundary, not in the CKKS operation sequence.
+
 ## 2. Legacy assumptions are NOT the current research contract
 
 The existing platform contains valuable functionality alongside **obsolete assumptions**. Repair the platform instead of building around it.

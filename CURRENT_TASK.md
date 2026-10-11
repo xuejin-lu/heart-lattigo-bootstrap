@@ -1,11 +1,11 @@
-# CURRENT TASK — Offline recover already-captured LogN16 Fast stage trace
+# CURRENT TASK — Generalize and consolidate the CKKS measurement platform
 
-Task: FAST-LOGN16-TRACE-OFFLINE-RECOVERY-007
-Status: READY_FOR_CODEX
-Authoritative spec: `specs/FAST-LOGN16-TRACE-OFFLINE-RECOVERY-007.md`
+Task: `CKKS-MEASUREMENT-PLATFORM-GENERALIZATION-001`
+Status: `READY_FOR_CODEX` (user-authorized autonomous integration task)
+Authoritative spec: `specs/CKKS-MEASUREMENT-PLATFORM-GENERALIZATION-001.md`
 
-Task006 captured **539 real Fast LogN16/E32 trace events** and passed two native terminal numerical oracles, but its test-only validator repeated the **historical Batch024 mistaken direct-child assumption** for recursive generated powers. Event #61 T8 correctly has parent #60 T16, whose parent is #59 generated_powers. Task005 exhausted 16/16 Bootstrap calls, Task006 exhausted 2/2; **NO NEW BOOTSTRAP CALLS ARE AUTHORIZED FOR TASK007**.
+Extend only the maintained Primary platform (`cmd/perfprobe`, `cmd/fastdiag`, `internal/perfmeasure`, `internal/numericalmetrics`) so generic profile metadata derives from effective CKKS parameters and common logic covers LogN13–16, with unsupported backend/profile cases explicit. Revalidate the existing Task006 539-event trace offline by reusing Batch025's recursive event-tree analyzer. Audit and retire confirmed superseded root/`tools/` runner, adapter, and CLI code while preserving independent math/security regression tests and all historical results/specs/configs.
 
-Read existing Task006 raw trace/sidecar and compact report, verify raw path+SHA, 005/006 ledgers and provenance, then reuse the **Batch025 accepted offline recursive generated-power / event-tree analysis** to validate the *already captured* LogN16 trace. Diagnose/fix the minimal duplicated validator error in Primary task-owned test adapter without altering Secondary production math. Do NOT regenerate, rerun or recollect the trace. If raw temp files are absent, STOP with RAW_TRACE_UNAVAILABLE; do not run a bootstrap.
+No CKKS production arithmetic or security semantics changes; the frontend remains backend-transparent. Task005 performance measurements are not repeated. Task006's existing raw trace is preferred; only if immutable raw evidence is unavailable, the spec permits a separately journaled, no-retry capture of at most one cold and one traced-warm Fast Bootstrap after zero-call validation.
 
-Output new compact Task007 Markdown/JSON with offline status and meaningful in-circuit Bootstrap stage, generated-power and Rescale breakdowns if actually verified; parent/child stage shares must be nonoverlapping while independent power/Rescale roots are analyzed separately. Combine descriptively with old 005 uninstrumented LogN16 Standard 6425.276 ms, Fast 663.878 ms and old 006 traced warm 1060.783 ms; do not claim comparable Standard in-circuit stage traces or stage RMSE without an oracle. Preserve Task005/006 artifacts and call ledgers, Secondary stays clean. Use existing perfprobe/fastdiag/perfmeasure/numericalmetrics, not a new harness. Safe commit/push Primary, READY_FOR_WEB_REVIEW or NEEDS_WEB_REVIEW. Codex trigger remains `開始`.
+Execute the sequential checkpoints in the authoritative spec autonomously, commit the spec/rules/pointer before implementation, then commit and safely fast-forward push the completed Primary work. Secondary remains read-only. Stop for an actual math/security decision, unresolved correctness/evidence failure, or unsafe Git state.
