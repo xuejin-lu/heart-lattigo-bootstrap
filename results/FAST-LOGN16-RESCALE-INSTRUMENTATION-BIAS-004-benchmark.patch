@@ -1,0 +1,218 @@
+diff --git a/schemes/ckks/fast/rescale_task004_benchmark_test.go b/schemes/ckks/fast/rescale_task004_benchmark_test.go
+new file mode 100644
+index 00000000..0f1a9dc2
+--- /dev/null
++++ b/schemes/ckks/fast/rescale_task004_benchmark_test.go
+@@ -0,0 +1,212 @@
++package fast
++
++import (
++	"crypto/sha256"
++	"encoding/binary"
++	"encoding/hex"
++	"encoding/json"
++	"fmt"
++	"math"
++	"math/big"
++	"math/rand"
++	"os"
++	"testing"
++
++	"github.com/stretchr/testify/require"
++	"github.com/tuneinsight/lattigo/v6/core/rlwe"
++	"github.com/tuneinsight/lattigo/v6/internal/fastdiag"
++	"github.com/tuneinsight/lattigo/v6/schemes/ckks"
++)
++
++const task004ExpectedQPSHA = "6c82ca724cbfdce2083b2ef2c18d53f81e658a6f28ff283e9a671d276710ec5f"
++
++func task004Parameters(tb testing.TB) ckks.Parameters {
++	tb.Helper()
++	q := []uint64{
++		36028797019488257, 549754109953, 549753978881, 549753716737,
++		549753192449, 1152921504606584833, 1152921504614055937,
++		1152921504598720513, 1152921504615628801, 1152921504616808449,
++		1152921504597016577, 1152921504595968001, 1152921504618381313,
++		72057594038321153, 72057594036879361, 72057594035306497,
++		72057594040680449,
++	}
++	p := []uint64{
++		2305843009211596801, 2305843009210023937, 2305843009218281473,
++		2305843009208713217, 2305843009218936833,
++	}
++	params, err := ckks.NewParametersFromLiteral(ckks.ParametersLiteral{
++		LogN: 16, Q: q, P: p, LogDefaultScale: 45,
++	})
++	require.NoError(tb, err)
++	encoded, err := json.Marshal(struct {
++		Q []uint64
++		P []uint64
++	}{Q: params.Q(), P: params.P()})
++	require.NoError(tb, err)
++	sum := sha256.Sum256(encoded)
++	require.Equal(tb, task004ExpectedQPSHA, hex.EncodeToString(sum[:]))
++	require.Equal(tb, 65536, params.N())
++	return params
++}
++
++func task004Fixture(tb testing.TB, params ckks.Parameters) (*rlwe.Ciphertext, string) {
++	tb.Helper()
++	const level, rows = 12, 4
++	prefixProduct := big.NewInt(1)
++	for _, q := range params.Q()[:rows] {
++		prefixProduct.Mul(prefixProduct, new(big.Int).SetUint64(q))
++	}
++	half := new(big.Int).Rsh(new(big.Int).Set(prefixProduct), 1)
++	rng := rand.New(rand.NewSource(0x52455343414c4534))
++	values := make([]*big.Int, params.N())
++	for i := range values {
++		value := new(big.Int).SetUint64(rng.Uint64())
++		value.Lsh(value, 64).Or(value, new(big.Int).SetUint64(rng.Uint64()))
++		value.Lsh(value, 64).Or(value, new(big.Int).SetUint64(rng.Uint64()))
++		value.Mod(value, prefixProduct)
++		if value.Cmp(half) >= 0 {
++			value.Sub(value, prefixProduct)
++		}
++		values[i] = value
++	}
++
++	ct := NewCiphertext(params, 1, level)
++	ct.IsNTT = true
++	ct.IsMontgomery = false
++	ct.Scale = rlwe.NewScale(math.Ldexp(1, 120))
++	for component := range ct.Value {
++		for row := 0; row < rows; row++ {
++			modulus := new(big.Int).SetUint64(params.Q()[row])
++			for coefficient := 0; coefficient < params.N(); coefficient++ {
++				value := new(big.Int).Set(values[coefficient])
++				if component == 1 {
++					value.Neg(value)
++				}
++				ct.Value[component].Coeffs[row][coefficient] = value.Mod(value, modulus).Uint64()
++			}
++			params.RingQ().SubRings[row].NTT(ct.Value[component].Coeffs[row], ct.Value[component].Coeffs[row])
++		}
++	}
++
++	hash := sha256.New()
++	_, _ = hash.Write([]byte(fmt.Sprintf("logn=16;level=12;rows=4;scale=2^120;ntt=true;montgomery=false;in_place=true;qp=%s;", task004ExpectedQPSHA)))
++	var encoded [8]byte
++	buffer := make([]byte, 32*1024)
++	used := 0
++	for component := range ct.Value {
++		for row := 0; row < rows; row++ {
++			for _, residue := range ct.Value[component].Coeffs[row] {
++				binary.LittleEndian.PutUint64(encoded[:], residue)
++				copy(buffer[used:], encoded[:])
++				used += len(encoded)
++				if used == len(buffer) {
++					_, _ = hash.Write(buffer)
++					used = 0
++				}
++			}
++		}
++	}
++	if used != 0 {
++		_, _ = hash.Write(buffer[:used])
++	}
++	return ct, hex.EncodeToString(hash.Sum(nil))
++}
++
++func task004Configure(tb testing.TB) string {
++	tb.Helper()
++	mode := os.Getenv("TASK004_MODE")
++	if mode == "" {
++		mode = "A"
++	}
++	if mode != "A" && mode != "B" && mode != "C" {
++		tb.Fatalf("TASK004_MODE must be A, B or C; got %q", mode)
++	}
++	mask := ""
++	if mode == "C" {
++		mask = "rescale"
++	}
++	if err := fastdiag.ConfigureCSV(mask); err != nil {
++		tb.Fatal(err)
++	}
++	if mode == "A" && fastdiag.Enabled {
++		tb.Fatal("mode A must be built without the fastdiag tag")
++	}
++	if (mode == "B" || mode == "C") && !fastdiag.Enabled {
++		tb.Fatal("modes B/C require the fastdiag build tag")
++	}
++	fastdiag.Reset()
++	return mode
++}
++
++func TestTask004LogN16RescaleFixtureMatchesOracle(t *testing.T) {
++	mode := task004Configure(t)
++	params := task004Parameters(t)
++	in, fixtureSHA := task004Fixture(t, params)
++	want := bigIntRescaleOracle(t, params, in, 1, 4)
++	eval := NewEvaluator(params)
++	require.NoError(t, eval.Rescale(in, in))
++	require.Equal(t, 11, in.Level())
++	require.Equal(t, rlwe.NewScale(math.Ldexp(1, 120)).Div(rlwe.NewScale(params.Q()[12])), in.Scale)
++	require.True(t, in.IsNTT)
++	require.False(t, in.IsMontgomery)
++	require.Equal(t, 4, qPrefixWidthOrPanic(in.Level()))
++	for component := range in.Value {
++		for row := range want[component] {
++			require.Equal(t, want[component][row], in.Value[component].Coeffs[row], "component=%d q%d", component, row)
++		}
++	}
++	events := fastdiag.Events()
++	if mode == "C" {
++		require.Len(t, events, 13)
++		var root *fastdiag.Event
++		for i := range events {
++			if events[i].Scope == fastdiag.Rescale && events[i].Name == "rescale" {
++				root = &events[i]
++				break
++			}
++		}
++		require.NotNil(t, root)
++		require.NotNil(t, root.InPlace)
++		require.True(t, *root.InPlace)
++		require.Equal(t, 12, *root.LevelIn)
++		require.Equal(t, 11, *root.LevelOut)
++		require.Equal(t, 4, *root.RowsIn)
++		require.Equal(t, 4, *root.RowsOut)
++	} else {
++		require.Empty(t, events)
++	}
++	t.Logf("mode=%s fastdiag_enabled=%t fixture=synthetic qpsha256=%s fixture_sha256=%s input=(N=%d,components=2,level=12,rows=4,scale_log2=120,NTT=true,Montgomery=false) in_place=true output=(level=%d,scale_log2=%.12f,rows=%d) events=%d oracle=exact",
++		mode, fastdiag.Enabled, task004ExpectedQPSHA, fixtureSHA, params.N(), in.Level(), in.Scale.Log2(), qPrefixWidthOrPanic(in.Level()), len(events))
++}
++
++func BenchmarkTask004LogN16Rescale(b *testing.B) {
++	mode := task004Configure(b)
++	params := task004Parameters(b)
++	eval := NewEvaluator(params)
++	warm, fixtureSHA := task004Fixture(b, params)
++	if err := eval.Rescale(warm, warm); err != nil {
++		b.Fatal(err)
++	}
++	fastdiag.Reset()
++	b.ReportAllocs()
++	b.ResetTimer()
++	var last *rlwe.Ciphertext
++	for i := 0; i < b.N; i++ {
++		b.StopTimer()
++		last, fixtureSHA = task004Fixture(b, params)
++		b.StartTimer()
++		if err := eval.Rescale(last, last); err != nil {
++			b.Fatal(err)
++		}
++	}
++	b.StopTimer()
++	events := fastdiag.Events()
++	if mode == "C" && len(events) != 13*b.N {
++		b.Fatalf("mode C expected %d events; got %d", 13*b.N, len(events))
++	}
++	if mode != "C" && len(events) != 0 {
++		b.Fatalf("mode %s unexpectedly emitted %d events", mode, len(events))
++	}
++	b.Logf("mode=%s fastdiag_enabled=%t fixture=synthetic qpsha256=%s fixture_sha256=%s N=%d components=2 level_in=12 level_out=%d rows=4 scale_in_log2=120 scale_out_log2=%.12f NTT=true Montgomery=false in_place=true events=%d samples=%d",
++		mode, fastdiag.Enabled, task004ExpectedQPSHA, fixtureSHA, params.N(), last.Level(), last.Scale.Log2(), len(events), b.N)
++}
