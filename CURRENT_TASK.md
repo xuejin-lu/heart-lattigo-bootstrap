@@ -1,9 +1,9 @@
-# CURRENT TASK — Measure LogN16 Rescale instrumentation perturbation
+# CURRENT TASK — Q0123 Rescale realism and bounded optimization pilot
 
-Task: FAST-LOGN16-RESCALE-INSTRUMENTATION-BIAS-004
+Task: FAST-Q0123-RESCALE-REALISM-OPT-PILOT-005
 Status: READY_FOR_CODEX
-Authoritative spec: `specs/FAST-LOGN16-RESCALE-INSTRUMENTATION-BIAS-004.md`
+Authoritative spec: `specs/FAST-Q0123-RESCALE-REALISM-OPT-PILOT-005.md`
 
-Previous Task003 source-backed LogN16 EvalMod audit at `6271aae2fee2cdfb286f112f309e0a8e0a9e90ec` passed as a hypothesis report, **not** causal proof. Task006 trace shows EvalMod real+imag 71.4485% of one traced Bootstrap. However `fastcore/rescale.go` currently uses fine-grained `StartTimer/ElapsedNS` calls inside the coefficient loop when tracing is enabled, creating a possibly large observer effect. The existing BenchmarkFastRescaleLogN16 also uses a different Q chain from historical Task006.
+Previous Task004 at `d8ea95d2d005db96c7a54750fa243fef62e8412b` is accepted as a matching synthetic instrumentation-perturbation result: uninstrumented LogN16 Q0123 Rescale median 21.340 ms, trace-on median 31.852 ms (+48.82% vs tagged mask-off). This is NOT a real Bootstrap improvement measurement.
 
-On `開始`, use AGENTS.md mandatory safe Git sync, then autonomously execute bounded Task004: audit instrumentation source, reuse current package benchmarks/oracles to compare matched LogN16 Rescale with tracing absent, disabled and enabled, and determine whether CRT coefficient-loop is a credible uninstrumented optimization target. NO new full Bootstrap, no new measurement platform, no production math changes, no Secondary committed branch changes. Check file sizes first; preserve Task005/006 historical traces. Source and matched-measurement evidence must be separated from inference. Finish with compact report, safe Primary fast-forward push, READY_FOR_WEB_REVIEW or NEEDS_WEB_REVIEW for actual blockers.
+When user says `開始`, follow AGENTS.md mandatory safe Primary/Secondary Git sync, then autonomously run one bounded Task005 pilot. First audit actual EvalMod c1 state; compare matched zero/nonzero c1 on exact LogN16 Q/P with existing Task004 test-only benchmark and BigInt oracle, without tracing. Then attempt at most one justified bit-exact coefficient-loop optimization in isolated Secondary prototype, if appropriate, with existing regression and finite A/B timing. No full Bootstrap, no new tools/framework, no Secondary production commit/push, no stale data overwrite or compromised math/security. Preserve prior experimental evidence. Publish compact Primary summary and candidate patch only if correct and repeatably beneficial; safe Primary fast-forward push. Finish READY_FOR_WEB_REVIEW with PROMOTE/REJECT/INCONCLUSIVE or NEEDS_WEB_REVIEW on genuine blockers.
