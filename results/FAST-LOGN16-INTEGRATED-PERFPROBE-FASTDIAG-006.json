@@ -1,0 +1,111 @@
+{
+  "schema_version": "fastdiag.logn16.task006-summary.v1",
+  "task": "FAST-LOGN16-INTEGRATED-PERFPROBE-FASTDIAG-006",
+  "classification": "TRACE_COLLECTED_UNVERIFIED",
+  "trace_status": "TRACE_UNVERIFIED",
+  "trace_scopes": ["stage", "power", "rescale"],
+  "bootstrap_budget": {
+    "task005_reserved": 16,
+    "task005_actual": 16,
+    "task005_reused": 0,
+    "task006_authorized": 2,
+    "task006_reserved": 2,
+    "task006_actual": 2,
+    "retry_count": 0
+  },
+  "provenance": {
+    "primary_commit": "aff322665f6d178f159408d66eae39a2823815f5",
+    "primary_measurement_source_sha256": "8a72fc5b1eed5c2957fe65cb431d885fce18c7fed75ac665b312cc6263f66ca8",
+    "secondary_production_commit": "2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f",
+    "diagnostic_test_adapter_commit": "649da85757a97dc8c60b5f9cc031634f39ad4a40",
+    "diagnostic_test_adapter_patch_sha256": "3ad46f934d597472caac0f0810719425dec75bde0064342cc0b05278510b50ae",
+    "config_sha256": "16e62fdea2dc5ac32240a33cc256cdf60b935aa00b4a16aa004474d2c3033b02",
+    "qp_sha256": "6c82ca724cbfdce2083b2ef2c18d53f81e658a6f28ff283e9a671d276710ec5f",
+    "canonical_input_sha256": "659fc59c899341a8253887270f1ae3478528fd864d66aca14bba918550ce8ccf",
+    "workload_sha256": "1413c0f0edc3c6b52d7a71e4714efe70280854e1208f87640b741682b65fa2a9",
+    "fixture_manifest_sha256": "f04988b4f8348a02ad291c76bd34b12b8a12c9bf077caefbab0d9cfef3b74f16",
+    "fixture_vectors_sha256": "51ccbf1ea03e4fa6be1e3b61f746aef6c6d642d43764292540e8f438a79d93e9",
+    "fixture_ciphertext_sha256": "a8b90d1b8db318ee49bae0d78d1d3faf98be56c12491cd041594862f35e13cc7",
+    "task005_fast_reference_vectors_sha256": "1e6862e56e003352b2418308fe46fe60ec260d58a23f0007a3b65a28aa6cdcc3",
+    "task005_fast_reference_result_sha256": "6c45265e515095efc49652dd012b75436a409800085d5d072ee4113a55b04ed0"
+  },
+  "task005_uninstrumented_baseline": {
+    "standard_lattigo_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+    "fast_lattigo_commit": "2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f",
+    "standard_warm_median_ms": 6425.27575,
+    "fast_warm_median_ms": 663.878208,
+    "fast_over_standard_speedup": 9.6784,
+    "fast_vs_standard_terminal_complex_rmse": 4.09656347139061e-8,
+    "fast_vs_standard_terminal_max_complex_difference": 4.345682976228596e-7,
+    "origin": "results/FAST-LOGN16-PUBLIC-NATIVE-CAPACITY-SAFE-PERFORMANCE-005"
+  },
+  "task006_fast_only_runs": [
+    {
+      "phase": "first_cold_bootstrap",
+      "elapsed_ms": 12279.909583,
+      "oracle_complex_rmse": 5.82126707846636e-9,
+      "oracle_max_complex_difference": 4.6694655714754984e-7,
+      "task005_fast_reference_worst_rmse": 0,
+      "task005_fast_reference_worst_max_complex_difference": 0,
+      "level": 1,
+      "degree": 1,
+      "scale": "2^45",
+      "q_prefix_rows": 2,
+      "output_gate_passed": true
+    },
+    {
+      "phase": "warm_bootstrap_01_traced",
+      "elapsed_ms": 1060.782625,
+      "oracle_complex_rmse": 5.82126707846636e-9,
+      "oracle_max_complex_difference": 4.6694655714754984e-7,
+      "task005_fast_reference_worst_rmse": 0,
+      "task005_fast_reference_worst_max_complex_difference": 0,
+      "level": 1,
+      "degree": 1,
+      "scale": "2^45",
+      "q_prefix_rows": 2,
+      "output_gate_passed": true
+    }
+  ],
+  "trace_validation": {
+    "failure_phase": "event_tree_validation",
+    "failure_reason": "power event is not nested under generated_powers",
+    "event_count": 539,
+    "first_rejected_event": {
+      "sequence": 61,
+      "scope": "power",
+      "name": "power",
+      "power": 8,
+      "parent_sequence": 60,
+      "parent_power": 16,
+      "generated_powers_ancestor_sequence": 59
+    },
+    "observed_recursive_ancestry": ["generated_powers#59", "T16#60", "T8#61", "T4#62", "T2#63"],
+    "interpretation": "The isolated test-only validator required each power event to be an immediate child of generated_powers. The captured event tree uses recursive recurrence ancestry. The trace was rejected by the validator; no stage/power/rescale attribution is certified by this artifact.",
+    "stage_attribution_certified": false
+  },
+  "evidence": {
+    "raw_unverified_trace_path": "/var/folders/dn/6p3z5ctd50v_2dzzh2y4nvyc0000gn/T/fastdiag-public-e32-2617861684/raw-trace-unverified.json",
+    "raw_unverified_trace_sha256": "9bd5ba81abce75b8fd7c06ac544410246fb385bafb1585a646d7d71e2f8e872d",
+    "failure_artifact_path": "/var/folders/dn/6p3z5ctd50v_2dzzh2y4nvyc0000gn/T/fastdiag-public-e32-2617861684/trace-failure.json",
+    "failure_artifact_sha256": "f598b481b776448dcc78ff80083610e9376cee12451716ddb88fd414abfc756b",
+    "attempt_ledger_path": "results/FAST-LOGN16-INTEGRATED-PERFPROBE-FASTDIAG-006-attempt-ledger.json",
+    "attempt_ledger_sha256": "e752dbaf4aee28229e14cbcbc85c6c8c9f4b4467c0da3b5dbf29577b4e28672d",
+    "reservation_journals": [
+      {
+        "path": "results/FAST-LOGN16-INTEGRATED-PERFPROBE-FASTDIAG-006.json.diagnostic-fast.bootstrap-attempt-01.json",
+        "sha256": "02b8daf7eea9dddc980681c085b6e11d005e6fb7891dc87ab6d9db72c8e21384"
+      },
+      {
+        "path": "results/FAST-LOGN16-INTEGRATED-PERFPROBE-FASTDIAG-006.json.diagnostic-fast.bootstrap-attempt-02.json",
+        "sha256": "f809dbfa8bc018cb52c19931e5b59f238e7b2d1ec9224f7f0256f167c8246bdc"
+      }
+    ]
+  },
+  "limitations": [
+    "Task006 trace timings are instrumented Fast-only observations and are not comparable to Task005 uninstrumented Standard/Fast timing samples.",
+    "No per-stage, power, or Rescale time attribution is certified because event-tree validation failed.",
+    "The two output plaintext-oracle gates passed, but the overall trace remains unverified.",
+    "No additional Bootstrap call or retry is permitted; the Task006 2/2 budget is exhausted."
+  ]
+}

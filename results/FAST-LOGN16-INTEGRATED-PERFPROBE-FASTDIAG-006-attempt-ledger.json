@@ -1,0 +1,31 @@
+{
+  "schema_version": "fastdiag.logn16.task006-attempt-ledger.v1",
+  "task": "FAST-LOGN16-INTEGRATED-PERFPROBE-FASTDIAG-006",
+  "generated_at": "2026-10-11T15:21:43.326199Z",
+  "completion_status": "TRACE_FAILED_RESERVED_NO_RETRY",
+  "task005_reserved_calls_not_reused": 16,
+  "task005_actual_calls_not_reused": 16,
+  "task005_attempt_ledger_sha256": "336e92b11c391e212b69843947fc5d689471e9f25b3153070e45093215fa44b1",
+  "task006_bootstrap_budget": 2,
+  "task006_reserved_calls": 2,
+  "task006_actual_calls": 2,
+  "task006_actual_calls_observed": true,
+  "attempts": [
+    {
+      "attempt_index": 1,
+      "phase": "diagnostic_fast_cold",
+      "reserved_at": "2026-10-11T15:21:15.922354Z",
+      "status": "irrevocably_reserved_before_call",
+      "journal_file": "FAST-LOGN16-INTEGRATED-PERFPROBE-FASTDIAG-006.json.diagnostic-fast.bootstrap-attempt-01.json",
+      "journal_sha256": "02b8daf7eea9dddc980681c085b6e11d005e6fb7891dc87ab6d9db72c8e21384"
+    },
+    {
+      "attempt_index": 2,
+      "phase": "diagnostic_fast_traced_warm",
+      "reserved_at": "2026-10-11T15:21:15.922592Z",
+      "status": "irrevocably_reserved_before_call",
+      "journal_file": "FAST-LOGN16-INTEGRATED-PERFPROBE-FASTDIAG-006.json.diagnostic-fast.bootstrap-attempt-02.json",
+      "journal_sha256": "f809dbfa8bc018cb52c19931e5b59f238e7b2d1ec9224f7f0256f167c8246bdc"
+    }
+  ]
+}
