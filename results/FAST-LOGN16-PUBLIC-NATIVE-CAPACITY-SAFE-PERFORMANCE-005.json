@@ -1,0 +1,227 @@
+{
+  "schema_version": "fast-logn16-public-native-capacity-safe-performance-005-summary.v1",
+  "task": "FAST-LOGN16-PUBLIC-NATIVE-CAPACITY-SAFE-PERFORMANCE-005",
+  "classification": "CURRENT_LOGN16_FAST_SPEED_VERIFIED",
+  "status": "READY_FOR_WEB_REVIEW",
+  "scope": {
+    "original_logN16_e32_workload_unchanged": true,
+    "q_p_scale_and_frontend_operation_chain_unchanged": true,
+    "secondary_production_modified": false,
+    "bootstrap_calls_outside_authorized_budget": 0
+  },
+  "provenance": {
+    "primary_measurement_commit": "edf68d4a161207cb43b66ad84970b248ef9c31e8",
+    "primary_measurement_source_sha256": "6f42022d458c646e01e27d17559037b63dfcecc861ad05d5a5ed3e8986b8e597",
+    "standard_lattigo_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+    "fast_lattigo_commit": "2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f",
+    "fast_lattigo_branch": "fast-qprefix",
+    "primary_and_backend_checkouts_clean_at_measurement": true,
+    "go_version": "go1.26.4",
+    "os": "darwin",
+    "architecture": "arm64",
+    "cpu": "Apple M4",
+    "gomaxprocs": 10,
+    "standard_and_fast_environment_matched": true,
+    "ephemeral_secret_weight": 32,
+    "input_slots": 32768,
+    "ring_degree": 65536,
+    "config_sha256": "16e62fdea2dc5ac32240a33cc256cdf60b935aa00b4a16aa004474d2c3033b02",
+    "input_sha256": "659fc59c899341a8253887270f1ae3478528fd864d66aca14bba918550ce8ccf",
+    "workload_sha256": "1413c0f0edc3c6b52d7a71e4714efe70280854e1208f87640b741682b65fa2a9",
+    "qp_sha256": "6c82ca724cbfdce2083b2ef2c18d53f81e658a6f28ff283e9a671d276710ec5f"
+  },
+  "profile": {
+    "log_n": 16,
+    "q0_config_target_bits": 55,
+    "q0_actual_bits": 56,
+    "default_scale": "2^45",
+    "q0": "36028797019488257",
+    "q5_mul_divisor": "1152921504606584833",
+    "q0123_product": "5986249335185303576695453761753997162624003383361537"
+  },
+  "capacity_evidence": {
+    "policy": "logn16-original-e32-observed-native-oracle-v1",
+    "conservative_bound_status": "NOT_PROVEN",
+    "q0123_sufficient_gate": "PASS",
+    "terminal_rescale_bound_b": "18169085704944493",
+    "terminal_q0_sufficient_condition": "2B < q0",
+    "two_b_minus_q0_deficit": "309374390400729",
+    "bound_definition": "ceil(2*Delta*max_slot_magnitude)+1 for each encoded input; add bounds sum; negacyclic multiply bound is N*B_add*B_C; nearest-integer q5 rescale bound is floor((B_mul+floor((q5-1)/2))/q5).",
+    "interpretation": "The terminal q0 sufficient condition is not proven by this conservative worst-case coefficient bound. This is not an observed overflow or measured ciphertext residue magnitude.",
+    "original_slot_magnitude_evidence": {
+      "max_abs_a": 0.0333750146301466,
+      "max_abs_b": 0.025648067192177354,
+      "max_abs_a_plus_b": 0.05899745187088121,
+      "max_abs_(a_plus_b)_times_c": 0.0019690408193320306,
+      "q0_over_2_delta_coefficient_message_capacity": 512.0000000074506,
+      "max_abs_a_percent_of_normalized_capacity": 0.006518557544855651,
+      "max_abs_product_percent_of_normalized_capacity": 0.0003845782850201909,
+      "slot_magnitude_10_percent_of_normalized_capacity": 1.9531249999715783
+    },
+    "limitations": [
+      "Slot magnitude is not an encoded coefficient bound for arbitrary packed activations.",
+      "Centered residues after reduction cannot prove that no earlier wrap occurred.",
+      "Passing applies only to this exact 32768-slot workload and observed CKKS path, not arbitrary CNN intermediate activations, ciphertext noise, or all inputs."
+    ]
+  },
+  "zero_bootstrap_preflight": {
+    "logn16": {
+      "status": "PASS_ZERO_BOOTSTRAP_PREBOOTSTRAP_CHAIN",
+      "policy": "logn16-original-e32-observed-native-oracle-v1",
+      "actual_bootstrap_calls": 0,
+      "standard_full_slot_oracles": "8/8 PASS at max complex difference <= 1e-6",
+      "fast_full_slot_oracles": "8/8 PASS at max complex difference <= 1e-6",
+      "level4_to_level0_continuity_max_complex_difference_standard": 0,
+      "level4_to_level0_continuity_max_complex_difference_fast": 0,
+      "paired_checkpoint_comparisons": [
+        {"name":"encrypt_a_level5","level":5,"scale_log2":45,"complex_rmse":2.337626420293912e-11,"max_complex_difference":7.836700106908352e-11,"pass":true},
+        {"name":"encrypt_b_level5","level":5,"scale_log2":45,"complex_rmse":2.3311935853066038e-11,"max_complex_difference":7.041871757884207e-11,"pass":true},
+        {"name":"encrypt_c_q5_level5","level":5,"scale_log2":59.99999999999967,"complex_rmse":7.1128995011441e-16,"max_complex_difference":2.3188667469835047e-15,"pass":true},
+        {"name":"add_level5","level":5,"scale_log2":45,"complex_rmse":3.299433636582169e-11,"max_complex_difference":1.093859727870019e-10,"pass":true},
+        {"name":"mulrelin_level5","level":5,"scale_log2":104.99999999999967,"complex_rmse":6.749091727584815e-13,"max_complex_difference":3.224580292455998e-12,"pass":true},
+        {"name":"rescale_q5_level4","level":4,"scale_log2":45,"complex_rmse":2.930825398685596e-11,"max_complex_difference":2.0763858711674715e-10,"pass":true},
+        {"name":"rotate_level4","level":4,"scale_log2":45,"complex_rmse":4.1293643314233626e-11,"max_complex_difference":2.0877707162721593e-10,"pass":true},
+        {"name":"drop_level0","level":0,"scale_log2":45,"complex_rmse":4.1293643314233626e-11,"max_complex_difference":2.0877707162721593e-10,"pass":true}
+      ]
+    },
+    "logn13_control": {
+      "status": "PASS",
+      "policy": "strict-sufficient-bound-v1",
+      "actual_bootstrap_calls": 0,
+      "standard_full_slot_oracles": "8/8 PASS",
+      "fast_full_slot_oracles": "8/8 PASS",
+      "level4_to_level0_continuity_max_complex_difference_standard": 0,
+      "level4_to_level0_continuity_max_complex_difference_fast": 0,
+      "paired_checkpoint_comparisons": [
+        {"name":"encrypt_a_level5","level":5,"scale_log2":45,"complex_rmse":8.227532663160243e-12,"max_complex_difference":2.4995830004055858e-11,"pass":true},
+        {"name":"encrypt_b_level5","level":5,"scale_log2":45,"complex_rmse":8.378525221734112e-12,"max_complex_difference":2.486338441723047e-11,"pass":true},
+        {"name":"encrypt_c_q5_level5","level":5,"scale_log2":59.99999999999998,"complex_rmse":2.5027158474574725e-16,"max_complex_difference":6.933427371662636e-16,"pass":true},
+        {"name":"add_level5","level":5,"scale_log2":45,"complex_rmse":1.1794153356362292e-11,"max_complex_difference":3.8432977788610515e-11,"pass":true},
+        {"name":"mulrelin_level5","level":5,"scale_log2":104.99999999999999,"complex_rmse":2.418019943274425e-13,"max_complex_difference":1.0239980760944924e-12,"pass":true},
+        {"name":"rescale_q5_level4","level":4,"scale_log2":45,"complex_rmse":1.0246804763161703e-11,"max_complex_difference":4.809671168665812e-11,"pass":true},
+        {"name":"rotate_level4","level":4,"scale_log2":45,"complex_rmse":1.4374699262726383e-11,"max_complex_difference":5.3689325342406835e-11,"pass":true},
+        {"name":"drop_level0","level":0,"scale_log2":45,"complex_rmse":1.4374699262726383e-11,"max_complex_difference":5.3689325342406835e-11,"pass":true}
+      ]
+    }
+  },
+  "bootstrap_budget": {
+    "task_004_reserved_calls": 0,
+    "task_004_actual_calls": 0,
+    "task_005_authorized_calls": 16,
+    "task_005_reserved_calls": 16,
+    "task_005_actual_calls": 16,
+    "runs": [
+      {"profile":"logn16","backend":"standard","calls":6,"result":"PASS_PUBLIC_BOOTSTRAP_1COLD_5WARM"},
+      {"profile":"logn16","backend":"fast","calls":6,"result":"PASS_PUBLIC_BOOTSTRAP_1COLD_5WARM"},
+      {"profile":"logn13","backend":"standard","calls":2,"result":"PASS_PUBLIC_BOOTSTRAP_COLD_WARM"},
+      {"profile":"logn13","backend":"fast","calls":2,"result":"PASS_PUBLIC_BOOTSTRAP_COLD_WARM"}
+    ],
+    "implicit_warmups_retries_or_extra_calls": 0
+  },
+  "bootstrap_performance": {
+    "logn16": {
+      "standard": {
+        "cold_ms": 24079.744625,
+        "cold_allocated_bytes": 1270046968,
+        "cold_allocations": 42481,
+        "warm_samples_ms": [6425.27575,5728.371333,5957.288417,26056.046958,11325.118666],
+        "warm_median_ms": 6425.27575,
+        "warm_range_ms": [5728.371333,26056.046958],
+        "warm_median_allocated_bytes": 850543880,
+        "warm_median_allocations": 40690,
+        "paired_native_oracle_max_complex_difference": 1.4559558237754026e-7
+      },
+      "fast": {
+        "cold_ms": 8093.325666,
+        "cold_allocated_bytes": 11053864048,
+        "cold_allocations": 225945923,
+        "warm_samples_ms": [680.102125,663.878208,659.665625,662.5235,668.751709],
+        "warm_median_ms": 663.878208,
+        "warm_range_ms": [659.665625,680.102125],
+        "warm_median_allocated_bytes": 57063448,
+        "warm_median_allocations": 8429,
+        "paired_native_oracle_max_complex_difference": 4.6694655714754984e-7
+      },
+      "fast_vs_standard_warm_median_speedup": 9.678395333018674,
+      "fast_vs_standard_warm_median_time_reduction_percent": 89.66770868938971,
+      "paired_bootstrap_outputs": {
+        "sample_count": 6,
+        "phases": ["first_cold_bootstrap","warm_bootstrap_01","warm_bootstrap_02","warm_bootstrap_03","warm_bootstrap_04","warm_bootstrap_05"],
+        "all_level_scale_matched": true,
+        "all_pass_at_max_complex_gate_1e-6": true,
+        "complex_rmse_each_sample": 4.09656347139061e-8,
+        "max_complex_difference_each_sample": 4.345682976228596e-7,
+        "level": 1,
+        "scale_log2": 45
+      }
+    },
+    "logn13_control": {
+      "standard": {
+        "cold_ms": 356.916958,
+        "warm_ms": 341.894791,
+        "cold_allocated_bytes": 144106464,
+        "warm_allocated_bytes": 92213336,
+        "cold_allocations": 36742,
+        "warm_allocations": 35047,
+        "max_complex_oracle_difference": 1.4413338802282028e-8
+      },
+      "fast": {
+        "cold_ms": 622.535167,
+        "warm_ms": 73.822375,
+        "cold_allocated_bytes": 960717296,
+        "warm_allocated_bytes": 7505568,
+        "cold_allocations": 19282460,
+        "warm_allocations": 8093,
+        "max_complex_oracle_difference": 5.738790672737443e-8
+      },
+      "fast_vs_standard_warm_speedup": 4.631316602859228,
+      "paired_bootstrap_outputs": {
+        "sample_count": 2,
+        "phases": ["first_cold_bootstrap","later_warm_bootstrap"],
+        "all_level_scale_matched": true,
+        "all_pass_at_max_complex_gate_1e-6": true,
+        "complex_rmse_each_sample": 4.901501733076133e-9,
+        "max_complex_difference_each_sample": 4.6260892998958456e-8,
+        "level": 1,
+        "scale_log2": 45
+      }
+    }
+  },
+  "fast_dispatch_evidence": {
+    "primary_frontend": "The same public-native Primary source calls ckks.NewEvaluator and bootstrapping.NewEvaluator, then public AddNew, MulRelinNew, Rescale, RotateNew, DropLevelNew, and Bootstrap. Build tags select only the linked backend adapter.",
+    "standard_adapter": "public_backend_standard.go validates that bootstrapping.NewEvaluator constructed a genuine Standard evaluator.",
+    "fast_adapter": "public_backend_fast.go validates that the ordinary bootstrapping.NewEvaluator wrapper selected the pinned Fast capability; no application-side NewFastEvaluator or Fast arithmetic branch is used.",
+    "secondary_source_paths": [
+      "schemes/ckks/evaluator.go: NewEvaluator, AddNew/Add, Rescale, MulRelinNew/MulRelin, RotateNew/Rotate",
+      "schemes/ckks/evaluator_fast_zero_secret_add.go: addSubFastCKKSZeroSecret -> fastcore AddSubCore.ApplyRows",
+      "schemes/ckks/evaluator_fast_zero_secret.go: mulRelinFastCKKSZeroSecret -> fastcore MulCore.ApplyRows",
+      "schemes/ckks/evaluator_fast_zero_secret_automorphism.go: rotateFastCKKSZeroSecret -> fastcore AutomorphismCore.ApplyRows",
+      "schemes/ckks/evaluator.go: Rescale -> fastcore RescaleCore.ApplyRows",
+      "circuits/ckks/bootstrapping/evaluator.go and fast_bootstrap.go: ordinary Bootstrap wrapper selects Fast; Fast circuit data is lazily initialized on first Bootstrap"
+    ],
+    "logn16_runtime_qprefix_evidence": {
+      "encrypt_new_level5": "full physical rows at the native encryption boundary",
+      "add_and_mulrelin_level5": "four authoritative rows backed; dormant q4/q5 rows unallocated",
+      "rescale_and_rotate_level4": "four authoritative rows backed; dormant q4 row unallocated",
+      "drop_level0": "one authoritative q0 row",
+      "bootstrap_output_level1": "two authoritative Q-prefix rows",
+      "fast_c1_nonzero": false
+    },
+    "fast_internal_in_circuit_stage_spans_collected": false,
+    "limitation": "Public end-to-end timings and source/runtime Q-prefix evidence are present; no in-circuit C2S/EvalMod/S2C timing attribution is claimed."
+  },
+  "artifacts": {
+    "attempt_ledger": "results/FAST-LOGN16-PUBLIC-NATIVE-CAPACITY-SAFE-PERFORMANCE-005-attempt-ledger.json",
+    "logn16_preflight_pair": "results/FAST-LOGN16-PUBLIC-NATIVE-CAPACITY-SAFE-PERFORMANCE-005-logn16-preflight-pair.json",
+    "logn16_bootstrap_pair": "results/FAST-LOGN16-PUBLIC-NATIVE-CAPACITY-SAFE-PERFORMANCE-005-logn16-bootstrap-pair.json",
+    "logn13_preflight_pair": "results/FAST-LOGN16-PUBLIC-NATIVE-CAPACITY-SAFE-PERFORMANCE-005-logn13-preflight-pair.json",
+    "logn13_bootstrap_pair": "results/FAST-LOGN16-PUBLIC-NATIVE-CAPACITY-SAFE-PERFORMANCE-005-logn13-bootstrap-pair.json",
+    "per_backend_run_documents": [
+      "results/FAST-LOGN16-PUBLIC-NATIVE-CAPACITY-SAFE-PERFORMANCE-005-logn16-standard.json",
+      "results/FAST-LOGN16-PUBLIC-NATIVE-CAPACITY-SAFE-PERFORMANCE-005-logn16-fast.json",
+      "results/FAST-LOGN16-PUBLIC-NATIVE-CAPACITY-SAFE-PERFORMANCE-005-logn13-standard.json",
+      "results/FAST-LOGN16-PUBLIC-NATIVE-CAPACITY-SAFE-PERFORMANCE-005-logn13-fast.json"
+    ],
+    "per_call_reservation_journals": "One bootstrap-attempt-01..06 journal per LogN16 backend and bootstrap-attempt-01..02 per LogN13 backend; all committed."
+  }
+}
