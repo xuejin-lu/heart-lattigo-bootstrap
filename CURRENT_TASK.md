@@ -1,23 +1,19 @@
-# CURRENT TASK — Current Fast LogN16 execution path and performance
+# CURRENT TASK — LogN16 capacity-safe native E32 performance, inherited budget
 
-Task: FAST-LOGN16-BACKEND-PATH-AND-PERFORMANCE-004
+Task: FAST-LOGN16-PUBLIC-NATIVE-CAPACITY-SAFE-PERFORMANCE-005
 Status: READY_FOR_CODEX
-Class: FAST PATH PROOF, MEASUREMENT PLATFORM REUSE, MATCHED STANDARD/FAST TIMING — NO ARITHMETIC OPTIMIZATION
+Authoritative specification: `specs/FAST-LOGN16-PUBLIC-NATIVE-CAPACITY-SAFE-PERFORMANCE-005.md`
 
-**Authoritative specification:** `specs/FAST-LOGN16-BACKEND-PATH-AND-PERFORMANCE-004.md`
+## Web review disposition
 
-## Why this task
+Task 004 completed as `CURRENT_PERFORMANCE_BLOCKED` / `PUBLIC_NATIVE_LOGN16_PROFILE_BLOCKED`, with **0/16** full Bootstrap attempts spent. This is not a proven coefficient overflow: `internal/perfmeasure.BoundPublicMulRescaleWorkload` found a conservative centered-capacity bound `B=18169085704944493` for original LogN16 public-native E32 workload; `q0=36028797019488257`, so `2B-q0=309374390400729` (about 0.859% of q0). Keep the old failure and guard intact. No proof yet of current LogN16 Fast kernel runtime or speed.
 
-Task 002 measured good diagnostic RMSE, but LogN16's 32,768 complex values were bitwise identical at every public replay stage and final output; Task 003 audited source/vector independence, so this equality is real in the archived numeric evidence. **Equality does not prove optimized Fast execution.** The user requests a deeper test using our existing speed/profiling/allocations/stage measurement platform rather than more RMSE-only checks.
+## New safe experiment and authorization
 
-Source `circuits/ckks/bootstrapping/fast_c2s_compression.go` has a LogN13-only C2S compression gate. It **does not** imply that the rest of LogN16 Fast Bootstrap is skipped. Verify the actual ordinary `bootstrapping.NewEvaluator` dispatch, Fast kernel call paths and data-dependent eligibility at LogN16 before any new full Bootstrap.
+Create a **separately named** LogN16/E32 public-native workload `logn16-e32-c15over16-v1` in our existing `perfprobe`/`perfmeasure` platform, with original A/B and C scaled exactly by `15/16`. Keep Q/P, Scale, E32, full identical public CKKS frontend and original genuine Standard/Fast pins unchanged; change only the named benchmark's input C **for both backends equally**, and regenerate its own workload SHA/oracle. Never alter the frozen original LogN13/E32 fixture or original failing LogN16 case, silently bypass the `2B<q0` gate, or claim these two LogN16 workloads are identical.
 
-## Mandatory staged gate
+First require zero Bootstrap capacity recomputation, canonical hashes, full matched original Standard and Fast native public E32 preflights, all eight checkpoints, dispatch/kernel evidence and focused tests. If any preflight fails or Fast optimized execution cannot be established, STOP and spend **zero** calls; no Secondary changes.
 
-A. Zero Bootstrap: source-backed Fast dispatch and actual kernel-path evidence; shared platform inventory. Identify exactly what is LogN13-only versus generally Fast at LogN16. No Secondary modifications.
+Only AFTER those gates pass: **TRANSFER, not add to, task 004's unspent total allowance**. Across 004+005 maximum stays 16 full Bootstrap calls: LogN16 Standard 1 cold+5 warm, Fast 1 cold+5 warm (12); LogN13 frozen original Standard 1 cold+1 warm, Fast 1 cold+1 warm (4). Durable task-wide cumulative reservation journal, failures consume calls, no implicit warmups or repetitions, no retries, no extra profiler Bootstrap. Reuse existing timers/alloc counters and `fastdiag`, measure paired native numerical oracles plus speed; report exact Fast kernel path and construction vs cold vs warm cost. No mathematics, backend, parameter or optimization modifications authorized.
 
-B. Zero Bootstrap: use shared `cmd/perfprobe`, `cmd/fastdiag`, `internal/perfmeasure`, `internal/numericalmetrics`, isolated genuine Standard `5dbffbdea05394de2ca3a432ed5318aa832e3f40` and Fast `2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f` builds. Preserve same ordinary CKKS frontend without `NewFastEvaluator` calls. Extend existing formal native-E32 public mode for LogN16 where source-supported, without changing frozen LogN13 fixture. Confirm matched input, Q/P, metadata, proper Standard encryption and Fast mode.
-
-C. Only after A and B PASS: a **new separate, strictly bounded performance budget** of at most 16 full Bootstrap calls: LogN16 each backend one cold and five warm (12 total); LogN13 each backend one cold and one warm (4 total). All reserved persistently before each call; no retries, hidden warmups, duplicate older experiments, or unbudgeted full Bootstrap from tests/tracers. If a preflight cannot pass, run ZERO calls. Capture wall-clock, allocations, cold/warm, source/runtime path proof, shared stage timing where semantically justified, complex RMSE/max/SNR, and exact limitations. Genuine original Standard source is immutable; no Fast production math changes, workaround, noise/security equivalence claims or performance optimizations.
-
-Output: new results/FAST-LOGN16-BACKEND-PATH-AND-PERFORMANCE-004.md/.json, and bounded-attempt journal; safe fast-forward commit/push and READY_FOR_WEB_REVIEW or NEEDS_WEB_REVIEW. Keep the earlier 002 PARTIAL and 003 exact-zero audit results untouched. Follow both AGENTS.md and docs/BACKEND_TRANSPARENCY_CONTRACT.md / docs/MEASUREMENT_PLATFORM.md. 
+Produce new `results/FAST-LOGN16-PUBLIC-NATIVE-CAPACITY-SAFE-PERFORMANCE-005.md` and `.json`, preserve 002/003/004, safe push Primary only and READY_FOR_WEB_REVIEW/NEEDS_WEB_REVIEW. Follow latest AGENTS/workflow and backend transparency contract. User need only type `開始` in Codex.
