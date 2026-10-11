@@ -1,0 +1,8 @@
+{
+  "schema_version": "perfprobe-bootstrap-attempt.v1",
+  "attempt_index": 2,
+  "bootstrap_budget": 2,
+  "phase": "later_warm_bootstrap",
+  "reserved_at": "2026-10-11T10:57:43.619861Z",
+  "status": "irrevocably_reserved_before_call"
+}
