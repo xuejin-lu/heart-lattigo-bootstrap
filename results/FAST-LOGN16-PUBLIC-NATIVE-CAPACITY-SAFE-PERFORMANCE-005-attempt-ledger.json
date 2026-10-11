@@ -51,6 +51,8 @@
         "status": "PENDING",
         "reserved_calls": 0,
         "actual_calls": 0,
+        "preflight_pair": "results/FAST-LOGN16-PUBLIC-NATIVE-CAPACITY-SAFE-PERFORMANCE-005-logn13-preflight-pair.json",
+        "preflight_pair_sha256": "38d5264af1d0a614dbe04931266a2356544c53530a03c2a9349a572ee113238d",
         "attempt_journal_prefix": "results/FAST-LOGN16-PUBLIC-NATIVE-CAPACITY-SAFE-PERFORMANCE-005-logn13-standard.json.bootstrap-attempt-"
       },
       {
@@ -61,6 +63,8 @@
         "status": "PENDING",
         "reserved_calls": 0,
         "actual_calls": 0,
+        "preflight_pair": "results/FAST-LOGN16-PUBLIC-NATIVE-CAPACITY-SAFE-PERFORMANCE-005-logn13-preflight-pair.json",
+        "preflight_pair_sha256": "38d5264af1d0a614dbe04931266a2356544c53530a03c2a9349a572ee113238d",
         "attempt_journal_prefix": "results/FAST-LOGN16-PUBLIC-NATIVE-CAPACITY-SAFE-PERFORMANCE-005-logn13-fast.json.bootstrap-attempt-"
       }
     ],
