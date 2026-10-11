@@ -1,9 +1,9 @@
-# CURRENT TASK — Source-backed LogN16 EvalMod bottleneck attribution
+# CURRENT TASK — Measure LogN16 Rescale instrumentation perturbation
 
-Task: FAST-LOGN16-EVALMOD-BOTTLENECK-003
-Status: READY_FOR_WEB_REVIEW
-Authoritative spec: `specs/FAST-LOGN16-EVALMOD-BOTTLENECK-003.md`
+Task: FAST-LOGN16-RESCALE-INSTRUMENTATION-BIAS-004
+Status: READY_FOR_CODEX
+Authoritative spec: `specs/FAST-LOGN16-RESCALE-INSTRUMENTATION-BIAS-004.md`
 
-Previous task CKKS-MEASUREMENT-PLATFORM-ACCEPTANCE-REPAIR-002 at `8f1848aacf32bf9c6199eb57a9b9f447dd031772` passed scoped engineering review. Historical Task006 539-event trace is revalidated offline and its nine direct-stage times and 35 independent Rescale roots are recorded; original raw remains TRACE_UNVERIFIED. The old live LogN16 E32 test adapter remains intentionally blocked, not certified for fresh capture.
+Previous Task003 source-backed LogN16 EvalMod audit at `6271aae2fee2cdfb286f112f309e0a8e0a9e90ec` passed as a hypothesis report, **not** causal proof. Task006 trace shows EvalMod real+imag 71.4485% of one traced Bootstrap. However `fastcore/rescale.go` currently uses fine-grained `StartTimer/ElapsedNS` calls inside the coefficient loop when tracing is enabled, creating a possibly large observer effect. The existing BenchmarkFastRescaleLogN16 also uses a different Q chain from historical Task006.
 
-When the user says `開始`, perform mandatory safe local/remote Git preflight from AGENTS.md and autonomously execute this new research-forensics task. Goal: identify the real performance bottleneck inside EvalMod (71.45% of single traced LogN16 Bootstrap), using existing analyzers, source inspection, and at most existing low-cost microbench hooks. **No new Bootstrap or CKKS mathematics changes; do not rebuild tools.** Produce source-backed compact attribution, one prioritized optimization hypothesis, and safe fast-forward Primary commit/push. Only stop for real evidence/math/security/Git blockers. The user need not paste another spec.
+On `開始`, use AGENTS.md mandatory safe Git sync, then autonomously execute bounded Task004: audit instrumentation source, reuse current package benchmarks/oracles to compare matched LogN16 Rescale with tracing absent, disabled and enabled, and determine whether CRT coefficient-loop is a credible uninstrumented optimization target. NO new full Bootstrap, no new measurement platform, no production math changes, no Secondary committed branch changes. Check file sizes first; preserve Task005/006 historical traces. Source and matched-measurement evidence must be separated from inference. Finish with compact report, safe Primary fast-forward push, READY_FOR_WEB_REVIEW or NEEDS_WEB_REVIEW for actual blockers.
