@@ -1,8 +1,9 @@
-# CURRENT TASK — Complete measurement platform acceptance repair
+# CURRENT TASK — Source-backed LogN16 EvalMod bottleneck attribution
 
-Task: `CKKS-MEASUREMENT-PLATFORM-ACCEPTANCE-REPAIR-002`
-Status: READY_FOR_WEB_REVIEW
-Authoritative spec: `specs/CKKS-MEASUREMENT-PLATFORM-ACCEPTANCE-REPAIR-002.md`
-Previous Task `CKKS-MEASUREMENT-PLATFORM-GENERALIZATION-001` at `7fc06031e5a8ca499c083814159e10ffea325baa`: implementation and 188-file historical runner retirement accepted as completed engineering work, subject to the targeted acceptance gaps in this task. Do not recreate or roll back the retired tools.
+Task: FAST-LOGN16-EVALMOD-BOTTLENECK-003
+Status: READY_FOR_CODEX
+Authoritative spec: `specs/FAST-LOGN16-EVALMOD-BOTTLENECK-003.md`
 
-When user says `開始`, follow the mandatory safe Git startup preflight in `AGENTS.md`, then **continue autonomously** with the new spec. A remote source check that has not yet been performed is not a reason to stop or ask the user to repeat instructions; perform it. Existing local authorized changes must be inspected and preserved. Stop only on demonstrated math/security/evidence/Git blockers under the normal workflow. No new Bootstrap calls authorized for this engineering closeout. Preserve Secondary and previous Task005/006 raw evidence. Target: parameter-driven common tools, full compact Task006 per-stage attribution, correct live trace validation, targeted retired-test safety review, and compile-only package check. Finish with safe Primary fast-forward push and READY_FOR_WEB_REVIEW or NEEDS_WEB_REVIEW.
+Previous task CKKS-MEASUREMENT-PLATFORM-ACCEPTANCE-REPAIR-002 at `8f1848aacf32bf9c6199eb57a9b9f447dd031772` passed scoped engineering review. Historical Task006 539-event trace is revalidated offline and its nine direct-stage times and 35 independent Rescale roots are recorded; original raw remains TRACE_UNVERIFIED. The old live LogN16 E32 test adapter remains intentionally blocked, not certified for fresh capture.
+
+When the user says `開始`, perform mandatory safe local/remote Git preflight from AGENTS.md and autonomously execute this new research-forensics task. Goal: identify the real performance bottleneck inside EvalMod (71.45% of single traced LogN16 Bootstrap), using existing analyzers, source inspection, and at most existing low-cost microbench hooks. **No new Bootstrap or CKKS mathematics changes; do not rebuild tools.** Produce source-backed compact attribution, one prioritized optimization hypothesis, and safe fast-forward Primary commit/push. Only stop for real evidence/math/security/Git blockers. The user need not paste another spec.
