@@ -1,6 +1,6 @@
 # FAST-LOGN16-EVALMOD-BOTTLENECK-003
 
-Status: READY_FOR_CODEX
+Status: READY_FOR_WEB_REVIEW
 Class: performance-forensics / source audit; **no new mathematical design or CKKS production changes**.
 Authority: AGENTS.md; docs/MEASUREMENT_PLATFORM.md; docs/RESEARCH_ENGINEERING_WORKFLOW.md.
 Previous: CKKS-MEASUREMENT-PLATFORM-ACCEPTANCE-REPAIR-002, accepted for its scoped engineering goals at 8f1848aacf32bf9c6199eb57a9b9f447dd031772.

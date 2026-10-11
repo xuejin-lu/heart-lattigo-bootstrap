@@ -1,7 +1,7 @@
 # CURRENT TASK — Source-backed LogN16 EvalMod bottleneck attribution
 
 Task: FAST-LOGN16-EVALMOD-BOTTLENECK-003
-Status: READY_FOR_CODEX
+Status: READY_FOR_WEB_REVIEW
 Authoritative spec: `specs/FAST-LOGN16-EVALMOD-BOTTLENECK-003.md`
 
 Previous task CKKS-MEASUREMENT-PLATFORM-ACCEPTANCE-REPAIR-002 at `8f1848aacf32bf9c6199eb57a9b9f447dd031772` passed scoped engineering review. Historical Task006 539-event trace is revalidated offline and its nine direct-stage times and 35 independent Rescale roots are recorded; original raw remains TRACE_UNVERIFIED. The old live LogN16 E32 test adapter remains intentionally blocked, not certified for fresh capture.
