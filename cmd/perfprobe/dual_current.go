@@ -777,16 +777,16 @@ func validateDualCurrentStandardCapacityAudit(standard dualCurrentDocument) erro
 		}
 		return nil
 	}
-	if len(standard.Parameters.QPrimes) != 16 || standard.Parameters.RingN != 1<<16 || audit.MatrixGroupSize < 1 {
-		return fmt.Errorf("LogN16 genuine Standard capacity audit expected 16 Q primes and RingN=65536; got Q=%d N=%d group=%d", len(standard.Parameters.QPrimes), standard.Parameters.RingN, audit.MatrixGroupSize)
+	if len(standard.Parameters.QPrimes) != 17 || standard.Parameters.RingN != 1<<16 || audit.MatrixGroupSize < 1 {
+		return fmt.Errorf("LogN16 genuine Standard capacity audit expected 17 Q primes (Level16) and RingN=65536; got Q=%d N=%d group=%d", len(standard.Parameters.QPrimes), standard.Parameters.RingN, audit.MatrixGroupSize)
 	}
-	if err := checkShape("ModUp", audit.Before, 15, 16); err != nil {
+	if err := checkShape("ModUp", audit.Before, 16, 17); err != nil {
 		return err
 	}
-	if err := checkShape("group0 Rescale", audit.AfterRescale, 14, 15); err != nil {
+	if err := checkShape("group0 Rescale", audit.AfterRescale, 15, 16); err != nil {
 		return err
 	}
-	return checkShape("next matrix", audit.AfterNextMatrix, 14, 15)
+	return checkShape("next matrix", audit.AfterNextMatrix, 15, 16)
 }
 
 func compareDualCurrentCheckpoints(standard, fast []dualCurrentCheckpoint) []dualCurrentStageComparison {

@@ -152,7 +152,7 @@ func TestDualCurrentCheckpointCompareRequiresMatchingLogicalMetadata(t *testing.
 	}
 }
 
-func TestDualCurrentLogN16StandardAuditRequiresFullQ012345RowsAndNextMatrix(t *testing.T) {
+func TestDualCurrentLogN16StandardAuditRequiresLevel16ThenLevel15FullRows(t *testing.T) {
 	shape := func(name string, level, rows int) dualCurrentCheckpoint {
 		checkpoint := dualCurrentCheckpoint{Name: name, State: ciphertextState{Level: level, QPrefixRows: rows}}
 		checkpoint.PhysicalRowLengths = make([][]int, 2)
@@ -170,15 +170,15 @@ func TestDualCurrentLogN16StandardAuditRequiresFullQ012345RowsAndNextMatrix(t *t
 		}
 		return checkpoint
 	}
-	doc := dualCurrentDocument{Backend: "standard", Profile: "logn16", Parameters: perfmeasure.EffectiveParameters{RingN: 1 << 16, QPrimes: make([]string, 16)}, C2SAudit: dualCurrentC2SAudit{
-		Applicable: true, MatrixGroupSize: 1, Before: shape("modup", 15, 16),
-		AfterRescale: shape("rescale", 14, 15), AfterNextMatrix: shape("next", 14, 15),
+	doc := dualCurrentDocument{Backend: "standard", Profile: "logn16", Parameters: perfmeasure.EffectiveParameters{RingN: 1 << 16, QPrimes: make([]string, 17)}, C2SAudit: dualCurrentC2SAudit{
+		Applicable: true, MatrixGroupSize: 1, Before: shape("modup", 16, 17),
+		AfterRescale: shape("rescale", 15, 16), AfterNextMatrix: shape("next", 15, 16),
 	}}
 	if err := validateDualCurrentStandardCapacityAudit(doc); err != nil {
-		t.Fatalf("complete q0..q15 audit rejected: %v", err)
+		t.Fatalf("complete q0..q16 ModUp / q0..q15 post-Rescale audit rejected: %v", err)
 	}
-	doc.C2SAudit.Before.PhysicalRowLengths[1][15] = 0
+	doc.C2SAudit.Before.PhysicalRowLengths[1][16] = 0
 	if err := validateDualCurrentStandardCapacityAudit(doc); err == nil {
-		t.Fatal("Standard ModUp audit accepted an empty q15 row")
+		t.Fatal("Standard Level16 ModUp audit accepted an empty q16 row")
 	}
 }
