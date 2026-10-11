@@ -1,0 +1,539 @@
+{
+  "schema_version": "fast-standard-public-native-pair.v1",
+  "generated_at": "2026-10-11T10:56:19.42962Z",
+  "status": "PASS",
+  "max_complex_gate": 0.000001,
+  "fast_backend_commit": "2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f",
+  "standard_backend_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+  "primary_commit": "edf68d4a161207cb43b66ad84970b248ef9c31e8",
+  "primary_measurement_source_sha256": "6f42022d458c646e01e27d17559037b63dfcecc861ad05d5a5ed3e8986b8e597",
+  "input_sha256": "659fc59c899341a8253887270f1ae3478528fd864d66aca14bba918550ce8ccf",
+  "workload_sha256": "1413c0f0edc3c6b52d7a71e4714efe70280854e1208f87640b741682b65fa2a9",
+  "config_sha256": "16e62fdea2dc5ac32240a33cc256cdf60b935aa00b4a16aa004474d2c3033b02",
+  "qp_sha256": "6c82ca724cbfdce2083b2ef2c18d53f81e658a6f28ff283e9a671d276710ec5f",
+  "capacity_evidence_version": "public-capacity-evidence.v1",
+  "capacity_policy": "logn16-original-e32-observed-native-oracle-v1",
+  "conservative_bound_status": "NOT_PROVEN",
+  "observed_native_oracle_status": "PASS_EIGHT_CHECKPOINTS_AND_LEVEL4_TO_LEVEL0_CONTINUITY",
+  "standard_level4_to_level0_continuity": {
+    "complex_rmse": 0,
+    "max_complex_difference": 0,
+    "max_real_difference": 0,
+    "max_imag_difference": 0,
+    "worst_slot": 0,
+    "real_components_above_threshold": 0,
+    "imag_components_above_threshold": 0,
+    "median_precision_bits": 99.65784284662087
+  },
+  "fast_level4_to_level0_continuity": {
+    "complex_rmse": 0,
+    "max_complex_difference": 0,
+    "max_real_difference": 0,
+    "max_imag_difference": 0,
+    "worst_slot": 0,
+    "real_components_above_threshold": 0,
+    "imag_components_above_threshold": 0,
+    "median_precision_bits": 99.65784284662087
+  },
+  "ephemeral_secret_weight": 32,
+  "actual_bootstrap_calls": 12,
+  "matched_environment": true,
+  "checkpoints": [
+    {
+      "name": "add_level5",
+      "level_scale_degree_matched": true,
+      "fast_state": {
+        "level": 5,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 15,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986249335185303576695453761753997162624003383361537"
+      },
+      "standard_state": {
+        "level": 5,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 15,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986249335185303576695453761753997162624003383361537"
+      },
+      "fast_vs_standard": {
+        "complex_rmse": 3.323165151737077e-11,
+        "max_complex_difference": 1.0565354841834906e-10,
+        "max_real_difference": 9.732651837235373e-11,
+        "max_imag_difference": 1.0331780916916777e-10,
+        "worst_slot": 3002,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 35.069382427301484
+      },
+      "pass": true
+    },
+    {
+      "name": "drop_level0",
+      "level_scale_degree_matched": true,
+      "fast_state": {
+        "level": 0,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 15,
+        "q_prefix_rows": 1,
+        "prefix_q": "36028797019488257"
+      },
+      "standard_state": {
+        "level": 0,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 15,
+        "q_prefix_rows": 1,
+        "prefix_q": "36028797019488257"
+      },
+      "fast_vs_standard": {
+        "complex_rmse": 4.138065224050962e-11,
+        "max_complex_difference": 2.1545150938514383e-10,
+        "max_real_difference": 2.1198482064773566e-10,
+        "max_imag_difference": 1.8942603941581732e-10,
+        "worst_slot": 20553,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 34.966039889585225
+      },
+      "pass": true
+    },
+    {
+      "name": "encrypt_a_level5",
+      "level_scale_degree_matched": true,
+      "fast_state": {
+        "level": 5,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 15,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986249335185303576695453761753997162624003383361537"
+      },
+      "standard_state": {
+        "level": 5,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 15,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986249335185303576695453761753997162624003383361537"
+      },
+      "fast_vs_standard": {
+        "complex_rmse": 2.349634934828615e-11,
+        "max_complex_difference": 8.375888671546587e-11,
+        "max_real_difference": 7.965801629428171e-11,
+        "max_imag_difference": 6.780349285501197e-11,
+        "worst_slot": 17532,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 35.57112753036551
+      },
+      "pass": true
+    },
+    {
+      "name": "encrypt_b_level5",
+      "level_scale_degree_matched": true,
+      "fast_state": {
+        "level": 5,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 15,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986249335185303576695453761753997162624003383361537"
+      },
+      "standard_state": {
+        "level": 5,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 15,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986249335185303576695453761753997162624003383361537"
+      },
+      "fast_vs_standard": {
+        "complex_rmse": 2.343786580442208e-11,
+        "max_complex_difference": 8.059590101894864e-11,
+        "max_real_difference": 7.586733151432323e-11,
+        "max_imag_difference": 6.582117142994726e-11,
+        "worst_slot": 5615,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 35.573053886736645
+      },
+      "pass": true
+    },
+    {
+      "name": "encrypt_c_q5_level5",
+      "level_scale_degree_matched": true,
+      "fast_state": {
+        "level": 5,
+        "degree": 1,
+        "scale": "1.15292150460658483300000000000000000000000000000000000000000000000000000000000000e+18",
+        "scale_log2": 59.99999999999967,
+        "log_rows": 0,
+        "log_cols": 15,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986249335185303576695453761753997162624003383361537"
+      },
+      "standard_state": {
+        "level": 5,
+        "degree": 1,
+        "scale": "1.15292150460658483300000000000000000000000000000000000000000000000000000000000000e+18",
+        "scale_log2": 59.99999999999967,
+        "log_rows": 0,
+        "log_cols": 15,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986249335185303576695453761753997162624003383361537"
+      },
+      "fast_vs_standard": {
+        "complex_rmse": 7.099444600295982e-16,
+        "max_complex_difference": 2.307889047202517e-15,
+        "max_real_difference": 2.3037127760972e-15,
+        "max_imag_difference": 2.048708425128609e-15,
+        "worst_slot": 29530,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 50.59296339530989
+      },
+      "pass": true
+    },
+    {
+      "name": "mulrelin_level5",
+      "level_scale_degree_matched": true,
+      "fast_state": {
+        "level": 5,
+        "degree": 1,
+        "scale": "4.05648192072941175110420198850560000000000000000000000000000000000000000000000000e+31",
+        "scale_log2": 104.99999999999967,
+        "log_rows": 0,
+        "log_cols": 15,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986249335185303576695453761753997162624003383361537"
+      },
+      "standard_state": {
+        "level": 5,
+        "degree": 1,
+        "scale": "4.05648192072941175110420198850560000000000000000000000000000000000000000000000000e+31",
+        "scale_log2": 104.99999999999967,
+        "log_rows": 0,
+        "log_cols": 15,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986249335185303576695453761753997162624003383361537"
+      },
+      "fast_vs_standard": {
+        "complex_rmse": 6.819153771402213e-13,
+        "max_complex_difference": 3.448519290117377e-12,
+        "max_real_difference": 2.6133947436668414e-12,
+        "max_imag_difference": 3.377526014945731e-12,
+        "worst_slot": 17866,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 41.00636078878617
+      },
+      "pass": true
+    },
+    {
+      "name": "rescale_q5_level4",
+      "level_scale_degree_matched": true,
+      "fast_state": {
+        "level": 4,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 15,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986249335185303576695453761753997162624003383361537"
+      },
+      "standard_state": {
+        "level": 4,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 15,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986249335185303576695453761753997162624003383361537"
+      },
+      "fast_vs_standard": {
+        "complex_rmse": 2.9283699756506124e-11,
+        "max_complex_difference": 1.8301218921021393e-10,
+        "max_real_difference": 1.7464554173500513e-10,
+        "max_imag_difference": 1.6168407509110222e-10,
+        "worst_slot": 10639,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 35.65282623437252
+      },
+      "pass": true
+    },
+    {
+      "name": "rotate_level4",
+      "level_scale_degree_matched": true,
+      "fast_state": {
+        "level": 4,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 15,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986249335185303576695453761753997162624003383361537"
+      },
+      "standard_state": {
+        "level": 4,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 15,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986249335185303576695453761753997162624003383361537"
+      },
+      "fast_vs_standard": {
+        "complex_rmse": 4.138065224050962e-11,
+        "max_complex_difference": 2.1545150938514383e-10,
+        "max_real_difference": 2.1198482064773566e-10,
+        "max_imag_difference": 1.8942603941581732e-10,
+        "worst_slot": 20553,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 34.966039889585225
+      },
+      "pass": true
+    }
+  ],
+  "bootstrap_comparisons": [
+    {
+      "phase": "first_cold_bootstrap",
+      "level_scale_degree_matched": true,
+      "fast_state": {
+        "level": 1,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 15,
+        "q_prefix_rows": 2,
+        "prefix_q": "19806979238126065922570321921"
+      },
+      "standard_state": {
+        "level": 1,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 15,
+        "q_prefix_rows": 2,
+        "prefix_q": "19806979238126065922570321921"
+      },
+      "fast_vs_standard": {
+        "complex_rmse": 4.09656347139061e-8,
+        "max_complex_difference": 4.345682976228596e-7,
+        "max_real_difference": 1.223429130093722e-7,
+        "max_imag_difference": 4.345481273898338e-7,
+        "worst_slot": 0,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 24.804781380430292
+      },
+      "pass": true
+    },
+    {
+      "phase": "warm_bootstrap_01",
+      "level_scale_degree_matched": true,
+      "fast_state": {
+        "level": 1,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 15,
+        "q_prefix_rows": 2,
+        "prefix_q": "19806979238126065922570321921"
+      },
+      "standard_state": {
+        "level": 1,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 15,
+        "q_prefix_rows": 2,
+        "prefix_q": "19806979238126065922570321921"
+      },
+      "fast_vs_standard": {
+        "complex_rmse": 4.09656347139061e-8,
+        "max_complex_difference": 4.345682976228596e-7,
+        "max_real_difference": 1.223429130093722e-7,
+        "max_imag_difference": 4.345481273898338e-7,
+        "worst_slot": 0,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 24.804781380430292
+      },
+      "pass": true
+    },
+    {
+      "phase": "warm_bootstrap_02",
+      "level_scale_degree_matched": true,
+      "fast_state": {
+        "level": 1,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 15,
+        "q_prefix_rows": 2,
+        "prefix_q": "19806979238126065922570321921"
+      },
+      "standard_state": {
+        "level": 1,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 15,
+        "q_prefix_rows": 2,
+        "prefix_q": "19806979238126065922570321921"
+      },
+      "fast_vs_standard": {
+        "complex_rmse": 4.09656347139061e-8,
+        "max_complex_difference": 4.345682976228596e-7,
+        "max_real_difference": 1.223429130093722e-7,
+        "max_imag_difference": 4.345481273898338e-7,
+        "worst_slot": 0,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 24.804781380430292
+      },
+      "pass": true
+    },
+    {
+      "phase": "warm_bootstrap_03",
+      "level_scale_degree_matched": true,
+      "fast_state": {
+        "level": 1,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 15,
+        "q_prefix_rows": 2,
+        "prefix_q": "19806979238126065922570321921"
+      },
+      "standard_state": {
+        "level": 1,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 15,
+        "q_prefix_rows": 2,
+        "prefix_q": "19806979238126065922570321921"
+      },
+      "fast_vs_standard": {
+        "complex_rmse": 4.09656347139061e-8,
+        "max_complex_difference": 4.345682976228596e-7,
+        "max_real_difference": 1.223429130093722e-7,
+        "max_imag_difference": 4.345481273898338e-7,
+        "worst_slot": 0,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 24.804781380430292
+      },
+      "pass": true
+    },
+    {
+      "phase": "warm_bootstrap_04",
+      "level_scale_degree_matched": true,
+      "fast_state": {
+        "level": 1,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 15,
+        "q_prefix_rows": 2,
+        "prefix_q": "19806979238126065922570321921"
+      },
+      "standard_state": {
+        "level": 1,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 15,
+        "q_prefix_rows": 2,
+        "prefix_q": "19806979238126065922570321921"
+      },
+      "fast_vs_standard": {
+        "complex_rmse": 4.09656347139061e-8,
+        "max_complex_difference": 4.345682976228596e-7,
+        "max_real_difference": 1.223429130093722e-7,
+        "max_imag_difference": 4.345481273898338e-7,
+        "worst_slot": 0,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 24.804781380430292
+      },
+      "pass": true
+    },
+    {
+      "phase": "warm_bootstrap_05",
+      "level_scale_degree_matched": true,
+      "fast_state": {
+        "level": 1,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 15,
+        "q_prefix_rows": 2,
+        "prefix_q": "19806979238126065922570321921"
+      },
+      "standard_state": {
+        "level": 1,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 15,
+        "q_prefix_rows": 2,
+        "prefix_q": "19806979238126065922570321921"
+      },
+      "fast_vs_standard": {
+        "complex_rmse": 4.09656347139061e-8,
+        "max_complex_difference": 4.345682976228596e-7,
+        "max_real_difference": 1.223429130093722e-7,
+        "max_imag_difference": 4.345481273898338e-7,
+        "worst_slot": 0,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 24.804781380430292
+      },
+      "pass": true
+    }
+  ],
+  "limitations": [
+    "One cold plus five warm public Bootstrap samples characterize only this pinned logn16/E32 profile and environment.",
+    "Standard uses genuine native encryption while Fast uses the pinned intentionally insecure zero-secret mode; security equivalence is not claimed."
+  ]
+}

@@ -12,8 +12,8 @@
     "evidence": "results/FAST-LOGN16-BACKEND-PATH-AND-PERFORMANCE-004.json"
   },
   "task_005": {
-    "reserved_calls": 6,
-    "actual_calls": 6,
+    "reserved_calls": 12,
+    "actual_calls": 12,
     "runs": [
       {
         "profile": "logn16",
@@ -23,7 +23,10 @@
         "status": "PASS_PUBLIC_BOOTSTRAP_1COLD_5WARM",
         "reserved_calls": 6,
         "actual_calls": 6,
-        "preflight_pair": "/private/tmp/fast-logn16-005.BfyMFZ/logn16-pair-edf68d4.json",
+        "preflight_pair": "results/FAST-LOGN16-PUBLIC-NATIVE-CAPACITY-SAFE-PERFORMANCE-005-logn16-preflight-pair.json",
+        "preflight_pair_sha256": "068bd052ddb955d8d6c4f255e2d0ec58b6202099143c6cfeb962cc478852ccc4",
+        "bootstrap_pair": "results/FAST-LOGN16-PUBLIC-NATIVE-CAPACITY-SAFE-PERFORMANCE-005-logn16-bootstrap-pair.json",
+        "bootstrap_pair_sha256": "9051ec424dc96462647c36d92cb5eec54cfeed03e58bbe8c824490ac24734662",
         "attempt_journal_prefix": "results/FAST-LOGN16-PUBLIC-NATIVE-CAPACITY-SAFE-PERFORMANCE-005-logn16-standard.json.bootstrap-attempt-"
       },
       {
@@ -31,9 +34,13 @@
         "backend": "fast",
         "planned_calls": 6,
         "mode": "public-repeatability",
-        "status": "PENDING",
-        "reserved_calls": 0,
-        "actual_calls": 0,
+        "status": "PASS_PUBLIC_BOOTSTRAP_1COLD_5WARM",
+        "reserved_calls": 6,
+        "actual_calls": 6,
+        "preflight_pair": "results/FAST-LOGN16-PUBLIC-NATIVE-CAPACITY-SAFE-PERFORMANCE-005-logn16-preflight-pair.json",
+        "preflight_pair_sha256": "068bd052ddb955d8d6c4f255e2d0ec58b6202099143c6cfeb962cc478852ccc4",
+        "bootstrap_pair": "results/FAST-LOGN16-PUBLIC-NATIVE-CAPACITY-SAFE-PERFORMANCE-005-logn16-bootstrap-pair.json",
+        "bootstrap_pair_sha256": "9051ec424dc96462647c36d92cb5eec54cfeed03e58bbe8c824490ac24734662",
         "attempt_journal_prefix": "results/FAST-LOGN16-PUBLIC-NATIVE-CAPACITY-SAFE-PERFORMANCE-005-logn16-fast.json.bootstrap-attempt-"
       },
       {
