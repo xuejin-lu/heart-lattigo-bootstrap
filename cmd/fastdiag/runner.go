@@ -69,7 +69,7 @@ func execute(args []string) error {
 		return nil
 	}
 	if opts.mode == "trace" {
-		if opts.profile == publicE32Profile {
+		if opts.profile == publicE32Profile || opts.profile == publicE32LogN16Profile {
 			doc, err := tracePublicE32(primaryRoot, secondaryRoot, primaryMeta, opts, paths)
 			if err != nil {
 				return err

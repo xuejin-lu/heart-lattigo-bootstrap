@@ -11,6 +11,7 @@ import (
 const supportedProfile = "p93-q55"
 const logN16Profile = "logn16-q55"
 const publicE32Profile = "logn13-e32-public"
+const publicE32LogN16Profile = "logn16-e32-public"
 
 const (
 	numericalFastRevisionHistorical = "historical-pinned"
@@ -18,18 +19,20 @@ const (
 )
 
 type options struct {
-	mode           string
-	profile        string
-	fastRevision   string
-	traceScopes    []string
-	baseline       string
-	candidate      string
-	output         string
-	e32Manifest    string
-	fastVectors    string
-	warmup         int
-	repetitions    int
-	standardTrials int
+	mode                 string
+	profile              string
+	fastRevision         string
+	traceScopes          []string
+	baseline             string
+	candidate            string
+	output               string
+	e32Manifest          string
+	fastVectors          string
+	fastReferenceVectors string
+	fastReferenceResult  string
+	warmup               int
+	repetitions          int
+	standardTrials       int
 }
 
 func parseArgs(args []string) (options, error) {
@@ -48,8 +51,10 @@ func parseArgs(args []string) (options, error) {
 	baseline := flags.String("baseline", "", "compare 的 Secondary baseline ref")
 	candidate := flags.String("candidate", "", "compare 的 Secondary candidate ref")
 	output := flags.String("out", "", "輸出 JSON 路徑（summary 使用相同 basename）")
-	e32Manifest := flags.String("e32-manifest", "", "public E32 trace fixture manifest (logn13-e32-public only)")
-	fastVectors := flags.String("fast-vectors", "", "matching uninstrumented Fast repeatability vectors (logn13-e32-public only)")
+	e32Manifest := flags.String("e32-manifest", "", "versioned public E32 trace fixture manifest")
+	fastVectors := flags.String("fast-vectors", "", "matching zero-call public-native Fast vectors")
+	fastReferenceVectors := flags.String("fast-reference-vectors", "", "Task005 LogN16 Fast Bootstrap vectors for direct trace-output comparison")
+	fastReferenceResult := flags.String("fast-reference-result", "", "Task005 LogN16 Fast result JSON bound to --fast-reference-vectors")
 	warmup := flags.Int("warmup", 1, "trace warmup 次數")
 	repetitions := flags.Int("repetitions", 5, "trace measured repetitions")
 	standardTrials := flags.Int("standard-trials", 3, "numerical mode 的 Standard key/evaluation-key trials（historical 3–10；current-fast-qprefix 固定 1）")
@@ -59,8 +64,8 @@ func parseArgs(args []string) (options, error) {
 	if flags.NArg() != 0 {
 		return options{}, fmt.Errorf("不預期的位置參數：%s", strings.Join(flags.Args(), " "))
 	}
-	if *profile != supportedProfile && *profile != logN16Profile && *profile != publicE32Profile {
-		return options{}, fmt.Errorf("不支援 profile %q；允許 %s、%s 或 %s", *profile, supportedProfile, logN16Profile, publicE32Profile)
+	if *profile != supportedProfile && *profile != logN16Profile && *profile != publicE32Profile && *profile != publicE32LogN16Profile {
+		return options{}, fmt.Errorf("不支援 profile %q；允許 %s、%s、%s 或 %s", *profile, supportedProfile, logN16Profile, publicE32Profile, publicE32LogN16Profile)
 	}
 	if *fastRevision != numericalFastRevisionHistorical && *fastRevision != numericalFastRevisionCurrent {
 		return options{}, fmt.Errorf("不支援 Fast revision mode %q；允許 %s 或 %s", *fastRevision, numericalFastRevisionHistorical, numericalFastRevisionCurrent)
@@ -120,26 +125,36 @@ func parseArgs(args []string) (options, error) {
 			return options{}, errors.New("compare 子命令需要 --baseline 與 --candidate")
 		}
 	}
-	if *profile == publicE32Profile {
+	if *profile == publicE32Profile || *profile == publicE32LogN16Profile {
 		if opts.mode != "trace" {
-			return options{}, errors.New("logn13-e32-public 僅供 trace 子命令使用")
+			return options{}, errors.New("public E32 profiles 僅供 trace 子命令使用")
 		}
 		if *e32Manifest == "" || *fastVectors == "" {
-			return options{}, errors.New("logn13-e32-public trace 需要 --e32-manifest 與 --fast-vectors")
+			return options{}, errors.New("public E32 trace 需要 --e32-manifest 與 --fast-vectors")
 		}
 		if strings.Join(scopes, ",") != "stage,power,rescale" {
-			return options{}, errors.New("logn13-e32-public trace 固定使用 --trace stage,power,rescale")
+			return options{}, errors.New("public E32 trace 固定使用 --trace stage,power,rescale")
 		}
 		if warmupSet && *warmup != 0 || repetitionsSet && *repetitions != 1 {
-			return options{}, errors.New("logn13-e32-public 固定執行一次 cold 與一次 traced warm call，不接受 warmup/repetitions 變更")
+			return options{}, errors.New("public E32 固定執行一次 cold 與一次 traced warm call，不接受 warmup/repetitions 變更")
 		}
-	} else if *e32Manifest != "" || *fastVectors != "" {
-		return options{}, errors.New("--e32-manifest 與 --fast-vectors 僅供 logn13-e32-public trace 使用")
+		if *profile == publicE32Profile && (*fastReferenceVectors != "" || *fastReferenceResult != "") {
+			return options{}, errors.New("--fast-reference-vectors/result 僅供 LogN16/E32 trace 使用")
+		}
+		if (*fastReferenceVectors == "") != (*fastReferenceResult == "") {
+			return options{}, errors.New("LogN16 reference comparison requires both --fast-reference-vectors and --fast-reference-result")
+		}
+		if *profile == publicE32LogN16Profile && *fastReferenceVectors == "" {
+			return options{}, errors.New("LogN16 public E32 trace requires the provenance-bound Task005 Fast reference vectors and result")
+		}
+	} else if *e32Manifest != "" || *fastVectors != "" || *fastReferenceVectors != "" || *fastReferenceResult != "" {
+		return options{}, errors.New("E32 fixture/vector flags are only accepted by public E32 trace profiles")
 	}
 	opts.profile, opts.fastRevision, opts.traceScopes, opts.baseline, opts.candidate = *profile, *fastRevision, scopes, *baseline, *candidate
 	opts.output, opts.warmup, opts.repetitions = *output, *warmup, *repetitions
 	opts.e32Manifest, opts.fastVectors = *e32Manifest, *fastVectors
-	if opts.profile == publicE32Profile {
+	opts.fastReferenceVectors, opts.fastReferenceResult = *fastReferenceVectors, *fastReferenceResult
+	if opts.profile == publicE32Profile || opts.profile == publicE32LogN16Profile {
 		opts.warmup, opts.repetitions = 0, 1
 	}
 	opts.standardTrials = *standardTrials

@@ -377,6 +377,52 @@ func TestPublicNativeOutputPreflightRejectsAliasesAndExistingArtifacts(t *testin
 	}
 }
 
+func TestTraceFixtureRequestIsVersionedAndLogN16IsCurrentFastOnly(t *testing.T) {
+	for _, tc := range []struct {
+		name, profile string
+		wantSchema    string
+		wantProfile   string
+		wantBackend   string
+	}{
+		{name: "logn13", profile: "logn13", wantSchema: "fast-public-e32-trace-fixture.v1", wantProfile: "logn13-e32-public-native", wantBackend: publicFastSHA},
+		{name: "logn16", profile: "logn16", wantSchema: "fast-public-e32-trace-fixture.v2", wantProfile: "logn16-e32-public-native", wantBackend: publicCurrentFastSHA},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			contract, err := publicTraceFixtureContractFor(tc.profile)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if contract.SchemaVersion != tc.wantSchema || contract.Profile != tc.wantProfile || contract.BackendCommit != tc.wantBackend {
+				t.Fatalf("fixture contract = %+v, want schema=%q profile=%q backend=%q", contract, tc.wantSchema, tc.wantProfile, tc.wantBackend)
+			}
+			opts := cliOptions{mode: "public-native", profile: tc.profile, backendCommit: tc.wantBackend, ephemeralSecretWeight: 32, bootstrapBudget: 0}
+			if err := validateTraceFixtureRequest(opts); err != nil {
+				t.Fatalf("current Fast E32 zero-call fixture request rejected: %v", err)
+			}
+			for name, mutate := range map[string]func(*cliOptions){
+				"wrong_fast_pin": func(o *cliOptions) {
+					o.backendCommit = publicCurrentFastSHA
+					if tc.wantBackend == publicCurrentFastSHA {
+						o.backendCommit = publicFastSHA
+					}
+				},
+				"wrong_e":   func(o *cliOptions) { o.ephemeralSecretWeight = 0 },
+				"budget":    func(o *cliOptions) { o.bootstrapBudget = 1 },
+				"bootstrap": func(o *cliOptions) { o.publicBootstrap = true },
+			} {
+				bad := opts
+				mutate(&bad)
+				if err := validateTraceFixtureRequest(bad); err == nil {
+					t.Errorf("%s request unexpectedly accepted", name)
+				}
+			}
+		})
+	}
+	if _, err := publicTraceFixtureContractFor("unsupported"); err == nil {
+		t.Fatal("unsupported profile unexpectedly has a trace-fixture contract")
+	}
+}
+
 func TestPublicBootstrapGateRequiresExactPassingZeroCallPair(t *testing.T) {
 	wantNames := []string{"encrypt_a_level5", "encrypt_b_level5", "encrypt_c_q5_level5", "add_level5", "mulrelin_level5", "rescale_q5_level4", "rotate_level4", "drop_level0"}
 	base := publicPairDocument{

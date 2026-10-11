@@ -61,6 +61,23 @@ type publicProfileContract struct {
 	CapacityPolicy string
 }
 
+type publicTraceFixtureContract struct {
+	SchemaVersion string
+	Profile       string
+	BackendCommit string
+}
+
+func publicTraceFixtureContractFor(profile string) (publicTraceFixtureContract, error) {
+	switch profile {
+	case "logn13":
+		return publicTraceFixtureContract{SchemaVersion: "fast-public-e32-trace-fixture.v1", Profile: "logn13-e32-public-native", BackendCommit: publicFastSHA}, nil
+	case "logn16":
+		return publicTraceFixtureContract{SchemaVersion: "fast-public-e32-trace-fixture.v2", Profile: "logn16-e32-public-native", BackendCommit: publicCurrentFastSHA}, nil
+	default:
+		return publicTraceFixtureContract{}, fmt.Errorf("profile %q has no E32 trace-fixture contract", profile)
+	}
+}
+
 func publicProfileFor(name string) (publicProfileContract, error) {
 	switch name {
 	case "logn13":
@@ -211,6 +228,12 @@ type publicTraceFixtureManifest struct {
 	NumericalGate               float64                         `json:"max_complex_numerical_gate"`
 	EphemeralSecretWeight       int                             `json:"ephemeral_secret_weight"`
 	Parameters                  perfmeasure.EffectiveParameters `json:"effective_parameters"`
+	Mode                        string                          `json:"mode,omitempty"`
+	InputKind                   string                          `json:"input_kind,omitempty"`
+	InputConstructor            string                          `json:"input_constructor,omitempty"`
+	PublicDispatch              string                          `json:"public_evaluator_dispatch,omitempty"`
+	BootstrapBudget             int                             `json:"bootstrap_budget,omitempty"`
+	BootstrapCalls              int                             `json:"actual_bootstrap_calls,omitempty"`
 }
 
 type publicBootstrapFailureDocument struct {
@@ -533,8 +556,10 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 		if backend.name != "fast" {
 			return errors.New("E32 diagnostic trace fixture export is Fast-only")
 		}
-		if err := writePublicTraceFixture(opts.traceFixtureOut, params, dropped, checkpoints[len(checkpoints)-1], effective,
-			primaryCommit, sourceHash, secondaryCommit, configHash, qpHash, inputHash, workloadHash); err != nil {
+		inputKind, inputConstructor := publicInputContract(backend.name)
+		if err := writePublicTraceFixture(opts.traceFixtureOut, opts.profile, params, dropped, checkpoints[len(checkpoints)-1], effective,
+			primaryCommit, sourceHash, secondaryCommit, configHash, qpHash, inputHash, workloadHash, backend.dispatch,
+			inputKind, inputConstructor, opts.bootstrapBudget, 0); err != nil {
 			return fmt.Errorf("export E32 public trace fixture: %w", err)
 		}
 	}
@@ -702,11 +727,13 @@ func ensurePublicNativeOutputsAvailable(opts cliOptions) error {
 
 func writePublicTraceFixture(
 	base string,
+	profile string,
 	params bootstrapping.Parameters,
 	ciphertext *rlwe.Ciphertext,
 	checkpoint publicCheckpoint,
 	effective perfmeasure.EffectiveParameters,
-	primaryCommit, sourceHash, backendCommit, configHash, qpHash, inputHash, workloadHash string,
+	primaryCommit, sourceHash, backendCommit, configHash, qpHash, inputHash, workloadHash, publicDispatch, inputKind, inputConstructor string,
+	bootstrapBudget, bootstrapCalls int,
 ) error {
 	if ciphertext == nil || ciphertext.MetaData == nil || checkpoint.Name != "drop_level0" || checkpoint.State.Level != 0 ||
 		checkpoint.C1Nonzero || !ciphertext.IsNTT || ciphertext.IsMontgomery || ciphertext.Degree() != 1 || ciphertext.Level() != 0 {
@@ -740,8 +767,15 @@ func writePublicTraceFixture(
 	if err := writeExclusiveBytes(ciphertextPath, ciphertextBytes, 0o600); err != nil {
 		return fmt.Errorf("write held ciphertext: %w", err)
 	}
+	contract, err := publicTraceFixtureContractFor(profile)
+	if err != nil {
+		return err
+	}
+	if backendCommit != contract.BackendCommit || bootstrapBudget != 0 || bootstrapCalls != 0 {
+		return errors.New("trace fixture export backend pin or Bootstrap budget/call count differs from its versioned profile contract")
+	}
 	manifest := publicTraceFixtureManifest{
-		SchemaVersion: "fast-public-e32-trace-fixture.v1", GeneratedAt: time.Now().UTC(), Profile: "logn13-e32-public-native",
+		SchemaVersion: contract.SchemaVersion, GeneratedAt: time.Now().UTC(), Profile: contract.Profile,
 		Backend: "fast", BackendCommit: backendCommit, PrimaryCommit: primaryCommit, PrimarySourceSHA256: sourceHash,
 		ConfigSHA256: configHash, QPSHA256: qpHash, InputSHA256: inputHash, WorkloadSHA256: workloadHash,
 		ParametersFile: parameterName, ParametersSHA256: hex.EncodeToString(parameterSum[:]),
@@ -749,6 +783,11 @@ func writePublicTraceFixture(
 		CiphertextFingerprintSHA256: fingerprint, DecodedSHA256: checkpoint.DecodedSHA256, State: checkpoint.State,
 		PhysicalRowLengths: rowLengths, IsNTT: ciphertext.IsNTT, IsMontgomery: ciphertext.IsMontgomery,
 		C1Nonzero: checkpoint.C1Nonzero, NumericalGate: publicNumericalGate, EphemeralSecretWeight: 32, Parameters: effective,
+	}
+	if profile == "logn16" {
+		manifest.Mode, manifest.InputKind, manifest.InputConstructor = "public-native", inputKind, inputConstructor
+		manifest.PublicDispatch = publicDispatch
+		manifest.BootstrapBudget, manifest.BootstrapCalls = bootstrapBudget, bootstrapCalls
 	}
 	return writeExclusiveJSON(manifestPath, manifest)
 }

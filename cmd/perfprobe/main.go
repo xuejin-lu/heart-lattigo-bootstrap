@@ -250,8 +250,10 @@ func run() error {
 		} else if opts.preflightPair != "" {
 			return errors.New("--preflight-pair is only accepted with --public-bootstrap")
 		}
-		if opts.traceFixtureOut != "" && ((opts.backendCommit != publicFastSHA && opts.backendCommit != publicCurrentFastSHA) || opts.profile != "logn13" || opts.bootstrapBudget != 0 || opts.publicBootstrap || opts.publicRepeatability) {
-			return errors.New("--trace-fixture-out is only accepted for the pinned Fast zero-Bootstrap public-native preflight")
+		if opts.traceFixtureOut != "" {
+			if err := validateTraceFixtureRequest(opts); err != nil {
+				return err
+			}
 		}
 		if opts.bootstrapBudget != wantBudget {
 			return fmt.Errorf("public-native mode requires --bootstrap-budget=%d", wantBudget)
@@ -435,6 +437,15 @@ func run() error {
 		return err
 	}
 	fmt.Printf("%s %s timing=%s numerical_trials=%d checkpoints=%d\n", opts.profile, backend.Name(), opts.out, len(numericalTrials), len(stages))
+	return nil
+}
+
+func validateTraceFixtureRequest(opts cliOptions) error {
+	contract, err := publicTraceFixtureContractFor(opts.profile)
+	if err != nil || opts.mode != "public-native" || opts.backendCommit != contract.BackendCommit || opts.ephemeralSecretWeight != 32 || opts.bootstrapBudget != 0 ||
+		opts.publicBootstrap || opts.publicRepeatability {
+		return errors.New("--trace-fixture-out requires the profile-pinned Fast E32 zero-Bootstrap public-native preflight")
+	}
 	return nil
 }
 

@@ -23,28 +23,43 @@ import (
 
 const e32ProductionFastCommit = "2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac"
 const e32FixturePrimaryCommit = "6e938918442c409faa6d32e159c7a3f7a1041f7a"
+const e32LogN16ProductionFastCommit = "2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f"
+const e32Task005PrimaryCommit = "edf68d4a161207cb43b66ad84970b248ef9c31e8"
+const e32Task005SourceSHA256 = "6f42022d458c646e01e27d17559037b63dfcecc861ad05d5a5ed3e8986b8e597"
 
 const e32AuthorizedInstrumentationPath = "schemes/ckks/internal/fastcore/rescale.go"
 
 type publicE32FixtureManifest struct {
-	SchemaVersion         string               `json:"schema_version"`
-	Profile               string               `json:"profile"`
-	Backend               string               `json:"backend"`
-	BackendCommit         string               `json:"backend_commit"`
-	PrimaryCommit         string               `json:"primary_commit"`
-	PrimarySourceSHA256   string               `json:"primary_measurement_source_sha256"`
-	ConfigSHA256          string               `json:"config_sha256"`
-	QPSHA256              string               `json:"qp_sha256"`
-	InputSHA256           string               `json:"canonical_input_sha256"`
-	WorkloadSHA256        string               `json:"workload_sha256"`
-	ParametersFile        string               `json:"parameters_file"`
-	ParametersSHA256      string               `json:"parameters_sha256"`
-	CiphertextFile        string               `json:"ciphertext_file"`
-	CiphertextSHA256      string               `json:"ciphertext_sha256"`
-	DecodedSHA256         string               `json:"decoded_sha256"`
-	State                 publicE32CipherState `json:"ciphertext_state"`
-	NumericalGate         float64              `json:"max_complex_numerical_gate"`
-	EphemeralSecretWeight int                  `json:"ephemeral_secret_weight"`
+	SchemaVersion               string                          `json:"schema_version"`
+	Profile                     string                          `json:"profile"`
+	Backend                     string                          `json:"backend"`
+	BackendCommit               string                          `json:"backend_commit"`
+	PrimaryCommit               string                          `json:"primary_commit"`
+	PrimarySourceSHA256         string                          `json:"primary_measurement_source_sha256"`
+	ConfigSHA256                string                          `json:"config_sha256"`
+	QPSHA256                    string                          `json:"qp_sha256"`
+	InputSHA256                 string                          `json:"canonical_input_sha256"`
+	WorkloadSHA256              string                          `json:"workload_sha256"`
+	ParametersFile              string                          `json:"parameters_file"`
+	ParametersSHA256            string                          `json:"parameters_sha256"`
+	CiphertextFile              string                          `json:"ciphertext_file"`
+	CiphertextSHA256            string                          `json:"ciphertext_sha256"`
+	DecodedSHA256               string                          `json:"decoded_sha256"`
+	State                       publicE32CipherState            `json:"ciphertext_state"`
+	CiphertextFingerprintSHA256 string                          `json:"ciphertext_fingerprint_sha256"`
+	PhysicalRowLengths          [][]int                         `json:"physical_row_lengths"`
+	IsNTT                       bool                            `json:"is_ntt"`
+	IsMontgomery                bool                            `json:"is_montgomery"`
+	C1Nonzero                   bool                            `json:"c1_nonzero"`
+	Parameters                  perfmeasure.EffectiveParameters `json:"effective_parameters"`
+	NumericalGate               float64                         `json:"max_complex_numerical_gate"`
+	EphemeralSecretWeight       int                             `json:"ephemeral_secret_weight"`
+	Mode                        string                          `json:"mode,omitempty"`
+	InputKind                   string                          `json:"input_kind,omitempty"`
+	InputConstructor            string                          `json:"input_constructor,omitempty"`
+	PublicDispatch              string                          `json:"public_evaluator_dispatch,omitempty"`
+	BootstrapBudget             int                             `json:"bootstrap_budget,omitempty"`
+	BootstrapCalls              int                             `json:"actual_bootstrap_calls,omitempty"`
 }
 
 type publicE32CipherState struct {
@@ -61,18 +76,19 @@ type publicE32Vector struct {
 }
 
 type publicE32Vectors struct {
-	SchemaVersion    string                       `json:"schema_version"`
-	Mode             string                       `json:"mode"`
-	Backend          string                       `json:"backend"`
-	BackendCommit    string                       `json:"backend_commit"`
-	PrimaryCommit    string                       `json:"primary_commit"`
-	SourceSHA256     string                       `json:"primary_measurement_source_sha256"`
-	ConfigSHA256     string                       `json:"config_sha256"`
-	QPSHA256         string                       `json:"qp_sha256"`
-	InputSHA256      string                       `json:"input_sha256"`
-	WorkloadSHA256   string                       `json:"workload_sha256"`
-	Checkpoints      map[string][]publicE32Vector `json:"checkpoints"`
-	BootstrapOutputs map[string][]publicE32Vector `json:"bootstrap_outputs"`
+	SchemaVersion         string                       `json:"schema_version"`
+	Mode                  string                       `json:"mode"`
+	Backend               string                       `json:"backend"`
+	BackendCommit         string                       `json:"backend_commit"`
+	PrimaryCommit         string                       `json:"primary_commit"`
+	SourceSHA256          string                       `json:"primary_measurement_source_sha256"`
+	ConfigSHA256          string                       `json:"config_sha256"`
+	QPSHA256              string                       `json:"qp_sha256"`
+	InputSHA256           string                       `json:"input_sha256"`
+	WorkloadSHA256        string                       `json:"workload_sha256"`
+	EphemeralSecretWeight int                          `json:"ephemeral_secret_weight"`
+	Checkpoints           map[string][]publicE32Vector `json:"checkpoints"`
+	BootstrapOutputs      map[string][]publicE32Vector `json:"bootstrap_outputs"`
 }
 
 type publicE32Run struct {
@@ -84,6 +100,7 @@ type publicE32Run struct {
 	OracleMaxComplex       float64 `json:"oracle_max_complex_difference"`
 	FastReferenceWorstRMSE float64 `json:"fast_reference_worst_rmse"`
 	FastReferenceWorstMax  float64 `json:"fast_reference_worst_max_complex_difference"`
+	FastReferenceAvailable bool    `json:"fast_reference_comparison_available"`
 	Level                  int     `json:"level"`
 	Degree                 int     `json:"degree"`
 	Scale                  string  `json:"scale"`
@@ -91,43 +108,48 @@ type publicE32Run struct {
 }
 
 type publicE32RawTrace struct {
-	SchemaVersion         string         `json:"schema_version"`
-	Timestamp             time.Time      `json:"timestamp"`
-	TraceStatus           string         `json:"trace_status"`
-	TraceValidationError  string         `json:"trace_validation_error,omitempty"`
-	RawEvidenceFile       string         `json:"raw_unverified_file,omitempty"`
-	RawEvidenceSHA256     string         `json:"raw_unverified_sha256,omitempty"`
-	Profile               string         `json:"profile"`
-	Mode                  string         `json:"mode"`
-	PrimaryCommit         string         `json:"primary_commit"`
-	FixturePrimaryCommit  string         `json:"fixture_primary_commit"`
-	PrimarySourceSHA256   string         `json:"primary_measurement_source_sha256"`
-	ProductionFastCommit  string         `json:"production_fast_commit"`
-	DiagnosticHead        string         `json:"diagnostic_head"`
-	ConfigSHA256          string         `json:"config_sha256"`
-	QPSHA256              string         `json:"qp_sha256"`
-	InputSHA256           string         `json:"input_sha256"`
-	WorkloadSHA256        string         `json:"workload_sha256"`
-	FixtureManifestSHA256 string         `json:"fixture_manifest_sha256"`
-	CiphertextSHA256      string         `json:"ciphertext_sha256"`
-	ExpectedInputSHA256   string         `json:"expected_input_decoded_sha256"`
-	CallBudget            int            `json:"call_budget"`
-	ActualCalls           int            `json:"actual_calls"`
-	CPUProfileFile        string         `json:"warm_cpu_profile_file"`
-	CPUProfileSHA256      string         `json:"warm_cpu_profile_sha256"`
-	HeapProfileFile       string         `json:"post_warm_heap_profile_file"`
-	HeapProfileSHA256     string         `json:"post_warm_heap_profile_sha256"`
-	NumericalGate         float64        `json:"max_complex_gate"`
-	GoVersion             string         `json:"go_version"`
-	OS                    string         `json:"os"`
-	Arch                  string         `json:"arch"`
-	NumCPU                int            `json:"num_cpu"`
-	GOMAXPROCS            int            `json:"gomaxprocs"`
-	GOGC                  string         `json:"gogc"`
-	GOMEMLIMIT            string         `json:"gomemlimit"`
-	GODEBUG               string         `json:"godebug"`
-	Runs                  []publicE32Run `json:"runs"`
-	Events                []Event        `json:"warm_traced_events"`
+	SchemaVersion                    string         `json:"schema_version"`
+	Timestamp                        time.Time      `json:"timestamp"`
+	TraceStatus                      string         `json:"trace_status"`
+	TraceValidationError             string         `json:"trace_validation_error,omitempty"`
+	RawEvidenceFile                  string         `json:"raw_unverified_file,omitempty"`
+	RawEvidenceSHA256                string         `json:"raw_unverified_sha256,omitempty"`
+	Profile                          string         `json:"profile"`
+	Mode                             string         `json:"mode"`
+	PrimaryCommit                    string         `json:"primary_commit"`
+	FixturePrimaryCommit             string         `json:"fixture_primary_commit"`
+	PrimarySourceSHA256              string         `json:"primary_measurement_source_sha256"`
+	ProductionFastCommit             string         `json:"production_fast_commit"`
+	ProductionSourceIdentical        bool           `json:"production_go_source_identical"`
+	DiagnosticHead                   string         `json:"diagnostic_head"`
+	ConfigSHA256                     string         `json:"config_sha256"`
+	QPSHA256                         string         `json:"qp_sha256"`
+	InputSHA256                      string         `json:"input_sha256"`
+	WorkloadSHA256                   string         `json:"workload_sha256"`
+	FastReferenceVectorsSHA256       string         `json:"fast_reference_vectors_sha256,omitempty"`
+	FastReferenceResultSHA256        string         `json:"fast_reference_result_sha256,omitempty"`
+	DiagnosticTestAdapterCommit      string         `json:"diagnostic_test_adapter_commit,omitempty"`
+	DiagnosticTestAdapterPatchSHA256 string         `json:"diagnostic_test_adapter_patch_sha256,omitempty"`
+	FixtureManifestSHA256            string         `json:"fixture_manifest_sha256"`
+	CiphertextSHA256                 string         `json:"ciphertext_sha256"`
+	ExpectedInputSHA256              string         `json:"expected_input_decoded_sha256"`
+	CallBudget                       int            `json:"call_budget"`
+	ActualCalls                      int            `json:"actual_calls"`
+	CPUProfileFile                   string         `json:"warm_cpu_profile_file"`
+	CPUProfileSHA256                 string         `json:"warm_cpu_profile_sha256"`
+	HeapProfileFile                  string         `json:"post_warm_heap_profile_file"`
+	HeapProfileSHA256                string         `json:"post_warm_heap_profile_sha256"`
+	NumericalGate                    float64        `json:"max_complex_gate"`
+	GoVersion                        string         `json:"go_version"`
+	OS                               string         `json:"os"`
+	Arch                             string         `json:"arch"`
+	NumCPU                           int            `json:"num_cpu"`
+	GOMAXPROCS                       int            `json:"gomaxprocs"`
+	GOGC                             string         `json:"gogc"`
+	GOMEMLIMIT                       string         `json:"gomemlimit"`
+	GODEBUG                          string         `json:"godebug"`
+	Runs                             []publicE32Run `json:"runs"`
+	Events                           []Event        `json:"warm_traced_events"`
 }
 
 type publicE32FailureArtifact struct {
@@ -147,40 +169,72 @@ type publicE32FailureArtifact struct {
 }
 
 type publicE32TraceDocument struct {
-	SchemaVersion             string                 `json:"schema_version"`
-	Timestamp                 time.Time              `json:"timestamp"`
-	Profile                   string                 `json:"profile"`
-	Trace                     []string               `json:"trace"`
-	Primary                   RepositoryMetadata     `json:"primary_repository"`
-	Secondary                 RepositoryMetadata     `json:"diagnostic_secondary_repository"`
-	ProductionFastCommit      string                 `json:"production_fast_commit"`
-	FixturePrimaryCommit      string                 `json:"fixture_primary_commit"`
-	ProductionGoSourceSHA256  string                 `json:"production_go_source_sha256"`
-	DiagnosticGoSourceSHA256  string                 `json:"diagnostic_go_source_sha256"`
-	ProductionSourceIdentical bool                   `json:"production_go_source_identical"`
-	InstrumentationOnlyDelta  bool                   `json:"authorized_instrumentation_only_delta"`
-	ProductionSourceDiffPaths []string               `json:"production_source_diff_paths"`
-	FixtureManifestSHA256     string                 `json:"fixture_manifest_sha256"`
-	CiphertextSHA256          string                 `json:"ciphertext_sha256"`
-	FastVectorsSHA256         string                 `json:"fast_vectors_sha256"`
-	RawTracePath              string                 `json:"raw_trace_path"`
-	RawTraceSHA256            string                 `json:"raw_trace_sha256"`
-	CertifiedTracePath        string                 `json:"certified_trace_path"`
-	CertifiedTraceSHA256      string                 `json:"certified_trace_sha256"`
-	FailureArtifactPath       string                 `json:"failure_artifact_path"`
-	CPUProfilePath            string                 `json:"warm_cpu_profile_path"`
-	CPUProfileSHA256          string                 `json:"warm_cpu_profile_sha256"`
-	CPUProfileAttribution     string                 `json:"cpu_profile_symbol_attribution"`
-	HeapProfilePath           string                 `json:"post_warm_heap_profile_path"`
-	HeapProfileSHA256         string                 `json:"post_warm_heap_profile_sha256"`
-	CallBudget                int                    `json:"call_budget"`
-	ActualCalls               int                    `json:"actual_calls"`
-	NumericalGate             float64                `json:"max_complex_gate"`
-	Environment               EnvironmentMetadata    `json:"environment"`
-	GCEnvironment             publicE32GCEnvironment `json:"gc_environment"`
-	Runs                      []publicE32Run         `json:"runs"`
-	EventMedians              []EventMedian          `json:"event_medians"`
-	Analysis                  publicE32TraceAnalysis `json:"event_analysis"`
+	SchemaVersion                    string                    `json:"schema_version"`
+	Classification                   string                    `json:"classification,omitempty"`
+	Timestamp                        time.Time                 `json:"timestamp"`
+	Profile                          string                    `json:"profile"`
+	Trace                            []string                  `json:"trace"`
+	Primary                          RepositoryMetadata        `json:"primary_repository"`
+	Secondary                        RepositoryMetadata        `json:"diagnostic_secondary_repository"`
+	ProductionFastCommit             string                    `json:"production_fast_commit"`
+	FixturePrimaryCommit             string                    `json:"fixture_primary_commit"`
+	ProductionGoSourceSHA256         string                    `json:"production_go_source_sha256"`
+	DiagnosticGoSourceSHA256         string                    `json:"diagnostic_go_source_sha256"`
+	ProductionSourceIdentical        bool                      `json:"production_go_source_identical"`
+	InstrumentationOnlyDelta         bool                      `json:"authorized_instrumentation_only_delta"`
+	ProductionSourceDiffPaths        []string                  `json:"production_source_diff_paths"`
+	FixtureManifestSHA256            string                    `json:"fixture_manifest_sha256"`
+	CiphertextSHA256                 string                    `json:"ciphertext_sha256"`
+	FastVectorsSHA256                string                    `json:"fast_vectors_sha256"`
+	FastReferenceVectorsSHA256       string                    `json:"fast_reference_vectors_sha256,omitempty"`
+	FastReferenceResultSHA256        string                    `json:"fast_reference_result_sha256,omitempty"`
+	DiagnosticTestAdapterCommit      string                    `json:"diagnostic_test_adapter_commit,omitempty"`
+	DiagnosticTestAdapterPatchSHA256 string                    `json:"diagnostic_test_adapter_patch_sha256,omitempty"`
+	Task005Baseline                  *publicE32Task005Baseline `json:"task005_uninstrumented_baseline,omitempty"`
+	AttemptLedgerPath                string                    `json:"attempt_ledger_path,omitempty"`
+	AttemptLedgerSHA256              string                    `json:"attempt_ledger_sha256,omitempty"`
+	RawTracePath                     string                    `json:"raw_trace_path"`
+	RawTraceSHA256                   string                    `json:"raw_trace_sha256"`
+	CertifiedTracePath               string                    `json:"certified_trace_path"`
+	CertifiedTraceSHA256             string                    `json:"certified_trace_sha256"`
+	FailureArtifactPath              string                    `json:"failure_artifact_path"`
+	CPUProfilePath                   string                    `json:"warm_cpu_profile_path"`
+	CPUProfileSHA256                 string                    `json:"warm_cpu_profile_sha256"`
+	CPUProfileAttribution            string                    `json:"cpu_profile_symbol_attribution"`
+	HeapProfilePath                  string                    `json:"post_warm_heap_profile_path"`
+	HeapProfileSHA256                string                    `json:"post_warm_heap_profile_sha256"`
+	CallBudget                       int                       `json:"call_budget"`
+	ActualCalls                      int                       `json:"actual_calls"`
+	NumericalGate                    float64                   `json:"max_complex_gate"`
+	Environment                      EnvironmentMetadata       `json:"environment"`
+	GCEnvironment                    publicE32GCEnvironment    `json:"gc_environment"`
+	Runs                             []publicE32Run            `json:"runs"`
+	EventMedians                     []EventMedian             `json:"event_medians"`
+	Analysis                         publicE32TraceAnalysis    `json:"event_analysis"`
+}
+
+type publicE32Task006AttemptLedger struct {
+	SchemaVersion              string                        `json:"schema_version"`
+	Task                       string                        `json:"task"`
+	GeneratedAt                time.Time                     `json:"generated_at"`
+	CompletionStatus           string                        `json:"completion_status"`
+	Task005ReservedCalls       int                           `json:"task005_reserved_calls_not_reused"`
+	Task005ActualCalls         int                           `json:"task005_actual_calls_not_reused"`
+	Task005LedgerSHA256        string                        `json:"task005_attempt_ledger_sha256"`
+	Task006Budget              int                           `json:"task006_bootstrap_budget"`
+	Task006ReservedCalls       int                           `json:"task006_reserved_calls"`
+	Task006ActualCalls         int                           `json:"task006_actual_calls"`
+	Task006ActualCallsObserved bool                          `json:"task006_actual_calls_observed"`
+	Reservations               []publicE32Task006Reservation `json:"attempts"`
+}
+
+type publicE32Task006Reservation struct {
+	Index      int       `json:"attempt_index"`
+	Phase      string    `json:"phase"`
+	ReservedAt time.Time `json:"reserved_at"`
+	Status     string    `json:"status"`
+	Journal    string    `json:"journal_file"`
+	SHA256     string    `json:"journal_sha256"`
 }
 
 type publicE32GCEnvironment struct {
@@ -240,25 +294,102 @@ func tracePublicE32(primaryRoot, secondaryRoot string, primary RepositoryMetadat
 	if err != nil {
 		return publicE32TraceDocument{}, err
 	}
-	productionHash, diagnosticHash, sourceDiffPaths, instrumentationOnlyDelta, err := verifyE32ProductionSourceIdentity(secondaryRoot, secondary.Commit)
-	if err != nil {
-		return publicE32TraceDocument{}, err
+	isLogN16 := opts.profile == publicE32LogN16Profile
+	productionFastCommit := e32ProductionFastCommit
+	if isLogN16 {
+		productionFastCommit = e32LogN16ProductionFastCommit
+		if secondary.Commit != productionFastCommit {
+			return publicE32TraceDocument{}, fmt.Errorf("LogN16 trace requires the current production Fast pin %s, got %s", productionFastCommit, secondary.Commit)
+		}
+	}
+	var productionHash, diagnosticHash string
+	var sourceDiffPaths []string
+	var instrumentationOnlyDelta bool
+	if isLogN16 {
+		files, listErr := gitOutput(secondaryRoot, "ls-tree", "-r", "--name-only", secondary.Commit)
+		if listErr != nil {
+			return publicE32TraceDocument{}, listErr
+		}
+		sources, sourceErr := productionGoSourceBlobs(secondaryRoot, secondary.Commit, files)
+		if sourceErr != nil {
+			return publicE32TraceDocument{}, sourceErr
+		}
+		productionHash = hashProductionGoSources(sources)
+		diagnosticHash = productionHash
+	} else {
+		productionHash, diagnosticHash, sourceDiffPaths, instrumentationOnlyDelta, err = verifyE32ProductionSourceIdentity(secondaryRoot, secondary.Commit)
+		if err != nil {
+			return publicE32TraceDocument{}, err
+		}
 	}
 	measurementSourceHash, err := primaryMeasurementSourceFingerprint(primaryRoot, primary.Commit)
 	if err != nil {
 		return publicE32TraceDocument{}, err
 	}
-	manifestBytes, manifest, vectorsBytes, vectors, err := validatePublicE32Fixture(opts.e32Manifest, opts.fastVectors, e32FixturePrimaryCommit, measurementSourceHash)
+	fixturePrimaryCommit := e32FixturePrimaryCommit
+	if isLogN16 {
+		fixturePrimaryCommit = primary.Commit
+	}
+	var manifestBytes, vectorsBytes []byte
+	var manifest publicE32FixtureManifest
+	var vectors publicE32Vectors
+	if isLogN16 {
+		manifestBytes, manifest, vectorsBytes, vectors, err = validatePublicE32LogN16Fixture(opts.e32Manifest, opts.fastVectors, fixturePrimaryCommit, measurementSourceHash)
+	} else {
+		manifestBytes, manifest, vectorsBytes, vectors, err = validatePublicE32Fixture(opts.e32Manifest, opts.fastVectors, fixturePrimaryCommit, measurementSourceHash)
+	}
 	if err != nil {
 		return publicE32TraceDocument{}, err
 	}
-	if err := gitRun(primaryRoot, "merge-base", "--is-ancestor", manifest.PrimaryCommit, primary.Commit); err != nil {
+	if isLogN16 {
+		if manifest.PrimaryCommit != primary.Commit {
+			return publicE32TraceDocument{}, fmt.Errorf("LogN16 held fixture was built from Primary %s, current committed harness is %s", manifest.PrimaryCommit, primary.Commit)
+		}
+	} else if err := gitRun(primaryRoot, "merge-base", "--is-ancestor", manifest.PrimaryCommit, primary.Commit); err != nil {
 		return publicE32TraceDocument{}, fmt.Errorf("held E32 fixture source commit %s is not an ancestor of current Primary harness %s", manifest.PrimaryCommit, primary.Commit)
+	}
+	var task005Baseline *publicE32Task005Baseline
+	var task005Reference task005ReferenceInfo
+	if isLogN16 {
+		resultPath := filepath.Join(primaryRoot, "results", task005ResultBase+"-logn16-fast.json")
+		providedResult, absErr := filepath.Abs(opts.fastReferenceResult)
+		wantResult, wantErr := filepath.Abs(resultPath)
+		if absErr != nil || wantErr != nil || providedResult != wantResult {
+			return publicE32TraceDocument{}, fmt.Errorf("LogN16 reference result must be the committed Task005 Fast result %s", resultPath)
+		}
+		baseline, _, baselineErr := loadPublicE32Task005Baseline(primaryRoot)
+		if baselineErr != nil {
+			return publicE32TraceDocument{}, fmt.Errorf("validate immutable Task005 baseline before any diagnostic reservation: %w", baselineErr)
+		}
+		task005Reference, err = validateTask005FastReference(primaryRoot, opts.fastReferenceVectors, manifest)
+		if err != nil {
+			return publicE32TraceDocument{}, fmt.Errorf("validate Task005 Fast reference vectors before any diagnostic reservation: %w", err)
+		}
+		baseline.ReferenceStatus = "TASK005_FAST_REFERENCE_HASHES_AND_VECTORS_VALIDATED"
+		baseline.ReferenceVectorsSHA256 = task005Reference.VectorsSHA256
+		baseline.ReferenceResultSHA256 = task005Reference.ResultSHA256
+		task005Baseline = &baseline
 	}
 	manifestSum := sha256.Sum256(manifestBytes)
 	manifestHash := hex.EncodeToString(manifestSum[:])
 	vectorsSum := sha256.Sum256(vectorsBytes)
 	vectorsHash := hex.EncodeToString(vectorsSum[:])
+	if isLogN16 {
+		ledgerPath := publicE32Task006AttemptLedgerPath(outputs.json)
+		if _, statErr := os.Lstat(ledgerPath); statErr == nil {
+			return publicE32TraceDocument{}, fmt.Errorf("refusing to reuse an existing Task006 attempt ledger %s", ledgerPath)
+		} else if !errors.Is(statErr, os.ErrNotExist) {
+			return publicE32TraceDocument{}, fmt.Errorf("inspect Task006 attempt ledger path: %w", statErr)
+		}
+		for index := 1; index <= 2; index++ {
+			journalPath := fmt.Sprintf("%s.diagnostic-fast.bootstrap-attempt-%02d.json", outputs.json, index)
+			if _, statErr := os.Lstat(journalPath); statErr == nil {
+				return publicE32TraceDocument{}, fmt.Errorf("refusing to reuse existing Task006 reservation journal %s", journalPath)
+			} else if !errors.Is(statErr, os.ErrNotExist) {
+				return publicE32TraceDocument{}, fmt.Errorf("inspect Task006 reservation journal path: %w", statErr)
+			}
+		}
+	}
 
 	journalBase := outputs.json + ".diagnostic-fast"
 	tempRoot, err := os.MkdirTemp("", "fastdiag-public-e32-")
@@ -277,6 +408,13 @@ func tracePublicE32(primaryRoot, secondaryRoot string, primary RepositoryMetadat
 	if err := createPublicE32IsolatedClone(secondaryRoot, diagnosticRoot, secondary.Commit); err != nil {
 		return publicE32TraceDocument{}, fmt.Errorf("create task-local pinned diagnostic clone (temp retained at %s): %w", tempRoot, err)
 	}
+	adapterCommit, adapterPatchSHA := "", ""
+	if isLogN16 {
+		adapterCommit, adapterPatchSHA, err = applyPublicE32LogN16TestAdapter(diagnosticRoot, primaryRoot)
+		if err != nil {
+			return publicE32TraceDocument{}, fmt.Errorf("apply isolated LogN16 test-only adapter (temp retained at %s): %w", tempRoot, err)
+		}
+	}
 	diagnosticMeta, err := repositoryMetadata(diagnosticRoot, "diagnostic-detached:"+secondary.Commit[:12])
 	if err != nil {
 		return publicE32TraceDocument{}, fmt.Errorf("inspect isolated diagnostic checkout %s: %w", diagnosticRoot, err)
@@ -284,20 +422,34 @@ func tracePublicE32(primaryRoot, secondaryRoot string, primary RepositoryMetadat
 	if diagnosticMeta.Dirty {
 		return publicE32TraceDocument{}, fmt.Errorf("isolated diagnostic checkout unexpectedly dirty; preserved at %s", diagnosticRoot)
 	}
-	productionHash, diagnosticHash, sourceDiffPaths, instrumentationOnlyDelta, err = verifyE32ProductionSourceIdentity(diagnosticRoot, diagnosticMeta.Commit)
+	if isLogN16 {
+		productionHash, diagnosticHash, sourceDiffPaths, err = verifyCurrentFastTestOnlyClone(diagnosticRoot, diagnosticMeta.Commit)
+		instrumentationOnlyDelta = false
+	} else {
+		productionHash, diagnosticHash, sourceDiffPaths, instrumentationOnlyDelta, err = verifyE32ProductionSourceIdentity(diagnosticRoot, diagnosticMeta.Commit)
+	}
 	if err != nil {
 		return publicE32TraceDocument{}, fmt.Errorf("isolated diagnostic checkout fails production-source identity: %w", err)
 	}
 	rawPath := filepath.Join(tempRoot, "raw-trace-unverified.json")
 	certifiedPath := filepath.Join(tempRoot, "raw-trace-certified.json")
 	failurePath := filepath.Join(tempRoot, "trace-failure.json")
-	if err := runPublicE32TraceTest(diagnosticRoot, certifiedPath, rawPath, failurePath, cachePath, profileDir, manifestPath(opts.e32Manifest), manifestPath(opts.fastVectors), diagnosticMeta.Commit, primary.Commit, true); err != nil {
+	if err := runPublicE32TraceTest(diagnosticRoot, certifiedPath, rawPath, failurePath, cachePath, profileDir, manifestPath(opts.e32Manifest), manifestPath(opts.fastVectors), manifestPath(opts.fastReferenceVectors), manifestPath(opts.fastReferenceResult), diagnosticMeta.Commit, primary.Commit, adapterCommit, adapterPatchSHA, true); err != nil {
 		return publicE32TraceDocument{}, fmt.Errorf("zero-call E32 fixture compatibility validation failed before diagnostic reservations; no Bootstrap call was launched; preserve checkout %s and artifacts %s: %w", diagnosticRoot, tempRoot, err)
 	}
 	if err := runReservedPublicE32Trace(journalBase, func() error {
-		return runPublicE32TraceTest(diagnosticRoot, certifiedPath, rawPath, failurePath, cachePath, profileDir, manifestPath(opts.e32Manifest), manifestPath(opts.fastVectors), diagnosticMeta.Commit, primary.Commit, false)
+		return runPublicE32TraceTest(diagnosticRoot, certifiedPath, rawPath, failurePath, cachePath, profileDir, manifestPath(opts.e32Manifest), manifestPath(opts.fastVectors), manifestPath(opts.fastReferenceVectors), manifestPath(opts.fastReferenceResult), diagnosticMeta.Commit, primary.Commit, adapterCommit, adapterPatchSHA, false)
 	}); err != nil {
-		return publicE32TraceDocument{}, fmt.Errorf("E32 tracer failed; both diagnostic attempt tokens remain reserved; preserve checkout %s, raw unverified trace %s, failure record %s, and artifacts %s: %w", diagnosticRoot, rawPath, failurePath, tempRoot, err)
+		ledgerPath, ledgerSHA := "", ""
+		if isLogN16 {
+			actual, observed := readPublicE32AttemptedCalls(rawPath)
+			var ledgerErr error
+			ledgerPath, ledgerSHA, ledgerErr = writePublicE32Task006AttemptLedger(outputs.json, 2, actual, observed, "TRACE_FAILED_RESERVED_NO_RETRY", task005Baseline)
+			if ledgerErr != nil {
+				return publicE32TraceDocument{}, fmt.Errorf("E32 tracer failed (%v); also failed to preserve Task006 attempt ledger: %w", err, ledgerErr)
+			}
+		}
+		return publicE32TraceDocument{}, fmt.Errorf("E32 tracer failed; reserved Task006 attempts are not reusable; attempt ledger %s (SHA-256 %s); preserve checkout %s, raw unverified trace %s, failure record %s, and artifacts %s: %w", ledgerPath, ledgerSHA, diagnosticRoot, rawPath, failurePath, tempRoot, err)
 	}
 	rawBytes, err := os.ReadFile(rawPath)
 	if err != nil {
@@ -317,7 +469,12 @@ func tracePublicE32(primaryRoot, secondaryRoot string, primary RepositoryMetadat
 	if err := validatePublicE32RawCertification(unverified, raw, rawBytes); err != nil {
 		return publicE32TraceDocument{}, fmt.Errorf("raw/certified E32 trace linkage failed in preserved temp directory %s: %w", tempRoot, err)
 	}
-	if err := validatePublicE32RawTrace(raw, manifest, vectors, primary.Commit, manifest.PrimaryCommit, secondary.Commit, manifestHash); err != nil {
+	if isLogN16 {
+		err = validatePublicE32LogN16RawTrace(raw, manifest, vectors, primary.Commit, manifest.PrimaryCommit, diagnosticMeta.Commit, manifestHash, task005Reference)
+	} else {
+		err = validatePublicE32RawTrace(raw, manifest, vectors, primary.Commit, manifest.PrimaryCommit, secondary.Commit, manifestHash)
+	}
+	if err != nil {
 		return publicE32TraceDocument{}, fmt.Errorf("invalid E32 trace artifact in preserved temp directory %s: %w", tempRoot, err)
 	}
 	analysis, err := analyzePublicE32Events(raw.Events)
@@ -343,9 +500,9 @@ func tracePublicE32(primaryRoot, secondaryRoot string, primary RepositoryMetadat
 	rawSum := sha256.Sum256(rawBytes)
 	certifiedSum := sha256.Sum256(certifiedBytes)
 	doc := publicE32TraceDocument{
-		SchemaVersion: "fastdiag.public-e32.summary.v1", Timestamp: raw.Timestamp, Profile: publicE32Profile,
+		SchemaVersion: "fastdiag.public-e32.summary.v1", Timestamp: raw.Timestamp, Profile: manifest.Profile,
 		Trace: []string{"stage", "power", "rescale"}, Primary: primary, Secondary: diagnosticMeta,
-		ProductionFastCommit: e32ProductionFastCommit, FixturePrimaryCommit: manifest.PrimaryCommit, ProductionGoSourceSHA256: productionHash,
+		ProductionFastCommit: productionFastCommit, FixturePrimaryCommit: manifest.PrimaryCommit, ProductionGoSourceSHA256: productionHash,
 		DiagnosticGoSourceSHA256: diagnosticHash, ProductionSourceIdentical: productionHash == diagnosticHash,
 		InstrumentationOnlyDelta: instrumentationOnlyDelta, ProductionSourceDiffPaths: sourceDiffPaths,
 		FixtureManifestSHA256: manifestHash, CiphertextSHA256: manifest.CiphertextSHA256,
@@ -358,11 +515,98 @@ func tracePublicE32(primaryRoot, secondaryRoot string, primary RepositoryMetadat
 		Environment:   EnvironmentMetadata{GoVersion: raw.GoVersion, OS: raw.OS, Arch: raw.Arch, CPU: cpuModel(), NumCPU: raw.NumCPU, GOMAXPROCS: raw.GOMAXPROCS},
 		GCEnvironment: gcEnvironment,
 		Runs:          raw.Runs, EventMedians: aggregateSingleTraceEventTypes(raw.Events), Analysis: analysis,
+		FastReferenceVectorsSHA256: raw.FastReferenceVectorsSHA256, FastReferenceResultSHA256: raw.FastReferenceResultSHA256,
+		DiagnosticTestAdapterCommit: raw.DiagnosticTestAdapterCommit, DiagnosticTestAdapterPatchSHA256: raw.DiagnosticTestAdapterPatchSHA256,
+		Task005Baseline: task005Baseline,
+	}
+	if isLogN16 {
+		doc.Classification = "FAST_LOGN16_STAGE_TRACE_VERIFIED"
+		doc.AttemptLedgerPath, doc.AttemptLedgerSHA256, err = writePublicE32Task006AttemptLedger(outputs.json, raw.CallBudget, raw.ActualCalls, true, "FAST_LOGN16_STAGE_TRACE_VERIFIED", task005Baseline)
+		if err != nil {
+			return publicE32TraceDocument{}, fmt.Errorf("write durable Task006 attempt ledger after verified trace: %w", err)
+		}
 	}
 	return doc, nil
 }
 
+func publicE32Task006AttemptLedgerPath(outputJSON string) string {
+	return strings.TrimSuffix(outputJSON, filepath.Ext(outputJSON)) + "-attempt-ledger.json"
+}
+
+func writePublicE32Task006AttemptLedger(outputJSON string, budget, actual int, actualObserved bool, completionStatus string, baseline *publicE32Task005Baseline) (string, string, error) {
+	if outputJSON == "" || budget != 2 || actual < 0 || actual > budget || completionStatus == "" || baseline == nil || baseline.ReservedCalls != 16 || baseline.ActualCalls != 16 {
+		return "", "", errors.New("Task006 ledger requires its exact two-call authorization and immutable Task005 16/16 baseline")
+	}
+	base := outputJSON + ".diagnostic-fast"
+	reservations := make([]publicE32Task006Reservation, 0, 2)
+	for index, phase := range []string{"diagnostic_fast_cold", "diagnostic_fast_traced_warm"} {
+		path := fmt.Sprintf("%s.bootstrap-attempt-%02d.json", base, index+1)
+		data, err := os.ReadFile(path)
+		if err != nil {
+			if errors.Is(err, os.ErrNotExist) {
+				continue
+			}
+			return "", "", fmt.Errorf("read irrevocable Task006 attempt journal %s: %w", path, err)
+		}
+		var reservation struct {
+			SchemaVersion string    `json:"schema_version"`
+			Index         int       `json:"attempt_index"`
+			Budget        int       `json:"bootstrap_budget"`
+			Phase         string    `json:"phase"`
+			ReservedAt    time.Time `json:"reserved_at"`
+			Status        string    `json:"status"`
+		}
+		if err := json.Unmarshal(data, &reservation); err != nil {
+			return "", "", err
+		}
+		if reservation.SchemaVersion != "perfprobe-bootstrap-attempt.v1" || reservation.Index != index+1 || reservation.Budget != 2 ||
+			reservation.Phase != phase || reservation.Status != "irrevocably_reserved_before_call" || reservation.ReservedAt.IsZero() {
+			return "", "", fmt.Errorf("Task006 reservation journal %s has invalid task, phase, or consumed status", path)
+		}
+		sum := sha256.Sum256(data)
+		reservations = append(reservations, publicE32Task006Reservation{
+			Index: reservation.Index, Phase: reservation.Phase, ReservedAt: reservation.ReservedAt, Status: reservation.Status,
+			Journal: filepath.Base(path), SHA256: hex.EncodeToString(sum[:]),
+		})
+	}
+	if completionStatus == "FAST_LOGN16_STAGE_TRACE_VERIFIED" && (len(reservations) != 2 || actual != 2 || !actualObserved) {
+		return "", "", errors.New("verified Task006 ledger requires exactly two reserved and observed Bootstrap calls")
+	}
+	ledger := publicE32Task006AttemptLedger{
+		SchemaVersion: "fastdiag.logn16.task006-attempt-ledger.v1", Task: "FAST-LOGN16-INTEGRATED-PERFPROBE-FASTDIAG-006", GeneratedAt: time.Now().UTC(),
+		CompletionStatus:     completionStatus,
+		Task005ReservedCalls: baseline.ReservedCalls, Task005ActualCalls: baseline.ActualCalls, Task005LedgerSHA256: baseline.AttemptLedgerSHA256,
+		Task006Budget: budget, Task006ReservedCalls: len(reservations), Task006ActualCalls: actual, Task006ActualCallsObserved: actualObserved, Reservations: reservations,
+	}
+	data, err := json.MarshalIndent(ledger, "", "  ")
+	if err != nil {
+		return "", "", err
+	}
+	data = append(data, '\n')
+	path := publicE32Task006AttemptLedgerPath(outputJSON)
+	if err := writeNewFile(path, data, 0o644); err != nil {
+		return "", "", err
+	}
+	sum := sha256.Sum256(data)
+	return path, hex.EncodeToString(sum[:]), nil
+}
+
+func readPublicE32AttemptedCalls(rawPath string) (int, bool) {
+	data, err := os.ReadFile(rawPath)
+	if err != nil {
+		return 0, false
+	}
+	var raw publicE32RawTrace
+	if json.Unmarshal(data, &raw) != nil || raw.CallBudget != 2 || raw.ActualCalls < 0 || raw.ActualCalls > 2 {
+		return 0, false
+	}
+	return raw.ActualCalls, true
+}
+
 func manifestPath(path string) string {
+	if path == "" {
+		return ""
+	}
 	abs, err := filepath.Abs(path)
 	if err != nil {
 		return path
@@ -620,7 +864,7 @@ func runReservedPublicE32Trace(journalBase string, run func() error) error {
 	return run()
 }
 
-func runPublicE32TraceTest(secondaryRoot, certifiedPath, rawPath, failurePath, cachePath, profileDir, manifestPath, vectorsPath, diagnosticHead, primaryHead string, validateOnly bool) error {
+func runPublicE32TraceTest(secondaryRoot, certifiedPath, rawPath, failurePath, cachePath, profileDir, manifestPath, vectorsPath, referenceVectorsPath, referenceResultPath, diagnosticHead, primaryHead, adapterCommit, adapterPatchSHA string, validateOnly bool) error {
 	args := []string{"test", "-tags", "fastdiag", "./circuits/ckks/bootstrapping", "-run", "^TestFastDiagPublicE32Trace$", "-count=1"}
 	command := exec.Command("go", args...)
 	command.Dir = secondaryRoot
@@ -629,18 +873,22 @@ func runPublicE32TraceTest(secondaryRoot, certifiedPath, rawPath, failurePath, c
 		validateOnlySetting = "1"
 	}
 	command.Env = updateEnv(os.Environ(), map[string]string{
-		"FASTDIAG_TRACE":                   "stage,power,rescale",
-		"FASTDIAG_PUBLIC_E32_MANIFEST":     manifestPath,
-		"FASTDIAG_PUBLIC_E32_FAST_VECTORS": vectorsPath,
-		"FASTDIAG_DIAGNOSTIC_HEAD":         diagnosticHead,
-		"FASTDIAG_PRIMARY_HEAD":            primaryHead,
-		"FASTDIAG_OUTPUT":                  certifiedPath,
-		"FASTDIAG_RAW_OUTPUT":              rawPath,
-		"FASTDIAG_FAILURE_OUTPUT":          failurePath,
-		"FASTDIAG_PROFILE_DIR":             profileDir,
-		"FASTDIAG_VALIDATE_ONLY":           validateOnlySetting,
-		"GOCACHE":                          cachePath,
-		"GOMAXPROCS":                       fmt.Sprint(runtime.GOMAXPROCS(0)),
+		"FASTDIAG_TRACE":                        "stage,power,rescale",
+		"FASTDIAG_PUBLIC_E32_MANIFEST":          manifestPath,
+		"FASTDIAG_PUBLIC_E32_FAST_VECTORS":      vectorsPath,
+		"FASTDIAG_PUBLIC_E32_REFERENCE_VECTORS": referenceVectorsPath,
+		"FASTDIAG_PUBLIC_E32_REFERENCE_RESULT":  referenceResultPath,
+		"FASTDIAG_DIAGNOSTIC_HEAD":              diagnosticHead,
+		"FASTDIAG_PRIMARY_HEAD":                 primaryHead,
+		"FASTDIAG_TEST_ADAPTER_COMMIT":          adapterCommit,
+		"FASTDIAG_TEST_ADAPTER_PATCH_SHA256":    adapterPatchSHA,
+		"FASTDIAG_OUTPUT":                       certifiedPath,
+		"FASTDIAG_RAW_OUTPUT":                   rawPath,
+		"FASTDIAG_FAILURE_OUTPUT":               failurePath,
+		"FASTDIAG_PROFILE_DIR":                  profileDir,
+		"FASTDIAG_VALIDATE_ONLY":                validateOnlySetting,
+		"GOCACHE":                               cachePath,
+		"GOMAXPROCS":                            fmt.Sprint(runtime.GOMAXPROCS(0)),
 	})
 	var output strings.Builder
 	command.Stdout, command.Stderr = &output, &output
@@ -706,7 +954,10 @@ func validatePublicE32RawCertification(unverified, certified publicE32RawTrace, 
 		unverified.NumericalGate != certified.NumericalGate || unverified.GoVersion != certified.GoVersion || unverified.OS != certified.OS ||
 		unverified.Arch != certified.Arch || unverified.NumCPU != certified.NumCPU || unverified.GOMAXPROCS != certified.GOMAXPROCS ||
 		unverified.GOGC != certified.GOGC || unverified.GOMEMLIMIT != certified.GOMEMLIMIT || unverified.GODEBUG != certified.GODEBUG ||
-		unverified.CPUProfileFile != certified.CPUProfileFile || unverified.HeapProfileFile != certified.HeapProfileFile {
+		unverified.CPUProfileFile != certified.CPUProfileFile || unverified.HeapProfileFile != certified.HeapProfileFile ||
+		unverified.FastReferenceVectorsSHA256 != certified.FastReferenceVectorsSHA256 || unverified.FastReferenceResultSHA256 != certified.FastReferenceResultSHA256 ||
+		unverified.DiagnosticTestAdapterCommit != certified.DiagnosticTestAdapterCommit || unverified.DiagnosticTestAdapterPatchSHA256 != certified.DiagnosticTestAdapterPatchSHA256 ||
+		unverified.ProductionSourceIdentical != certified.ProductionSourceIdentical {
 		return errors.New("unverified and certified E32 artifacts disagree on source, fixture, or call-budget provenance")
 	}
 	if len(unverified.Runs) != len(certified.Runs) || len(unverified.Events) != len(certified.Events) {
@@ -1095,6 +1346,9 @@ func hasKey[V any](values map[string]V, key string) bool {
 }
 
 func renderPublicE32Summary(doc publicE32TraceDocument) string {
+	if doc.Task005Baseline != nil {
+		return renderLogN16IntegratedSummary(doc)
+	}
 	var out strings.Builder
 	fmt.Fprintf(&out, "# Public E32 Fast diagnostic trace\n\n- Primary harness: `%s` (`%s`, dirty=%t)\n- Held fixture source Primary: `%s`\n- Diagnostic Secondary: `%s` (`%s`, dirty=%t)\n", doc.Primary.Commit, doc.Primary.Ref, doc.Primary.Dirty, doc.FixturePrimaryCommit, doc.Secondary.Commit, doc.Secondary.Ref, doc.Secondary.Dirty)
 	fmt.Fprintf(&out, "- Frozen formal Fast production pin: `%s`\n- Original production Go-source SHA-256: `%s`\n- Diagnostic production Go-source SHA-256: `%s`\n- Production source identical: `%t`; authorized instrumentation-only delta: `%t`; changed production paths: `%v`\n- E32 trace budget: %d reserved / %d actual calls\n- Numerical gate: %.3g\n- Environment: `%s`, `%s/%s`, CPU `%s`, NumCPU `%d`, GOMAXPROCS `%d`; GC `%s`, limit `%s`, debug `%s`\n- Raw unverified trace (outside Git): `%s` (SHA-256 `%s`)\n- Separately certified trace (outside Git): `%s` (SHA-256 `%s`)\n- Failure sidecar path (created only on failure): `%s`\n- CPU profile (warm traced call only): `%s` (SHA-256 `%s`)\n- Heap profile (post-warm in-use snapshot, not allocation attribution): `%s` (SHA-256 `%s`)\n\n## CPU profile symbol views\n\n%s\n\n", doc.ProductionFastCommit, doc.ProductionGoSourceSHA256, doc.DiagnosticGoSourceSHA256, doc.ProductionSourceIdentical, doc.InstrumentationOnlyDelta, doc.ProductionSourceDiffPaths, doc.CallBudget, doc.ActualCalls, doc.NumericalGate, doc.Environment.GoVersion, doc.Environment.OS, doc.Environment.Arch, doc.Environment.CPU, doc.Environment.NumCPU, doc.Environment.GOMAXPROCS, doc.GCEnvironment.GOGC, doc.GCEnvironment.GOMEMLIMIT, doc.GCEnvironment.GODEBUG, doc.RawTracePath, doc.RawTraceSHA256, doc.CertifiedTracePath, doc.CertifiedTraceSHA256, doc.FailureArtifactPath, doc.CPUProfilePath, doc.CPUProfileSHA256, doc.HeapProfilePath, doc.HeapProfileSHA256, doc.CPUProfileAttribution)
@@ -1123,6 +1377,57 @@ func renderPublicE32Summary(doc publicE32TraceDocument) string {
 		}
 		fmt.Fprintf(&out, "| %s | %s | %s | %s | %s | %.3f | %d |\n", displayOrDash(event.ParentKey), event.Scope, event.Name, power, component, event.MedianNS/1e6, event.Count)
 	}
+	return out.String()
+}
+
+func renderLogN16IntegratedSummary(doc publicE32TraceDocument) string {
+	var out strings.Builder
+	baseline := doc.Task005Baseline
+	fmt.Fprintf(&out, "# LogN16/E32 integrated perfprobe + fastdiag\n\n- Classification: `%s`\n- Primary commit: `%s`\n- Genuine Fast production pin: `%s`\n- Isolated test-only adapter commit / patch SHA-256: `%s` / `%s`\n- Production Go source identical in isolated tracer: `%t`\n- Input profile: LogN16/E32, public-native, original Task005 workload/config/Q/P, 32,768 slots; no Standard run in Task006.\n\n",
+		doc.Classification, doc.Primary.Commit, doc.ProductionFastCommit, doc.DiagnosticTestAdapterCommit, doc.DiagnosticTestAdapterPatchSHA256, doc.ProductionSourceIdentical)
+	out.WriteString("## Task005 uninstrumented end-to-end baseline (prior accepted run)\n\n| Measure | Standard | Fast | Evidence boundary |\n|---|---:|---:|---|\n")
+	fmt.Fprintf(&out, "| Warm median | %.3f ms | %.3f ms | Task005 uninstrumented; 005's 16/16 calls remain exhausted and were not repeated. |\n", baseline.StandardWarmMedianMS, baseline.FastWarmMedianMS)
+	fmt.Fprintf(&out, "| Fast / Standard speed ratio | — | %.3fx | Different backend lifecycle; descriptive fixed-profile result. |\n", baseline.StandardWarmMedianMS/baseline.FastWarmMedianMS)
+	fmt.Fprintf(&out, "| Fast-vs-Standard terminal error | — | RMSE %.6g; max %.6g | Gate %.3g; Task005 matched public-native pair. |\n", baseline.FastVsStandardRMSE, baseline.FastVsStandardMax, baseline.NumericalGate)
+	fmt.Fprintf(&out, "| Fast warm median allocation | — | %d bytes / %d allocs | Task005 uninstrumented. |\n\n", baseline.FastWarmAllocatedBytes, baseline.FastWarmAllocations)
+	fmt.Fprintf(&out, "Task005 provenance: Standard `%s`; Fast `%s`; Primary `%s`; source `%s`. Task005 reference vectors SHA-256 `%s`, result SHA-256 `%s`.\n\n",
+		baseline.StandardCommit, baseline.FastCommit, baseline.PrimaryCommit, baseline.PrimarySourceSHA256, baseline.ReferenceVectorsSHA256, baseline.ReferenceResultSHA256)
+	out.WriteString("## Task006 Fast-only trace-only observation\n\n| Call | Elapsed | Native plaintext oracle RMSE / max | Vs Task005 Fast worst RMSE / max | State |\n|---|---:|---:|---:|---|\n")
+	for _, run := range doc.Runs {
+		fmt.Fprintf(&out, "| %s | %.3f ms | %.6g / %.6g | %.6g / %.6g | Level %d, Scale `%s`, degree %d, Q-prefix rows %d |\n",
+			run.Phase, float64(run.ElapsedNS)/1e6, run.OracleRMSE, run.OracleMaxComplex, run.FastReferenceWorstRMSE, run.FastReferenceWorstMax, run.Level, run.Scale, run.Degree, run.QPrefixRows)
+	}
+	fmt.Fprintf(&out, "\nTask006 budget: **%d reserved / %d actual**. The warm sample is instrumented; comparing it directly to Task005's uninstrumented Fast median would mix executions and trace overhead, so no adjusted speedup is claimed. Attempt ledger: `%s` (SHA-256 `%s`).\n\n",
+		doc.CallBudget, doc.ActualCalls, doc.AttemptLedgerPath, doc.AttemptLedgerSHA256)
+	rootSequence := uint64(0)
+	for _, closure := range doc.Analysis.Closures {
+		if closure.Scope == "stage" && closure.Name == "bootstrap" && closure.ParentSequence == 0 {
+			rootSequence = closure.Sequence
+			fmt.Fprintf(&out, "Bootstrap event root: %.3f ms; signed unattributed residual %.3f ms (%.2f%%). Stage spans are inclusive in this root.\n\n",
+				closure.InclusiveNS/1e6, closure.UnattributedNS/1e6, closure.UnattributedFraction*100)
+			break
+		}
+	}
+	out.WriteString("### Direct Bootstrap stage spans\n\n| Stage | Inclusive | Direct children | Residual |\n|---|---:|---:|---:|\n")
+	for _, closure := range doc.Analysis.Closures {
+		if closure.Scope == "stage" && closure.ParentSequence == rootSequence && closure.Name != "bootstrap" {
+			fmt.Fprintf(&out, "| %s | %.3f ms | %.3f ms | %.3f ms |\n", closure.Name, closure.InclusiveNS/1e6, closure.ImmediateChildrenNS/1e6, closure.UnattributedNS/1e6)
+		}
+	}
+	out.WriteString("\n### Nested power and Rescale event roots (non-additive to stages)\n\nEach independent event tree is kept separate; nested inclusive times are not summed. No stage-level plaintext RMSE is inferred from timing/state-only trace events.\n")
+	for _, group := range doc.Analysis.PositiveExclusiveByType {
+		if group.RootScope != "power" && group.RootScope != "rescale" {
+			continue
+		}
+		fmt.Fprintf(&out, "\n#### `%s/%s` root (%.3f ms)\n\n| Rank | Event | Component | Count | Exclusive total | Root share |\n|---:|---|---|---:|---:|---:|\n",
+			group.RootScope, group.RootName, group.RootElapsedNS/1e6)
+		for _, entry := range group.Entries {
+			fmt.Fprintf(&out, "| %d | %s | %s | %d | %.3f ms | %s |\n", entry.Rank, entry.Name, displayOrDash(entry.Component), entry.Count, entry.ExclusiveTotalNS/1e6, formatE32Percent(entry.RootShare))
+		}
+	}
+	fmt.Fprintf(&out, "\nRaw unverified trace: `%s` (SHA-256 `%s`); certified trace: `%s` (SHA-256 `%s`). CPU profile SHA-256 `%s`; post-warm heap snapshot SHA-256 `%s`.\n",
+		doc.RawTracePath, doc.RawTraceSHA256, doc.CertifiedTracePath, doc.CertifiedTraceSHA256, doc.CPUProfileSHA256, doc.HeapProfileSHA256)
+	fmt.Fprintf(&out, "\nThe in-circuit events are Fast-only diagnostic attribution. Task005's accepted Standard/Fast numerical and latency result remains the only matched end-to-end comparison; Task006 made no Standard Bootstrap calls.\n")
 	return out.String()
 }
 
