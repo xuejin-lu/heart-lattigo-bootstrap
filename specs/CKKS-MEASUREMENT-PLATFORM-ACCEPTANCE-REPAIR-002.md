@@ -1,6 +1,6 @@
 # CKKS-MEASUREMENT-PLATFORM-ACCEPTANCE-REPAIR-002
 
-Status: READY_FOR_CODEX. Authoritative context: AGENTS.md, docs/MEASUREMENT_PLATFORM.md, prior Task CKKS-MEASUREMENT-PLATFORM-GENERALIZATION-001 and its evidence at 7fc06031.
+Status: READY_FOR_WEB_REVIEW. Authoritative context: AGENTS.md, docs/MEASUREMENT_PLATFORM.md, prior Task CKKS-MEASUREMENT-PLATFORM-GENERALIZATION-001 and its evidence at 7fc06031.
 
 Goal: finish existing-platform acceptance gaps without replacing, rerunning, or reverting the accepted 188-file retirement and Task006 offline trace result.
 

@@ -1,7 +1,7 @@
 # CURRENT TASK — Complete measurement platform acceptance repair
 
 Task: `CKKS-MEASUREMENT-PLATFORM-ACCEPTANCE-REPAIR-002`
-Status: READY_FOR_CODEX
+Status: READY_FOR_WEB_REVIEW
 Authoritative spec: `specs/CKKS-MEASUREMENT-PLATFORM-ACCEPTANCE-REPAIR-002.md`
 Previous Task `CKKS-MEASUREMENT-PLATFORM-GENERALIZATION-001` at `7fc06031e5a8ca499c083814159e10ffea325baa`: implementation and 188-file historical runner retirement accepted as completed engineering work, subject to the targeted acceptance gaps in this task. Do not recreate or roll back the retired tools.
 
