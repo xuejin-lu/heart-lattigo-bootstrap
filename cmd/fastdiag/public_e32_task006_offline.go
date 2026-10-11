@@ -136,13 +136,13 @@ type task006PowerRoot struct {
 }
 
 type task006OfflineAnalysis struct {
-	RootElapsedNS            float64                         `json:"bootstrap_root_elapsed_ns"`
-	RootImmediateChildrenNS  float64                         `json:"bootstrap_direct_children_ns"`
-	RootUnattributedNS       float64                         `json:"bootstrap_unattributed_ns"`
-	RootUnattributedFraction float64                         `json:"bootstrap_unattributed_fraction"`
-	EventTypeSummaries       []publicE32EventTypeSummary     `json:"event_type_summaries_by_independent_root"`
-	PositiveExclusiveByType  []publicE32EventTypeParetoGroup `json:"positive_exclusive_pareto_by_event_type_root"`
-	AmdahlScenarios          []publicE32AmdahlScenario       `json:"stage_amdahl_scenarios"`
+	RootElapsedNS            float64 `json:"bootstrap_root_elapsed_ns"`
+	RootImmediateChildrenNS  float64 `json:"bootstrap_direct_children_ns"`
+	RootUnattributedNS       float64 `json:"bootstrap_unattributed_ns"`
+	RootUnattributedFraction float64 `json:"bootstrap_unattributed_fraction"`
+	EventTypeRootRecords     int     `json:"event_type_root_record_count"`
+	PositiveExclusiveGroups  int     `json:"positive_exclusive_group_count"`
+	AmdahlScenarioCount      int     `json:"amdahl_scenario_count"`
 }
 
 type task006OfflineEvidence struct {
@@ -442,8 +442,8 @@ func replayPublicE32Task006Offline(primaryRoot, secondaryRoot string, primaryMet
 		doc.Analysis = &task006OfflineAnalysis{
 			RootElapsedNS: analysis.RootElapsedNS, RootImmediateChildrenNS: analysis.RootImmediateChildrenNS,
 			RootUnattributedNS: analysis.RootUnattributedNS, RootUnattributedFraction: analysis.RootUnattributedFraction,
-			EventTypeSummaries: analysis.EventTypeSummaries, PositiveExclusiveByType: analysis.PositiveExclusiveByType,
-			AmdahlScenarios: analysis.AmdahlScenarios,
+			EventTypeRootRecords: len(analysis.EventTypeSummaries), PositiveExclusiveGroups: len(analysis.PositiveExclusiveByType),
+			AmdahlScenarioCount: len(analysis.AmdahlScenarios),
 		}
 		doc.RootClosures = publicE32OfflineRootClosures(raw.Events)
 		doc.IndependentRootCount = len(doc.RootClosures)
@@ -563,6 +563,9 @@ func task006RecursivePowerAncestry(events []Event) []uint64 {
 func renderPublicE32Task006OfflineSummary(doc task006OfflineEvidence) string {
 	var out strings.Builder
 	fmt.Fprintf(&out, "# Task006 LogN16/E32 offline recursive trace revalidation\n\n- Classification: `%s`\n- Original classification/status: `%s` / `%s` (unchanged)\n- New Bootstrap calls: **%d**\n- Event count: **%d**; independent event roots: **%d**\n- Generated-power branch roots: `%v`\n- Raw SHA-256: `%s`\n- Failure-sidecar SHA-256: `%s`\n- Task006 ledger SHA-256: `%s`\n- Captured Fast production / diagnostic adapter commits: `%s` / `%s`\n- Adapter patch digest matches committed patch: **%t**\n- Historical adapter commit object currently available: **%t**\n\n", doc.Classification, doc.OriginalClassification, doc.OriginalTraceStatus, doc.NewBootstrapCalls, doc.EventCount, doc.IndependentRootCount, doc.GeneratedPowerRoots, doc.RawSHA256, doc.SidecarSHA256, doc.LedgerSHA256, doc.ProductionFastCommit, doc.DiagnosticAdapterCommit, doc.DiagnosticPatchMatches, doc.DiagnosticCommitAvailable)
+	if doc.Analysis != nil {
+		fmt.Fprintf(&out, "- Bootstrap root timing: inclusive %.0f ns; direct children %.0f ns; signed residual %.0f ns (%.2f%%)\n- Existing analyzer detail counts: event-type/root records %d; positive-exclusive groups %d; Amdahl scenarios %d\n\n", doc.Analysis.RootElapsedNS, doc.Analysis.RootImmediateChildrenNS, doc.Analysis.RootUnattributedNS, 100*doc.Analysis.RootUnattributedFraction, doc.Analysis.EventTypeRootRecords, doc.Analysis.PositiveExclusiveGroups, doc.Analysis.AmdahlScenarioCount)
+	}
 	out.WriteString("## Recorded numerical outputs (metadata only; no decrypt repeated)\n\n| Call | Level | Scale log2 | Degree | Q-prefix rows | Oracle RMSE | Oracle max | Task005 Fast-reference max | Gate |\n|---|---:|---:|---:|---:|---:|---:|---:|---|\n")
 	for _, run := range doc.RunChecks {
 		fmt.Fprintf(&out, "| %s | %d | %.0f | %d | %d | %.9g | %.9g | %.9g | %t |\n", run.Phase, run.Level, run.ScaleLog2, run.Degree, run.QPrefixRows, run.OracleRMSE, run.OracleMax, run.ReferenceMax, run.Pass)
@@ -585,6 +588,9 @@ func renderPublicE32Task006OfflineSummary(doc task006OfflineEvidence) string {
 func renderPublicE32Task006OfflineJournal(doc task006OfflineEvidence) string {
 	var out strings.Builder
 	fmt.Fprintf(&out, "# Task006 offline analysis journal\n\n- Generated: `%s`\n- Classification: `%s`\n- Original raw remains `%s`; relabeled: `%t`\n- New Bootstrap calls: `%d`\n- Captured events analyzed by maintained Batch025 analyzer: `%d`\n- Raw / sidecar / ledger SHA-256: `%s` / `%s` / `%s`\n- Task006 attempt accounting preserved: Task005 %d/%d, Task006 %d/%d, retries 0\n- Generated-power branch roots: `%v`\n- Recursive power ancestry sequences (leaf-to-root): `%v`\n- Root-partitioned analysis available: `%t`\n\n", doc.GeneratedAt.Format(time.RFC3339), doc.Classification, doc.OriginalTraceStatus, doc.OriginalRawRelabeled, doc.NewBootstrapCalls, doc.EventCount, doc.RawSHA256, doc.SidecarSHA256, doc.LedgerSHA256, 16, 16, doc.ActualCalls, doc.CallBudget, doc.GeneratedPowerRoots, doc.RecursivePowerAncestry, doc.Analysis != nil)
+	if doc.Analysis != nil {
+		fmt.Fprintf(&out, "- Root timing (inclusive/direct children/signed residual): %.0f / %.0f / %.0f ns; event-type/root records: %d; positive-exclusive groups: %d; Amdahl scenarios: %d\n", doc.Analysis.RootElapsedNS, doc.Analysis.RootImmediateChildrenNS, doc.Analysis.RootUnattributedNS, doc.Analysis.EventTypeRootRecords, doc.Analysis.PositiveExclusiveGroups, doc.Analysis.AmdahlScenarioCount)
+	}
 	fmt.Fprintf(&out, "- Validation anomalies: %d\n", len(doc.ValidationAnomalies))
 	for _, anomaly := range doc.ValidationAnomalies {
 		fmt.Fprintf(&out, "  - %s\n", anomaly)

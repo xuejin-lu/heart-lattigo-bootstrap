@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -148,5 +149,11 @@ func TestTask006OfflineReplayCapturedTraceWithoutBootstrap(t *testing.T) {
 	require.Equal(t, 16, doc.EffectiveParameters.LogN)
 	require.Equal(t, 15, doc.EffectiveParameters.LogSlots)
 	require.True(t, doc.DiagnosticPatchMatches)
+	require.NotNil(t, doc.Analysis)
+	require.Equal(t, 539, doc.Analysis.EventTypeRootRecords)
+	encoded, err := json.Marshal(doc)
+	require.NoError(t, err)
+	require.Less(t, len(encoded), 64*1024, "offline evidence must remain compact and omit per-event analyzer arrays")
+	require.NotContains(t, string(encoded), "positive_exclusive_top10_by_event_type")
 	require.Contains(t, journal, "New Bootstrap calls: `0`")
 }
