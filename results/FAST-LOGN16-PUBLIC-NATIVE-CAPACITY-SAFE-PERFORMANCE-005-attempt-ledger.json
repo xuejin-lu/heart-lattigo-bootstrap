@@ -1,8 +1,8 @@
 {
   "schema_version": "fast-logn16-public-native-capacity-safe-performance-attempt-ledger.v1",
   "task": "FAST-LOGN16-PUBLIC-NATIVE-CAPACITY-SAFE-PERFORMANCE-005",
-  "primary_measurement_commit": "95c73dd8adeb2eb4eca9a795bfb280199b82765c",
-  "primary_measurement_source_sha256": "7942e391e34997834c1a1b4a0a7e85df70f5f93f7c8ffcca317ffd79b5544ccc",
+  "primary_measurement_commit": "edf68d4a161207cb43b66ad84970b248ef9c31e8",
+  "primary_measurement_source_sha256": "6f42022d458c646e01e27d17559037b63dfcecc861ad05d5a5ed3e8986b8e597",
   "standard_backend_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
   "fast_backend_commit": "2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f",
   "total_authorized_calls_across_004_and_005": 16,
@@ -12,17 +12,18 @@
     "evidence": "results/FAST-LOGN16-BACKEND-PATH-AND-PERFORMANCE-004.json"
   },
   "task_005": {
-    "reserved_calls": 0,
-    "actual_calls": 0,
+    "reserved_calls": 6,
+    "actual_calls": 6,
     "runs": [
       {
         "profile": "logn16",
         "backend": "standard",
         "planned_calls": 6,
         "mode": "public-repeatability",
-        "status": "PENDING",
-        "reserved_calls": 0,
-        "actual_calls": 0,
+        "status": "PASS_PUBLIC_BOOTSTRAP_1COLD_5WARM",
+        "reserved_calls": 6,
+        "actual_calls": 6,
+        "preflight_pair": "/private/tmp/fast-logn16-005.BfyMFZ/logn16-pair-edf68d4.json",
         "attempt_journal_prefix": "results/FAST-LOGN16-PUBLIC-NATIVE-CAPACITY-SAFE-PERFORMANCE-005-logn16-standard.json.bootstrap-attempt-"
       },
       {
