@@ -450,6 +450,61 @@ func TestPublicBootstrapGateBindsTheCurrentFastLogN13Pin(t *testing.T) {
 	}
 }
 
+func TestPublicBootstrapGateRequiresVersionedLogN16ObservedOracleEvidence(t *testing.T) {
+	profile, err := publicProfileFor("logn16")
+	if err != nil {
+		t.Fatal(err)
+	}
+	base := publicPairDocument{
+		SchemaVersion: "fast-standard-public-native-pair.v1", Status: "PASS", NumericalGate: publicNumericalGate,
+		FastCommit: publicCurrentFastSHA, StandardCommit: publicStandardSHA, PrimaryCommit: "primary-sha", SourceSHA256: "source-sha",
+		InputSHA256: publicLogN16InputSHA, WorkloadSHA256: publicLogN16WorkloadSHA,
+		ConfigSHA256: publicLogN16ConfigSHA, QPSHA256: publicLogN16QPSHA,
+		CapacityEvidenceVersion: publicCapacityEvidenceVersion, CapacityPolicy: publicCapacityPolicyLogN16Observed,
+		ConservativeBoundStatus: perfmeasure.PublicCapacityNotProven, ObservedNativeOracleStatus: publicObservedOraclePassed,
+		StandardLevel0Continuity: vectorMetrics{}, FastLevel0Continuity: vectorMetrics{},
+		E: 32, BootstrapCalls: 0, MatchedEnvironment: true,
+	}
+	for _, name := range []string{"encrypt_a_level5", "encrypt_b_level5", "encrypt_c_q5_level5", "add_level5", "mulrelin_level5", "rescale_q5_level4", "rotate_level4", "drop_level0"} {
+		base.Checkpoints = append(base.Checkpoints, publicPairCheckpoint{Name: name, Pass: true, StateMatched: true, Metrics: vectorMetrics{MaxComplexDifference: 0}})
+	}
+	tests := []struct {
+		name   string
+		mutate func(*publicPairDocument)
+		valid  bool
+	}{
+		{name: "complete observed evidence", valid: true},
+		{name: "missing evidence version", mutate: func(pair *publicPairDocument) { pair.CapacityEvidenceVersion = "" }},
+		{name: "unproven result hidden", mutate: func(pair *publicPairDocument) { pair.ConservativeBoundStatus = perfmeasure.PublicCapacitySufficient }},
+		{name: "oracle status failed", mutate: func(pair *publicPairDocument) { pair.ObservedNativeOracleStatus = "NOT_RUN" }},
+		{name: "Level0 continuity exceeded", mutate: func(pair *publicPairDocument) {
+			pair.FastLevel0Continuity.MaxComplexDifference = 2 * publicNumericalGate
+		}},
+		{name: "workload hash mismatch", mutate: func(pair *publicPairDocument) { pair.WorkloadSHA256 = publicWorkloadSHA }},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			pair := base
+			pair.Checkpoints = append([]publicPairCheckpoint(nil), base.Checkpoints...)
+			if test.mutate != nil {
+				test.mutate(&pair)
+			}
+			path := filepath.Join(t.TempDir(), "logn16-preflight-pair.json")
+			if err := writeExclusiveJSON(path, pair); err != nil {
+				t.Fatal(err)
+			}
+			_, err := validatePublicPreflightGateForProfile(path, "primary-sha", "source-sha", "logn16", publicCurrentFastSHA,
+				profile.ConfigSHA256, profile.QPSHA256, profile.InputSHA256, profile.WorkloadSHA256)
+			if test.valid && err != nil {
+				t.Fatalf("complete LogN16 observed-oracle pair rejected: %v", err)
+			}
+			if !test.valid && err == nil {
+				t.Fatal("incomplete/forged LogN16 observed-oracle pair accepted")
+			}
+		})
+	}
+}
+
 func TestPublicBootstrapAttemptsStopAfterFirstOutputGateFailure(t *testing.T) {
 	input := publicTestCiphertext(t)
 	journalBase := filepath.Join(t.TempDir(), "bootstrap-fail-closed")
@@ -605,12 +660,12 @@ func TestPublicPairProvenanceRequiresPinnedCoverageAndCleanSources(t *testing.T)
 	}
 }
 
-func TestLogN16PublicNativeProfileStopsAtTerminalQ0CapacityGate(t *testing.T) {
+func TestLogN16PublicNativeProfileUsesOnlyObservedOracleCapacityPolicy(t *testing.T) {
 	profile, err := publicProfileFor("logn16")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if profile.InputSlots != 1<<15 || profile.RingN != 1<<16 || profile.ConfigSHA256 != publicLogN16ConfigSHA || profile.InputSHA256 != publicLogN16InputSHA || profile.QPSHA256 != publicLogN16QPSHA {
+	if profile.InputSlots != 1<<15 || profile.RingN != 1<<16 || profile.ConfigSHA256 != publicLogN16ConfigSHA || profile.InputSHA256 != publicLogN16InputSHA || profile.WorkloadSHA256 != publicLogN16WorkloadSHA || profile.QPSHA256 != publicLogN16QPSHA {
 		t.Fatalf("LogN16 contract differs from its frozen canonical profile: %+v", profile)
 	}
 	if err := validatePublicBackendPin("fast", publicCurrentFastSHA, "logn16"); err != nil {
@@ -630,6 +685,26 @@ func TestLogN16PublicNativeProfileStopsAtTerminalQ0CapacityGate(t *testing.T) {
 	a, b, c, err := perfmeasure.PublicMulRescaleWorkload(effective.InputSlots)
 	if err != nil {
 		t.Fatal(err)
+	}
+	plan, err := assessPublicCapacityForProfile(profile, a, b, c, params.BootstrappingParameters.Q(), params.BootstrappingParameters.N())
+	if err != nil {
+		t.Fatalf("exact LogN16 observed-oracle profile rejected its Q0123-passing bound assessment: %v", err)
+	}
+	if profile.CapacityPolicy != publicCapacityPolicyLogN16Observed || plan.TerminalQ0Status != perfmeasure.PublicCapacityNotProven || plan.TerminalQ0Deficit != "309374390400729" {
+		t.Fatalf("LogN16 does not carry the pinned NOT_PROVEN sufficient-bound evidence: profile=%+v plan=%+v", profile, plan)
+	}
+	if err := validatePublicCapacityForProfile(plan, profile); err != nil {
+		t.Fatalf("versioned LogN16 capacity evidence rejected: %v", err)
+	}
+	if err := validatePublicCapacity(plan); err == nil {
+		t.Fatal("strict default capacity validator accepted the LogN16 NOT_PROVEN terminal condition")
+	}
+	logn13, err := publicProfileFor("logn13")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := assessPublicCapacityForProfile(logn13, a, b, c, params.BootstrappingParameters.Q(), params.BootstrappingParameters.N()); err == nil {
+		t.Fatal("strict LogN13 profile accepted the LogN16 NOT_PROVEN capacity case")
 	}
 	_, err = perfmeasure.BoundPublicMulRescaleWorkload(a, b, c, params.BootstrappingParameters.Q(), params.BootstrappingParameters.N())
 	const wantBlocker = "terminal Level0 q0 capacity failure: B=18169085704944493 q0=36028797019488257 deficit=309374390400729"
@@ -689,6 +764,14 @@ func TestPublicPairRejectsDecodedVectorIntegrityFailures(t *testing.T) {
 			name: "missing vector checkpoint",
 			mutate: func(_ *publicNativeDocument, vectors *publicVectorDocument) {
 				delete(vectors.Checkpoints, "drop_level0")
+			},
+		},
+		{
+			name: "corrupted Level0 output",
+			mutate: func(_ *publicNativeDocument, vectors *publicVectorDocument) {
+				values := vectors.Checkpoints["drop_level0"]
+				values[0].Real += 0.25
+				vectors.Checkpoints["drop_level0"] = values
 			},
 		},
 		{
@@ -769,6 +852,43 @@ func TestPublicPairRejectsForgedStateRowsAndCapacity(t *testing.T) {
 	}
 }
 
+func TestPublicPairRejectsForgedObservedOracleEvidence(t *testing.T) {
+	standard, standardVectors := makePublicPairArtifactFixture(t, "standard")
+	fast, fastVectors := makePublicPairArtifactFixture(t, "fast")
+	tests := []struct {
+		name   string
+		mutate func(*publicNativeDocument, *publicVectorDocument)
+	}{
+		{name: "changed capacity policy", mutate: func(doc *publicNativeDocument, _ *publicVectorDocument) {
+			doc.CapacityPolicy = publicCapacityPolicyLogN16Observed
+		}},
+		{name: "changed observed status", mutate: func(doc *publicNativeDocument, _ *publicVectorDocument) {
+			doc.ObservedNativeOracleStatus = "NOT_RUN"
+		}},
+		{name: "backend vector commit mismatch", mutate: func(_ *publicNativeDocument, vectors *publicVectorDocument) {
+			vectors.BackendCommit = "different-backend-commit"
+		}},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			mutated := clonePublicNativeDocument(fast)
+			vectors := clonePublicVectorDocument(fastVectors)
+			test.mutate(&mutated, &vectors)
+			if err := validatePublicPairArtifacts(standard, mutated, standardVectors, vectors); err == nil {
+				t.Fatal("public comparator accepted forged or mismatched observed-oracle evidence")
+			}
+		})
+	}
+}
+
+func TestLogN16ObservedOracleRejectsForgedLevel0ContinuityMetric(t *testing.T) {
+	doc, vectors := makePublicPairArtifactFixture(t, "fast")
+	doc.Level0Continuity.MaxComplexDifference = publicNumericalGate
+	if err := validatePublicLevel0ContinuityEvidence(publicCapacityPolicyLogN16Observed, doc, vectors); err == nil {
+		t.Fatal("LogN16 observed-oracle validator accepted a forged Level4-to-Level0 continuity metric")
+	}
+}
+
 func makePublicPairArtifactFixture(t *testing.T, backend string) (publicNativeDocument, publicVectorDocument) {
 	t.Helper()
 	commit, tag := publicStandardSHA, "perf_standard"
@@ -782,6 +902,10 @@ func makePublicPairArtifactFixture(t *testing.T, backend string) (publicNativeDo
 	add := publicAdd(a, b)
 	product := publicMul(add, c)
 	rotated := publicRotateLeft(product, 1)
+	continuity, err := comparePublicLevel0Continuity(rotated, rotated)
+	if err != nil {
+		t.Fatal(err)
+	}
 	params, capacity := publicFixtureParameters(t)
 	oracles := map[string][]complex128{
 		"encrypt_a_level5":    a,
@@ -843,9 +967,12 @@ func makePublicPairArtifactFixture(t *testing.T, backend string) (publicNativeDo
 		PrimaryCommit: "primary-sha", PrimaryClean: true, PrimarySourceSHA256: "source-sha", BuildTag: tag,
 		ConfigSHA256: publicConfigSHA, QPSHA256: publicQPSHA, InputSHA256: publicInputSHA, WorkloadSHA256: publicWorkloadSHA,
 		Parameters: params, EphemeralSecretWeight: 32, InputSlots: 1 << 12, NumericalGate: publicNumericalGate, BootstrapBudget: 0, BootstrapCalls: 0,
-		InputC1Nonzero: backend == "standard",
-		Capacity:       capacity,
-		Checkpoints:    checkpoints,
+		CapacityEvidenceVersion: publicCapacityEvidenceVersion, CapacityPolicy: publicCapacityPolicyStrict,
+		ConservativeBoundStatus: capacity.TerminalQ0Status, ObservedNativeOracleStatus: publicStrictOraclePassed,
+		Level0Continuity: continuity,
+		InputC1Nonzero:   backend == "standard",
+		Capacity:         capacity,
+		Checkpoints:      checkpoints,
 	}
 	vectorDoc := publicVectorDocument{
 		SchemaVersion: "fast-standard-public-native-vectors.v1", Mode: "public-native", Backend: backend,

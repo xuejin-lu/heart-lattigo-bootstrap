@@ -334,7 +334,24 @@ Mul/Rescale workload currently fails the existing hard centered-capacity check
 at terminal Level0 q0 (`B=18169085704944493`, `q0=36028797019488257`, deficit
 `309374390400729`). The runner stops before backend construction or any CKKS
 operation; do not change the workload, parameters, or capacity threshold to
-force acceptance. Therefore no LogN16 public-native pair or Bootstrap timing
-is established, and no Bootstrap attempt may proceed from this failed
-preflight. A future task must resolve/authorize the profile-capacity question
-before treating LogN16 as a comparable formal workload.
+force acceptance. Therefore Task 004 established no LogN16 public-native pair
+or Bootstrap timing, and no Bootstrap attempt could proceed from that failed
+preflight. Task 005 below revises the gate's interpretation without changing
+the frozen workload or the historical 004 classification.
+
+Task 005 adds a narrowly versioned interpretation without changing this
+historical 004 result or its artifacts. `AssessPublicMulRescaleWorkload`
+continues to enforce the Q0123 sufficient bound and reports the terminal q0
+condition as `SUFFICIENT` or `NOT_PROVEN`; the existing
+`BoundPublicMulRescaleWorkload` remains strict and still returns the exact 004
+terminal-q0 error. Only the frozen original LogN16/E32 public-native profile
+selects `logn16-original-e32-observed-native-oracle-v1`. That path is not a
+general capacity bypass: it is eligible to continue only for the pinned
+config, Q/P, input and workload hashes, after both genuine Standard and
+current Fast independently pass all eight full-slot plaintext-oracle
+checkpoints at `1e-6`, including native Level0, and each backend's decoded
+Level4-to-Level0 continuity check. The paired gate records the versioned
+conservative-bound status, observed-oracle status and both continuity metrics.
+It does not establish that centered residues prove absence of prior wrap,
+bound ciphertext noise, or prove arbitrary CNN activations safe; a failed or
+missing observed gate still blocks every Bootstrap call.

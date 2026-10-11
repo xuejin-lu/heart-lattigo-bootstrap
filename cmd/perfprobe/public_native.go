@@ -28,19 +28,25 @@ import (
 )
 
 const (
-	publicStandardSHA        = "5dbffbdea05394de2ca3a432ed5318aa832e3f40"
-	publicFastSHA            = "2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac"
-	publicCurrentFastSHA     = "2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f"
-	publicConfigSHA          = "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98"
-	publicInputSHA           = "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285"
-	publicWorkloadSHA        = "00b70a2e77887c7d6a41db1859246f6513f2c984915de648734e5dd8c584cf74"
-	publicQPSHA              = "1f045e603a856968779d62e045a037274bba08cbfce8b1dd3dec2828f1f6a46b"
-	publicLogN16ConfigSHA    = "16e62fdea2dc5ac32240a33cc256cdf60b935aa00b4a16aa004474d2c3033b02"
-	publicLogN16InputSHA     = "659fc59c899341a8253887270f1ae3478528fd864d66aca14bba918550ce8ccf"
-	publicLogN16QPSHA        = "6c82ca724cbfdce2083b2ef2c18d53f81e658a6f28ff283e9a671d276710ec5f"
-	publicNumericalGate      = 1e-6
-	publicTerminalLevel      = 0
-	publicMulRescaleInputLvl = 5
+	publicStandardSHA                  = "5dbffbdea05394de2ca3a432ed5318aa832e3f40"
+	publicFastSHA                      = "2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac"
+	publicCurrentFastSHA               = "2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f"
+	publicConfigSHA                    = "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98"
+	publicInputSHA                     = "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285"
+	publicWorkloadSHA                  = "00b70a2e77887c7d6a41db1859246f6513f2c984915de648734e5dd8c584cf74"
+	publicQPSHA                        = "1f045e603a856968779d62e045a037274bba08cbfce8b1dd3dec2828f1f6a46b"
+	publicLogN16ConfigSHA              = "16e62fdea2dc5ac32240a33cc256cdf60b935aa00b4a16aa004474d2c3033b02"
+	publicLogN16InputSHA               = "659fc59c899341a8253887270f1ae3478528fd864d66aca14bba918550ce8ccf"
+	publicLogN16WorkloadSHA            = "1413c0f0edc3c6b52d7a71e4714efe70280854e1208f87640b741682b65fa2a9"
+	publicLogN16QPSHA                  = "6c82ca724cbfdce2083b2ef2c18d53f81e658a6f28ff283e9a671d276710ec5f"
+	publicNumericalGate                = 1e-6
+	publicTerminalLevel                = 0
+	publicMulRescaleInputLvl           = 5
+	publicCapacityEvidenceVersion      = "public-capacity-evidence.v1"
+	publicCapacityPolicyStrict         = "strict-sufficient-bound-v1"
+	publicCapacityPolicyLogN16Observed = "logn16-original-e32-observed-native-oracle-v1"
+	publicStrictOraclePassed           = "PASS_EIGHT_CHECKPOINT_PLAINTEXT_ORACLES"
+	publicObservedOraclePassed         = "PASS_EIGHT_CHECKPOINTS_AND_LEVEL4_TO_LEVEL0_CONTINUITY"
 )
 
 type publicProfileContract struct {
@@ -52,6 +58,7 @@ type publicProfileContract struct {
 	InputSHA256    string
 	WorkloadSHA256 string
 	QPSHA256       string
+	CapacityPolicy string
 }
 
 func publicProfileFor(name string) (publicProfileContract, error) {
@@ -60,13 +67,13 @@ func publicProfileFor(name string) (publicProfileContract, error) {
 		return publicProfileContract{
 			Name: name, LogN: 13, InputSlots: 1 << 12, RingN: 1 << 13,
 			ConfigSHA256: publicConfigSHA, InputSHA256: publicInputSHA,
-			WorkloadSHA256: publicWorkloadSHA, QPSHA256: publicQPSHA,
+			WorkloadSHA256: publicWorkloadSHA, QPSHA256: publicQPSHA, CapacityPolicy: publicCapacityPolicyStrict,
 		}, nil
 	case "logn16":
 		return publicProfileContract{
 			Name: name, LogN: 16, InputSlots: 1 << 15, RingN: 1 << 16,
 			ConfigSHA256: publicLogN16ConfigSHA, InputSHA256: publicLogN16InputSHA,
-			QPSHA256: publicLogN16QPSHA,
+			WorkloadSHA256: publicLogN16WorkloadSHA, QPSHA256: publicLogN16QPSHA, CapacityPolicy: publicCapacityPolicyLogN16Observed,
 		}, nil
 	default:
 		return publicProfileContract{}, fmt.Errorf("unsupported public-native profile %q", name)
@@ -102,52 +109,57 @@ type publicCheckpoint struct {
 }
 
 type publicNativeDocument struct {
-	SchemaVersion           string                          `json:"schema_version"`
-	Mode                    string                          `json:"mode"`
-	Status                  string                          `json:"status"`
-	Timestamp               time.Time                       `json:"timestamp"`
-	Profile                 string                          `json:"profile"`
-	Backend                 string                          `json:"backend"`
-	BackendCommit           string                          `json:"backend_commit"`
-	BackendRef              string                          `json:"backend_ref"`
-	BackendCheckoutRef      string                          `json:"backend_checkout_ref"`
-	BackendPath             string                          `json:"backend_path"`
-	BackendClean            bool                            `json:"backend_clean"`
-	PrimaryPath             string                          `json:"primary_path"`
-	PrimaryCommit           string                          `json:"primary_commit"`
-	PrimaryClean            bool                            `json:"primary_clean"`
-	PrimarySourceSHA256     string                          `json:"primary_measurement_source_sha256"`
-	BuildTag                string                          `json:"build_tag"`
-	GoVersion               string                          `json:"go_version"`
-	OS                      string                          `json:"os"`
-	Arch                    string                          `json:"arch"`
-	CPU                     string                          `json:"cpu"`
-	NumCPU                  int                             `json:"num_cpu"`
-	GOMAXPROCS              int                             `json:"gomaxprocs"`
-	GOGC                    string                          `json:"gogc"`
-	GOMEMLIMIT              string                          `json:"gomemlimit"`
-	GODEBUG                 string                          `json:"godebug"`
-	ConfigPath              string                          `json:"config_path"`
-	ConfigSHA256            string                          `json:"config_sha256"`
-	QPSHA256                string                          `json:"qp_sha256"`
-	InputSHA256             string                          `json:"canonical_input_sha256"`
-	WorkloadSHA256          string                          `json:"workload_sha256"`
-	Parameters              perfmeasure.EffectiveParameters `json:"effective_parameters"`
-	EphemeralSecretWeight   int                             `json:"ephemeral_secret_weight"`
-	InputSlots              int                             `json:"input_slots"`
-	InputKind               string                          `json:"input_kind"`
-	InputConstructor        string                          `json:"input_constructor"`
-	InputC1Nonzero          bool                            `json:"input_c1_nonzero"`
-	PublicEvaluatorDispatch string                          `json:"public_evaluator_dispatch"`
-	PreflightPairSHA256     string                          `json:"preflight_pair_sha256,omitempty"`
-	Capacity                perfmeasure.PublicCapacityPlan  `json:"capacity_plan"`
-	NumericalGate           float64                         `json:"max_complex_numerical_gate"`
-	BootstrapBudget         int                             `json:"bootstrap_budget"`
-	BootstrapCalls          int                             `json:"actual_bootstrap_calls"`
-	ExecutionPhases         []phaseTiming                   `json:"execution_phases"`
-	Checkpoints             []publicCheckpoint              `json:"checkpoints"`
-	BootstrapResults        []publicBootstrapResult         `json:"bootstrap_results,omitempty"`
-	Limitations             []string                        `json:"limitations"`
+	SchemaVersion              string                          `json:"schema_version"`
+	Mode                       string                          `json:"mode"`
+	Status                     string                          `json:"status"`
+	Timestamp                  time.Time                       `json:"timestamp"`
+	Profile                    string                          `json:"profile"`
+	Backend                    string                          `json:"backend"`
+	BackendCommit              string                          `json:"backend_commit"`
+	BackendRef                 string                          `json:"backend_ref"`
+	BackendCheckoutRef         string                          `json:"backend_checkout_ref"`
+	BackendPath                string                          `json:"backend_path"`
+	BackendClean               bool                            `json:"backend_clean"`
+	PrimaryPath                string                          `json:"primary_path"`
+	PrimaryCommit              string                          `json:"primary_commit"`
+	PrimaryClean               bool                            `json:"primary_clean"`
+	PrimarySourceSHA256        string                          `json:"primary_measurement_source_sha256"`
+	BuildTag                   string                          `json:"build_tag"`
+	GoVersion                  string                          `json:"go_version"`
+	OS                         string                          `json:"os"`
+	Arch                       string                          `json:"arch"`
+	CPU                        string                          `json:"cpu"`
+	NumCPU                     int                             `json:"num_cpu"`
+	GOMAXPROCS                 int                             `json:"gomaxprocs"`
+	GOGC                       string                          `json:"gogc"`
+	GOMEMLIMIT                 string                          `json:"gomemlimit"`
+	GODEBUG                    string                          `json:"godebug"`
+	ConfigPath                 string                          `json:"config_path"`
+	ConfigSHA256               string                          `json:"config_sha256"`
+	QPSHA256                   string                          `json:"qp_sha256"`
+	InputSHA256                string                          `json:"canonical_input_sha256"`
+	WorkloadSHA256             string                          `json:"workload_sha256"`
+	Parameters                 perfmeasure.EffectiveParameters `json:"effective_parameters"`
+	EphemeralSecretWeight      int                             `json:"ephemeral_secret_weight"`
+	InputSlots                 int                             `json:"input_slots"`
+	InputKind                  string                          `json:"input_kind"`
+	InputConstructor           string                          `json:"input_constructor"`
+	InputC1Nonzero             bool                            `json:"input_c1_nonzero"`
+	PublicEvaluatorDispatch    string                          `json:"public_evaluator_dispatch"`
+	PreflightPairSHA256        string                          `json:"preflight_pair_sha256,omitempty"`
+	CapacityEvidenceVersion    string                          `json:"capacity_evidence_version"`
+	CapacityPolicy             string                          `json:"capacity_policy"`
+	ConservativeBoundStatus    string                          `json:"conservative_bound_status"`
+	ObservedNativeOracleStatus string                          `json:"observed_native_oracle_status"`
+	Level0Continuity           vectorMetrics                   `json:"level4_to_level0_continuity"`
+	Capacity                   perfmeasure.PublicCapacityPlan  `json:"capacity_plan"`
+	NumericalGate              float64                         `json:"max_complex_numerical_gate"`
+	BootstrapBudget            int                             `json:"bootstrap_budget"`
+	BootstrapCalls             int                             `json:"actual_bootstrap_calls"`
+	ExecutionPhases            []phaseTiming                   `json:"execution_phases"`
+	Checkpoints                []publicCheckpoint              `json:"checkpoints"`
+	BootstrapResults           []publicBootstrapResult         `json:"bootstrap_results,omitempty"`
+	Limitations                []string                        `json:"limitations"`
 }
 
 type publicVectorDocument struct {
@@ -240,24 +252,30 @@ type publicPairBootstrapComparison struct {
 }
 
 type publicPairDocument struct {
-	SchemaVersion      string                          `json:"schema_version"`
-	GeneratedAt        time.Time                       `json:"generated_at"`
-	Status             string                          `json:"status"`
-	NumericalGate      float64                         `json:"max_complex_gate"`
-	FastCommit         string                          `json:"fast_backend_commit"`
-	StandardCommit     string                          `json:"standard_backend_commit"`
-	PrimaryCommit      string                          `json:"primary_commit"`
-	SourceSHA256       string                          `json:"primary_measurement_source_sha256"`
-	InputSHA256        string                          `json:"input_sha256"`
-	WorkloadSHA256     string                          `json:"workload_sha256"`
-	ConfigSHA256       string                          `json:"config_sha256"`
-	QPSHA256           string                          `json:"qp_sha256"`
-	E                  int                             `json:"ephemeral_secret_weight"`
-	BootstrapCalls     int                             `json:"actual_bootstrap_calls"`
-	MatchedEnvironment bool                            `json:"matched_environment"`
-	Checkpoints        []publicPairCheckpoint          `json:"checkpoints"`
-	Bootstrap          []publicPairBootstrapComparison `json:"bootstrap_comparisons,omitempty"`
-	Limitations        []string                        `json:"limitations"`
+	SchemaVersion              string                          `json:"schema_version"`
+	GeneratedAt                time.Time                       `json:"generated_at"`
+	Status                     string                          `json:"status"`
+	NumericalGate              float64                         `json:"max_complex_gate"`
+	FastCommit                 string                          `json:"fast_backend_commit"`
+	StandardCommit             string                          `json:"standard_backend_commit"`
+	PrimaryCommit              string                          `json:"primary_commit"`
+	SourceSHA256               string                          `json:"primary_measurement_source_sha256"`
+	InputSHA256                string                          `json:"input_sha256"`
+	WorkloadSHA256             string                          `json:"workload_sha256"`
+	ConfigSHA256               string                          `json:"config_sha256"`
+	QPSHA256                   string                          `json:"qp_sha256"`
+	CapacityEvidenceVersion    string                          `json:"capacity_evidence_version"`
+	CapacityPolicy             string                          `json:"capacity_policy"`
+	ConservativeBoundStatus    string                          `json:"conservative_bound_status"`
+	ObservedNativeOracleStatus string                          `json:"observed_native_oracle_status"`
+	StandardLevel0Continuity   vectorMetrics                   `json:"standard_level4_to_level0_continuity"`
+	FastLevel0Continuity       vectorMetrics                   `json:"fast_level4_to_level0_continuity"`
+	E                          int                             `json:"ephemeral_secret_weight"`
+	BootstrapCalls             int                             `json:"actual_bootstrap_calls"`
+	MatchedEnvironment         bool                            `json:"matched_environment"`
+	Checkpoints                []publicPairCheckpoint          `json:"checkpoints"`
+	Bootstrap                  []publicPairBootstrapComparison `json:"bootstrap_comparisons,omitempty"`
+	Limitations                []string                        `json:"limitations"`
 }
 
 func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameters, params bootstrapping.Parameters, effective perfmeasure.EffectiveParameters) error {
@@ -322,7 +340,7 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 	if profile.WorkloadSHA256 != "" && workloadHash != profile.WorkloadSHA256 {
 		return fmt.Errorf("canonical public-native %s workload fingerprint mismatch: %s", profile.Name, workloadHash)
 	}
-	capacity, err := perfmeasure.BoundPublicMulRescaleWorkload(valuesA, valuesB, valuesC, q, full.N())
+	capacity, err := assessPublicCapacityForProfile(profile, valuesA, valuesB, valuesC, q, full.N())
 	if err != nil {
 		return err
 	}
@@ -501,6 +519,13 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 	if err := addCheckpoint("drop_level0", dropped, expectedRotated, true); err != nil {
 		return err
 	}
+	level0Continuity, err := comparePublicLevel0Continuity(decodedByCheckpoint["rotate_level4"], decodedByCheckpoint["drop_level0"])
+	if err != nil {
+		return err
+	}
+	if profile.CapacityPolicy == publicCapacityPolicyLogN16Observed && level0Continuity.MaxComplexDifference > publicNumericalGate {
+		return fmt.Errorf("Level4-to-Level0 decoded continuity max %.12g exceeds %.12g", level0Continuity.MaxComplexDifference, publicNumericalGate)
+	}
 	if opts.traceFixtureOut != "" {
 		if backend.name != "fast" {
 			return errors.New("E32 diagnostic trace fixture export is Fast-only")
@@ -596,6 +621,10 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 		)
 	}
 	inputKind, constructor := publicInputContract(backend.name)
+	observedOracleStatus := publicStrictOraclePassed
+	if profile.CapacityPolicy == publicCapacityPolicyLogN16Observed {
+		observedOracleStatus = publicObservedOraclePassed
+	}
 	doc := publicNativeDocument{
 		SchemaVersion: schemaVersion, Mode: mode, Status: status,
 		Timestamp: time.Now().UTC(), Profile: opts.profile, Backend: backend.name, BackendCommit: secondaryCommit,
@@ -607,7 +636,10 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 		ConfigPath: opts.config, ConfigSHA256: configHash, QPSHA256: qpHash, InputSHA256: inputHash, WorkloadSHA256: workloadHash,
 		Parameters: effective, EphemeralSecretWeight: params.EphemeralSecretWeight, InputSlots: effective.InputSlots,
 		InputKind: inputKind, InputConstructor: constructor, InputC1Nonzero: c1Nonzero, PublicEvaluatorDispatch: backend.dispatch,
-		PreflightPairSHA256: preflightPairSHA, Capacity: capacity, NumericalGate: publicNumericalGate,
+		PreflightPairSHA256: preflightPairSHA, CapacityEvidenceVersion: publicCapacityEvidenceVersion,
+		CapacityPolicy: profile.CapacityPolicy, ConservativeBoundStatus: capacity.TerminalQ0Status,
+		ObservedNativeOracleStatus: observedOracleStatus, Level0Continuity: level0Continuity,
+		Capacity: capacity, NumericalGate: publicNumericalGate,
 		BootstrapBudget: opts.bootstrapBudget, BootstrapCalls: bootstrapCalls,
 		ExecutionPhases: phaseTimings, Checkpoints: checkpoints, BootstrapResults: bootstrapResults,
 		Limitations: limitations,
@@ -914,6 +946,12 @@ func validatePublicPreflightGateForProfile(path, primaryCommit, sourceSHA256, pr
 	}
 	if pair.SchemaVersion != "fast-standard-public-native-pair.v1" || pair.Status != "PASS" || !pair.MatchedEnvironment || pair.BootstrapCalls != 0 || len(pair.Bootstrap) != 0 || pair.E != 32 || pair.NumericalGate != publicNumericalGate {
 		return "", fmt.Errorf("preflight pair is not a passing zero-Bootstrap %s/E32 pair", profileName)
+	}
+	if profile.CapacityPolicy == publicCapacityPolicyLogN16Observed &&
+		(pair.CapacityEvidenceVersion != publicCapacityEvidenceVersion || pair.CapacityPolicy != profile.CapacityPolicy ||
+			pair.ConservativeBoundStatus != perfmeasure.PublicCapacityNotProven || pair.ObservedNativeOracleStatus != publicObservedOraclePassed ||
+			!validPassingLevel0Continuity(pair.StandardLevel0Continuity) || !validPassingLevel0Continuity(pair.FastLevel0Continuity)) {
+		return "", errors.New("LogN16 preflight pair lacks its complete versioned observed-oracle evidence")
 	}
 	if pair.PrimaryCommit != primaryCommit || pair.SourceSHA256 != sourceSHA256 || pair.StandardCommit != publicStandardSHA || pair.FastCommit != fastCommit ||
 		pair.ConfigSHA256 != configSHA256 || pair.ConfigSHA256 != profile.ConfigSHA256 || pair.QPSHA256 != qpSHA256 || pair.QPSHA256 != profile.QPSHA256 ||
@@ -1244,6 +1282,9 @@ func runPublicCompare(args []string) error {
 		NumericalGate: publicNumericalGate, FastCommit: fast.BackendCommit, StandardCommit: standard.BackendCommit,
 		PrimaryCommit: standard.PrimaryCommit, SourceSHA256: standard.PrimarySourceSHA256, InputSHA256: standard.InputSHA256,
 		WorkloadSHA256: standard.WorkloadSHA256, ConfigSHA256: standard.ConfigSHA256, QPSHA256: standard.QPSHA256, E: 32,
+		CapacityEvidenceVersion: standard.CapacityEvidenceVersion, CapacityPolicy: standard.CapacityPolicy,
+		ConservativeBoundStatus: standard.ConservativeBoundStatus, ObservedNativeOracleStatus: standard.ObservedNativeOracleStatus,
+		StandardLevel0Continuity: standard.Level0Continuity, FastLevel0Continuity: fast.Level0Continuity,
 		BootstrapCalls: 0, MatchedEnvironment: publicEnvironmentsMatch(standard, fast),
 	}
 	if bootstrapMode {
@@ -1367,10 +1408,10 @@ func validatePublicPairArtifacts(standard, fast publicNativeDocument, standardVe
 	if !reflect.DeepEqual(standard.Capacity, fast.Capacity) {
 		return errors.New("paired artifacts have mismatched Q0123/q0 capacity evidence")
 	}
-	if err := validatePublicCapacity(standard.Capacity); err != nil {
+	if err := validatePublicCapacityForProfile(standard.Capacity, profile); err != nil {
 		return fmt.Errorf("Standard capacity evidence: %w", err)
 	}
-	if err := validatePublicCapacity(fast.Capacity); err != nil {
+	if err := validatePublicCapacityForProfile(fast.Capacity, profile); err != nil {
 		return fmt.Errorf("Fast capacity evidence: %w", err)
 	}
 	oracles, err := publicOracleCheckpoints(profile.InputSlots)
@@ -1559,8 +1600,12 @@ func validatePublicBackendEvidence(doc publicNativeDocument, vectors publicVecto
 	if err := validatePublicProfileEvidence(doc); err != nil {
 		return err
 	}
-	if err := validatePublicCapacity(doc.Capacity); err != nil {
-		return err
+	wantOracleStatus := publicStrictOraclePassed
+	if profile.CapacityPolicy == publicCapacityPolicyLogN16Observed {
+		wantOracleStatus = publicObservedOraclePassed
+	}
+	if doc.ObservedNativeOracleStatus != wantOracleStatus {
+		return errors.New("public evidence does not declare the required native plaintext-oracle gate as passed")
 	}
 	if doc.Backend == "fast" && doc.InputC1Nonzero {
 		return errors.New("Fast input reports nonzero c1 for the approved zero-secret mode")
@@ -1591,6 +1636,9 @@ func validatePublicBackendEvidence(doc publicNativeDocument, vectors publicVecto
 			return err
 		}
 	}
+	if err := validatePublicLevel0ContinuityEvidence(profile.CapacityPolicy, doc, vectors); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -1602,6 +1650,9 @@ func validatePublicProfileEvidence(doc publicNativeDocument) error {
 	if doc.ConfigSHA256 != profile.ConfigSHA256 || doc.InputSlots != profile.InputSlots ||
 		doc.Parameters.LogN != profile.LogN || doc.Parameters.RingN != profile.RingN {
 		return fmt.Errorf("recorded dimensions/config do not match the frozen %s public-native profile", profile.Name)
+	}
+	if doc.CapacityEvidenceVersion != publicCapacityEvidenceVersion || doc.CapacityPolicy != profile.CapacityPolicy {
+		return errors.New("recorded public capacity evidence version/policy does not match the frozen profile")
 	}
 	parsePrimes := func(label string, values []string) ([]uint64, error) {
 		primes := make([]uint64, len(values))
@@ -1647,12 +1698,15 @@ func validatePublicProfileEvidence(doc publicNativeDocument) error {
 	if workloadHash != doc.WorkloadSHA256 || (profile.WorkloadSHA256 != "" && doc.WorkloadSHA256 != profile.WorkloadSHA256) {
 		return errors.New("recorded public workload does not match the canonical workload fingerprint")
 	}
-	capacity, err := perfmeasure.BoundPublicMulRescaleWorkload(a, b, c, q, doc.Parameters.RingN)
+	capacity, err := assessPublicCapacityForProfile(profile, a, b, c, q, doc.Parameters.RingN)
 	if err != nil {
 		return fmt.Errorf("recompute canonical Q0123/q0 capacity: %w", err)
 	}
-	if !reflect.DeepEqual(capacity, doc.Capacity) {
+	if capacity.TerminalQ0Status != doc.ConservativeBoundStatus || !reflect.DeepEqual(capacity, doc.Capacity) {
 		return errors.New("recorded Q0123/q0 capacity plan does not match recomputed canonical bounds")
+	}
+	if err := validatePublicCapacityForProfile(doc.Capacity, profile); err != nil {
+		return err
 	}
 	return nil
 }
@@ -1762,7 +1816,30 @@ func isPublicBootstrapCheckpoint(name string, budget int) bool {
 	return err == nil && index >= 1 && index <= 5 && name == fmt.Sprintf("bootstrap_warm_%02d", index)
 }
 
+func assessPublicCapacityForProfile(profile publicProfileContract, a, b, c []complex128, q []uint64, ringN int) (perfmeasure.PublicCapacityPlan, error) {
+	switch profile.CapacityPolicy {
+	case publicCapacityPolicyStrict:
+		return perfmeasure.BoundPublicMulRescaleWorkload(a, b, c, q, ringN)
+	case publicCapacityPolicyLogN16Observed:
+		if profile.Name != "logn16" || profile.LogN != 16 || profile.InputSlots != 1<<15 || profile.RingN != 1<<16 ||
+			ringN != profile.RingN || len(a) != profile.InputSlots || len(b) != profile.InputSlots || len(c) != profile.InputSlots {
+			return perfmeasure.PublicCapacityPlan{}, errors.New("observed-native-oracle capacity policy is restricted to the exact original LogN16/E32 profile")
+		}
+		return perfmeasure.AssessPublicMulRescaleWorkload(a, b, c, q, ringN)
+	default:
+		return perfmeasure.PublicCapacityPlan{}, fmt.Errorf("unsupported public capacity policy %q", profile.CapacityPolicy)
+	}
+}
+
 func validatePublicCapacity(capacity perfmeasure.PublicCapacityPlan) error {
+	return validatePublicCapacityWithPolicy(capacity, publicCapacityPolicyStrict)
+}
+
+func validatePublicCapacityForProfile(capacity perfmeasure.PublicCapacityPlan, profile publicProfileContract) error {
+	return validatePublicCapacityWithPolicy(capacity, profile.CapacityPolicy)
+}
+
+func validatePublicCapacityWithPolicy(capacity perfmeasure.PublicCapacityPlan, policy string) error {
 	parsePositive := func(name, value string) (*big.Int, error) {
 		bound, ok := new(big.Int).SetString(value, 10)
 		if !ok || bound.Sign() <= 0 {
@@ -1791,13 +1868,62 @@ func validatePublicCapacity(capacity perfmeasure.PublicCapacityPlan) error {
 		}
 	}
 	rescale, _ := new(big.Int).SetString(capacity.Rescale, 10)
-	if new(big.Int).Lsh(rescale, 1).Cmp(q0) >= 0 {
+	twiceRescale := new(big.Int).Lsh(new(big.Int).Set(rescale), 1)
+	terminalPasses := twiceRescale.Cmp(q0) < 0
+	switch capacity.TerminalQ0Status {
+	case perfmeasure.PublicCapacitySufficient:
+		if !terminalPasses || capacity.TerminalQ0Deficit != "" {
+			return errors.New("terminal q0 status conflicts with the recorded rescale bound")
+		}
+	case perfmeasure.PublicCapacityNotProven:
+		if policy != publicCapacityPolicyLogN16Observed || terminalPasses {
+			return errors.New("terminal q0 sufficient condition is unproven outside the fixed LogN16 observed-oracle policy")
+		}
+		deficit, ok := new(big.Int).SetString(capacity.TerminalQ0Deficit, 10)
+		if !ok || deficit.Cmp(new(big.Int).Sub(twiceRescale, q0)) != 0 || deficit.Sign() <= 0 {
+			return errors.New("terminal q0 NOT_PROVEN deficit does not match the exact conservative bound")
+		}
+	default:
+		return fmt.Errorf("unknown terminal q0 sufficient-condition status %q", capacity.TerminalQ0Status)
+	}
+	if policy == publicCapacityPolicyStrict && !terminalPasses {
 		return errors.New("Rescale(q5) bound does not fit strict terminal q0 capacity")
+	}
+	if policy != publicCapacityPolicyStrict && policy != publicCapacityPolicyLogN16Observed {
+		return fmt.Errorf("unsupported public capacity policy %q", policy)
 	}
 	if _, err := parsePositive("MulRelin divisor", capacity.MulDivisor); err != nil {
 		return err
 	}
 	return nil
+}
+
+func comparePublicLevel0Continuity(level4, level0 []complex128) (vectorMetrics, error) {
+	if len(level4) == 0 || len(level4) != len(level0) || !allFinite(level4) || !allFinite(level0) {
+		return vectorMetrics{}, errors.New("Level4-to-Level0 continuity requires matching non-empty finite decoded vectors")
+	}
+	return compareVectors(level4, level0, publicNumericalGate), nil
+}
+
+func validatePublicLevel0ContinuityEvidence(policy string, doc publicNativeDocument, vectors publicVectorDocument) error {
+	if policy != publicCapacityPolicyLogN16Observed {
+		return nil
+	}
+	continuity, err := comparePublicLevel0Continuity(
+		decodeComplexValues(vectors.Checkpoints["rotate_level4"]),
+		decodeComplexValues(vectors.Checkpoints["drop_level0"]),
+	)
+	if err != nil {
+		return err
+	}
+	if !validPassingLevel0Continuity(continuity) || !reflect.DeepEqual(doc.Level0Continuity, continuity) {
+		return errors.New("recorded Level4-to-Level0 decoded continuity does not match the complete finite vectors")
+	}
+	return nil
+}
+
+func validPassingLevel0Continuity(metrics vectorMetrics) bool {
+	return finitePublicPairMetrics(metrics) && metrics.MaxComplexDifference <= publicNumericalGate
 }
 
 func publicOracleCheckpoints(slots int) (map[string][]complex128, error) {

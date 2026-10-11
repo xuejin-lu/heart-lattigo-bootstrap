@@ -101,10 +101,45 @@ func TestBatch019PublicWorkloadUsesCanonicalInputAndCapacityGates(t *testing.T) 
 	if err != nil {
 		t.Fatal(err)
 	}
-	if plan.Q0 == "" || plan.Q0123 == "" || plan.MulDivisor != new(big.Int).SetUint64(params.BootstrappingParameters.Q()[5]).String() {
+	if plan.Q0 == "" || plan.Q0123 == "" || plan.TerminalQ0Status != PublicCapacitySufficient || plan.TerminalQ0Deficit != "" || plan.MulDivisor != new(big.Int).SetUint64(params.BootstrappingParameters.Q()[5]).String() {
 		t.Fatalf("incomplete Batch019 capacity plan: %+v", plan)
 	}
 	if _, err := BoundPublicMulRescaleWorkload(a[:1], b, c, params.BootstrappingParameters.Q(), params.BootstrappingParameters.N()); err == nil {
 		t.Fatal("mismatched workload vectors were accepted")
+	}
+}
+
+func TestLogN16PublicCapacityAssessmentRetainsStrictBoundWarning(t *testing.T) {
+	config, _, err := LoadConfig(filepath.Join("..", "..", "configs", "bootstrap_config.logN16.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, params, effective, err := ParametersFromConfigWithE(config, 32)
+	if err != nil {
+		t.Fatal(err)
+	}
+	a, b, c, err := PublicMulRescaleWorkload(effective.InputSlots)
+	if err != nil {
+		t.Fatal(err)
+	}
+	q := params.BootstrappingParameters.Q()
+	plan, err := AssessPublicMulRescaleWorkload(a, b, c, q, params.BootstrappingParameters.N())
+	if err != nil {
+		t.Fatalf("Q0123 sufficient-condition assessment rejected the canonical LogN16 workload: %v", err)
+	}
+	if plan.Rescale != "18169085704944493" || plan.Q0 != "36028797019488257" ||
+		plan.TerminalQ0Status != PublicCapacityNotProven || plan.TerminalQ0Deficit != "309374390400729" {
+		t.Fatalf("LogN16 sufficient-condition warning changed: %+v", plan)
+	}
+	if _, err := BoundPublicMulRescaleWorkload(a, b, c, q, params.BootstrappingParameters.N()); err == nil ||
+		err.Error() != "terminal Level0 q0 capacity failure: B=18169085704944493 q0=36028797019488257 deficit=309374390400729" {
+		t.Fatalf("historical strict API no longer fails with the exact terminal warning: %v", err)
+	}
+	workloadHash, err := PublicMulRescaleWorkloadFingerprint(a, b, c, new(big.Int).SetUint64(q[5]).String())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if want := "1413c0f0edc3c6b52d7a71e4714efe70280854e1208f87640b741682b65fa2a9"; workloadHash != want {
+		t.Fatalf("canonical LogN16 workload SHA-256=%s, want %s", workloadHash, want)
 	}
 }

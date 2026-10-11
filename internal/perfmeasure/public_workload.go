@@ -58,21 +58,39 @@ func PublicMulRescaleWorkloadFingerprint(a, b, c []complex128, cScale string) (s
 }
 
 type PublicCapacityPlan struct {
-	InputA     string `json:"input_a_bound"`
-	InputB     string `json:"input_b_bound"`
-	InputC     string `json:"input_c_bound"`
-	Add        string `json:"add_bound"`
-	MulRelin   string `json:"mulrelin_bound"`
-	Rescale    string `json:"rescale_bound"`
-	Q0123      string `json:"q0123_product"`
-	Q0         string `json:"q0"`
-	MulDivisor string `json:"mul_divisor_q5"`
+	InputA            string `json:"input_a_bound"`
+	InputB            string `json:"input_b_bound"`
+	InputC            string `json:"input_c_bound"`
+	Add               string `json:"add_bound"`
+	MulRelin          string `json:"mulrelin_bound"`
+	Rescale           string `json:"rescale_bound"`
+	Q0123             string `json:"q0123_product"`
+	Q0                string `json:"q0"`
+	MulDivisor        string `json:"mul_divisor_q5"`
+	TerminalQ0Status  string `json:"terminal_q0_sufficient_condition"`
+	TerminalQ0Deficit string `json:"terminal_q0_deficit,omitempty"`
 }
 
-// BoundPublicMulRescaleWorkload derives the exact independent coefficient
-// bounds used by the Batch019 fixture and enforces both Q0123 and terminal q0
-// centered-capacity gates before the public chain is executed.
-func BoundPublicMulRescaleWorkload(a, b, c []complex128, q []uint64, ringN int) (PublicCapacityPlan, error) {
+const (
+	PublicCapacitySufficient = "SUFFICIENT"
+	PublicCapacityNotProven  = "NOT_PROVEN"
+)
+
+// AssessPublicMulRescaleWorkload derives conservative independent coefficient
+// bounds for the public Mul/Rescale fixture. Q0123 remains a hard gate. The
+// terminal q0 result is returned as sufficient-condition evidence: NOT_PROVEN
+// means this worst-case bound cannot establish centered uniqueness, not that
+// an observed ciphertext or decoded value overflowed.
+//
+// The encoded coefficient bound is ceil(2*Delta*max|slot|)+1. The inverse
+// canonical embedding is a normalized sum of unit-magnitude terms, so this is
+// a conservative coefficient bound; the extra 1 covers coordinate rounding.
+// Add bounds sum componentwise. A negacyclic ring product has at most N terms
+// per coefficient, giving N*B_add*B_C. Rescale's nearest-integer division by
+// odd q5 is bounded by floor((B_mul+floor((q5-1)/2))/q5). These are bounds on
+// the ideal encoded plaintext polynomial, not ciphertext residue magnitudes,
+// encryption/key-switch noise, or arbitrary application activations.
+func AssessPublicMulRescaleWorkload(a, b, c []complex128, q []uint64, ringN int) (PublicCapacityPlan, error) {
 	if len(a) == 0 || len(a) != len(b) || len(a) != len(c) || len(q) <= 5 || ringN <= 0 {
 		return PublicCapacityPlan{}, errors.New("public capacity plan requires q5 and a positive ring degree")
 	}
@@ -103,13 +121,29 @@ func BoundPublicMulRescaleWorkload(a, b, c []complex128, q []uint64, ringN int) 
 		}
 	}
 	q0 := new(big.Int).SetUint64(q[0])
-	if !strictCapacity(br, q0) {
-		return PublicCapacityPlan{}, fmt.Errorf("terminal Level0 q0 capacity failure: B=%s q0=%s deficit=%s", br, q0, new(big.Int).Sub(new(big.Int).Lsh(new(big.Int).Set(br), 1), q0))
-	}
-	return PublicCapacityPlan{
+	plan := PublicCapacityPlan{
 		InputA: ba.String(), InputB: bb.String(), InputC: bc.String(), Add: badd.String(),
 		MulRelin: bmul.String(), Rescale: br.String(), Q0123: prefix.String(), Q0: q0.String(), MulDivisor: q5.String(),
-	}, nil
+		TerminalQ0Status: PublicCapacitySufficient,
+	}
+	if !strictCapacity(br, q0) {
+		plan.TerminalQ0Status = PublicCapacityNotProven
+		plan.TerminalQ0Deficit = new(big.Int).Sub(new(big.Int).Lsh(new(big.Int).Set(br), 1), q0).String()
+	}
+	return plan, nil
+}
+
+// BoundPublicMulRescaleWorkload preserves the historical strict policy: both
+// the Q0123 and terminal q0 sufficient conditions must pass.
+func BoundPublicMulRescaleWorkload(a, b, c []complex128, q []uint64, ringN int) (PublicCapacityPlan, error) {
+	plan, err := AssessPublicMulRescaleWorkload(a, b, c, q, ringN)
+	if err != nil {
+		return PublicCapacityPlan{}, err
+	}
+	if plan.TerminalQ0Status != PublicCapacitySufficient {
+		return PublicCapacityPlan{}, fmt.Errorf("terminal Level0 q0 capacity failure: B=%s q0=%s deficit=%s", plan.Rescale, plan.Q0, plan.TerminalQ0Deficit)
+	}
+	return plan, nil
 }
 
 func encodedInputBoundExact(values []complex128, scale *big.Int) (*big.Int, error) {
