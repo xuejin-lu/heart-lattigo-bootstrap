@@ -70,8 +70,11 @@ This is one approved autonomous integration task. Complete sequentially without 
 Write compact Primary results:
 
 - `results/CKKS-MEASUREMENT-PLATFORM-GENERALIZATION-001-summary.md`
-- `results/CKKS-MEASUREMENT-PLATFORM-GENERALIZATION-001-evidence.json` (compact projection of the existing offline analyzer output)
+- `results/CKKS-MEASUREMENT-PLATFORM-GENERALIZATION-001-summary.json`
 - `results/CKKS-MEASUREMENT-PLATFORM-GENERALIZATION-001-journal.md`
+- `results/CKKS-MEASUREMENT-PLATFORM-GENERALIZATION-001-task006-offline-summary.md`
+- `results/CKKS-MEASUREMENT-PLATFORM-GENERALIZATION-001-task006-offline-journal.md`
+- `results/CKKS-MEASUREMENT-PLATFORM-GENERALIZATION-001-task006-offline-evidence.json` (compact projection of the existing offline analyzer output)
 
 Record effective-profile support by LogN, Task006 raw/sidecar provenance and offline classification, exact retired source paths and migrated regression tests, commands/results, and Bootstrap counts. Do not include raw event arrays. Preserve the Task006 and Task005 files unchanged.
 
