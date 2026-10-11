@@ -1,0 +1,567 @@
+{
+  "schema_version": "fastdiag.public-e32.task006-offline.v1",
+  "generated_at": "2026-10-11T17:36:29.996978Z",
+  "task": "FAST-LOGN16-INTEGRATED-PERFPROBE-FASTDIAG-006",
+  "classification": "OFFLINE_RECURSIVE_TRACE_REVALIDATED",
+  "original_classification": "TRACE_COLLECTED_UNVERIFIED",
+  "original_trace_status": "TRACE_UNVERIFIED",
+  "original_raw_relabelled": false,
+  "new_bootstrap_calls": 0,
+  "primary_analyzer_repository": {
+    "path": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap",
+    "commit": "89aed11dac03cd4d41cbccd55a3201384ebe7a3b",
+    "ref": "main",
+    "dirty": false
+  },
+  "secondary_production_repository": {
+    "path": "/Users/xuejinlu/Developer/xuejin-lu/lattigo",
+    "commit": "2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f",
+    "ref": "fast-qprefix",
+    "dirty": false
+  },
+  "raw_path": "/var/folders/dn/6p3z5ctd50v_2dzzh2y4nvyc0000gn/T/fastdiag-public-e32-2617861684/raw-trace-unverified.json",
+  "raw_sha256": "9bd5ba81abce75b8fd7c06ac544410246fb385bafb1585a646d7d71e2f8e872d",
+  "raw_bytes": 178754,
+  "failure_sidecar_path": "/var/folders/dn/6p3z5ctd50v_2dzzh2y4nvyc0000gn/T/fastdiag-public-e32-2617861684/trace-failure.json",
+  "failure_sidecar_sha256": "f598b481b776448dcc78ff80083610e9376cee12451716ddb88fd414abfc756b",
+  "task006_summary_path": "results/FAST-LOGN16-INTEGRATED-PERFPROBE-FASTDIAG-006.json",
+  "task006_summary_sha256": "b0223a4334f0d4275de4e6dc2e424e864be8bf5f83773a3ff63a8e8a309b2a08",
+  "attempt_ledger_path": "results/FAST-LOGN16-INTEGRATED-PERFPROBE-FASTDIAG-006-attempt-ledger.json",
+  "attempt_ledger_sha256": "e752dbaf4aee28229e14cbcbc85c6c8c9f4b4467c0da3b5dbf29577b4e28672d",
+  "attempt_journals": [
+    {
+      "path": "results/FAST-LOGN16-INTEGRATED-PERFPROBE-FASTDIAG-006.json.diagnostic-fast.bootstrap-attempt-01.json",
+      "sha256": "02b8daf7eea9dddc980681c085b6e11d005e6fb7891dc87ab6d9db72c8e21384",
+      "attempt_index": 1,
+      "bootstrap_budget": 2,
+      "phase": "diagnostic_fast_cold",
+      "status": "irrevocably_reserved_before_call",
+      "reserved_at": "2026-10-11T15:21:15.922354Z"
+    },
+    {
+      "path": "results/FAST-LOGN16-INTEGRATED-PERFPROBE-FASTDIAG-006.json.diagnostic-fast.bootstrap-attempt-02.json",
+      "sha256": "f809dbfa8bc018cb52c19931e5b59f238e7b2d1ec9224f7f0256f167c8246bdc",
+      "attempt_index": 2,
+      "bootstrap_budget": 2,
+      "phase": "diagnostic_fast_traced_warm",
+      "status": "irrevocably_reserved_before_call",
+      "reserved_at": "2026-10-11T15:21:15.922592Z"
+    }
+  ],
+  "profile": "logn16-e32-public-native",
+  "mode": "test-only-public-e32-fast",
+  "captured_primary_commit": "aff322665f6d178f159408d66eae39a2823815f5",
+  "primary_measurement_source_sha256": "8a72fc5b1eed5c2957fe65cb431d885fce18c7fed75ac665b312cc6263f66ca8",
+  "effective_parameters": {
+    "ephemeral_secret_weight": 32,
+    "log_n": 16,
+    "log_slots": 15,
+    "input_slots": 32768,
+    "ring_n": 65536,
+    "residual_ring_n": 65536,
+    "q0_config_target_bits": 55,
+    "q0_bits": 56,
+    "q_chain_bits": [
+      56,
+      39,
+      39,
+      39,
+      39,
+      60,
+      61,
+      60,
+      61,
+      61,
+      60,
+      60,
+      61,
+      57,
+      56,
+      56,
+      57
+    ],
+    "p_bits": [
+      61,
+      61,
+      62,
+      61,
+      62
+    ],
+    "q_primes": [
+      "36028797019488257",
+      "549754109953",
+      "549753978881",
+      "549753716737",
+      "549753192449",
+      "1152921504606584833",
+      "1152921504614055937",
+      "1152921504598720513",
+      "1152921504615628801",
+      "1152921504616808449",
+      "1152921504597016577",
+      "1152921504595968001",
+      "1152921504618381313",
+      "72057594038321153",
+      "72057594036879361",
+      "72057594035306497",
+      "72057594040680449"
+    ],
+    "p_primes": [
+      "2305843009211596801",
+      "2305843009210023937",
+      "2305843009218281473",
+      "2305843009208713217",
+      "2305843009218936833"
+    ],
+    "default_scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+    "mod1_log_scale": 60,
+    "mod1_degree": 30,
+    "double_angle": 3,
+    "k": 16,
+    "log_message_ratio": 10,
+    "circuit_order": 0,
+    "q_prefix_rows_at_max_level": 4
+  },
+  "production_fast_commit": "2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f",
+  "diagnostic_test_adapter_commit": "649da85757a97dc8c60b5f9cc031634f39ad4a40",
+  "diagnostic_test_adapter_patch_sha256": "3ad46f934d597472caac0f0810719425dec75bde0064342cc0b05278510b50ae",
+  "diagnostic_test_adapter_patch_matches": true,
+  "diagnostic_commit_object_available_in_current_clone": false,
+  "config_sha256": "16e62fdea2dc5ac32240a33cc256cdf60b935aa00b4a16aa004474d2c3033b02",
+  "qp_sha256": "6c82ca724cbfdce2083b2ef2c18d53f81e658a6f28ff283e9a671d276710ec5f",
+  "input_sha256": "659fc59c899341a8253887270f1ae3478528fd864d66aca14bba918550ce8ccf",
+  "workload_sha256": "1413c0f0edc3c6b52d7a71e4714efe70280854e1208f87640b741682b65fa2a9",
+  "fixture_manifest_sha256": "f04988b4f8348a02ad291c76bd34b12b8a12c9bf077caefbab0d9cfef3b74f16",
+  "fixture_vectors_sha256": "51ccbf1ea03e4fa6be1e3b61f746aef6c6d642d43764292540e8f438a79d93e9",
+  "ciphertext_sha256": "a8b90d1b8db318ee49bae0d78d1d3faf98be56c12491cd041594862f35e13cc7",
+  "task005_reference_hashes": [
+    "1e6862e56e003352b2418308fe46fe60ec260d58a23f0007a3b65a28aa6cdcc3",
+    "6c45265e515095efc49652dd012b75436a409800085d5d072ee4113a55b04ed0"
+  ],
+  "captured_call_budget": 2,
+  "captured_actual_calls": 2,
+  "event_count": 539,
+  "stage_counts": {
+    "coeffs_to_slots": 1,
+    "evalmod_imag": 1,
+    "evalmod_real": 1,
+    "mod_up_trace": 1,
+    "pack_n1_to_n2": 1,
+    "public_finalization": 1,
+    "scale_down": 1,
+    "slots_to_coeffs": 1,
+    "unpack_n2_to_n1": 1
+  },
+  "independent_root_count": 38,
+  "generated_power_branch_roots": [
+    {
+      "branch": "real",
+      "root_sequence": 59
+    },
+    {
+      "branch": "imag",
+      "root_sequence": 279
+    }
+  ],
+  "independent_root_closures": [
+    {
+      "root_sequence": 1,
+      "root_scope": "stage",
+      "root_name": "bootstrap",
+      "tree_event_count": 10,
+      "root_inclusive_ns": 1060517791,
+      "immediate_children_ns": 1060469666,
+      "signed_unattributed_ns": 48125
+    },
+    {
+      "root_sequence": 6,
+      "root_scope": "rescale",
+      "root_name": "rescale",
+      "tree_event_count": 13,
+      "root_inclusive_ns": 25697333,
+      "immediate_children_ns": 25563000,
+      "signed_unattributed_ns": 134333
+    },
+    {
+      "root_sequence": 19,
+      "root_scope": "rescale",
+      "root_name": "rescale",
+      "tree_event_count": 13,
+      "root_inclusive_ns": 25699459,
+      "immediate_children_ns": 25555750,
+      "signed_unattributed_ns": 143709
+    },
+    {
+      "root_sequence": 32,
+      "root_scope": "rescale",
+      "root_name": "rescale",
+      "tree_event_count": 13,
+      "root_inclusive_ns": 25637750,
+      "immediate_children_ns": 25506084,
+      "signed_unattributed_ns": 131666
+    },
+    {
+      "root_sequence": 45,
+      "root_scope": "rescale",
+      "root_name": "rescale",
+      "tree_event_count": 13,
+      "root_inclusive_ns": 25624291,
+      "immediate_children_ns": 25491125,
+      "signed_unattributed_ns": 133166
+    },
+    {
+      "root_sequence": 59,
+      "root_scope": "power",
+      "root_name": "generated_powers",
+      "tree_event_count": 37,
+      "root_inclusive_ns": 160157292,
+      "immediate_children_ns": 160155917,
+      "signed_unattributed_ns": 1375
+    },
+    {
+      "root_sequence": 69,
+      "root_scope": "rescale",
+      "root_name": "rescale",
+      "tree_event_count": 13,
+      "root_inclusive_ns": 25620000,
+      "immediate_children_ns": 25488625,
+      "signed_unattributed_ns": 131375
+    },
+    {
+      "root_sequence": 87,
+      "root_scope": "rescale",
+      "root_name": "rescale",
+      "tree_event_count": 13,
+      "root_inclusive_ns": 26226583,
+      "immediate_children_ns": 26095083,
+      "signed_unattributed_ns": 131500
+    },
+    {
+      "root_sequence": 105,
+      "root_scope": "rescale",
+      "root_name": "rescale",
+      "tree_event_count": 13,
+      "root_inclusive_ns": 25576041,
+      "immediate_children_ns": 25438541,
+      "signed_unattributed_ns": 137500
+    },
+    {
+      "root_sequence": 123,
+      "root_scope": "rescale",
+      "root_name": "rescale",
+      "tree_event_count": 13,
+      "root_inclusive_ns": 25634750,
+      "immediate_children_ns": 25500126,
+      "signed_unattributed_ns": 134624
+    },
+    {
+      "root_sequence": 143,
+      "root_scope": "rescale",
+      "root_name": "rescale",
+      "tree_event_count": 13,
+      "root_inclusive_ns": 25834083,
+      "immediate_children_ns": 25694875,
+      "signed_unattributed_ns": 139208
+    },
+    {
+      "root_sequence": 161,
+      "root_scope": "rescale",
+      "root_name": "rescale",
+      "tree_event_count": 13,
+      "root_inclusive_ns": 25603917,
+      "immediate_children_ns": 25472375,
+      "signed_unattributed_ns": 131542
+    },
+    {
+      "root_sequence": 174,
+      "root_scope": "rescale",
+      "root_name": "rescale",
+      "tree_event_count": 13,
+      "root_inclusive_ns": 25624083,
+      "immediate_children_ns": 25491959,
+      "signed_unattributed_ns": 132124
+    },
+    {
+      "root_sequence": 187,
+      "root_scope": "rescale",
+      "root_name": "rescale",
+      "tree_event_count": 13,
+      "root_inclusive_ns": 24061250,
+      "immediate_children_ns": 23928209,
+      "signed_unattributed_ns": 133041
+    },
+    {
+      "root_sequence": 200,
+      "root_scope": "rescale",
+      "root_name": "rescale",
+      "tree_event_count": 13,
+      "root_inclusive_ns": 24263167,
+      "immediate_children_ns": 24128125,
+      "signed_unattributed_ns": 135042
+    },
+    {
+      "root_sequence": 213,
+      "root_scope": "rescale",
+      "root_name": "rescale",
+      "tree_event_count": 13,
+      "root_inclusive_ns": 25594625,
+      "immediate_children_ns": 25462958,
+      "signed_unattributed_ns": 131667
+    },
+    {
+      "root_sequence": 226,
+      "root_scope": "rescale",
+      "root_name": "rescale",
+      "tree_event_count": 13,
+      "root_inclusive_ns": 25621833,
+      "immediate_children_ns": 25487333,
+      "signed_unattributed_ns": 134500
+    },
+    {
+      "root_sequence": 239,
+      "root_scope": "rescale",
+      "root_name": "rescale",
+      "tree_event_count": 13,
+      "root_inclusive_ns": 25562750,
+      "immediate_children_ns": 25431583,
+      "signed_unattributed_ns": 131167
+    },
+    {
+      "root_sequence": 252,
+      "root_scope": "rescale",
+      "root_name": "rescale",
+      "tree_event_count": 13,
+      "root_inclusive_ns": 25569000,
+      "immediate_children_ns": 25437749,
+      "signed_unattributed_ns": 131251
+    },
+    {
+      "root_sequence": 265,
+      "root_scope": "rescale",
+      "root_name": "rescale",
+      "tree_event_count": 13,
+      "root_inclusive_ns": 25621208,
+      "immediate_children_ns": 25490375,
+      "signed_unattributed_ns": 130833
+    },
+    {
+      "root_sequence": 279,
+      "root_scope": "power",
+      "root_name": "generated_powers",
+      "tree_event_count": 37,
+      "root_inclusive_ns": 163584750,
+      "immediate_children_ns": 163583292,
+      "signed_unattributed_ns": 1458
+    },
+    {
+      "root_sequence": 289,
+      "root_scope": "rescale",
+      "root_name": "rescale",
+      "tree_event_count": 13,
+      "root_inclusive_ns": 25711625,
+      "immediate_children_ns": 25580208,
+      "signed_unattributed_ns": 131417
+    },
+    {
+      "root_sequence": 307,
+      "root_scope": "rescale",
+      "root_name": "rescale",
+      "tree_event_count": 13,
+      "root_inclusive_ns": 27033583,
+      "immediate_children_ns": 26894583,
+      "signed_unattributed_ns": 139000
+    },
+    {
+      "root_sequence": 325,
+      "root_scope": "rescale",
+      "root_name": "rescale",
+      "tree_event_count": 13,
+      "root_inclusive_ns": 26161166,
+      "immediate_children_ns": 26029750,
+      "signed_unattributed_ns": 131416
+    },
+    {
+      "root_sequence": 343,
+      "root_scope": "rescale",
+      "root_name": "rescale",
+      "tree_event_count": 13,
+      "root_inclusive_ns": 26095917,
+      "immediate_children_ns": 25956167,
+      "signed_unattributed_ns": 139750
+    },
+    {
+      "root_sequence": 363,
+      "root_scope": "rescale",
+      "root_name": "rescale",
+      "tree_event_count": 13,
+      "root_inclusive_ns": 25856833,
+      "immediate_children_ns": 25722667,
+      "signed_unattributed_ns": 134166
+    },
+    {
+      "root_sequence": 381,
+      "root_scope": "rescale",
+      "root_name": "rescale",
+      "tree_event_count": 13,
+      "root_inclusive_ns": 27091375,
+      "immediate_children_ns": 26953250,
+      "signed_unattributed_ns": 138125
+    },
+    {
+      "root_sequence": 394,
+      "root_scope": "rescale",
+      "root_name": "rescale",
+      "tree_event_count": 13,
+      "root_inclusive_ns": 26302166,
+      "immediate_children_ns": 26169208,
+      "signed_unattributed_ns": 132958
+    },
+    {
+      "root_sequence": 407,
+      "root_scope": "rescale",
+      "root_name": "rescale",
+      "tree_event_count": 13,
+      "root_inclusive_ns": 24624583,
+      "immediate_children_ns": 24491625,
+      "signed_unattributed_ns": 132958
+    },
+    {
+      "root_sequence": 420,
+      "root_scope": "rescale",
+      "root_name": "rescale",
+      "tree_event_count": 13,
+      "root_inclusive_ns": 25194584,
+      "immediate_children_ns": 25054541,
+      "signed_unattributed_ns": 140043
+    },
+    {
+      "root_sequence": 433,
+      "root_scope": "rescale",
+      "root_name": "rescale",
+      "tree_event_count": 13,
+      "root_inclusive_ns": 26215500,
+      "immediate_children_ns": 26075875,
+      "signed_unattributed_ns": 139625
+    },
+    {
+      "root_sequence": 446,
+      "root_scope": "rescale",
+      "root_name": "rescale",
+      "tree_event_count": 13,
+      "root_inclusive_ns": 25790041,
+      "immediate_children_ns": 25654750,
+      "signed_unattributed_ns": 135291
+    },
+    {
+      "root_sequence": 459,
+      "root_scope": "rescale",
+      "root_name": "rescale",
+      "tree_event_count": 13,
+      "root_inclusive_ns": 25695250,
+      "immediate_children_ns": 25549917,
+      "signed_unattributed_ns": 145333
+    },
+    {
+      "root_sequence": 472,
+      "root_scope": "rescale",
+      "root_name": "rescale",
+      "tree_event_count": 13,
+      "root_inclusive_ns": 25812042,
+      "immediate_children_ns": 25677334,
+      "signed_unattributed_ns": 134708
+    },
+    {
+      "root_sequence": 485,
+      "root_scope": "rescale",
+      "root_name": "rescale",
+      "tree_event_count": 13,
+      "root_inclusive_ns": 25708333,
+      "immediate_children_ns": 25572542,
+      "signed_unattributed_ns": 135791
+    },
+    {
+      "root_sequence": 499,
+      "root_scope": "rescale",
+      "root_name": "rescale",
+      "tree_event_count": 13,
+      "root_inclusive_ns": 25312209,
+      "immediate_children_ns": 25165000,
+      "signed_unattributed_ns": 147209
+    },
+    {
+      "root_sequence": 512,
+      "root_scope": "rescale",
+      "root_name": "rescale",
+      "tree_event_count": 13,
+      "root_inclusive_ns": 24749750,
+      "immediate_children_ns": 24599291,
+      "signed_unattributed_ns": 150459
+    },
+    {
+      "root_sequence": 525,
+      "root_scope": "rescale",
+      "root_name": "rescale",
+      "tree_event_count": 13,
+      "root_inclusive_ns": 20162458,
+      "immediate_children_ns": 20061291,
+      "signed_unattributed_ns": 101167
+    }
+  ],
+  "event_metadata_field_coverage": {
+    "degree_in": 177,
+    "degree_out": 187,
+    "level_in": 527,
+    "level_out": 537,
+    "rows_in": 518,
+    "rows_out": 537,
+    "scale_log2_in": 177,
+    "scale_log2_out": 187
+  },
+  "recursive_power_ancestry_sequences": [
+    63,
+    62,
+    61,
+    60,
+    59
+  ],
+  "recorded_output_checks": [
+    {
+      "phase": "first_cold_bootstrap",
+      "level": 1,
+      "degree": 1,
+      "scale_log2": 45,
+      "q_prefix_rows": 2,
+      "recorded_oracle_rmse": 5.82126707846636e-9,
+      "recorded_oracle_max_complex_difference": 4.6694655714754984e-7,
+      "recorded_task005_fast_reference_rmse": 0,
+      "recorded_task005_fast_reference_max_complex_difference": 0,
+      "recorded_gate_passed": true
+    },
+    {
+      "phase": "warm_bootstrap_01_traced",
+      "level": 1,
+      "degree": 1,
+      "scale_log2": 45,
+      "q_prefix_rows": 2,
+      "recorded_oracle_rmse": 5.82126707846636e-9,
+      "recorded_oracle_max_complex_difference": 4.6694655714754984e-7,
+      "recorded_task005_fast_reference_rmse": 0,
+      "recorded_task005_fast_reference_max_complex_difference": 0,
+      "recorded_gate_passed": true
+    }
+  ],
+  "root_partitioned_analysis": {
+    "bootstrap_root_elapsed_ns": 1060517791,
+    "bootstrap_direct_children_ns": 1060469666,
+    "bootstrap_unattributed_ns": 48125,
+    "bootstrap_unattributed_fraction": 0.00004537877667721276,
+    "event_type_root_record_count": 539,
+    "positive_exclusive_group_count": 38,
+    "amdahl_scenario_count": 9
+  },
+  "limitations": [
+    "Analysis reuses the maintained Batch025 recursive event validator and root-partitioned analyzer; it does not rerun Bootstrap, decrypt, or change the immutable raw trace.",
+    "The historical diagnostic adapter commit object is absent from the current Secondary clone. Its recorded commit and patch digest match Task006 metadata, and the committed patch digest is independently verified; the event attribution is certified from captured trace data, not a fresh source-tree rebuild.",
+    "Task005 reference vector/result hashes are recorded provenance; the historical temporary vector payloads are not embedded in this repository and are not reconstructed here."
+  ]
+}

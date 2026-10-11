@@ -1,0 +1,384 @@
+{
+  "schema_version": "ckks.measurement-platform-generalization.v1",
+  "task": "CKKS-MEASUREMENT-PLATFORM-GENERALIZATION-001",
+  "status": "READY_FOR_WEB_REVIEW",
+  "primary_commits_before_result_bundle": [
+    {
+      "purpose": "formal task/spec/rules pointer",
+      "sha": "656be6d9e193e28eb1cefe3466c4ccc89e9580ae"
+    },
+    {
+      "purpose": "platform generalization, Task006 integration, and obsolete tool retirement",
+      "sha": "70c75eec1286910ccce5fdbc7ffc9a2e28fc2201"
+    },
+    {
+      "purpose": "compact Task006 evidence projection and tests",
+      "sha": "675cbe17806901b3744030103fd8b0e2116bb22d"
+    },
+    {
+      "purpose": "final result artifact contract",
+      "sha": "89aed11dac03cd4d41cbccd55a3201384ebe7a3b"
+    }
+  ],
+  "maintained_platform": [
+    "cmd/perfprobe",
+    "cmd/fastdiag",
+    "internal/perfmeasure",
+    "internal/numericalmetrics"
+  ],
+  "effective_parameterization": {
+    "derived_fields": [
+      "LogN",
+      "LogSlots",
+      "slots",
+      "ring dimensions",
+      "DefaultScale",
+      "ordered Q/P primes and fingerprints",
+      "E"
+    ],
+    "shared_parameter_builder_profiles": [
+      {
+        "log_n": 13,
+        "construction_test": "PASS",
+        "public_native_contract": "FROZEN"
+      },
+      {
+        "log_n": 14,
+        "construction_test": "PASS",
+        "public_native_contract": "UNSUPPORTED_EFFECTIVE_PROFILE: no frozen public-native config/Q/P/input/workload contract"
+      },
+      {
+        "log_n": 15,
+        "construction_test": "PASS",
+        "public_native_contract": "UNSUPPORTED_EFFECTIVE_PROFILE: no frozen public-native config/Q/P/input/workload contract"
+      },
+      {
+        "log_n": 16,
+        "construction_test": "PASS",
+        "public_native_contract": "FROZEN; existing observed-capacity policy remains a separate gate"
+      }
+    ],
+    "unsupported_profiles_are_not_relabelled_or_switched": true,
+    "no_production_arithmetic_or_frontend_operation_changes": true
+  },
+  "task006_trace": {
+    "offline_classification": "OFFLINE_RECURSIVE_TRACE_REVALIDATED",
+    "original_classification": "TRACE_COLLECTED_UNVERIFIED",
+    "original_trace_status": "TRACE_UNVERIFIED",
+    "original_raw_relabelled": false,
+    "raw_sha256": "9bd5ba81abce75b8fd7c06ac544410246fb385bafb1585a646d7d71e2f8e872d",
+    "raw_bytes": 178754,
+    "failure_sidecar_sha256": "f598b481b776448dcc78ff80083610e9376cee12451716ddb88fd414abfc756b",
+    "attempt_ledger_sha256": "e752dbaf4aee28229e14cbcbc85c6c8c9f4b4467c0da3b5dbf29577b4e28672d",
+    "attempt_journal_sha256": [
+      "02b8daf7eea9dddc980681c085b6e11d005e6fb7891dc87ab6d9db72c8e21384",
+      "f809dbfa8bc018cb52c19931e5b59f238e7b2d1ec9224f7f0256f167c8246bdc"
+    ],
+    "event_count": 539,
+    "independent_root_count": 38,
+    "generated_power_roots": [
+      {
+        "branch": "real",
+        "sequence": 59
+      },
+      {
+        "branch": "imag",
+        "sequence": 279
+      }
+    ],
+    "recursive_ancestry_leaf_to_root": [
+      63,
+      62,
+      61,
+      60,
+      59
+    ],
+    "root_timing_ns": {
+      "bootstrap_inclusive": 1060517791,
+      "immediate_children": 1060469666,
+      "signed_unattributed": 48125,
+      "signed_unattributed_fraction": 0.00004537877667721276
+    },
+    "recorded_outputs": [
+      {
+        "phase": "first_cold_bootstrap",
+        "level": 1,
+        "scale_log2": 45,
+        "degree": 1,
+        "q_prefix_rows": 2,
+        "oracle_rmse": 5.82126707846636e-9,
+        "oracle_max_complex": 4.6694655714754984e-7,
+        "task005_reference_max_complex": 0,
+        "gate_passed": true
+      },
+      {
+        "phase": "warm_bootstrap_01_traced",
+        "level": 1,
+        "scale_log2": 45,
+        "degree": 1,
+        "q_prefix_rows": 2,
+        "oracle_rmse": 5.82126707846636e-9,
+        "oracle_max_complex": 4.6694655714754984e-7,
+        "task005_reference_max_complex": 0,
+        "gate_passed": true
+      }
+    ],
+    "captured_primary_commit": "aff322665f6d178f159408d66eae39a2823815f5",
+    "fast_production_commit": "2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f",
+    "diagnostic_adapter_commit_recorded": "649da85757a97dc8c60b5f9cc031634f39ad4a40",
+    "diagnostic_adapter_commit_object_available": false,
+    "adapter_patch_sha256": "3ad46f934d597472caac0f0810719425dec75bde0064342cc0b05278510b50ae",
+    "adapter_patch_digest_verified": true,
+    "new_bootstrap_calls": 0,
+    "validation_anomalies": []
+  },
+  "retired_sources": {
+    "root_go_files": 162,
+    "tools_go_files": 26,
+    "exact_paths": [
+      "bootstrap_config.go",
+      "bootstrap_config_test.go",
+      "correctness_runner.go",
+      "correctness_runner_test.go",
+      "diagnostic_runner.go",
+      "fast_diagnostics_standard_stub.go",
+      "fast_measurement.go",
+      "fast_measurement_oracle.go",
+      "fast_measurement_stats.go",
+      "fast_measurement_test.go",
+      "finalization_diagnostic_runner.go",
+      "finalization_diagnostic_runner_test.go",
+      "fix001_diag_poly_oracle.go",
+      "fix001_diag_poly_runner.go",
+      "fix001_diag_poly_runner_test.go",
+      "fix001_diag_poly_stub.go",
+      "fix001_diag_t3_capacity_runner.go",
+      "fix001_diag_t3_capacity_stub.go",
+      "fix001_diag_t3_runner.go",
+      "fix001_diag_t3_stub.go",
+      "fix001_p3_chebyshev_oracle_basis_runner.go",
+      "fix001_p3_chebyshev_oracle_basis_runner_test.go",
+      "fix001_p3_design_double_angle_normalized_recurrence_runner.go",
+      "fix001_p3_design_double_angle_normalized_recurrence_runner_test.go",
+      "fix001_p3_design_logn13_b4_t2_local_scalar_guard_runner.go",
+      "fix001_p3_design_logn13_b4_t2_local_scalar_guard_runner_test.go",
+      "fix001_p3_design_logn13_c2s_group0_compressed_linear_runner.go",
+      "fix001_p3_design_logn13_c2s_group0_compressed_linear_runner_test.go",
+      "fix001_p3_design_logn13_c2s_group1_compressed_linear_runner.go",
+      "fix001_p3_design_logn13_c2s_group1_compressed_linear_runner_test.go",
+      "fix001_p3_design_logn13_d0_production_precondition_closure_runner.go",
+      "fix001_p3_design_logn13_d0_production_precondition_closure_runner_test.go",
+      "fix001_p3_design_logn13_da_all_rounds_local_q2_runner.go",
+      "fix001_p3_design_logn13_da_all_rounds_local_q2_runner_test.go",
+      "fix001_p3_design_logn13_da_r0_local_q2_feasibility_runner.go",
+      "fix001_p3_design_logn13_da_r0_local_q2_feasibility_runner_test.go",
+      "fix001_p3_design_logn13_evalmod_precision_scale_sweep_runner.go",
+      "fix001_p3_design_logn13_evalmod_precision_scale_sweep_test.go",
+      "fix001_p3_design_logn13_f0_local_q2_guard_sweep_runner.go",
+      "fix001_p3_design_logn13_f0_local_q2_guard_sweep_runner_test.go",
+      "fix001_p3_design_logn13_f0_local_q2_rescale_feasibility_runner.go",
+      "fix001_p3_design_logn13_f0_local_q2_rescale_feasibility_runner_test.go",
+      "fix001_p3_design_logn13_g0_local_q2_guard_sweep_runner.go",
+      "fix001_p3_design_logn13_g0_local_q2_guard_sweep_runner_test.go",
+      "fix001_p3_design_logn13_generated_power_multiply_first_local_q2_runner.go",
+      "fix001_p3_design_logn13_generated_power_multiply_first_local_q2_runner_test.go",
+      "fix001_p3_design_logn13_generated_power_native_q012_multiply_first_runner.go",
+      "fix001_p3_design_logn13_generated_power_native_q012_multiply_first_runner_test.go",
+      "fix001_p3_design_logn13_generated_power_native_q01_multiply_first_runner.go",
+      "fix001_p3_design_logn13_generated_power_native_q01_multiply_first_runner_test.go",
+      "fix001_p3_design_logn13_guarded_power_precision_runner.go",
+      "fix001_p3_design_logn13_guarded_power_precision_test.go",
+      "fix001_p3_design_logn13_ps_mixed_scale_precision_runner.go",
+      "fix001_p3_design_logn13_ps_mixed_scale_precision_runner_test.go",
+      "fix001_p3_design_logn13_ps_oracle_scale_precision_runner.go",
+      "fix001_p3_design_logn13_ps_oracle_scale_precision_runner_test.go",
+      "fix001_p3_design_logn13_ps_rescale_guard_precision_runner.go",
+      "fix001_p3_design_logn13_ps_rescale_guard_precision_runner_test.go",
+      "fix001_p3_design_logn13_ps_wide_q012_q056_scale_sweep_runner.go",
+      "fix001_p3_design_logn13_ps_wide_q012_q056_scale_sweep_runner_test.go",
+      "fix001_p3_design_logn13_q055_plan92_t2_local_q2_guard_feasibility_runner.go",
+      "fix001_p3_design_logn13_q055_plan92_t2_local_q2_guard_feasibility_runner_test.go",
+      "fix001_p3_design_logn13_q0_56_f0_two_bit_guard_runner.go",
+      "fix001_p3_design_logn13_q0_56_f0_two_bit_guard_runner_test.go",
+      "fix001_p3_design_logn13_q0_56_rescale_guard_feasibility_runner.go",
+      "fix001_p3_design_logn13_q0_56_rescale_guard_feasibility_runner_test.go",
+      "fix001_p3_diag_double_angle_mul_alias_runner.go",
+      "fix001_p3_diag_double_angle_mul_alias_runner_test.go",
+      "fix001_p3_diag_double_angle_runner.go",
+      "fix001_p3_diag_double_angle_runner_test.go",
+      "fix001_p3_diag_logn13_b4_baby_step_attribution_runner.go",
+      "fix001_p3_diag_logn13_b4_baby_step_attribution_runner_test.go",
+      "fix001_p3_diag_logn13_c2s_final_split_probe_fix_runner.go",
+      "fix001_p3_diag_logn13_c2s_final_split_probe_fix_runner_test.go",
+      "fix001_p3_diag_logn13_c2s_group0_linear_alias_runner.go",
+      "fix001_p3_diag_logn13_c2s_group0_linear_alias_runner_test.go",
+      "fix001_p3_diag_logn13_c2s_group1_linear_alias_runner.go",
+      "fix001_p3_diag_logn13_c2s_group1_linear_alias_runner_test.go",
+      "fix001_p3_diag_logn13_c2s_precision_runner.go",
+      "fix001_p3_diag_logn13_c2s_precision_runner_test.go",
+      "fix001_p3_diag_logn13_evalmod_causal_runner.go",
+      "fix001_p3_diag_logn13_evalmod_causal_runner_test.go",
+      "fix001_p3_diag_logn13_evalmod_matched_normalized_oracle_runner.go",
+      "fix001_p3_diag_logn13_evalmod_matched_normalized_oracle_runner_test.go",
+      "fix001_p3_diag_logn13_evalmod_residual_error_decomposition_runner.go",
+      "fix001_p3_diag_logn13_evalmod_residual_error_decomposition_runner_test.go",
+      "fix001_p3_diag_logn13_evalmod_s2c_amplification_runner.go",
+      "fix001_p3_diag_logn13_evalmod_s2c_amplification_runner_test.go",
+      "fix001_p3_diag_logn13_g0_merge_attribution_runner.go",
+      "fix001_p3_diag_logn13_g0_merge_attribution_runner_test.go",
+      "fix001_p3_diag_logn13_generated_power_reentry_runner.go",
+      "fix001_p3_diag_logn13_generated_power_reentry_runner_test.go",
+      "fix001_p3_diag_logn13_high_precision_oracle_recovery_runner.go",
+      "fix001_p3_diag_logn13_high_precision_oracle_recovery_runner_test.go",
+      "fix001_p3_diag_logn13_k3_downstream_sufficiency_runner.go",
+      "fix001_p3_diag_logn13_k3_downstream_sufficiency_runner_test.go",
+      "fix001_p3_diag_logn13_polynomial_precision_decomposition_runner.go",
+      "fix001_p3_diag_logn13_polynomial_precision_decomposition_test.go",
+      "fix001_p3_diag_logn13_ps_residual_localization_runner.go",
+      "fix001_p3_diag_logn13_ps_residual_localization_runner_test.go",
+      "fix001_p3_diag_logn13_q012_g0_f0_source_faithful_closure_runner.go",
+      "fix001_p3_diag_logn13_q012_g0_f0_source_faithful_closure_runner_test.go",
+      "fix001_p3_diag_logn13_q055_plan92_ps_dependency_window_closure_runner.go",
+      "fix001_p3_diag_logn13_q055_plan92_ps_dependency_window_closure_runner_test.go",
+      "fix001_p3_diag_logn13_q055_plan92_ps_first_divergence_runner.go",
+      "fix001_p3_diag_logn13_q055_plan92_ps_first_divergence_runner_test.go",
+      "fix001_p3_diag_logn13_quantization_aware_evalmod_decomposition_runner.go",
+      "fix001_p3_diag_logn13_quantization_aware_evalmod_decomposition_runner_test.go",
+      "fix001_p3_diag_logn13_s2c_error_decomposition_runner.go",
+      "fix001_p3_diag_logn13_s2c_error_decomposition_runner_test.go",
+      "fix001_p3_diag_logn13_semantic_bisect_runner.go",
+      "fix001_p3_diag_logn13_semantic_bisect_runner_test.go",
+      "fix001_p3_diag_p93_actual_evalmod_vs_forced_runner.go",
+      "fix001_p3_diag_p93_doubleangle_plaintext_causal_decomposition_runner.go",
+      "fix001_p3_diag_p93_doubleangle_plaintext_causal_decomposition_runner_test.go",
+      "fix001_p3_diag_p93_evalmod_first_divergence_runner.go",
+      "fix001_p3_diag_p93_evalmod_lockstep_logical_semantics_trace_runner.go",
+      "fix001_p3_diag_p93_evalmod_lockstep_logical_semantics_trace_runner_test.go",
+      "fix001_p3_diag_p93_evalmod_public_scale_reset_causal_proof_runner.go",
+      "fix001_p3_diag_p93_evalmod_public_scale_reset_causal_proof_runner_test.go",
+      "fix001_p3_diag_p93_fast_vs_genuine_standard_evalmod_internal_bisect_runner.go",
+      "fix001_p3_diag_p93_fast_vs_genuine_standard_evalmod_internal_bisect_test.go",
+      "fix001_p3_diag_p93_final_maintained_restore_factor_causal_proof_runner.go",
+      "fix001_p3_diag_p93_final_maintained_restore_factor_causal_proof_runner_test.go",
+      "fix001_p3_diag_p93_genuine_standard_vs_matched_reconciliation_runner.go",
+      "fix001_p3_diag_p93_polynomial_reference_reconciliation_runner.go",
+      "fix001_p3_diag_p93_polynomial_reference_reconciliation_runner_test.go",
+      "fix001_p3_diag_p93_post_s2c_scale_collapse_causal_proof_runner.go",
+      "fix001_p3_diag_p93_post_s2c_scale_collapse_causal_proof_runner_test.go",
+      "fix001_p3_diag_p93_production_c2s_first_material_divergence_runner.go",
+      "fix001_p3_diag_p93_s2c_attribution_runner.go",
+      "fix001_p3_diag_p93_s2c_attribution_runner_test.go",
+      "fix001_p3_diag_p93_t3_balanced_vs_postproduct_schedule_causal_ab_runner.go",
+      "fix001_p3_diag_p93_t3_balanced_vs_postproduct_schedule_causal_ab_runner_test.go",
+      "fix001_p3_diag_p93_t3_generated_power_causal_decomposition_runner.go",
+      "fix001_p3_diag_p93_t3_generated_power_causal_decomposition_runner_test.go",
+      "fix001_p3_diag_p93_t3_primitive_semantic_residual_localization_runner.go",
+      "fix001_p3_diag_p93_t3_q012_rescale_causal_ab_runner.go",
+      "fix001_p3_diag_p93_t3_q012_rescale_causal_ab_runner_test.go",
+      "fix001_p3_diag_p93_trace_support.go",
+      "fix001_p3_diag_post_mod1_s2c_runner.go",
+      "fix001_p3_diag_public_finalization_runner.go",
+      "fix001_p3_global_semantics_runner.go",
+      "fix001_p3_global_semantics_types.go",
+      "fix001_p3_integrate_logn13_b4_t2_one_bit_scalar_guard_runner.go",
+      "fix001_p3_integrate_logn13_b4_t2_one_bit_scalar_guard_runner_test.go",
+      "fix001_p3_integrate_logn13_c2s_compression_runner.go",
+      "fix001_p3_integrate_logn13_mod1_runner.go",
+      "fix001_p3_measure_logn13_p93_scale_runtime_facts_runner.go",
+      "fix001_p3_measure_logn13_p93_scale_runtime_facts_runner_test.go",
+      "fix001_p3_prod_logn13_postproduct_schedule_repair_runner.go",
+      "fix001_p3_target_scale_capacity_domain_runner.go",
+      "fix001_p3_target_scale_restoration_runner.go",
+      "fix001_p3_target_scale_restoration_runner_test.go",
+      "fix001_p3_validate_logn13_e2e_runner.go",
+      "main.go",
+      "q01_diagnostic_runner.go",
+      "q01_diagnostic_runner_test.go",
+      "qprefix_audit_002_runner.go",
+      "qprefix_audit_002_runner_test.go",
+      "runner.go",
+      "stage_runner.go",
+      "tools/fast-dropin-above-cap-numerical-batch-016/capacity_adapter_fast.go",
+      "tools/fast-dropin-above-cap-numerical-batch-016/capacity_adapter_standard.go",
+      "tools/fast-dropin-above-cap-numerical-batch-016/main.go",
+      "tools/fast-dropin-above-cap-numerical-batch-016/main_test.go",
+      "tools/fast-dropin-api-lifecycle-audit/main.go",
+      "tools/fast-dropin-ckks-primitive-api-audit-005/main.go",
+      "tools/fast-dropin-compact-consumers-batch-015/main.go",
+      "tools/fast-dropin-compact-consumers-batch-015/main_test.go",
+      "tools/fast-dropin-fast-engine-adapter-batch-014/main.go",
+      "tools/fast-dropin-fast-engine-adapter-batch-014/main_test.go",
+      "tools/fast-dropin-highlevel-bootstrap-batch-018/capacity_adapter_fast.go",
+      "tools/fast-dropin-highlevel-bootstrap-batch-018/capacity_adapter_standard.go",
+      "tools/fast-dropin-highlevel-bootstrap-batch-018/main.go",
+      "tools/fast-dropin-highlevel-bootstrap-batch-018/main_test.go",
+      "tools/fast-dropin-highlevel-mul-rescale-bootstrap-batch-019/capacity_adapter_fast.go",
+      "tools/fast-dropin-highlevel-mul-rescale-bootstrap-batch-019/capacity_adapter_standard.go",
+      "tools/fast-dropin-highlevel-mul-rescale-bootstrap-batch-019/main.go",
+      "tools/fast-dropin-highlevel-mul-rescale-bootstrap-batch-019/main_test.go",
+      "tools/fast-dropin-public-primitives-batch-013/main.go",
+      "tools/fast-dropin-public-primitives-batch-013/main_test.go",
+      "tools/fast-dropin-public-primitives-bootstrap-batch-017/main.go",
+      "tools/fast-dropin-public-primitives-bootstrap-batch-017/main_test.go",
+      "tools/fast-dropin-public-rotate-bootstrap-composition-010/main.go",
+      "tools/fast-dropin-rotate-bootstrap-keyplan-011/main.go",
+      "tools/fast-dropin-rotate-bootstrap-keyplan-011/main_test.go",
+      "tools/fast-dropin-zero-secret-encrypt-bridge-004/main.go"
+    ]
+  },
+  "preserved_regressions": {
+    "migrated_primary_tests": [
+      "internal/perfmeasure: TestLoadConfigRejectsRemovedLegacyFields",
+      "internal/perfmeasure: TestChangingConfiguredPrimeScaleChangesEffectiveModulus",
+      "cmd/perfprobe: TestPublicRotateLeftMatchesCKKSSlotConvention"
+    ],
+    "existing_secondary_coverage_retained": [
+      "schemes/ckks/fast: TestQ0123FixedWidthProductCRTAndCenterMatchBigInt",
+      "schemes/ckks/fast: TestFastRescaleMatchesBigIntCenteredCRTOracleAtEveryPrefixWidth",
+      "circuits/ckks/bootstrapping: TestFastBootstrapPublicBoundaryRejectsRowsBeyondContract",
+      "schemes/ckks: TestPublicCKKSEvaluatorKeylessZeroSecretMulRelinRejectsUnsafeInputs"
+    ],
+    "secondary_repository_modified": false
+  },
+  "validation": [
+    {
+      "command": "GOCACHE=/private/tmp/ckks-platform-go-cache go test ./internal/perfmeasure -count=1",
+      "result": "PASS"
+    },
+    {
+      "command": "GOCACHE=/private/tmp/ckks-platform-go-cache go test ./internal/numericalmetrics -count=1",
+      "result": "PASS"
+    },
+    {
+      "command": "GOCACHE=/private/tmp/ckks-platform-go-cache go test ./cmd/perfprobe -run '^(TestPublicNativeExplicitlyRejectsUnvalidatedEffectiveLogN|TestEffectiveProfilesComeFromTheirConfigFiles|TestLogN16PublicNativeProfileUsesOnlyObservedOracleCapacityPolicy|TestSharedParameterBuilderDerivesLogN13Through16FromEffectiveParameters|TestLoadConfigRejectsRemovedLegacyFields|TestChangingConfiguredPrimeScaleChangesEffectiveModulus|TestPublicRotateLeftMatchesCKKSSlotConvention)$' -count=1",
+      "result": "PASS"
+    },
+    {
+      "command": "FASTDIAG_TASK006_RAW=<frozen raw> FASTDIAG_TASK006_SIDECAR=<frozen sidecar> GOCACHE=/private/tmp/ckks-platform-go-cache go test ./cmd/fastdiag -run '<six focused offline/tree/metadata tests>' -count=1",
+      "result": "PASS; zero Bootstrap"
+    },
+    {
+      "command": "GOCACHE=/private/tmp/ckks-platform-go-cache go vet ./internal/perfmeasure ./internal/numericalmetrics ./cmd/perfprobe ./cmd/fastdiag",
+      "result": "PASS"
+    },
+    {
+      "command": "git diff --check",
+      "result": "PASS"
+    },
+    {
+      "command": "GOCACHE=/private/tmp/ckks-platform-go-cache go run ./cmd/fastdiag offline-e32 --raw <frozen raw> --sidecar <frozen sidecar> --task006-summary results/FAST-LOGN16-INTEGRATED-PERFPROBE-FASTDIAG-006.json --task006-ledger results/FAST-LOGN16-INTEGRATED-PERFPROBE-FASTDIAG-006-attempt-ledger.json --attempt-01 <journal 01> --attempt-02 <journal 02> --out-prefix results/CKKS-MEASUREMENT-PLATFORM-GENERALIZATION-001-task006-offline",
+      "result": "PASS; OFFLINE_RECURSIVE_TRACE_REVALIDATED; 0 new Bootstrap calls"
+    }
+  ],
+  "bootstrap_accounting": {
+    "task005_historical_reserved_and_actual": "16/16, immutable and not reused",
+    "task006_historical_budget_and_actual": "2/2, immutable and not reused",
+    "this_task_new_bootstrap_calls": 0,
+    "retries": 0
+  },
+  "limitations": [
+    "The Task006 diagnostic adapter commit object is unavailable in the current Secondary clone; its recorded commit and independently verified committed patch digest match the captured metadata.",
+    "Task005 reference vector/result payloads were temporary and are not embedded; hashes and original metadata remain preserved.",
+    "LogN14/15 public-native measurement remains explicitly unsupported until a frozen profile contract exists; parameter construction itself passes."
+  ]
+}

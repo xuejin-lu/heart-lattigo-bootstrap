@@ -1,6 +1,6 @@
 # CKKS-MEASUREMENT-PLATFORM-GENERALIZATION-001
 
-Status: `READY_FOR_CODEX` — user-authorized autonomous integration task. This task supersedes the active pointer to `FAST-LOGN16-TRACE-OFFLINE-RECOVERY-007`; preserve that historical spec and all Task005/006 evidence.
+Status: `READY_FOR_WEB_REVIEW` — Codex checkpoints complete; independent review pending. This task supersedes the active pointer to `FAST-LOGN16-TRACE-OFFLINE-RECOVERY-007`; preserve that historical spec and all Task005/006 evidence.
 
 ## Objective
 
