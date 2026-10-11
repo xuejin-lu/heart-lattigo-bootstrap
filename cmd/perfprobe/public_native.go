@@ -346,7 +346,10 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 	}
 	preflightPairSHA := ""
 	if opts.publicBootstrap || opts.publicRepeatability {
-		preflightPairSHA, err = validatePublicPreflightGateForProfile(opts.preflightPair, primaryCommit, sourceHash, profile.Name, opts.backendCommit, configHash, qpHash, inputHash, workloadHash)
+		preflightPairSHA, err = validatePublicNativeBootstrapPreflight(
+			opts.preflightPair, primaryCommit, sourceHash, profile.Name, publicBackendName(), opts.backendCommit,
+			configHash, qpHash, inputHash, workloadHash,
+		)
 		if err != nil {
 			return fmt.Errorf("public Bootstrap preflight gate: %w", err)
 		}
@@ -932,6 +935,29 @@ func publicCiphertextFingerprint(ct *rlwe.Ciphertext) (string, error) {
 
 func validatePublicPreflightGate(path, primaryCommit, sourceSHA256, configSHA256, qpSHA256, inputSHA256, workloadSHA256 string) (string, error) {
 	return validatePublicPreflightGateForProfile(path, primaryCommit, sourceSHA256, "logn13", publicFastSHA,
+		configSHA256, qpSHA256, inputSHA256, workloadSHA256)
+}
+
+func validatePublicNativeBootstrapPreflight(
+	path, primaryCommit, sourceSHA256, profileName, backendName, backendCommit,
+	configSHA256, qpSHA256, inputSHA256, workloadSHA256 string,
+) (string, error) {
+	fastCommit := ""
+	switch backendName {
+	case "standard":
+		if backendCommit != publicStandardSHA {
+			return "", fmt.Errorf("Standard backend commit %s differs from pinned Standard %s", backendCommit, publicStandardSHA)
+		}
+		fastCommit = publicCurrentFastSHA
+	case "fast":
+		if err := validatePublicBackendPin("fast", backendCommit, profileName); err != nil {
+			return "", err
+		}
+		fastCommit = backendCommit
+	default:
+		return "", fmt.Errorf("unsupported public-native backend %q", backendName)
+	}
+	return validatePublicPreflightGateForProfile(path, primaryCommit, sourceSHA256, profileName, fastCommit,
 		configSHA256, qpSHA256, inputSHA256, workloadSHA256)
 }
 

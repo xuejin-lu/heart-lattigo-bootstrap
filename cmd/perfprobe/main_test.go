@@ -493,7 +493,7 @@ func TestPublicBootstrapGateRequiresVersionedLogN16ObservedOracleEvidence(t *tes
 			if err := writeExclusiveJSON(path, pair); err != nil {
 				t.Fatal(err)
 			}
-			_, err := validatePublicPreflightGateForProfile(path, "primary-sha", "source-sha", "logn16", publicCurrentFastSHA,
+			_, err := validatePublicNativeBootstrapPreflight(path, "primary-sha", "source-sha", "logn16", "standard", publicStandardSHA,
 				profile.ConfigSHA256, profile.QPSHA256, profile.InputSHA256, profile.WorkloadSHA256)
 			if test.valid && err != nil {
 				t.Fatalf("complete LogN16 observed-oracle pair rejected: %v", err)
@@ -502,6 +502,19 @@ func TestPublicBootstrapGateRequiresVersionedLogN16ObservedOracleEvidence(t *tes
 				t.Fatal("incomplete/forged LogN16 observed-oracle pair accepted")
 			}
 		})
+	}
+	path := filepath.Join(t.TempDir(), "valid-logn16-preflight-pair.json")
+	if err := writeExclusiveJSON(path, base); err != nil {
+		t.Fatal(err)
+	}
+	for _, backend := range []struct{ name, commit string }{
+		{name: "standard", commit: publicStandardSHA},
+		{name: "fast", commit: publicCurrentFastSHA},
+	} {
+		if _, err := validatePublicNativeBootstrapPreflight(path, "primary-sha", "source-sha", "logn16", backend.name, backend.commit,
+			profile.ConfigSHA256, profile.QPSHA256, profile.InputSHA256, profile.WorkloadSHA256); err != nil {
+			t.Errorf("%s build rejected the paired current Fast preflight pin: %v", backend.name, err)
+		}
 	}
 }
 
