@@ -33,6 +33,8 @@ const (
 	dualCurrentMetadata16     = "58b699119d1ca2d73cfe8812e6ae776f77d4267ff4c25e67229d7b140a6cf44f"
 	dualCurrentConfig13       = "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98"
 	dualCurrentConfig16       = "16e62fdea2dc5ac32240a33cc256cdf60b935aa00b4a16aa004474d2c3033b02"
+	dualCurrentQP13           = "1f045e603a856968779d62e045a037274bba08cbfce8b1dd3dec2828f1f6a46b"
+	dualCurrentQP16           = "6c82ca724cbfdce2083b2ef2c18d53f81e658a6f28ff283e9a671d276710ec5f"
 )
 
 type dualCurrentCheckpoint struct {
@@ -107,6 +109,7 @@ type dualCurrentStageComparison struct {
 	LogicalStateMatched        bool                 `json:"level_scale_degree_dimensions_matched"`
 	RepresentationFlagsMatched bool                 `json:"ntt_montgomery_flags_matched"`
 	Comparable                 bool                 `json:"comparable"`
+	DecodedBitwiseIdentical    bool                 `json:"decoded_float64_bitwise_identical"`
 	Reason                     string               `json:"reason,omitempty"`
 	Standard                   ciphertextState      `json:"standard_state"`
 	Fast                       ciphertextState      `json:"fast_state"`
@@ -119,25 +122,26 @@ type dualCurrentStageComparison struct {
 }
 
 type dualCurrentBootstrapComparison struct {
-	SchemaVersion    string               `json:"schema_version"`
-	Mode             string               `json:"mode"`
-	Status           string               `json:"status"`
-	Timestamp        time.Time            `json:"timestamp"`
-	Profile          string               `json:"profile"`
-	StandardCommit   string               `json:"standard_commit"`
-	FastCommit       string               `json:"fast_commit"`
-	InputSHA256      string               `json:"input_sha256"`
-	ConfigSHA256     string               `json:"config_sha256"`
-	SlotsCompared    int                  `json:"slots_compared"`
-	ThresholdRMSE    float64              `json:"suggested_rmse_gate"`
-	StandardVsInput  vectorMetrics        `json:"standard_vs_original_input"`
-	StandardInputSNR numericalmetrics.SNR `json:"standard_vs_original_input_snr"`
-	FastVsInput      vectorMetrics        `json:"fast_vs_original_input"`
-	FastInputSNR     numericalmetrics.SNR `json:"fast_vs_original_input_snr"`
-	FastVsStandard   vectorMetrics        `json:"fast_vs_genuine_standard"`
-	FastStandardSNR  numericalmetrics.SNR `json:"fast_vs_genuine_standard_snr"`
-	StandardState    ciphertextState      `json:"standard_output_state"`
-	FastState        ciphertextState      `json:"fast_output_state"`
+	SchemaVersion           string               `json:"schema_version"`
+	Mode                    string               `json:"mode"`
+	Status                  string               `json:"status"`
+	Timestamp               time.Time            `json:"timestamp"`
+	Profile                 string               `json:"profile"`
+	StandardCommit          string               `json:"standard_commit"`
+	FastCommit              string               `json:"fast_commit"`
+	InputSHA256             string               `json:"input_sha256"`
+	ConfigSHA256            string               `json:"config_sha256"`
+	SlotsCompared           int                  `json:"slots_compared"`
+	ThresholdRMSE           float64              `json:"suggested_rmse_gate"`
+	StandardVsInput         vectorMetrics        `json:"standard_vs_original_input"`
+	StandardInputSNR        numericalmetrics.SNR `json:"standard_vs_original_input_snr"`
+	FastVsInput             vectorMetrics        `json:"fast_vs_original_input"`
+	FastInputSNR            numericalmetrics.SNR `json:"fast_vs_original_input_snr"`
+	FastVsStandard          vectorMetrics        `json:"fast_vs_genuine_standard"`
+	FastStandardSNR         numericalmetrics.SNR `json:"fast_vs_genuine_standard_snr"`
+	DecodedBitwiseIdentical bool                 `json:"decoded_float64_bitwise_identical"`
+	StandardState           ciphertextState      `json:"standard_output_state"`
+	FastState               ciphertextState      `json:"fast_output_state"`
 }
 
 type dualCurrentPair struct {
@@ -307,6 +311,9 @@ func compareDualCurrentPreflight(opts dualCurrentOptions) error {
 	if opts.standard == "" || opts.fast == "" || opts.out == "" {
 		return errors.New("compare-preflight requires --standard, --fast, and --out")
 	}
+	if err := ensureDistinctDualCurrentArtifacts(opts.standard, opts.fast); err != nil {
+		return err
+	}
 	standard, standardBytes, err := readDualCurrentDocument(opts.standard)
 	if err != nil {
 		return fmt.Errorf("read Standard preflight: %w", err)
@@ -471,25 +478,10 @@ func compareDualCurrentBootstrap(opts dualCurrentOptions) error {
 	if err != nil {
 		return err
 	}
-	if standard.Status != "BOOTSTRAP_COMPLETE" || fast.Status != "BOOTSTRAP_COMPLETE" || standard.Mode != "single_cold_public_bootstrap" || fast.Mode != "single_cold_public_bootstrap" || standard.Backend != "standard" || fast.Backend != "fast" || standard.BackendCommit != dualCurrentStandardCommit || fast.BackendCommit != dualCurrentFastCommit || standard.BootstrapCalls != 1 || fast.BootstrapCalls != 1 || !standard.PrimaryClean || !fast.PrimaryClean || !standard.BackendClean || !fast.BackendClean {
-		return errors.New("compare-bootstrap requires exactly one completed call per backend")
-	}
-	if standard.Profile != fast.Profile || standard.InputSHA256 != fast.InputSHA256 || standard.InputMetadataSHA256 != fast.InputMetadataSHA256 || standard.ConfigSHA256 != fast.ConfigSHA256 || standard.QPSHA256 != fast.QPSHA256 || standard.PrimaryCommit != fast.PrimaryCommit || standard.PrimarySourceSHA256 != fast.PrimarySourceSHA256 || !reflect.DeepEqual(standard.Parameters, fast.Parameters) || standard.PreflightPairSHA256 == "" || standard.PreflightPairSHA256 != fast.PreflightPairSHA256 {
-		return errors.New("Bootstrap outputs are not from the same profile/config/input/Q/P")
-	}
-	if len(standard.Checkpoints) != 1 || len(fast.Checkpoints) != 1 {
-		return errors.New("Bootstrap documents must each contain one final checkpoint")
-	}
-	if standard.Checkpoints[0].DecodedValues == nil || fast.Checkpoints[0].DecodedValues == nil {
-		return errors.New("Bootstrap decoded vectors are missing")
-	}
-	if standard.OutputAgainstInput == nil || fast.OutputAgainstInput == nil || standard.OutputVsInput == nil || fast.OutputVsInput == nil {
-		return errors.New("Bootstrap output-vs-input metrics are missing")
+	if err := validateDualCurrentBootstrapInputs(standard, fast, opts.standard, opts.fast); err != nil {
+		return err
 	}
 	standardValues, fastValues := decodeDualValues(standard.Checkpoints[0].DecodedValues), decodeDualValues(fast.Checkpoints[0].DecodedValues)
-	if len(standardValues) != len(fastValues) || len(standardValues) != standard.Parameters.InputSlots || !allFinite(standardValues) || !allFinite(fastValues) {
-		return errors.New("Bootstrap outputs lack finite complete matched slot coverage")
-	}
 	result := dualCurrentBootstrapComparison{
 		SchemaVersion: "fast-current-dual-backend-numerical-revalidation-002/v1", Mode: "paired_single_cold_bootstrap",
 		Status: "MEASURED", Timestamp: time.Now().UTC(), Profile: standard.Profile,
@@ -498,9 +490,10 @@ func compareDualCurrentBootstrap(opts dualCurrentOptions) error {
 		SlotsCompared: len(standardValues), ThresholdRMSE: 1e-7,
 		StandardVsInput: *standard.OutputVsInput, StandardInputSNR: *standard.OutputAgainstInput,
 		FastVsInput: *fast.OutputVsInput, FastInputSNR: *fast.OutputAgainstInput,
-		FastVsStandard:  compareVectors(standardValues, fastValues, 1e-7),
-		FastStandardSNR: numericalmetrics.Compare(standardValues, fastValues),
-		StandardState:   standard.Checkpoints[0].State, FastState: fast.Checkpoints[0].State,
+		FastVsStandard:          compareVectors(standardValues, fastValues, 1e-7),
+		FastStandardSNR:         numericalmetrics.Compare(standardValues, fastValues),
+		DecodedBitwiseIdentical: dualCurrentDecodedBitwiseEqual(standardValues, fastValues),
+		StandardState:           standard.Checkpoints[0].State, FastState: fast.Checkpoints[0].State,
 	}
 	return writeExclusiveJSON(opts.out, result)
 }
@@ -737,8 +730,166 @@ func validateDualCurrentPairInputs(standard, fast dualCurrentDocument) error {
 	if standard.Backend != "standard" || fast.Backend != "fast" || standard.BackendCommit != dualCurrentStandardCommit || fast.BackendCommit != dualCurrentFastCommit {
 		return errors.New("preflight artifacts do not contain the independently pinned genuine Standard and Fast sources")
 	}
+	if err := validateDualCurrentIndependentBackendSources(standard, fast); err != nil {
+		return err
+	}
 	if !standard.PrimaryClean || !fast.PrimaryClean || !standard.BackendClean || !fast.BackendClean || standard.PrimaryCommit != fast.PrimaryCommit || standard.PrimarySourceSHA256 != fast.PrimarySourceSHA256 || standard.Profile != fast.Profile || standard.ConfigSHA256 != fast.ConfigSHA256 || standard.InputSHA256 != fast.InputSHA256 || standard.InputMetadataSHA256 != fast.InputMetadataSHA256 || standard.QPSHA256 != fast.QPSHA256 || !reflect.DeepEqual(standard.Parameters, fast.Parameters) {
 		return errors.New("Standard/Fast preflights differ in Primary source, clean provenance, input, configuration, or effective Q/P profile")
+	}
+	wantStages := []string{"input", "scale_down", "mod_up", "c2s_real", "c2s_imag", "evalmod_real", "evalmod_imag", "s2c"}
+	if err := validateDualCurrentDecodedCheckpoints(standard, wantStages); err != nil {
+		return fmt.Errorf("Standard preflight vectors: %w", err)
+	}
+	if err := validateDualCurrentDecodedCheckpoints(fast, wantStages); err != nil {
+		return fmt.Errorf("Fast preflight vectors: %w", err)
+	}
+	return nil
+}
+
+func validateDualCurrentBootstrapInputs(standard, fast dualCurrentDocument, standardPath, fastPath string) error {
+	if err := ensureDistinctDualCurrentArtifacts(standardPath, fastPath); err != nil {
+		return err
+	}
+	if standard.Status != "BOOTSTRAP_COMPLETE" || fast.Status != "BOOTSTRAP_COMPLETE" || standard.Mode != "single_cold_public_bootstrap" || fast.Mode != "single_cold_public_bootstrap" || standard.BootstrapCalls != 1 || fast.BootstrapCalls != 1 || !standard.PrimaryClean || !fast.PrimaryClean || !standard.BackendClean || !fast.BackendClean {
+		return errors.New("compare-bootstrap requires exactly one completed call per backend")
+	}
+	if err := validateDualCurrentIndependentBackendSources(standard, fast); err != nil {
+		return err
+	}
+	if standard.Profile != fast.Profile || standard.InputSHA256 != fast.InputSHA256 || standard.InputMetadataSHA256 != fast.InputMetadataSHA256 || standard.ConfigSHA256 != fast.ConfigSHA256 || standard.QPSHA256 != fast.QPSHA256 || standard.PrimaryCommit != fast.PrimaryCommit || standard.PrimarySourceSHA256 != fast.PrimarySourceSHA256 || !reflect.DeepEqual(standard.Parameters, fast.Parameters) || standard.PreflightPairSHA256 == "" || standard.PreflightPairSHA256 != fast.PreflightPairSHA256 {
+		return errors.New("Bootstrap outputs are not from the same profile/config/input/Q/P")
+	}
+	if len(standard.Checkpoints) != 1 || len(fast.Checkpoints) != 1 {
+		return errors.New("Bootstrap documents must each contain one final checkpoint")
+	}
+	if standard.OutputAgainstInput == nil || fast.OutputAgainstInput == nil || standard.OutputVsInput == nil || fast.OutputVsInput == nil {
+		return errors.New("Bootstrap output-vs-input metrics are missing")
+	}
+	if err := validateDualCurrentDecodedCheckpoints(standard, []string{"bootstrap_output"}); err != nil {
+		return fmt.Errorf("Standard Bootstrap vector: %w", err)
+	}
+	if err := validateDualCurrentDecodedCheckpoints(fast, []string{"bootstrap_output"}); err != nil {
+		return fmt.Errorf("Fast Bootstrap vector: %w", err)
+	}
+	if err := validateDualCurrentBootstrapMetrics(standard); err != nil {
+		return fmt.Errorf("Standard Bootstrap metrics: %w", err)
+	}
+	if err := validateDualCurrentBootstrapMetrics(fast); err != nil {
+		return fmt.Errorf("Fast Bootstrap metrics: %w", err)
+	}
+	return nil
+}
+
+func validateDualCurrentIndependentBackendSources(standard, fast dualCurrentDocument) error {
+	if err := validateDualCurrentBackendSource(standard, "standard"); err != nil {
+		return err
+	}
+	if err := validateDualCurrentBackendSource(fast, "fast"); err != nil {
+		return err
+	}
+	if filepath.Clean(standard.BackendPath) == filepath.Clean(fast.BackendPath) || filepath.Clean(standard.LattigoModulePath) == filepath.Clean(fast.LattigoModulePath) || standard.BinarySHA256 == fast.BinarySHA256 {
+		return errors.New("Standard and Fast artifacts reuse the same backend source path or executable")
+	}
+	return nil
+}
+
+func validateDualCurrentBackendSource(doc dualCurrentDocument, wantBackend string) error {
+	wantCommit, wantTag := dualCurrentStandardCommit, "perf_standard"
+	if wantBackend == "fast" {
+		wantCommit, wantTag = dualCurrentFastCommit, "perf_fast"
+	}
+	if doc.Backend != wantBackend || doc.BackendCommit != wantCommit || doc.BuildTag != wantTag {
+		return fmt.Errorf("%s artifact has wrong backend source identity (backend=%q commit=%q build_tag=%q)", wantBackend, doc.Backend, doc.BackendCommit, doc.BuildTag)
+	}
+	if doc.BackendPath == "" || doc.LattigoModulePath == "" || filepath.Clean(doc.BackendPath) != filepath.Clean(doc.LattigoModulePath) {
+		return fmt.Errorf("%s artifact backend path does not identify its compiled Lattigo module", wantBackend)
+	}
+	binaryHash, err := hex.DecodeString(doc.BinarySHA256)
+	if err != nil || len(binaryHash) != sha256.Size {
+		return fmt.Errorf("%s artifact has invalid binary SHA-256 provenance", wantBackend)
+	}
+	return nil
+}
+
+func ensureDistinctDualCurrentArtifacts(standardPath, fastPath string) error {
+	standardInfo, err := os.Stat(standardPath)
+	if err != nil {
+		return fmt.Errorf("stat Standard artifact: %w", err)
+	}
+	fastInfo, err := os.Stat(fastPath)
+	if err != nil {
+		return fmt.Errorf("stat Fast artifact: %w", err)
+	}
+	standardAbs, err := filepath.Abs(standardPath)
+	if err != nil {
+		return err
+	}
+	fastAbs, err := filepath.Abs(fastPath)
+	if err != nil {
+		return err
+	}
+	if standardAbs == fastAbs || os.SameFile(standardInfo, fastInfo) {
+		return errors.New("Standard and Fast artifact paths refer to the same file")
+	}
+	return nil
+}
+
+func validateDualCurrentDecodedCheckpoints(doc dualCurrentDocument, wantNames []string) error {
+	wantSlots := 1 << 12
+	wantLogN, wantLogSlots, wantRingN, wantQ0Bits := 13, 12, 1<<13, 55
+	wantConfig, wantInput, wantQP := dualCurrentConfig13, dualCurrentInput13, dualCurrentQP13
+	if doc.Profile == "logn16" {
+		wantSlots = 1 << 15
+		wantLogN, wantLogSlots, wantRingN, wantQ0Bits = 16, 15, 1<<16, 56
+		wantConfig, wantInput, wantQP = dualCurrentConfig16, dualCurrentInput16, dualCurrentQP16
+	} else if doc.Profile != "logn13" {
+		return fmt.Errorf("unsupported profile %q", doc.Profile)
+	}
+	if doc.InputSlots != wantSlots || doc.Parameters.InputSlots != wantSlots {
+		return fmt.Errorf("effective slot count mismatch: document=%d parameters=%d want=%d", doc.InputSlots, doc.Parameters.InputSlots, wantSlots)
+	}
+	if doc.ConfigSHA256 != wantConfig || doc.InputSHA256 != wantInput || doc.QPSHA256 != wantQP {
+		return fmt.Errorf("canonical config/input/Q/P identity mismatch for %s", doc.Profile)
+	}
+	parameters := doc.Parameters
+	if parameters.LogN != wantLogN || parameters.LogSlots != wantLogSlots || parameters.RingN != wantRingN || parameters.ResidualRingN != wantRingN || parameters.Q0Target != 55 || parameters.Q0Bits != wantQ0Bits || parameters.QPrefixRowsAtMax != 4 || len(parameters.QPrimes) != 17 || len(parameters.PPrimes) != 5 || len(parameters.QChainBits) != 17 || len(parameters.PBits) != 5 {
+		return fmt.Errorf("effective CKKS parameters do not match canonical %s profile", doc.Profile)
+	}
+	if len(doc.Checkpoints) != len(wantNames) {
+		return fmt.Errorf("checkpoint count=%d, want %d", len(doc.Checkpoints), len(wantNames))
+	}
+	for index, name := range wantNames {
+		checkpoint := doc.Checkpoints[index]
+		if checkpoint.Name != name {
+			return fmt.Errorf("checkpoint %d=%q, want %q", index, checkpoint.Name, name)
+		}
+		if len(checkpoint.DecodedValues) != wantSlots {
+			return fmt.Errorf("checkpoint %s slot count=%d, want %d", name, len(checkpoint.DecodedValues), wantSlots)
+		}
+		values := decodeDualValues(checkpoint.DecodedValues)
+		if !allFinite(values) {
+			return fmt.Errorf("checkpoint %s contains non-finite decoded values", name)
+		}
+		if checkpoint.DecodedSHA256 == "" || perfmeasure.Fingerprint(values) != checkpoint.DecodedSHA256 {
+			return fmt.Errorf("checkpoint %s decoded values do not match decoded_sha256", name)
+		}
+	}
+	return nil
+}
+
+func validateDualCurrentBootstrapMetrics(doc dualCurrentDocument) error {
+	if doc.InputSlots <= 0 || doc.InputSHA256 == "" || doc.OutputVsInput == nil || doc.OutputAgainstInput == nil || len(doc.Checkpoints) != 1 {
+		return errors.New("original input or stored output metrics are missing")
+	}
+	input := perfmeasure.DeterministicInput(doc.InputSlots)
+	if perfmeasure.Fingerprint(input) != doc.InputSHA256 {
+		return errors.New("deterministic original message does not match input_sha256")
+	}
+	output := decodeDualValues(doc.Checkpoints[0].DecodedValues)
+	recomputedMetrics := compareVectors(input, output, 1e-7)
+	recomputedSNR := numericalmetrics.Compare(input, output)
+	if !reflect.DeepEqual(recomputedMetrics, *doc.OutputVsInput) || !reflect.DeepEqual(recomputedSNR, *doc.OutputAgainstInput) {
+		return errors.New("stored output-vs-input metrics do not match the decoded output and canonical message")
 	}
 	return nil
 }
@@ -817,6 +968,7 @@ func compareDualCurrentCheckpoints(standard, fast []dualCurrentCheckpoint) []dua
 		} else {
 			result.Comparable = true
 			standardValues, fastValues := decodeDualValues(std.DecodedValues), decodeDualValues(got.DecodedValues)
+			result.DecodedBitwiseIdentical = dualCurrentDecodedBitwiseEqual(standardValues, fastValues)
 			result.FastVsStd = compareVectors(standardValues, fastValues, 1e-7)
 			result.SNR = numericalmetrics.Compare(standardValues, fastValues)
 			if !result.RepresentationFlagsMatched {
@@ -826,6 +978,18 @@ func compareDualCurrentCheckpoints(standard, fast []dualCurrentCheckpoint) []dua
 		comparisons = append(comparisons, result)
 	}
 	return comparisons
+}
+
+func dualCurrentDecodedBitwiseEqual(standard, fast []complex128) bool {
+	if len(standard) == 0 || len(standard) != len(fast) {
+		return false
+	}
+	for index := range standard {
+		if math.Float64bits(real(standard[index])) != math.Float64bits(real(fast[index])) || math.Float64bits(imag(standard[index])) != math.Float64bits(imag(fast[index])) {
+			return false
+		}
+	}
+	return true
 }
 
 func dualCurrentStageStateMatches(standard, fast dualCurrentCheckpoint) bool {

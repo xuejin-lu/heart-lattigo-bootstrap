@@ -1,0 +1,160 @@
+{
+  "schema_version": "fast-dual-logn16-exact-zero-evidence-audit-003/v1",
+  "task": "FAST-DUAL-LOGN16-EXACT-ZERO-EVIDENCE-AUDIT-003",
+  "status": "EXACT_ZERO_INDEPENDENTLY_CONFIRMED",
+  "prior_task_classification_preserved": "DUAL_BACKEND_NUMERICAL_PARTIAL",
+  "bootstrap_calls_during_audit": 0,
+  "provenance": {
+    "primary_commit": "590bcb89f831c582de0566472daca37d2e02cdc1",
+    "primary_measurement_source_sha256": "1d33c100dfa77545334e6dc5fbff2b14d00132db73672dd48d013288e9919a3c",
+    "standard_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+    "standard_ref": "detached clean pinned source",
+    "standard_module_path": "/private/tmp/current-dual-numerical-002.MRXp6T/lattigo-standard",
+    "standard_mod_sha256": "48550d3b4e161be92fdce1fcdc1aad20488de6b8f2ddec7abd5fd9ae273f8dae",
+    "standard_build_tag": "perf_standard",
+    "standard_binary_sha256": "89a88a424769a73b542e85d5962e8fe337b327047cee8b524cc80dc8178e1d7c",
+    "fast_commit": "2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f",
+    "fast_ref": "fast-qprefix detached clean pinned source",
+    "fast_module_path": "/private/tmp/current-dual-numerical-002.MRXp6T/lattigo-fast",
+    "fast_mod_sha256": "a3e8b6c80ad886772a6e05dd3c024f21a1a75a0d524ce2b78c6b223b4cb29edd",
+    "fast_build_tag": "perf_fast",
+    "fast_binary_sha256": "092cbf1ef203372529a3fdfc5da968d0162c19eec772155324ae6557038ee358",
+    "both_secondary_checkouts_clean": true,
+    "same_primary_source_and_build_environment": true
+  },
+  "measurement_integrity": {
+    "mode": "diagnostic-encoded-c0-c1-zero-v1",
+    "standard_dispatch": "bootstrapping.NewEvaluator genuine Standard evaluator",
+    "fast_dispatch": "ordinary bootstrapping.NewEvaluator wrapper; pinned Fast zero-secret capability selects internal Fast dispatch",
+    "same_deterministic_original_message_per_profile": true,
+    "formal_native_e32_or_security_equivalence_claim": false,
+    "raw_standard_fast_artifacts_distinct_files_and_sha256": true,
+    "all_decoded_vectors_rehashed_with_perfmeasure_fingerprint": true,
+    "all_decoded_vectors_finite_and_exact_expected_slot_count": true,
+    "all_effective_profile_identities_matched_canonical_config_input_qp": true,
+    "all_recomputed_metrics_match_original_pair_and_result_summary": true,
+    "terminal_output_hash_matches_own_backend_s2c_preflight_hash": true,
+    "attempt_journals_each_show_one_reserved_then_completed_call": true
+  },
+  "source_artifacts": {
+    "directory": "/private/tmp/current-dual-numerical-002.MRXp6T",
+    "logn13": {
+      "standard_preflight": {"file": "logn13-standard-preflight-final.json", "sha256": "b131300d43b1d5f52429f289d43cb086fadb7e9561d54df7902567cf274171fa"},
+      "fast_preflight": {"file": "logn13-fast-preflight-final.json", "sha256": "a093df13485a7225b433802dbe40930fb127112414675b6d4beaf4819e63f5b2"},
+      "standard_terminal": {"file": "logn13-standard-bootstrap.json", "sha256": "32291f5d3aab33a0e505b187c8c59f406f99b65bb072ed7d5b29d99c15801574"},
+      "fast_terminal": {"file": "logn13-fast-bootstrap.json", "sha256": "6ef70069f885c700d6b34fce7f2a04b156e7c33169d81839810c59a01cadeaab"},
+      "preflight_pair_sha256": "87045b26c928a311df16ae7169026444f0ae1104786b4f112a8623e23cfdfce1",
+      "attempts_per_backend": 1,
+      "attempt_state_sequence": ["RESERVED", "COMPLETED"]
+    },
+    "logn16": {
+      "standard_preflight": {"file": "logn16-standard-preflight-v5.json", "sha256": "311575f301cc7bc5f6a944d06d3f2e3e62aa68cd726684d6993432c5012c279b"},
+      "fast_preflight": {"file": "logn16-fast-preflight-v5.json", "sha256": "682c85e1360b8db7792800968f24ae0fedf6cb4b9be34afde276e0bc332ae631"},
+      "standard_terminal": {"file": "logn16-standard-bootstrap.json", "sha256": "585567f7a837a5d63cf03aef267f3369c5095a0956afa415e4a5772eaaa1d923"},
+      "fast_terminal": {"file": "logn16-fast-bootstrap.json", "sha256": "968b186eb6e5de56fee6fc28f21586c2791e8fe3daf1e3a22491ad53b843bad7"},
+      "preflight_pair_sha256": "b06b12f18aea83bfe8df83a484336a9e6d9b1db4c4e845a069e5974b5b176ca5",
+      "attempts_per_backend": 1,
+      "attempt_state_sequence": ["RESERVED", "COMPLETED"]
+    }
+  },
+  "recomputation": {
+    "commands": [
+      "go run . dual-current compare-preflight --standard <raw-standard-preflight.json> --fast <raw-fast-preflight.json> --out <new-audit-pair.json>",
+      "go run . dual-current compare-bootstrap --standard <raw-standard-bootstrap.json> --fast <raw-fast-bootstrap.json> --out <new-audit-pair.json>"
+    ],
+    "metrics": "existing compareVectors plus internal/numericalmetrics.Compare",
+    "terminal_vs_original_message_recomputed_from_canonical_deterministic_input": true,
+    "matched_all_values_in_previous_result_json": true,
+    "matched_all_values_in_original_pair_json": true
+  },
+  "profiles": [
+    {
+      "profile": "logn13",
+      "slots": 4096,
+      "config_sha256": "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98",
+      "input_sha256": "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285",
+      "input_metadata_sha256": "9171dac4a79b97f7f916001d0ea5805f6137711527d364f8dfcd8e71ed2764f6",
+      "qp_sha256": "1f045e603a856968779d62e045a037274bba08cbfce8b1dd3dec2828f1f6a46b",
+      "effective_parameters": "LogN=13, LogSlots=12, RingN=8192, 17 Q primes, 5 P primes, q0 target/actual=55/55 bits, Q-prefix max width=4; Standard/Fast parameter objects identical",
+      "checkpoints": [
+        {"name":"input","standard_decoded_sha256":"d107a20b1606f9d73a65b21299ead4d24f177adf74edcecb65dc7648aa4bdc5f","fast_decoded_sha256":"d107a20b1606f9d73a65b21299ead4d24f177adf74edcecb65dc7648aa4bdc5f","bitwise_identical":true,"complex_rmse":0,"max_complex_difference":0,"snr_status":"POSITIVE_INFINITY","snr_db":null},
+        {"name":"scale_down","standard_decoded_sha256":"d107a20b1606f9d73a65b21299ead4d24f177adf74edcecb65dc7648aa4bdc5f","fast_decoded_sha256":"d107a20b1606f9d73a65b21299ead4d24f177adf74edcecb65dc7648aa4bdc5f","bitwise_identical":true,"complex_rmse":0,"max_complex_difference":0,"snr_status":"POSITIVE_INFINITY","snr_db":null},
+        {"name":"mod_up","standard_decoded_sha256":"d107a20b1606f9d73a65b21299ead4d24f177adf74edcecb65dc7648aa4bdc5f","fast_decoded_sha256":"d107a20b1606f9d73a65b21299ead4d24f177adf74edcecb65dc7648aa4bdc5f","bitwise_identical":true,"complex_rmse":0,"max_complex_difference":0,"snr_status":"POSITIVE_INFINITY","snr_db":null},
+        {"name":"c2s_real","standard_decoded_sha256":"24a8f8da0ea07679d28ba266a43909bf7ad8720339c85ece4da9021e78d54745","fast_decoded_sha256":"c9cd0604ee19da27e352cfa3397e9e9506e3d4db96796498b4c89df5586b69ff","bitwise_identical":false,"complex_rmse":2.3964363961731316e-14,"max_complex_difference":9.1850748469742e-14,"snr_status":"FINITE","snr_db":175.43291024140183},
+        {"name":"c2s_imag","standard_decoded_sha256":"239a95d56d9596df95b9bfd7d71c555559a980a0dd722e8e5ca02ccc4fd1b329","fast_decoded_sha256":"c4e5374535e3c4ca704cbdcdaee7ec176da955e9c775be81e30577f36a166717","bitwise_identical":false,"complex_rmse":2.4095676473593568e-14,"max_complex_difference":9.768350882409342e-14,"snr_status":"FINITE","snr_db":175.35874442697173},
+        {"name":"evalmod_real","standard_decoded_sha256":"f410ac3dbee9c56cf08f860fdecce92cde9e1d31c662be7cc7e11efdf2df9988","fast_decoded_sha256":"43cccb396e6bbe48ab91e38dcfaf3cdf498797b126382dc08de112c94078027a","bitwise_identical":false,"complex_rmse":5.095135038373601e-11,"max_complex_difference":1.60298267715131e-10,"snr_status":"FINITE","snr_db":163.06651362820782},
+        {"name":"evalmod_imag","standard_decoded_sha256":"9ad6aa37a53f6a0da00e0f09d0606a4cfe9340b2a68d394ea44bc632386baf03","fast_decoded_sha256":"e1879f5bb482afc09c3b4bb6b176f2d79734dc3018a0d9a4638c75f44a7dd2b2","bitwise_identical":false,"complex_rmse":5.135616506107663e-11,"max_complex_difference":1.7541738200899104e-10,"snr_status":"FINITE","snr_db":162.97107437864028},
+        {"name":"s2c","standard_decoded_sha256":"0af5cdd54baa7f9eb28d53f5048a8856e1dfe15e3473057cc11626eab0479df0","fast_decoded_sha256":"b6e6c903382544adb9ee73b04d5b44eed26ef66925c1bcc310fb7c39f717b755","bitwise_identical":false,"complex_rmse":1.4468089544345387e-10,"max_complex_difference":4.675260603879638e-10,"snr_status":"FINITE","snr_db":163.01897348253942}
+      ],
+      "terminal": {
+        "standard_decoded_sha256":"0af5cdd54baa7f9eb28d53f5048a8856e1dfe15e3473057cc11626eab0479df0",
+        "fast_decoded_sha256":"b6e6c903382544adb9ee73b04d5b44eed26ef66925c1bcc310fb7c39f717b755",
+        "bitwise_identical":false,
+        "fast_vs_standard":{"complex_rmse":1.4468089544345387e-10,"max_complex_difference":4.675260603879638e-10,"snr_status":"FINITE","snr_db":163.01897348253942},
+        "standard_vs_original_input":{"complex_rmse":1.1903936621664996e-9,"max_complex_difference":5.805495741185792e-8,"snr_db":144.71338512805514},
+        "fast_vs_original_input":{"complex_rmse":1.1907546782784477e-9,"max_complex_difference":5.805793207821362e-8,"snr_db":144.7107513180764}
+      }
+    },
+    {
+      "profile": "logn16",
+      "slots": 32768,
+      "config_sha256": "16e62fdea2dc5ac32240a33cc256cdf60b935aa00b4a16aa004474d2c3033b02",
+      "input_sha256": "659fc59c899341a8253887270f1ae3478528fd864d66aca14bba918550ce8ccf",
+      "input_metadata_sha256": "58b699119d1ca2d73cfe8812e6ae776f77d4267ff4c25e67229d7b140a6cf44f",
+      "qp_sha256": "6c82ca724cbfdce2083b2ef2c18d53f81e658a6f28ff283e9a671d276710ec5f",
+      "effective_parameters": "LogN=16, LogSlots=15, RingN=65536, 17 Q primes, 5 P primes, q0 target/actual=55/56 bits, Q-prefix max width=4; Standard/Fast parameter objects identical",
+      "checkpoints": [
+        {"name":"input","standard_decoded_sha256":"740e6f327fef2e929054fc698920ce36bf608f867a7ad8973b7fed55900f175b","fast_decoded_sha256":"740e6f327fef2e929054fc698920ce36bf608f867a7ad8973b7fed55900f175b","bitwise_identical":true,"complex_rmse":0,"max_complex_difference":0,"snr_status":"POSITIVE_INFINITY","snr_db":null},
+        {"name":"scale_down","standard_decoded_sha256":"740e6f327fef2e929054fc698920ce36bf608f867a7ad8973b7fed55900f175b","fast_decoded_sha256":"740e6f327fef2e929054fc698920ce36bf608f867a7ad8973b7fed55900f175b","bitwise_identical":true,"complex_rmse":0,"max_complex_difference":0,"snr_status":"POSITIVE_INFINITY","snr_db":null},
+        {"name":"mod_up","standard_decoded_sha256":"740e6f327fef2e929054fc698920ce36bf608f867a7ad8973b7fed55900f175b","fast_decoded_sha256":"740e6f327fef2e929054fc698920ce36bf608f867a7ad8973b7fed55900f175b","bitwise_identical":true,"complex_rmse":0,"max_complex_difference":0,"snr_status":"POSITIVE_INFINITY","snr_db":null},
+        {"name":"c2s_real","standard_decoded_sha256":"024a890ed662996ae3db4d555ba9b09a57d32b6c693dc9fd28d55ac5801c385a","fast_decoded_sha256":"024a890ed662996ae3db4d555ba9b09a57d32b6c693dc9fd28d55ac5801c385a","bitwise_identical":true,"complex_rmse":0,"max_complex_difference":0,"snr_status":"POSITIVE_INFINITY","snr_db":null},
+        {"name":"c2s_imag","standard_decoded_sha256":"1cb32983dbaafa98a3027b3d5c41cb0ed472cb88a73b056dd31b587d03a670fc","fast_decoded_sha256":"1cb32983dbaafa98a3027b3d5c41cb0ed472cb88a73b056dd31b587d03a670fc","bitwise_identical":true,"complex_rmse":0,"max_complex_difference":0,"snr_status":"POSITIVE_INFINITY","snr_db":null},
+        {"name":"evalmod_real","standard_decoded_sha256":"5876e1a6528807f4d16bbeb968dbf710d90c65db4ce59259eb3097fc8e8508bc","fast_decoded_sha256":"5876e1a6528807f4d16bbeb968dbf710d90c65db4ce59259eb3097fc8e8508bc","bitwise_identical":true,"complex_rmse":0,"max_complex_difference":0,"snr_status":"POSITIVE_INFINITY","snr_db":null},
+        {"name":"evalmod_imag","standard_decoded_sha256":"b30590028f98a8bdab90d1fc1a12b1c6d363be1b409c3905bca1e8039ab644ba","fast_decoded_sha256":"b30590028f98a8bdab90d1fc1a12b1c6d363be1b409c3905bca1e8039ab644ba","bitwise_identical":true,"complex_rmse":0,"max_complex_difference":0,"snr_status":"POSITIVE_INFINITY","snr_db":null},
+        {"name":"s2c","standard_decoded_sha256":"84f85bb7891b062e5a3bb58ea8cd2d24c0487cd27b0a2b3cab637f508f8d825e","fast_decoded_sha256":"84f85bb7891b062e5a3bb58ea8cd2d24c0487cd27b0a2b3cab637f508f8d825e","bitwise_identical":true,"complex_rmse":0,"max_complex_difference":0,"snr_status":"POSITIVE_INFINITY","snr_db":null}
+      ],
+      "terminal": {
+        "standard_decoded_sha256":"84f85bb7891b062e5a3bb58ea8cd2d24c0487cd27b0a2b3cab637f508f8d825e",
+        "fast_decoded_sha256":"84f85bb7891b062e5a3bb58ea8cd2d24c0487cd27b0a2b3cab637f508f8d825e",
+        "bitwise_identical":true,
+        "fast_vs_standard":{"complex_rmse":0,"max_complex_difference":0,"snr_status":"POSITIVE_INFINITY","snr_db":null},
+        "standard_vs_original_input":{"complex_rmse":5.808193349077692e-9,"max_complex_difference":4.7088049150256786e-7,"snr_db":130.94764728940336},
+        "fast_vs_original_input":{"complex_rmse":5.808193349077692e-9,"max_complex_difference":4.7088049150256786e-7,"snr_db":130.94764728940336}
+      }
+    }
+  ],
+  "logn16_physical_ciphertext_row_hash_audit": {
+    "component_count_standard_and_fast": 2,
+    "shared_active_rows_compared_per_checkpoint": {
+      "input": {"rows": 2, "same_hash": 2, "different_hash": 0},
+      "scale_down": {"rows": 2, "same_hash": 2, "different_hash": 0},
+      "mod_up": {"rows": 8, "same_hash": 4, "different_hash": 4},
+      "c2s_real": {"rows": 8, "same_hash": 4, "different_hash": 4},
+      "c2s_imag": {"rows": 8, "same_hash": 4, "different_hash": 4},
+      "evalmod_real": {"rows": 8, "same_hash": 4, "different_hash": 4},
+      "evalmod_imag": {"rows": 8, "same_hash": 4, "different_hash": 4},
+      "s2c": {"rows": 4, "same_hash": 2, "different_hash": 2},
+      "final_public_output": {"rows": 4, "same_hash": 4, "different_hash": 0}
+    },
+    "ntt_true_on_both_backends": true,
+    "standard_montgomery_false_throughout": true,
+    "fast_montgomery_true_from_modup_through_s2c": true,
+    "terminal_montgomery_false_on_both": true,
+    "interpretation": "Different intermediate physical row hashes coexist with bit-identical decoded vectors and distinct Standard/Fast binaries; final terminal row hashes are also equal. Intermediate row differences are consistent with the recorded backend-specific Montgomery representation and Q-prefix storage, not evidence of vector aliasing."
+  },
+  "integrity_regressions": {
+    "wrong_decoded_vector_hash_rejected": true,
+    "wrong_backend_commit_or_module_source_rejected": true,
+    "wrong_slot_count_rejected": true,
+    "swapped_terminal_sources_rejected": true,
+    "reused_terminal_file_or_inode_rejected": true,
+    "stale_terminal_output_metrics_rejected": true,
+    "float64_signed_zero_difference_detected": true
+  },
+  "limitations": [
+    "Prior classification remains DUAL_BACKEND_NUMERICAL_PARTIAL because pristine Standard lacks matching private generated-power/DoubleAngle instrumentation.",
+    "Both backends used the prior diagnostic encoded-c0/zero-c1 input, not native E32 encryption; this is not a formal native-encrypted Standard/Fast or security-equivalence result.",
+    "Fast-only private internal traces remain not comparable to genuine Standard internal checkpoints.",
+    "No Bootstrap, benchmark, Secondary modification, parameter change, or threshold change occurred during this audit."
+  ]
+}
