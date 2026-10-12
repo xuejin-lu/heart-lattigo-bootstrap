@@ -1,0 +1,1722 @@
+{
+  "schema_version": 1,
+  "classification": "T1_SOURCE_EVIDENCE_MISSING",
+  "started_utc": "2026-10-12T12:36:41.406642Z",
+  "finished_utc": "2026-10-12T12:38:54.894525Z",
+  "runtime": "go1.26.4",
+  "os": "darwin",
+  "arch": "arm64",
+  "profile": {
+    "log_n": 16,
+    "log_slots": 15,
+    "n": 65536,
+    "slots": 32768,
+    "max_level": 29,
+    "s2c_start_level": 3,
+    "c2s_input_level": 29,
+    "q": [
+      4398044938241,
+      4293918721,
+      4296540161,
+      4291952641,
+      4298506241,
+      4299685889,
+      4300210177,
+      4300865537,
+      4289462273,
+      4301651969,
+      4288806913,
+      4302176257,
+      4302569473,
+      4286709761,
+      4304535553,
+      4286054401,
+      4284874753,
+      4306894849,
+      4284088321,
+      4398043496449,
+      4398042972161,
+      4398042185729,
+      4398052147201,
+      4398052540417,
+      4398053588993,
+      4398054506497,
+      4398054899713,
+      4398055555073,
+      4398058045441,
+      4398034845697
+    ],
+    "p": [
+      4398063157249,
+      4398029340673,
+      4398065909761,
+      4398028029953,
+      4398070628353
+    ],
+    "q0123_product": "348246915784587767546753829371582913576961"
+  },
+  "input": {
+    "plain_sha256": "5ca151755bd8232e0b581939fb1b2c079fa4451b454c0e1b0ad9f2b1a6198373",
+    "encoder_coefficients_verified": true,
+    "source_bound": "39477590",
+    "worst_coefficient": 34951,
+    "coefficient_sha256": "175fd9098c2a5b540b88800e42ba1b3f25b37e689491333a1eb2cd3e8fa48683",
+    "c1_zero": true
+  },
+  "new_bts_millis": 45233,
+  "scale_down_integer": "1",
+  "modup_integer": "1",
+  "modup_q0_lift_verified": true,
+  "first_proof_gap": "s2c stage 3 conservative raw bound does not fit maintained Q-prefix",
+  "capacity": {
+    "t1_required_bound": "354567853947127",
+    "first_failed_transform_stage": "S2C stage 3 raw pre-Rescale at Level 1",
+    "raw_bound": "232076387351619387697099559",
+    "q0q1_product": "18884847496112318709761",
+    "strict_centered_capacity": "9442423748056159354880",
+    "twice_bound_minus_q0q1": "464133889855742663075489357",
+    "bound_over_capacity_factor": 24578.05257886199,
+    "observed_full_q_centered_raw_max": "18442236704021432251",
+    "post_rescale_bound": "54047689868142566",
+    "post_rescale_observed_centered_max": "4294966417",
+    "concrete_wrap_counterexample": false
+  },
+  "stage_bounds": [
+    {
+      "transform": "s2c",
+      "arithmetic_basis": "complete logical Q plus full P for existing myBSGS/QP operations; report Q-prefix separately",
+      "stage": 1,
+      "level": 3,
+      "scale": "4.294967296e+09",
+      "bound_available": true,
+      "diagonal_count": 31,
+      "diagonal_coefficient_l1_sum_exact_encoder_source": "416343546501",
+      "diagonal_coefficient_max_abs_exact_encoder_source": "2040355841",
+      "input_bound": "39477590",
+      "raw_pre_rescale_bound": "16436239827912412591",
+      "rescale_divisor": "4291952641",
+      "post_rescale_bound": "3829548274",
+      "source_prefix_strict_fit_raw": true,
+      "source_full_q_strict_fit_raw": true,
+      "raw_qprefix_matches_full_q": true,
+      "target_prefix_strict_fit_post": true,
+      "target_full_q_strict_fit_post": true,
+      "post_qprefix_matches_full_q": true,
+      "observed_full_q_within_raw_bound": true,
+      "observed_within_post_bound": true
+    },
+    {
+      "transform": "s2c",
+      "arithmetic_basis": "complete logical Q plus full P for existing myBSGS/QP operations; report Q-prefix separately",
+      "stage": 2,
+      "level": 2,
+      "scale": "4.294967296e+09",
+      "bound_available": true,
+      "diagonal_count": 63,
+      "diagonal_coefficient_l1_sum_exact_encoder_source": "4654470083901",
+      "diagonal_coefficient_max_abs_exact_encoder_source": "571589966",
+      "input_bound": "3829548274",
+      "raw_pre_rescale_bound": "17824517876187709736875",
+      "rescale_divisor": "4296540161",
+      "post_rescale_bound": "4148574715531",
+      "source_prefix_strict_fit_raw": true,
+      "source_full_q_strict_fit_raw": true,
+      "raw_qprefix_matches_full_q": true,
+      "target_prefix_strict_fit_post": true,
+      "target_full_q_strict_fit_post": true,
+      "post_qprefix_matches_full_q": true,
+      "observed_full_q_within_raw_bound": true,
+      "observed_within_post_bound": true
+    },
+    {
+      "transform": "s2c",
+      "arithmetic_basis": "complete logical Q plus full P for existing myBSGS/QP operations; report Q-prefix separately",
+      "stage": 3,
+      "level": 1,
+      "scale": "4.294967296e+09",
+      "bound_available": true,
+      "diagonal_count": 64,
+      "diagonal_coefficient_l1_sum_exact_encoder_source": "55941233620018",
+      "diagonal_coefficient_max_abs_exact_encoder_source": "139236132",
+      "input_bound": "4148574715531",
+      "raw_pre_rescale_bound": "232076387351619387697099559",
+      "rescale_divisor": "4293918721",
+      "post_rescale_bound": "54047689868142566",
+      "source_prefix_strict_fit_raw": false,
+      "source_full_q_strict_fit_raw": false,
+      "raw_qprefix_matches_full_q": true,
+      "target_prefix_strict_fit_post": false,
+      "target_full_q_strict_fit_post": false,
+      "post_qprefix_matches_full_q": true,
+      "observed_full_q_within_raw_bound": true,
+      "observed_within_post_bound": true
+    },
+    {
+      "transform": "c2s",
+      "arithmetic_basis": "complete logical Q plus full P for existing myBSGS/QP operations; report Q-prefix separately",
+      "stage": 1,
+      "level": 29,
+      "scale": "4.294967296e+09",
+      "bound_available": false,
+      "diagonal_count": 32,
+      "diagonal_coefficient_l1_sum_exact_encoder_source": "279980005292245",
+      "diagonal_coefficient_max_abs_exact_encoder_source": "1834082964",
+      "input_bound": "unavailable",
+      "raw_pre_rescale_bound": "unavailable",
+      "rescale_divisor": "4398034845697",
+      "post_rescale_bound": "unavailable",
+      "source_prefix_strict_fit_raw": false,
+      "source_full_q_strict_fit_raw": false,
+      "raw_qprefix_matches_full_q": false,
+      "target_prefix_strict_fit_post": false,
+      "target_full_q_strict_fit_post": false,
+      "post_qprefix_matches_full_q": false,
+      "observed_full_q_within_raw_bound": false,
+      "observed_within_post_bound": false
+    },
+    {
+      "transform": "c2s",
+      "arithmetic_basis": "complete logical Q plus full P for existing myBSGS/QP operations; report Q-prefix separately",
+      "stage": 2,
+      "level": 28,
+      "scale": "4.294967296e+09",
+      "bound_available": false,
+      "diagonal_count": 63,
+      "diagonal_coefficient_l1_sum_exact_encoder_source": "66151809604518",
+      "diagonal_coefficient_max_abs_exact_encoder_source": "4151590796",
+      "input_bound": "unavailable",
+      "raw_pre_rescale_bound": "unavailable",
+      "rescale_divisor": "4398058045441",
+      "post_rescale_bound": "unavailable",
+      "source_prefix_strict_fit_raw": false,
+      "source_full_q_strict_fit_raw": false,
+      "raw_qprefix_matches_full_q": false,
+      "target_prefix_strict_fit_post": false,
+      "target_full_q_strict_fit_post": false,
+      "post_qprefix_matches_full_q": false,
+      "observed_full_q_within_raw_bound": false,
+      "observed_within_post_bound": false
+    },
+    {
+      "transform": "c2s",
+      "arithmetic_basis": "complete logical Q plus full P for existing myBSGS/QP operations; report Q-prefix separately",
+      "stage": 3,
+      "level": 27,
+      "scale": "4.294967296e+09",
+      "bound_available": false,
+      "diagonal_count": 63,
+      "diagonal_coefficient_l1_sum_exact_encoder_source": "11838663137549",
+      "diagonal_coefficient_max_abs_exact_encoder_source": "17361143904",
+      "input_bound": "unavailable",
+      "raw_pre_rescale_bound": "unavailable",
+      "rescale_divisor": "4398055555073",
+      "post_rescale_bound": "unavailable",
+      "source_prefix_strict_fit_raw": false,
+      "source_full_q_strict_fit_raw": false,
+      "raw_qprefix_matches_full_q": false,
+      "target_prefix_strict_fit_post": false,
+      "target_full_q_strict_fit_post": false,
+      "post_qprefix_matches_full_q": false,
+      "observed_full_q_within_raw_bound": false,
+      "observed_within_post_bound": false
+    }
+  ],
+  "t1": {
+    "definition": "Step2_Offset output after C2S(ctReal) and Step1_Relabel",
+    "offset": "-0.015625",
+    "offset_expected_coefficient": "-68719476736",
+    "offset_observed": {
+      "changed_coefficient_count": 1,
+      "max_abs": "68719476736",
+      "max_coefficient": 0,
+      "signed_at_max": "-68719476736",
+      "coefficient_zero_delta": "-68719476736",
+      "delta_sha256": "4ae92b1dccb1a304f84a877c7b10ffcd03ba3f21b8b488671786d453011cd8b8",
+      "expected_matches": true
+    },
+    "observed_qprefix_centered_max_abs": [
+      "68717802446",
+      "0"
+    ],
+    "proven_upper_bound": null,
+    "full_q_capacity_proof_complete": false,
+    "qprefix_capacity_proof_complete": false,
+    "source_proof_complete": false
+  },
+  "checkpoints": [
+    {
+      "name": "encrypted_input",
+      "operation": "ordinary rlwe.EncryptNew",
+      "level": 3,
+      "scale": "4.294967296e+09",
+      "degree": 1,
+      "is_ntt": true,
+      "is_montgomery": false,
+      "q_authority": "complete-Q",
+      "qprefix_policy_rows": 4,
+      "physical_rows_per_component": [
+        4,
+        4
+      ],
+      "c1_zero": true,
+      "full_q_complete_per_component": [
+        true,
+        true
+      ],
+      "qprefix_matches_full_q_per_component": [
+        true,
+        true
+      ],
+      "qprefix_observed_centered_max_abs": [
+        "39477590",
+        "0"
+      ],
+      "full_q_observed_centered_max_abs": [
+        "39477590",
+        "0"
+      ],
+      "proven_upper_bound": [
+        "39477590",
+        "0"
+      ],
+      "bound_derivation": "Source is accepted only after exact row equality between Fast zero-secret EncryptNew c0 and the original encoded plaintext, plus c1=0; the bound is the full logical-Q centered coefficient maximum of that exact plaintext",
+      "full_q_observed_strict_fit_per_component": [
+        true,
+        true
+      ],
+      "proven_bound_qprefix_strict_fit_per_component": [
+        true,
+        true
+      ],
+      "proven_bound_full_q_strict_fit_per_component": [
+        true,
+        true
+      ],
+      "qprefix_coefficient_row_sha256": [
+        {
+          "0": "2da8dfa79db4664fc70f6d867004010dade9b8adbd4272fe7170a91741bfd931",
+          "1": "f10e441d8d62412698ebefb88b617fec2ed86a626fcd9fa460a77004ef172d32",
+          "2": "bb7bca09f9f193a25840b7521022cb6aeeff8a3c952780dca310cf4039daca6b",
+          "3": "b59f4bbef7df2d51177038f4e86b1f0b3e9355b67fb585eeb106d2729fb7a5cc"
+        },
+        {
+          "0": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "1": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "2": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "3": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541"
+        }
+      ],
+      "full_q_coefficient_sha256": [
+        "a6ef84b6567067cde4f17f3daf9846560af778c9b792c2688487f7d297fd1633",
+        "5647f05ec18958947d32874eeb788fa396a05d0bab7c1b71f112ceb7e9b31eee"
+      ],
+      "centered_uniqueness_required_for_operation": true,
+      "centered_uniqueness_use": "The exact unmodded encoder coefficient must be uniquely represented by the source Q chain.",
+      "observer_error": null
+    },
+    {
+      "name": "s2c_stage_1_raw_pre_rescale",
+      "operation": "myBSGS QP accumulation + ModDownQPtoQNTT output before ordinary Rescale",
+      "level": 3,
+      "scale": "1.8433796229075828736e+19",
+      "degree": 1,
+      "is_ntt": true,
+      "is_montgomery": false,
+      "q_authority": "complete-Q",
+      "qprefix_policy_rows": 4,
+      "physical_rows_per_component": [
+        4,
+        4
+      ],
+      "c1_zero": true,
+      "full_q_complete_per_component": [
+        true,
+        true
+      ],
+      "qprefix_matches_full_q_per_component": [
+        true,
+        true
+      ],
+      "qprefix_observed_centered_max_abs": [
+        "754980965704717747",
+        "0"
+      ],
+      "full_q_observed_centered_max_abs": [
+        "754980965704717747",
+        "0"
+      ],
+      "proven_upper_bound": [
+        "16436239827912412591",
+        "0"
+      ],
+      "bound_derivation": "B_raw <= B_in * sum_diagonal(L1) + 1; valid only while the preceding source/strict-capacity chain is proven; zero c1 elides key-switch contributions",
+      "full_q_observed_strict_fit_per_component": [
+        true,
+        true
+      ],
+      "proven_bound_qprefix_strict_fit_per_component": [
+        true,
+        true
+      ],
+      "proven_bound_full_q_strict_fit_per_component": [
+        true,
+        true
+      ],
+      "qprefix_coefficient_row_sha256": [
+        {
+          "0": "aeca460904ed6141c167de539f56a0533355e463d69553a6d028b435aa198211",
+          "1": "57997239c19bf8b52a27432cd13f7631643279520599eadd3cccf2e58965ea8a",
+          "2": "c1ca88fe08e9c2b18c54c7640d99249ee3a161a4130a3687651d54795c611217",
+          "3": "d151bdd387fcbe22b007e7627410d2c2fc33887440410a30340dc84e55ea7d48"
+        },
+        {
+          "0": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "1": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "2": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "3": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541"
+        }
+      ],
+      "full_q_coefficient_sha256": [
+        "9ea57bd09fba0c633ae956168143368ac12ab9d8cd968f2c1989ee9f02285c94",
+        "5647f05ec18958947d32874eeb788fa396a05d0bab7c1b71f112ceb7e9b31eee"
+      ],
+      "centered_uniqueness_required_for_operation": true,
+      "centered_uniqueness_use": "Ordinary Rescale performs centered coefficient division by the dropped q prime.",
+      "observer_error": null
+    },
+    {
+      "name": "s2c_stage_1_post_rescale",
+      "operation": "ordinary ckks.Evaluator.Rescale output",
+      "level": 2,
+      "scale": "4.294967296e+09",
+      "degree": 1,
+      "is_ntt": true,
+      "is_montgomery": false,
+      "q_authority": "complete-Q",
+      "qprefix_policy_rows": 3,
+      "physical_rows_per_component": [
+        3,
+        3
+      ],
+      "c1_zero": true,
+      "full_q_complete_per_component": [
+        true,
+        true
+      ],
+      "qprefix_matches_full_q_per_component": [
+        true,
+        true
+      ],
+      "qprefix_observed_centered_max_abs": [
+        "175906173",
+        "0"
+      ],
+      "full_q_observed_centered_max_abs": [
+        "175906173",
+        "0"
+      ],
+      "proven_upper_bound": [
+        "3829548274",
+        "0"
+      ],
+      "bound_derivation": "B_post <= floor((B_raw + floor((q_level-1)/2))/q_level); the output observation is evidence, not a substitute for the carried bound",
+      "full_q_observed_strict_fit_per_component": [
+        true,
+        true
+      ],
+      "proven_bound_qprefix_strict_fit_per_component": [
+        true,
+        true
+      ],
+      "proven_bound_full_q_strict_fit_per_component": [
+        true,
+        true
+      ],
+      "qprefix_coefficient_row_sha256": [
+        {
+          "0": "a435613432f1081e72ac024b31cd0c8f3350d5212b979e1158b81a9130b51de9",
+          "1": "e2e9827d87322e928d8d3b51a87da793bf1769fb1d47fbb7e70190cc40c55c4c",
+          "2": "a0ed002372a05c34d4d778a13e75fff8741ea8fba8e9ad04a97cc1e3f0e01e9e"
+        },
+        {
+          "0": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "1": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "2": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541"
+        }
+      ],
+      "full_q_coefficient_sha256": [
+        "05d5bf5a9de61db7bd63c3f3000dc6569a43bb499fd7ca289ac772e56e057726",
+        "106f0647ae10a6516b1ab2968038161e287ef40d1b22ca047531ed768e594ef1"
+      ],
+      "centered_uniqueness_required_for_operation": true,
+      "centered_uniqueness_use": "The Rescale output feeds the next stage and its coefficient bound must remain a unique centered representative.",
+      "observer_error": null
+    },
+    {
+      "name": "s2c_stage_2_raw_pre_rescale",
+      "operation": "myBSGS QP accumulation + ModDownQPtoQNTT output before ordinary Rescale",
+      "level": 2,
+      "scale": "1.8453499477445574656e+19",
+      "degree": 1,
+      "is_ntt": true,
+      "is_montgomery": false,
+      "q_authority": "complete-Q",
+      "qprefix_policy_rows": 3,
+      "physical_rows_per_component": [
+        3,
+        3
+      ],
+      "c1_zero": true,
+      "full_q_complete_per_component": [
+        true,
+        true
+      ],
+      "qprefix_matches_full_q_per_component": [
+        true,
+        true
+      ],
+      "qprefix_observed_centered_max_abs": [
+        "4014994617892945071",
+        "0"
+      ],
+      "full_q_observed_centered_max_abs": [
+        "4014994617892945071",
+        "0"
+      ],
+      "proven_upper_bound": [
+        "17824517876187709736875",
+        "0"
+      ],
+      "bound_derivation": "B_raw <= B_in * sum_diagonal(L1) + 1; valid only while the preceding source/strict-capacity chain is proven; zero c1 elides key-switch contributions",
+      "full_q_observed_strict_fit_per_component": [
+        true,
+        true
+      ],
+      "proven_bound_qprefix_strict_fit_per_component": [
+        true,
+        true
+      ],
+      "proven_bound_full_q_strict_fit_per_component": [
+        true,
+        true
+      ],
+      "qprefix_coefficient_row_sha256": [
+        {
+          "0": "df60b89aad8c53f95ecc83314d5dfc3411b6861e07e95027dbaca937e764acb4",
+          "1": "b7e6b10d98f88a3b5f28f9cee8a513c178672846a0961787af19e4dbb5474bb4",
+          "2": "50f15116280792389f7f466fc34916ede0a02f143adbca9d402fd1bfa9aed87f"
+        },
+        {
+          "0": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "1": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "2": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541"
+        }
+      ],
+      "full_q_coefficient_sha256": [
+        "3db9fdf416e831970ad29a04e4fe32be8a7f8b5eddf5699eaf95941e9531a512",
+        "106f0647ae10a6516b1ab2968038161e287ef40d1b22ca047531ed768e594ef1"
+      ],
+      "centered_uniqueness_required_for_operation": true,
+      "centered_uniqueness_use": "Ordinary Rescale performs centered coefficient division by the dropped q prime.",
+      "observer_error": null
+    },
+    {
+      "name": "s2c_stage_2_post_rescale",
+      "operation": "ordinary ckks.Evaluator.Rescale output",
+      "level": 1,
+      "scale": "4.294967296e+09",
+      "degree": 1,
+      "is_ntt": true,
+      "is_montgomery": false,
+      "q_authority": "complete-Q",
+      "qprefix_policy_rows": 2,
+      "physical_rows_per_component": [
+        2,
+        2
+      ],
+      "c1_zero": true,
+      "full_q_complete_per_component": [
+        true,
+        true
+      ],
+      "qprefix_matches_full_q_per_component": [
+        true,
+        true
+      ],
+      "qprefix_observed_centered_max_abs": [
+        "934471567",
+        "0"
+      ],
+      "full_q_observed_centered_max_abs": [
+        "934471567",
+        "0"
+      ],
+      "proven_upper_bound": [
+        "4148574715531",
+        "0"
+      ],
+      "bound_derivation": "B_post <= floor((B_raw + floor((q_level-1)/2))/q_level); the output observation is evidence, not a substitute for the carried bound",
+      "full_q_observed_strict_fit_per_component": [
+        true,
+        true
+      ],
+      "proven_bound_qprefix_strict_fit_per_component": [
+        true,
+        true
+      ],
+      "proven_bound_full_q_strict_fit_per_component": [
+        true,
+        true
+      ],
+      "qprefix_coefficient_row_sha256": [
+        {
+          "0": "0ae1e1db35dcf39ce0468208b30eb0b7e972dd908fbab1d465770c34818e0020",
+          "1": "0f5810e2eedc582d90ed4c197ff0b3e37a8861344fd14f2f67fff8f7bd7c40dc"
+        },
+        {
+          "0": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "1": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541"
+        }
+      ],
+      "full_q_coefficient_sha256": [
+        "c6f01dddaeebc16adfac59d01587fc8a93300e96e254cd6f854dad2bffd5a13b",
+        "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58"
+      ],
+      "centered_uniqueness_required_for_operation": true,
+      "centered_uniqueness_use": "The Rescale output feeds the next stage and its coefficient bound must remain a unique centered representative.",
+      "observer_error": null
+    },
+    {
+      "name": "s2c_stage_3_raw_pre_rescale",
+      "operation": "myBSGS QP accumulation + ModDownQPtoQNTT output before ordinary Rescale",
+      "level": 1,
+      "scale": "1.8442240478377148416e+19",
+      "degree": 1,
+      "is_ntt": true,
+      "is_montgomery": false,
+      "q_authority": "complete-Q",
+      "qprefix_policy_rows": 2,
+      "physical_rows_per_component": [
+        2,
+        2
+      ],
+      "c1_zero": true,
+      "full_q_complete_per_component": [
+        true,
+        true
+      ],
+      "qprefix_matches_full_q_per_component": [
+        true,
+        true
+      ],
+      "qprefix_observed_centered_max_abs": [
+        "18442236704021432251",
+        "0"
+      ],
+      "full_q_observed_centered_max_abs": [
+        "18442236704021432251",
+        "0"
+      ],
+      "proven_upper_bound": [
+        "232076387351619387697099559",
+        "0"
+      ],
+      "bound_derivation": "B_raw <= B_in * sum_diagonal(L1) + 1; valid only while the preceding source/strict-capacity chain is proven; zero c1 elides key-switch contributions",
+      "full_q_observed_strict_fit_per_component": [
+        true,
+        true
+      ],
+      "proven_bound_qprefix_strict_fit_per_component": [
+        false,
+        true
+      ],
+      "proven_bound_full_q_strict_fit_per_component": [
+        false,
+        true
+      ],
+      "qprefix_coefficient_row_sha256": [
+        {
+          "0": "dc35c24675690d8229250114664d06c2e66cd51d986fd69f3d0a9367f4fa759d",
+          "1": "ef1da2c8541895e7f966ca2961970d3f5370b38cefdd60fc16ef155239b89a95"
+        },
+        {
+          "0": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "1": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541"
+        }
+      ],
+      "full_q_coefficient_sha256": [
+        "51bc14b729e7f700a1ac35127554379046de19fa4dc6762dba591fcf1f24a626",
+        "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58"
+      ],
+      "centered_uniqueness_required_for_operation": true,
+      "centered_uniqueness_use": "Ordinary Rescale performs centered coefficient division by the dropped q prime.",
+      "observer_error": null
+    },
+    {
+      "name": "s2c_stage_3_post_rescale",
+      "operation": "ordinary ckks.Evaluator.Rescale output",
+      "level": 0,
+      "scale": "4.294967296e+09",
+      "degree": 1,
+      "is_ntt": true,
+      "is_montgomery": false,
+      "q_authority": "complete-Q",
+      "qprefix_policy_rows": 1,
+      "physical_rows_per_component": [
+        1,
+        1
+      ],
+      "c1_zero": true,
+      "full_q_complete_per_component": [
+        true,
+        true
+      ],
+      "qprefix_matches_full_q_per_component": [
+        true,
+        true
+      ],
+      "qprefix_observed_centered_max_abs": [
+        "4294966417",
+        "0"
+      ],
+      "full_q_observed_centered_max_abs": [
+        "4294966417",
+        "0"
+      ],
+      "proven_upper_bound": [
+        "54047689868142566",
+        "0"
+      ],
+      "bound_derivation": "B_post <= floor((B_raw + floor((q_level-1)/2))/q_level); the output observation is evidence, not a substitute for the carried bound",
+      "full_q_observed_strict_fit_per_component": [
+        true,
+        true
+      ],
+      "proven_bound_qprefix_strict_fit_per_component": [
+        false,
+        true
+      ],
+      "proven_bound_full_q_strict_fit_per_component": [
+        false,
+        true
+      ],
+      "qprefix_coefficient_row_sha256": [
+        {
+          "0": "dfd1ee781b4dfc053ac67f4b1da5bfa3f8ceaf60bbe377df632a6456ba328d6f"
+        },
+        {
+          "0": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541"
+        }
+      ],
+      "full_q_coefficient_sha256": [
+        "dfd1ee781b4dfc053ac67f4b1da5bfa3f8ceaf60bbe377df632a6456ba328d6f",
+        "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541"
+      ],
+      "centered_uniqueness_required_for_operation": true,
+      "centered_uniqueness_use": "The Rescale output feeds the next stage and its coefficient bound must remain a unique centered representative.",
+      "observer_error": null
+    },
+    {
+      "name": "s2c_output",
+      "operation": "original S2C stage sequence via myBSGS",
+      "level": 0,
+      "scale": "4.294967296e+09",
+      "degree": 1,
+      "is_ntt": true,
+      "is_montgomery": false,
+      "q_authority": "complete-Q",
+      "qprefix_policy_rows": 1,
+      "physical_rows_per_component": [
+        1,
+        1
+      ],
+      "c1_zero": true,
+      "full_q_complete_per_component": [
+        true,
+        true
+      ],
+      "qprefix_matches_full_q_per_component": [
+        true,
+        true
+      ],
+      "qprefix_observed_centered_max_abs": [
+        "4294966417",
+        "0"
+      ],
+      "full_q_observed_centered_max_abs": [
+        "4294966417",
+        "0"
+      ],
+      "proven_upper_bound": null,
+      "bound_derivation": "All three original S2C stages and ordinary Rescales completed; at Levels 3..0 fixed Q-prefix width equals complete logical Q",
+      "full_q_observed_strict_fit_per_component": [
+        true,
+        true
+      ],
+      "proven_bound_qprefix_strict_fit_per_component": [
+        false,
+        false
+      ],
+      "proven_bound_full_q_strict_fit_per_component": [
+        false,
+        false
+      ],
+      "qprefix_coefficient_row_sha256": [
+        {
+          "0": "dfd1ee781b4dfc053ac67f4b1da5bfa3f8ceaf60bbe377df632a6456ba328d6f"
+        },
+        {
+          "0": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541"
+        }
+      ],
+      "full_q_coefficient_sha256": [
+        "dfd1ee781b4dfc053ac67f4b1da5bfa3f8ceaf60bbe377df632a6456ba328d6f",
+        "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541"
+      ],
+      "centered_uniqueness_required_for_operation": true,
+      "centered_uniqueness_use": "The Level-0 coefficient is multiplied by ScaleDown and then used as the source of a centered q0 lift.",
+      "observer_error": null
+    },
+    {
+      "name": "scale_down_output",
+      "operation": "MyScaleDown: ordinary integer Mul then Level-0 no-Rescale",
+      "level": 0,
+      "scale": "4.294967296e+09",
+      "degree": 1,
+      "is_ntt": true,
+      "is_montgomery": false,
+      "q_authority": "complete-Q",
+      "qprefix_policy_rows": 1,
+      "physical_rows_per_component": [
+        1,
+        1
+      ],
+      "c1_zero": true,
+      "full_q_complete_per_component": [
+        true,
+        true
+      ],
+      "qprefix_matches_full_q_per_component": [
+        true,
+        true
+      ],
+      "qprefix_observed_centered_max_abs": [
+        "4294966417",
+        "0"
+      ],
+      "full_q_observed_centered_max_abs": [
+        "4294966417",
+        "0"
+      ],
+      "proven_upper_bound": null,
+      "bound_derivation": "Input bound from the proven S2C chain multiplied by the exact public integer; Level 0 has one authoritative q0 row",
+      "full_q_observed_strict_fit_per_component": [
+        true,
+        true
+      ],
+      "proven_bound_qprefix_strict_fit_per_component": [
+        false,
+        false
+      ],
+      "proven_bound_full_q_strict_fit_per_component": [
+        false,
+        false
+      ],
+      "qprefix_coefficient_row_sha256": [
+        {
+          "0": "dfd1ee781b4dfc053ac67f4b1da5bfa3f8ceaf60bbe377df632a6456ba328d6f"
+        },
+        {
+          "0": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541"
+        }
+      ],
+      "full_q_coefficient_sha256": [
+        "dfd1ee781b4dfc053ac67f4b1da5bfa3f8ceaf60bbe377df632a6456ba328d6f",
+        "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541"
+      ],
+      "centered_uniqueness_required_for_operation": true,
+      "centered_uniqueness_use": "MyModUp interprets the q0 residue as a centered integer before lifting it to the full Q chain.",
+      "observer_error": null
+    },
+    {
+      "name": "modup_output",
+      "operation": "MyModUp: centered q0 lift, exact integer scale, full-Q generation and Trace boundary",
+      "level": 29,
+      "scale": "4.294967296e+09",
+      "degree": 1,
+      "is_ntt": true,
+      "is_montgomery": false,
+      "q_authority": "complete-Q",
+      "qprefix_policy_rows": 4,
+      "physical_rows_per_component": [
+        30,
+        30
+      ],
+      "c1_zero": true,
+      "full_q_complete_per_component": [
+        true,
+        true
+      ],
+      "qprefix_matches_full_q_per_component": [
+        true,
+        true
+      ],
+      "qprefix_observed_centered_max_abs": [
+        "4294966417",
+        "0"
+      ],
+      "full_q_observed_centered_max_abs": [
+        "4294966417",
+        "0"
+      ],
+      "proven_upper_bound": null,
+      "bound_derivation": "Exact row-by-row equality to centered Level-0 q0 lift times the source ModUp integer; source bound propagated from verified ScaleDown",
+      "full_q_observed_strict_fit_per_component": [
+        true,
+        true
+      ],
+      "proven_bound_qprefix_strict_fit_per_component": [
+        false,
+        false
+      ],
+      "proven_bound_full_q_strict_fit_per_component": [
+        false,
+        false
+      ],
+      "qprefix_coefficient_row_sha256": [
+        {
+          "0": "dfd1ee781b4dfc053ac67f4b1da5bfa3f8ceaf60bbe377df632a6456ba328d6f",
+          "1": "ab8a5733423b1d004c065d3aa6961a5163853c16a0d419f963bed311cf10520a",
+          "2": "e4101bb6e7e3c5ba483061da6cd8e0e9c0c1d465ecbc557c3089b1a80fecc696",
+          "3": "7980ca4a1b7efd10c5644e99929c96abb482995103c591c556840c90859cafe4"
+        },
+        {
+          "0": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "1": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "2": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "3": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541"
+        }
+      ],
+      "full_q_coefficient_sha256": [
+        "c0d0a9a182e9c6d5d2c04ed4f097b28b684d100b972c123355ac3ea53cfab242",
+        "167b76d3a8d20df15c421d48877c330597f6309d6b55c7b5327df5d89a51423f"
+      ],
+      "centered_uniqueness_required_for_operation": true,
+      "centered_uniqueness_use": "The centered q0 lift must equal the proven integer source before C2S consumes the full-Q representation.",
+      "observer_error": null
+    },
+    {
+      "name": "c2s_stage_1_raw_pre_rescale",
+      "operation": "myBSGS QP accumulation + ModDownQPtoQNTT output before ordinary Rescale",
+      "level": 29,
+      "scale": "1.8889415828937021325312e+22",
+      "degree": 1,
+      "is_ntt": true,
+      "is_montgomery": false,
+      "q_authority": "complete-Q",
+      "qprefix_policy_rows": 4,
+      "physical_rows_per_component": [
+        30,
+        30
+      ],
+      "c1_zero": true,
+      "full_q_complete_per_component": [
+        true,
+        true
+      ],
+      "qprefix_matches_full_q_per_component": [
+        true,
+        true
+      ],
+      "qprefix_observed_centered_max_abs": [
+        "2096475955375482935255",
+        "0"
+      ],
+      "full_q_observed_centered_max_abs": [
+        "2096475955375482935255",
+        "0"
+      ],
+      "proven_upper_bound": null,
+      "bound_derivation": "B_raw <= B_in * sum_diagonal(L1) + 1; valid only while the preceding source/strict-capacity chain is proven; zero c1 elides key-switch contributions",
+      "full_q_observed_strict_fit_per_component": [
+        true,
+        true
+      ],
+      "proven_bound_qprefix_strict_fit_per_component": [
+        false,
+        false
+      ],
+      "proven_bound_full_q_strict_fit_per_component": [
+        false,
+        false
+      ],
+      "qprefix_coefficient_row_sha256": [
+        {
+          "0": "2b01319dcb7e8994a2d16a477d7718889494f32b6fc30e42c2e49346cd6e7b7d",
+          "1": "8d4d11a4abca533740e95450756d817198c320b14c4efcc99016b3549d797c76",
+          "2": "c77ae4a82981b547f05cd166d81b001f4a88c328e59403ab560bf78c1de0f303",
+          "3": "8bd520dfe42399a79613d6eefc007443efb1414e22d05c22cf66740e61da08e6"
+        },
+        {
+          "0": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "1": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "2": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "3": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541"
+        }
+      ],
+      "full_q_coefficient_sha256": [
+        "a508bbe5f6f3e0a50d65bbae2e883868d1c17269631a13fbaf37d6e88341095f",
+        "167b76d3a8d20df15c421d48877c330597f6309d6b55c7b5327df5d89a51423f"
+      ],
+      "centered_uniqueness_required_for_operation": true,
+      "centered_uniqueness_use": "Ordinary Rescale performs centered coefficient division by the dropped q prime.",
+      "observer_error": null
+    },
+    {
+      "name": "c2s_stage_1_post_rescale",
+      "operation": "ordinary ckks.Evaluator.Rescale output",
+      "level": 28,
+      "scale": "4.294967296e+09",
+      "degree": 1,
+      "is_ntt": true,
+      "is_montgomery": false,
+      "q_authority": "complete-Q",
+      "qprefix_policy_rows": 4,
+      "physical_rows_per_component": [
+        29,
+        29
+      ],
+      "c1_zero": true,
+      "full_q_complete_per_component": [
+        true,
+        true
+      ],
+      "qprefix_matches_full_q_per_component": [
+        true,
+        true
+      ],
+      "qprefix_observed_centered_max_abs": [
+        "476684708",
+        "0"
+      ],
+      "full_q_observed_centered_max_abs": [
+        "476684708",
+        "0"
+      ],
+      "proven_upper_bound": null,
+      "bound_derivation": "B_post <= floor((B_raw + floor((q_level-1)/2))/q_level); the output observation is evidence, not a substitute for the carried bound",
+      "full_q_observed_strict_fit_per_component": [
+        true,
+        true
+      ],
+      "proven_bound_qprefix_strict_fit_per_component": [
+        false,
+        false
+      ],
+      "proven_bound_full_q_strict_fit_per_component": [
+        false,
+        false
+      ],
+      "qprefix_coefficient_row_sha256": [
+        {
+          "0": "d96dad95c60de919b9c7636d311102f99cfd11c1d95b3bd4531e286e756504f1",
+          "1": "d4a50af3acf13c2cd517493bcc548d61659b15d0780c39c10078468fd56930cf",
+          "2": "192f7a85f96540d1faf5a6442ece82d2f976baf4715739531a70964e8ea01311",
+          "3": "04ad8a93fe8a2272205f1b4c51ceb88f69a50e4c037d09bd1b59f7a6b8c404d5"
+        },
+        {
+          "0": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "1": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "2": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "3": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541"
+        }
+      ],
+      "full_q_coefficient_sha256": [
+        "1678eaf5d68b5435cf1648a9a760eb9a8e056e976e7d8c0275bf297b93640c99",
+        "fd63871720eba6cfb55cbd1e6d4801ffe2989edc6f77142ea2c6a7daa36046bf"
+      ],
+      "centered_uniqueness_required_for_operation": true,
+      "centered_uniqueness_use": "The Rescale output feeds the next stage and its coefficient bound must remain a unique centered representative.",
+      "observer_error": null
+    },
+    {
+      "name": "c2s_stage_2_raw_pre_rescale",
+      "operation": "myBSGS QP accumulation + ModDownQPtoQNTT output before ordinary Rescale",
+      "level": 28,
+      "scale": "1.8889515471078776897536e+22",
+      "degree": 1,
+      "is_ntt": true,
+      "is_montgomery": false,
+      "q_authority": "complete-Q",
+      "qprefix_policy_rows": 4,
+      "physical_rows_per_component": [
+        29,
+        29
+      ],
+      "c1_zero": true,
+      "full_q_complete_per_component": [
+        true,
+        true
+      ],
+      "qprefix_matches_full_q_per_component": [
+        true,
+        true
+      ],
+      "qprefix_observed_centered_max_abs": [
+        "94398424367359741420",
+        "0"
+      ],
+      "full_q_observed_centered_max_abs": [
+        "94398424367359741420",
+        "0"
+      ],
+      "proven_upper_bound": null,
+      "bound_derivation": "B_raw <= B_in * sum_diagonal(L1) + 1; valid only while the preceding source/strict-capacity chain is proven; zero c1 elides key-switch contributions",
+      "full_q_observed_strict_fit_per_component": [
+        true,
+        true
+      ],
+      "proven_bound_qprefix_strict_fit_per_component": [
+        false,
+        false
+      ],
+      "proven_bound_full_q_strict_fit_per_component": [
+        false,
+        false
+      ],
+      "qprefix_coefficient_row_sha256": [
+        {
+          "0": "00eb8f93b8bb05feefcedd1ad78ec263573d93baf572874a7a4ea6498be78b9d",
+          "1": "4dfa83774f1511fb34a3e634d96d68c244e046ec85876cf455fcd8fa40621e34",
+          "2": "a7abf562fad9a22c2a8651c54f9b23f146889b1f09a21cf8628c94f88e15db39",
+          "3": "58e0d29301a46ec8e5e5b3a0f9151d4ef8b1eefeb3818efca19817eee5af7d7e"
+        },
+        {
+          "0": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "1": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "2": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "3": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541"
+        }
+      ],
+      "full_q_coefficient_sha256": [
+        "be777f77bec8902ccc9aa21be369333d2ca7024da26d588e666f1e258dc86b64",
+        "fd63871720eba6cfb55cbd1e6d4801ffe2989edc6f77142ea2c6a7daa36046bf"
+      ],
+      "centered_uniqueness_required_for_operation": true,
+      "centered_uniqueness_use": "Ordinary Rescale performs centered coefficient division by the dropped q prime.",
+      "observer_error": null
+    },
+    {
+      "name": "c2s_stage_2_post_rescale",
+      "operation": "ordinary ckks.Evaluator.Rescale output",
+      "level": 27,
+      "scale": "4.294967296e+09",
+      "degree": 1,
+      "is_ntt": true,
+      "is_montgomery": false,
+      "q_authority": "complete-Q",
+      "qprefix_policy_rows": 4,
+      "physical_rows_per_component": [
+        28,
+        28
+      ],
+      "c1_zero": true,
+      "full_q_complete_per_component": [
+        true,
+        true
+      ],
+      "qprefix_matches_full_q_per_component": [
+        true,
+        true
+      ],
+      "qprefix_observed_centered_max_abs": [
+        "21463660",
+        "0"
+      ],
+      "full_q_observed_centered_max_abs": [
+        "21463660",
+        "0"
+      ],
+      "proven_upper_bound": null,
+      "bound_derivation": "B_post <= floor((B_raw + floor((q_level-1)/2))/q_level); the output observation is evidence, not a substitute for the carried bound",
+      "full_q_observed_strict_fit_per_component": [
+        true,
+        true
+      ],
+      "proven_bound_qprefix_strict_fit_per_component": [
+        false,
+        false
+      ],
+      "proven_bound_full_q_strict_fit_per_component": [
+        false,
+        false
+      ],
+      "qprefix_coefficient_row_sha256": [
+        {
+          "0": "b54b58f2662c2424bfe62d8db70a43d341370bd6678ad0c780778317387208dc",
+          "1": "ff3a4060f9ded1b6576ee8ca9c5be29699baa8d8f4019571a54da426f9c2be0f",
+          "2": "6915bf53baca35b874b834dc7dbd11b69a47cef3815c8e9511ae469640296f8b",
+          "3": "61bf2eb0c2b027468bc1b32dde9f5c26d8c2007fab7e04305857c9115f3ca53e"
+        },
+        {
+          "0": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "1": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "2": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "3": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541"
+        }
+      ],
+      "full_q_coefficient_sha256": [
+        "440a7bd64c60a2d9815175c5b09f02701be79a00fe0e09a83a2b3ab8291b3f34",
+        "e86bae8c0598c4ff83c695f467daa4a1e8fa01d57f9140372993366204022a4d"
+      ],
+      "centered_uniqueness_required_for_operation": true,
+      "centered_uniqueness_use": "The Rescale output feeds the next stage and its coefficient bound must remain a unique centered representative.",
+      "observer_error": null
+    },
+    {
+      "name": "c2s_stage_3_raw_pre_rescale",
+      "operation": "myBSGS QP accumulation + ModDownQPtoQNTT output before ordinary Rescale",
+      "level": 27,
+      "scale": "1.8889504775029661892608e+22",
+      "degree": 1,
+      "is_ntt": true,
+      "is_montgomery": false,
+      "q_authority": "complete-Q",
+      "qprefix_policy_rows": 4,
+      "physical_rows_per_component": [
+        28,
+        28
+      ],
+      "c1_zero": true,
+      "full_q_complete_per_component": [
+        true,
+        true
+      ],
+      "qprefix_matches_full_q_per_component": [
+        true,
+        true
+      ],
+      "qprefix_observed_centered_max_abs": [
+        "5425771770583904861",
+        "0"
+      ],
+      "full_q_observed_centered_max_abs": [
+        "5425771770583904861",
+        "0"
+      ],
+      "proven_upper_bound": null,
+      "bound_derivation": "B_raw <= B_in * sum_diagonal(L1) + 1; valid only while the preceding source/strict-capacity chain is proven; zero c1 elides key-switch contributions",
+      "full_q_observed_strict_fit_per_component": [
+        true,
+        true
+      ],
+      "proven_bound_qprefix_strict_fit_per_component": [
+        false,
+        false
+      ],
+      "proven_bound_full_q_strict_fit_per_component": [
+        false,
+        false
+      ],
+      "qprefix_coefficient_row_sha256": [
+        {
+          "0": "b79be414c386c449f14d1d76db1ce3d9b840f8f1b0fb5a1e331ba4da45b48a52",
+          "1": "e6674c48bda25b2cb9e37ac11c526e191576cad17810085f9835056fa5f72c16",
+          "2": "6bae4fd018e039944623f8cf03c8fe2ec60393d3a983530c0498c94f123c0f8d",
+          "3": "2838e68ccef071efca063166bb56ec2d8b323541a0b982e728308e55e915c3fa"
+        },
+        {
+          "0": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "1": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "2": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "3": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541"
+        }
+      ],
+      "full_q_coefficient_sha256": [
+        "307a91786de1d6fa9b1161b574b612aa2f6c25de799145271e9a509629664806",
+        "e86bae8c0598c4ff83c695f467daa4a1e8fa01d57f9140372993366204022a4d"
+      ],
+      "centered_uniqueness_required_for_operation": true,
+      "centered_uniqueness_use": "Ordinary Rescale performs centered coefficient division by the dropped q prime.",
+      "observer_error": null
+    },
+    {
+      "name": "c2s_stage_3_post_rescale",
+      "operation": "ordinary ckks.Evaluator.Rescale output",
+      "level": 26,
+      "scale": "4.294967296e+09",
+      "degree": 1,
+      "is_ntt": true,
+      "is_montgomery": false,
+      "q_authority": "complete-Q",
+      "qprefix_policy_rows": 4,
+      "physical_rows_per_component": [
+        27,
+        27
+      ],
+      "c1_zero": true,
+      "full_q_complete_per_component": [
+        true,
+        true
+      ],
+      "qprefix_matches_full_q_per_component": [
+        true,
+        true
+      ],
+      "qprefix_observed_centered_max_abs": [
+        "1233675",
+        "0"
+      ],
+      "full_q_observed_centered_max_abs": [
+        "1233675",
+        "0"
+      ],
+      "proven_upper_bound": null,
+      "bound_derivation": "B_post <= floor((B_raw + floor((q_level-1)/2))/q_level); the output observation is evidence, not a substitute for the carried bound",
+      "full_q_observed_strict_fit_per_component": [
+        true,
+        true
+      ],
+      "proven_bound_qprefix_strict_fit_per_component": [
+        false,
+        false
+      ],
+      "proven_bound_full_q_strict_fit_per_component": [
+        false,
+        false
+      ],
+      "qprefix_coefficient_row_sha256": [
+        {
+          "0": "dec5f64128cfa0a8dd96a4ce065416417b77443684c9577ffafa809f1d38107e",
+          "1": "21d40060c7c4e45ece47f1b7d201573c39587cdbfc325e355b4a8ddc46b588b7",
+          "2": "a459660cfd4b00f1317e4a0493583fc1e5419fd87934c1928306d54cb9429f46",
+          "3": "5ee2f4e2b19d0b7e1b4e57fd206f63a1b04367e801efb93d9822de00a9da58e3"
+        },
+        {
+          "0": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "1": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "2": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "3": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541"
+        }
+      ],
+      "full_q_coefficient_sha256": [
+        "5b449ca79b4c7239fbed2e0ae7bc48502b2005fef665ad6cc33f364fe544e656",
+        "0d8faa7114602436684c8087a48218bab32d5d334207f30ff77921523cda38d4"
+      ],
+      "centered_uniqueness_required_for_operation": true,
+      "centered_uniqueness_use": "The Rescale output feeds the next stage and its coefficient bound must remain a unique centered representative.",
+      "observer_error": null
+    },
+    {
+      "name": "c2s_zv",
+      "operation": "C2S output before real/imaginary split",
+      "level": 26,
+      "scale": "4.294967296e+09",
+      "degree": 1,
+      "is_ntt": true,
+      "is_montgomery": false,
+      "q_authority": "complete-Q",
+      "qprefix_policy_rows": 4,
+      "physical_rows_per_component": [
+        27,
+        27
+      ],
+      "c1_zero": true,
+      "full_q_complete_per_component": [
+        true,
+        true
+      ],
+      "qprefix_matches_full_q_per_component": [
+        true,
+        true
+      ],
+      "qprefix_observed_centered_max_abs": [
+        "1233675",
+        "0"
+      ],
+      "full_q_observed_centered_max_abs": [
+        "1233675",
+        "0"
+      ],
+      "proven_upper_bound": null,
+      "bound_derivation": "Three source-equivalent myBSGS stages and Rescales completed; full-Q no-wrap and Q-prefix consistency are reported separately",
+      "full_q_observed_strict_fit_per_component": [
+        true,
+        true
+      ],
+      "proven_bound_qprefix_strict_fit_per_component": [
+        false,
+        false
+      ],
+      "proven_bound_full_q_strict_fit_per_component": [
+        false,
+        false
+      ],
+      "qprefix_coefficient_row_sha256": [
+        {
+          "0": "dec5f64128cfa0a8dd96a4ce065416417b77443684c9577ffafa809f1d38107e",
+          "1": "21d40060c7c4e45ece47f1b7d201573c39587cdbfc325e355b4a8ddc46b588b7",
+          "2": "a459660cfd4b00f1317e4a0493583fc1e5419fd87934c1928306d54cb9429f46",
+          "3": "5ee2f4e2b19d0b7e1b4e57fd206f63a1b04367e801efb93d9822de00a9da58e3"
+        },
+        {
+          "0": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "1": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "2": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "3": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541"
+        }
+      ],
+      "full_q_coefficient_sha256": [
+        "5b449ca79b4c7239fbed2e0ae7bc48502b2005fef665ad6cc33f364fe544e656",
+        "0d8faa7114602436684c8087a48218bab32d5d334207f30ff77921523cda38d4"
+      ],
+      "centered_uniqueness_required_for_operation": true,
+      "centered_uniqueness_use": "The centered full-Q/Q0123 representative is used to prove the actual T1 coefficient bound without prior wrap.",
+      "observer_error": null
+    },
+    {
+      "name": "c2s_conjugate",
+      "operation": "ordinary ckks.Evaluator.Conjugate",
+      "level": 26,
+      "scale": "4.294967296e+09",
+      "degree": 1,
+      "is_ntt": true,
+      "is_montgomery": false,
+      "q_authority": "complete-Q",
+      "qprefix_policy_rows": 4,
+      "physical_rows_per_component": [
+        27,
+        27
+      ],
+      "c1_zero": true,
+      "full_q_complete_per_component": [
+        true,
+        true
+      ],
+      "qprefix_matches_full_q_per_component": [
+        true,
+        true
+      ],
+      "qprefix_observed_centered_max_abs": [
+        "1233675",
+        "0"
+      ],
+      "full_q_observed_centered_max_abs": [
+        "1233675",
+        "0"
+      ],
+      "proven_upper_bound": null,
+      "bound_derivation": "Automorphism permutes/signs coefficient indices; it preserves the zV coefficient bound and representation flags",
+      "full_q_observed_strict_fit_per_component": [
+        true,
+        true
+      ],
+      "proven_bound_qprefix_strict_fit_per_component": [
+        false,
+        false
+      ],
+      "proven_bound_full_q_strict_fit_per_component": [
+        false,
+        false
+      ],
+      "qprefix_coefficient_row_sha256": [
+        {
+          "0": "103c0c4e5a78c6f1a522c794d4d8b0b1d9295d55bb2efe98b368cf1d867d91f0",
+          "1": "73dd2d564021caac39ba6c7bcd35780be0bcf47a9d0271d4b8da6dd7a6ea0008",
+          "2": "b3e49519a1aee727dc9325fcd89c855684798ae5073e7aa3e69e4287b7dd1f2a",
+          "3": "596c9aceda8ab8169409171e338a26ab60684818eacb22915a00c9fb1c447bda"
+        },
+        {
+          "0": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "1": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "2": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "3": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541"
+        }
+      ],
+      "full_q_coefficient_sha256": [
+        "91b07ac439efe449643e4d46ed5677ce42529084cf8497e55f3f37bffac39bb6",
+        "0d8faa7114602436684c8087a48218bab32d5d334207f30ff77921523cda38d4"
+      ],
+      "centered_uniqueness_required_for_operation": true,
+      "centered_uniqueness_use": "The centered full-Q/Q0123 representative is used to prove the actual T1 coefficient bound without prior wrap.",
+      "observer_error": null
+    },
+    {
+      "name": "c2s_ct_imag",
+      "operation": "Sub(zV, Conjugate(zV)) then ordinary Mul(-1i)",
+      "level": 26,
+      "scale": "4.294967296e+09",
+      "degree": 1,
+      "is_ntt": true,
+      "is_montgomery": false,
+      "q_authority": "Q0123",
+      "qprefix_policy_rows": 4,
+      "physical_rows_per_component": [
+        4,
+        4
+      ],
+      "c1_zero": true,
+      "full_q_complete_per_component": [
+        false,
+        false
+      ],
+      "qprefix_matches_full_q_per_component": [
+        false,
+        false
+      ],
+      "qprefix_observed_centered_max_abs": [
+        "1",
+        "0"
+      ],
+      "full_q_observed_centered_max_abs": [
+        "",
+        ""
+      ],
+      "proven_upper_bound": null,
+      "bound_derivation": "Imaginary extraction branch is executed exactly as original C2S; its bound is retained as representation evidence",
+      "full_q_observed_strict_fit_per_component": [
+        false,
+        false
+      ],
+      "proven_bound_qprefix_strict_fit_per_component": [
+        false,
+        false
+      ],
+      "proven_bound_full_q_strict_fit_per_component": [
+        false,
+        false
+      ],
+      "qprefix_coefficient_row_sha256": [
+        {
+          "0": "a3c0fcc487a55f47237e6edabc880d659a547a936e53246fecce1b99fe796ffc",
+          "1": "66445947170b2499fed6ce1ada3f79a7b96b0a8556790015ffa2370dde7059f6",
+          "2": "1f076dede5883648663e21df413af581f443782762eaf101fe87152ff113c995",
+          "3": "f74c422ee84e3f6ec2e1f4434e25a338b0e12dfe67f0bc777f6462fc00e1cd34"
+        },
+        {
+          "0": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "1": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "2": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "3": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541"
+        }
+      ],
+      "full_q_coefficient_sha256": [
+        "",
+        ""
+      ],
+      "centered_uniqueness_required_for_operation": false,
+      "centered_uniqueness_use": "No centered reconstruction is used to authorize a division or integer lift at this checkpoint.",
+      "observer_error": null
+    },
+    {
+      "name": "c2s_ct_real",
+      "operation": "Conjugate(zV) + zV; ordinary public CKKS API",
+      "level": 26,
+      "scale": "4.294967296e+09",
+      "degree": 1,
+      "is_ntt": true,
+      "is_montgomery": false,
+      "q_authority": "Q0123",
+      "qprefix_policy_rows": 4,
+      "physical_rows_per_component": [
+        4,
+        4
+      ],
+      "c1_zero": true,
+      "full_q_complete_per_component": [
+        false,
+        false
+      ],
+      "qprefix_matches_full_q_per_component": [
+        false,
+        false
+      ],
+      "qprefix_observed_centered_max_abs": [
+        "2467350",
+        "0"
+      ],
+      "full_q_observed_centered_max_abs": [
+        "",
+        ""
+      ],
+      "proven_upper_bound": null,
+      "bound_derivation": "Conjugation permutes/signs coefficients; Add bound is 2*B(zV); c1 remains zero",
+      "full_q_observed_strict_fit_per_component": [
+        false,
+        false
+      ],
+      "proven_bound_qprefix_strict_fit_per_component": [
+        false,
+        false
+      ],
+      "proven_bound_full_q_strict_fit_per_component": [
+        false,
+        false
+      ],
+      "qprefix_coefficient_row_sha256": [
+        {
+          "0": "3be1f2ab1cf90a827e0a4faeb4374977a6faf60882414e652bf2274aff846847",
+          "1": "b6501b5701c7921a87ee75325d0352f1f3ba50aa302919473def668268ae1393",
+          "2": "978e3c2cf465a9ccd1f7cdfffb7edd7898bd9b6a5adc8c40c5618a0c03305e1a",
+          "3": "b68e7ef0283349d7c37587a8aa2b48bd0636b555ceef75fc2a49ed78eea8b6d5"
+        },
+        {
+          "0": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "1": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "2": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "3": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541"
+        }
+      ],
+      "full_q_coefficient_sha256": [
+        "",
+        ""
+      ],
+      "centered_uniqueness_required_for_operation": true,
+      "centered_uniqueness_use": "The centered full-Q/Q0123 representative is used to prove the actual T1 coefficient bound without prior wrap.",
+      "observer_error": null
+    },
+    {
+      "name": "step1_relabel",
+      "operation": "Step1_Relabel: Level/Scale metadata only",
+      "level": 26,
+      "scale": "4.398046511104e+12",
+      "degree": 1,
+      "is_ntt": true,
+      "is_montgomery": false,
+      "q_authority": "Q0123",
+      "qprefix_policy_rows": 4,
+      "physical_rows_per_component": [
+        4,
+        4
+      ],
+      "c1_zero": true,
+      "full_q_complete_per_component": [
+        false,
+        false
+      ],
+      "qprefix_matches_full_q_per_component": [
+        false,
+        false
+      ],
+      "qprefix_observed_centered_max_abs": [
+        "2467350",
+        "0"
+      ],
+      "full_q_observed_centered_max_abs": [
+        "",
+        ""
+      ],
+      "proven_upper_bound": null,
+      "bound_derivation": "Step1_Relabel leaves coefficients unchanged; no scale multiplication occurs",
+      "full_q_observed_strict_fit_per_component": [
+        false,
+        false
+      ],
+      "proven_bound_qprefix_strict_fit_per_component": [
+        false,
+        false
+      ],
+      "proven_bound_full_q_strict_fit_per_component": [
+        false,
+        false
+      ],
+      "qprefix_coefficient_row_sha256": [
+        {
+          "0": "3be1f2ab1cf90a827e0a4faeb4374977a6faf60882414e652bf2274aff846847",
+          "1": "b6501b5701c7921a87ee75325d0352f1f3ba50aa302919473def668268ae1393",
+          "2": "978e3c2cf465a9ccd1f7cdfffb7edd7898bd9b6a5adc8c40c5618a0c03305e1a",
+          "3": "b68e7ef0283349d7c37587a8aa2b48bd0636b555ceef75fc2a49ed78eea8b6d5"
+        },
+        {
+          "0": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "1": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "2": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "3": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541"
+        }
+      ],
+      "full_q_coefficient_sha256": [
+        "",
+        ""
+      ],
+      "centered_uniqueness_required_for_operation": true,
+      "centered_uniqueness_use": "The centered full-Q/Q0123 representative is used to prove the actual T1 coefficient bound without prior wrap.",
+      "observer_error": null
+    },
+    {
+      "name": "T1_step2_offset",
+      "operation": "Step2_Offset completed: true T1",
+      "level": 26,
+      "scale": "4.398046511104e+12",
+      "degree": 1,
+      "is_ntt": true,
+      "is_montgomery": false,
+      "q_authority": "Q0123",
+      "qprefix_policy_rows": 4,
+      "physical_rows_per_component": [
+        4,
+        4
+      ],
+      "c1_zero": true,
+      "full_q_complete_per_component": [
+        false,
+        false
+      ],
+      "qprefix_matches_full_q_per_component": [
+        false,
+        false
+      ],
+      "qprefix_observed_centered_max_abs": [
+        "68717802446",
+        "0"
+      ],
+      "full_q_observed_centered_max_abs": [
+        "",
+        ""
+      ],
+      "proven_upper_bound": null,
+      "bound_derivation": "carried C2S/full-Q no-wrap bound + exact coefficient-domain offset delta",
+      "full_q_observed_strict_fit_per_component": [
+        false,
+        false
+      ],
+      "proven_bound_qprefix_strict_fit_per_component": [
+        false,
+        false
+      ],
+      "proven_bound_full_q_strict_fit_per_component": [
+        false,
+        false
+      ],
+      "qprefix_coefficient_row_sha256": [
+        {
+          "0": "9b904decaf90a89610dc8b383d7e5541b9c1680a0ddd663d3e99e525240eb212",
+          "1": "0c1b0db31aac5fd7f151f70fd16d1e47105423ea0068deb504dc58d331c02438",
+          "2": "11002d5eda3bb00bd3a8f644344857355cbf4f495f3bb1af58aca98599ba2848",
+          "3": "6d6a9490c21b789835fcaa2f0205451e1172464558f56e485aa8f5dde16c86c2"
+        },
+        {
+          "0": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "1": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "2": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541",
+          "3": "07854d2fef297a06ba81685e660c332de36d5d18d546927d30daad6d7fda1541"
+        }
+      ],
+      "full_q_coefficient_sha256": [
+        "",
+        ""
+      ],
+      "centered_uniqueness_required_for_operation": true,
+      "centered_uniqueness_use": "The centered full-Q/Q0123 representative is used to prove the actual T1 coefficient bound without prior wrap.",
+      "observer_error": null
+    }
+  ],
+  "execution": {
+    "diagnostic_completed": true,
+    "s2c_calculations": 1,
+    "evalmod": 0,
+    "t2": 0,
+    "t3": 0,
+    "bootstrap": 0,
+    "standard_bts": 0
+  }
+}
