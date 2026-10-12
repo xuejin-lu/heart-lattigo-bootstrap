@@ -1,9 +1,7 @@
-# CURRENT TASK — BTS Fast No-Trace validation 003
+# CURRENT TASK — BTS Fast public API coverage Batch 004
 
-Task: BTS-FAST-NOTRACE-VALIDATION-003
-Status: READY_FOR_CODEX
-Authoritative spec: `specs/BTS-FAST-NOTRACE-VALIDATION-003.md`
+Task: `BTS-FAST-PUBLIC-API-COVERAGE-004`
+Status: `BATCH_IN_PROGRESS`
+Authoritative spec: `specs/BTS-FAST-PUBLIC-API-COVERAGE-004.md`
 
-This is an independent, one-call follow-up. Preserve task 002 and its attempt journal unchanged; do not reuse its failed call. The new task allows at most one actual Fast `bts.Bootstrap` invocation, after code validation and Secondary push, with its own durable reservation journal. Do not rerun Standard or perform warmup/Trace/benchmark calls.
-
-`FAST-Q0123-RESCALE-EXACT-DIVISION-PILOT-006` remains suspended. BTS source under `external/BTS/` must remain unchanged and must never be committed or pushed.
+Execute the authorized sequential checkpoints A–D in the spec. Preserve Task 003 and Task 002 results/journals unchanged. This Batch has a separate maximum of two actual Fast `bts.Bootstrap` calls, each requiring a durable reservation first. `external/BTS/` remains unchanged and must never be committed or pushed. Preserve the original Secondary dirty worktree; use only a clean independent checkout synced to the official GitHub origin.
