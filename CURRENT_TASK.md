@@ -1,9 +1,12 @@
-# CURRENT TASK — BTS Fast Decrypt/Decode 007
+# CURRENT TASK — BTS No-Trace Warm and Numerical Batch 008
 
-Task: `BTS-FAST-DECODE-007`
-Status: `NEEDS_WEB_REVIEW`
-Authoritative spec: `specs/BTS-FAST-DECODE-007.md`
+Task: `BTS-NOTRACE-WARM-AND-NUMERICAL-008`
+Status: `AUTHORIZED_AUTONOMOUS_BATCH`
+Authoritative spec: `specs/BTS-NOTRACE-WARM-AND-NUMERICAL-008.md`
+Primary approved baseline: `f3eb665e35f15b91d5f290626fbb7a3bb360a95c`; the task-spec/pointer commits are authorized additions.
 
-The remaining paragraph records the immutable Batch 006 historical state only. It does not constrain Task 007's separate one-Fast-call budget.
+User objective: finish the **teammate's original BTS** (LogN16, 32,768 slots) **No-Trace Cold/Warm performance table**, then use the exact same measured executions' decoded Standard/Fast vectors for numerical comparison. Standard first, after bounded resource preflight for prior exit 137. One cold plus five subsequent warm Bootstrap calls per backend, max 6 per backend and one measurement process per backend, no hidden test/warm-up calls. Both series must be environment-comparable to calculate a speedup. The existing public-native Notion baseline is a different workload and cannot be substituted.
 
-This user-authorized Batch prioritizes completing the unchanged LogN16 BTS on the intentionally insecure Fast zero-secret backend, then comparing decoded output with genuine Standard. The user's experimental capacity-proof waiver supersedes only Batch 005's capacity-certificate stop for this Fast zero-secret mode; Batch 005 history/evidence remains unchanged. Record missing prefix-bound proof as `CAPACITY_UNPROVEN_EXPERIMENTAL`, not as a correctness proof. Task 007 Fast budget: 1/1 Bootstrap entered and completed; decoded output and snapshot were validated. One Genuine Standard process was launched but terminated with exit code 137 after `NewBTS()` and before `bts.Bootstrap()`; Standard Bootstrap entered: 0/1 and no Standard vector exists. No retry is being made in this Batch. Standard/Fast numerical comparison is therefore incomplete; see `results/BTS-FAST-DECODE-007/summary.md` and `results/BTS-FAST-DECODE-007/journal.json`. Preserve the original Secondary dirty worktree and use the independent clean checkout.
+Read `AGENTS.md`, `docs/MEASUREMENT_PLATFORM.md`, `docs/RESEARCH_ENGINEERING_WORKFLOW.md`, and the spec after mandatory safe fetch/fast-forward. Reuse maintained measurement tools, preserve external/BTS source and pinned pristine Standard and Fast math. Original Secondary checkout with five dirty files remains untouched. All earlier Task007 evidence/call counts remain immutable. Log and preserve any environment resource issue without asserting exit 137 means OOM.
+
+Perform the spec's enumerated autonomous checks sequentially; follow mandatory coding self-review and only hand off at completed batch boundary or a genuine STOP escalation. User-facing updates in Traditional Chinese.
