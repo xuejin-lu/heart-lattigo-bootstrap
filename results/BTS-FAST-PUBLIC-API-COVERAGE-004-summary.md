@@ -35,7 +35,7 @@ The complete `go test ./schemes/ckks -count=1` is not green. Failures were compa
 
 ## D. Bounded No-Trace run and remaining limitations
 
-Attempt 01 has been launched; this Batch now has **1/2 actual invocations**. Its complete provenance, exact commands, binary SHA-256, reservation push, and raw-log destination are in the [durable journal](BTS-FAST-PUBLIC-API-COVERAGE-004-journal.md). The same binary must not be relaunched.
+Attempt 01 is complete and failed in ScaleDown; this Batch has **1/2 actual invocations**. `NewBTS()` succeeded in 45.687 s, the encrypted input was `L3` / Scale `2^32`, and the one `bts.Bootstrap()` call returned `cannot Fast CKKS zero-secret Mul: input ciphertext has invalid dimensions or logical Level` before any output was produced. The first failing API is the ordinary integer scalar `Mul` in `MyScaleDown`: S2C consumes the three levels from `S2CStartLevel=L3`, so the scalar operation receives `L0`; current Fast adapter wrongly requires both q0 and q1 although the integer operation consumes no level and the shared Q-prefix width at L0 is q0 only. This is a bounded public API validation/dispatch gap; the evidence and full raw log are in the [journal](BTS-FAST-PUBLIC-API-COVERAGE-004-journal.md). Attempt 01's binary must not be relaunched.
 
 The existing Standard result is historical and will not be rerun: Bootstrap 139.653 s, max absolute error `1.708e-3`, mean absolute error `1.172e-4`. Do not compute a speedup unless this Batch produces a complete Fast output with comparable metrics.
 
