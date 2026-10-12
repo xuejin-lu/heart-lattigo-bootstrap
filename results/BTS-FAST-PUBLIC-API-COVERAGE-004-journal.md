@@ -1,10 +1,10 @@
 # BTS-FAST-PUBLIC-API-COVERAGE-004 — durable batch journal
 
-- Status: `BATCH_IN_PROGRESS`; checkpoints A–C passed; attempt 01 failed at ScaleDown; attempt 02 launched and running.
-- Latest Primary checkpoint before attempt-02 launch: `e3e0526050c7eddd3c94a45351ffa92f3cc6563a`, reservation pushed and branch-verified.
-- Secondary implementation: `dcb46a0028af56e6caaa6f3daf8c3b49b53349bb`, normally pushed to official `origin/fast-qprefix`; independent checkout is clean and `HEAD=origin/fast-qprefix`.
+- Status: `BATCH_BLOCKED_NEEDS_WEB_REVIEW`; checkpoints A–C passed; both authorized D attempts are spent.
+- Latest Primary checkpoint before this evidence update: `ef3bcbcfef82239173290354819c68591bec92fb`, attempt-02 running-state commit pushed.
+- Secondary implementation: `d1b6dc9963b0df95a7c149306fb62660e1020f7b`, normally pushed to official `origin/fast-qprefix`; independent checkout is clean and `HEAD=origin/fast-qprefix`.
 - Original Secondary checkout: `fast-qprefix` at `0b922dc48315128a27db811a5f237e0a6c9813d6`; five authorized historical dirty files remain untouched. Tracked-diff SHA-256 remains `a052b913ee6e575d88b3cff5416ac21477e563bbbcd3536ad7014ab2f4f64a60`.
-- Task 003 is immutable: its one failed Bootstrap attempt, raw log, summary, and journal were not modified. Batch 004 actual Bootstrap calls: **2 / 2**; attempt 01 failed; attempt 02 is running. Neither binary may be relaunched.
+- Task 003 is immutable: its one failed Bootstrap attempt, raw log, summary, and journal were not modified. Batch 004 actual Bootstrap calls: **2 / 2**; attempt 01 failed in ScaleDown; attempt 02 failed in EvalSine/T6. Neither binary may be relaunched; no third attempt is authorized.
 
 ## Checkpoint A–C
 
@@ -42,7 +42,7 @@ A started invocation consumes its reservation even if it fails; never rerun the 
 
 ### Attempt 02
 
-`LAUNCHED — RUNNING`; reserved at `2026-10-12T06:28:07Z`, process launched at `2026-10-12T06:29:19Z`. This second reservation is eligible under the charter because attempt 01 exposed the ordinary integer scalar `Mul`/L0 validation gap, the regression passed without Bootstrap, and the bounded fix is independently committed and pushed as `d1b6dc9963b0df95a7c149306fb62660e1020f7b`.
+`FAILED — STOPPED`; reserved at `2026-10-12T06:28:07Z`, process launched at `2026-10-12T06:29:19Z`, exited at `2026-10-12T06:31:32Z`. This second reservation was eligible under the charter because attempt 01 exposed the ordinary integer scalar `Mul`/L0 validation gap, the regression passed without Bootstrap, and the bounded fix is independently committed and pushed as `d1b6dc9963b0df95a7c149306fb62660e1020f7b`.
 
 - Source/config manifest digest remains `53205b37abd1fb57a960394256b958f5d5e5b1a66f527bfb7cbadabfe3cf0cda`; pre-existing `external/BTS/btstest` was unchanged and excluded.
 - Fast backend commit and fetched official `origin/fast-qprefix` HEAD: `d1b6dc9963b0df95a7c149306fb62660e1020f7b`; independent checkout clean.
@@ -52,5 +52,8 @@ A started invocation consumes its reservation even if it fails; never rerun the 
 - Binary SHA-256: `8455e180d08675dcdc78abd961ef8276c3bca272ca9225b168994b354881f36d`, distinct from attempt 01 `ac65e791232a0935400baa81eaee777ab32f7074544dd7e706923e5bbf28bd5d`.
 - Exact No-Trace run command (same working directory; default original BTS flags): `set -o pipefail; GOWORK=off /private/tmp/bts004-fast-attempt02.ZK0jhx/bts-fast 2>&1 | tee /Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/results/BTS-FAST-PUBLIC-API-COVERAGE-004-attempt-02.log`
 - Unique full raw log path: `results/BTS-FAST-PUBLIC-API-COVERAGE-004-attempt-02.log`.
-- Actual invocations are now `2/2`. Do not rerun either binary.
-- This reservation must be committed, normally pushed to `origin/main`, and remotely verified before launch.
+- Raw log SHA-256: `0e4bd66581da364cc7df54b47ba986dee7d69828f3b2d8f0277f6423093e0644` (1,793 bytes).
+- Observed run: `NewBTS()` succeeded in `43.669s`; input encrypted at `L3`, Scale `2^32`. The single `bts.Bootstrap()` call passed the earlier ScaleDown gate and reached `EvalSine`, then returned `Bootstrap: EvalSine: genPower: T[6]: cannot Fast CKKS zero-secret Sub: component 0 is missing active row q4`. No output ciphertext, completed Bootstrap duration, decrypted vector, or error metrics were produced.
+- Static dispatch evidence: BTS `evalmod.go` generates Chebyshev `T_n = 2*T_a*T_b - T_c` through ordinary ciphertext `Sub`. The Fast public `Sub` path selects compact Q-prefix arithmetic only when its zero-secret/scale/domain/backing eligibility predicate succeeds; otherwise its generic compatibility guard requires every Q row through logical Level. The observed failure shows the T6 subtraction fell through that guard and its compact component lacks q4. Runtime evidence does not identify which eligibility predicate failed or establish whether a fix is an authorized dispatch correction versus a representation/scale compatibility change. Treat this as a new unresolved representation boundary and stop for Web review.
+- Actual invocations are `2/2`. Do not rerun either binary; no third call is authorized.
+- Reservation commit `e3e0526050c7eddd3c94a45351ffa92f3cc6563a` was normally pushed and verified by GitHub API before launch. Running-state commit `ef3bcbcfef82239173290354819c68591bec92fb` was normally pushed.
