@@ -1,14 +1,15 @@
 {
   "schema_version": "bts-fast-decode-007-journal.v1",
   "task": "BTS-FAST-DECODE-007",
-  "status": "FAST_BTS_DECODED_STANDARD_ATTEMPT_RESERVED",
-  "updated_at_utc": "2026-10-12T15:51:48Z",
+  "status": "FAST_BTS_DECODED_STANDARD_RUN_TERMINATED_BEFORE_BOOTSTRAP",
+  "updated_at_utc": "2026-10-12T15:57:10Z",
   "budgets": {
     "fast_bootstrap_max": 1,
     "fast_bootstrap_entered": 0,
     "standard_bootstrap_max": 1,
     "standard_bootstrap_authorized_only_after_valid_fast_vector": true,
     "standard_bootstrap_entered": 0,
+    "standard_process_invocations": 1,
     "batch_006_attempts_are_immutable_and_not_reused": true
   },
   "fast_attempts": [
@@ -61,6 +62,7 @@
       "input_vector_sha256": "5ca151755bd8232e0b581939fb1b2c079fa4451b454c0e1b0ad9f2b1a6198373",
       "decoded_vector_sha256": "577c0ff802da8036ce2557cc37cac04416f0b185d5393e1de617083b35e17f0b",
       "snapshot_sha256": "0b03f7df93e53f544071ae6ee77d33e1015d41b42c509914ed5b773a960ea277",
+      "snapshot_offline_restore_and_decode_verified": true,
       "max_abs_error_vs_input": 2.525e-05,
       "mean_abs_error_vs_input": 4.534e-06,
       "max_error_slot": 18078,
@@ -71,7 +73,7 @@
   "standard_attempts": [
     {
       "attempt": 1,
-      "status": "RESERVED_NOT_ENTERED",
+      "status": "PROCESS_TERMINATED_BEFORE_BOOTSTRAP",
       "reserved_at_utc": "2026-10-12T15:51:48Z",
       "profile": {
         "log_n": 16,
@@ -97,14 +99,30 @@
       "output_vector_path": "results/BTS-FAST-DECODE-007/standard-attempt-01-output.f64le",
       "vector_metadata_path": "results/BTS-FAST-DECODE-007/standard-attempt-01-vectors.json",
       "finite_vector_json_path": "results/BTS-FAST-DECODE-007/standard-attempt-01-vectors-human.json",
+      "input_vector_sha256": "5ca151755bd8232e0b581939fb1b2c079fa4451b454c0e1b0ad9f2b1a6198373",
+      "input_matches_fast": true,
       "entered_bootstrap": false,
       "bootstrap_returned": false,
-      "failure_position": null
+      "new_bts_initialization": "1m30.373s",
+      "process_exit_code": 137,
+      "failure_position": "process terminated after generating the matched input vector and completing NewBTS, but before the [enc] log line; the code path did not reach bts.Bootstrap()",
+      "failure_cause": "not reported in the captured stdout/stderr; no additional cause inferred",
+      "standard_output_vector_created": false,
+      "raw_log_sha256": "77f2084cf177bbe101f64ae45af3b3aed3e36b0beb8cf125d40f91c775c51cbc"
     }
   ],
   "standard_vector_search": {
     "checked": "existing BTS result and vector artifacts before Task 007",
     "compatible_complete_32768_slot_standard_vector_found": false,
     "evidence": "The existing Task 006 journal records no decoded output; no prior vector/slots/decoded artifact exists."
+  },
+  "validation": {
+    "focused_decrypt_decode_snapshot_tests": "PASS",
+    "core_rlwe_tests": "PASS",
+    "ckks_fast_tests": "PASS",
+    "go_vet_core_rlwe_ckks_ckks_fast": "PASS",
+    "git_diff_check": "PASS",
+    "full_schemes_ckks_suite": "FAILS_ON_FAST_BASELINE_AND_CURRENT_SOURCE; see summary for exact pristine-baseline comparison",
+    "full_bootstrap_or_trace_test_suites": "NOT_RUN; no extra BTS/Bootstrap, EvalMod, C2S, or S2C calls were made"
   }
 }
