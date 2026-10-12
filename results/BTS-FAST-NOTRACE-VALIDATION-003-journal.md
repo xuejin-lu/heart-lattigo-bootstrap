@@ -3,7 +3,7 @@
 ## Durable invocation budget
 
 - Task-wide maximum: **one** actual `bts.Bootstrap` invocation.
-- Attempt 01: **RESERVED, NOT LAUNCHED**. At reservation time, actual invocations = 0; Bootstrap has not been entered.
+- Attempt 01: **RESERVED; PROCESS LAUNCHED; BOOTSTRAP NOT YET ENTERED**. At this checkpoint, actual `bts.Bootstrap` invocations = 0; the one reserved process is running.
 - Exclusive reservation timestamp: `2026-10-12T02:36:10Z`.
 - Do not retry if the process starts and then fails, panics, or is interrupted. This journal is independent of BTS task 002; task 002's journal and consumed attempt remain unchanged.
 
@@ -44,9 +44,9 @@
 ## Invocation record
 
 - Exact run command, from `external/BTS/`: `set -o pipefail; /private/tmp/bts-fast-003-build.XJZ4gy/bts-fast 2>&1 | tee /Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/results/BTS-FAST-NOTRACE-VALIDATION-003-attempt-01.log`
-- Process launched: **no**.
-- Entered `bts.Bootstrap`: **no**.
-- `NewBTS()` result/time: not run.
+- Process launched: **yes**, single reserved No-Trace process; current output is in `NewBTS()` initialization.
+- Entered `bts.Bootstrap`: **no, as of this checkpoint**; only the parameter banner has been emitted.
+- `NewBTS()` result/time: pending.
 - Bootstrap result/time: not run.
 - Output Level/Scale and numerical errors: not available.
 - Raw log: will be created only by the single reserved invocation above.
