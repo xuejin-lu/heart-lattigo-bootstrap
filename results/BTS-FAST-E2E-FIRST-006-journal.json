@@ -3,7 +3,7 @@
   "status": "BATCH_IN_PROGRESS",
   "primary_base": "8d807c1b607a884c3a155118f3c6a20ba8b61923",
   "primary_origin_main_at_start": "8d807c1b607a884c3a155118f3c6a20ba8b61923",
-  "fast_bootstrap_budget": {"max": 3, "reserved": 2, "entered": 2, "completed": 0},
+  "fast_bootstrap_budget": {"max": 3, "reserved": 3, "entered": 2, "completed": 0},
   "standard_bootstrap_budget": {"max": 1, "conditional": "only if no adequate historical 32768-slot decoded Standard vector exists", "reserved": 0, "entered": 0, "completed": 0},
   "batch004_budget_reused": false,
   "batch005_history_modified": false,
@@ -75,6 +75,20 @@
       "next_repair_scope": "reuse the same existing scalar/AddSub cores for the verified degree-1-left/degree-1-right in-place T3 shape; retain degree-2/degree-1 coverage and all zero-secret/backing checks",
       "attempt_02_log_sha256": "fd3f4ea830c9c391fdfc479deb6c3160ba50f96136df28f2f29b18aa77061fa4",
       "identical_binary_retry_forbidden": true
+    },
+    {
+      "phase": "attempt-02-repair-and-attempt-03-preflight",
+      "attempt_index": 2,
+      "repair_commit": "e05283690fcb0262540a2f979b570dc979f49682",
+      "repair_scope": "support checked degree-1/degree-1 actual zero-secret T3 output using the same existing Fast scalar and AddSub cores; preserve degree-2/degree-1 coverage",
+      "focused_tests": "PASS: degree-2 and degree-1 T3 shapes, L25 output/L26 right source, scale ratio, per-row modular oracle, alias, metadata, zero components, dormant rows, and negative tests",
+      "fastcore_tests": "PASS",
+      "fast_package_tests": "PASS",
+      "go_vet": "PASS: schemes/ckks, schemes/ckks/internal/fastcore, schemes/ckks/fast",
+      "diff_check": "PASS",
+      "secondary_push": "success; origin/fast-qprefix verified at repair commit",
+      "fast_binary_sha256": "1ec5c97ae145e6becbd002d631594a63f7a72a71ee8bc040366926eac971ddb8",
+      "fast_binary_linked_secondary": "e05283690fcb0262540a2f979b570dc979f49682"
     }
   ],
   "attempts": [
@@ -121,6 +135,23 @@
       "bootstrap_return": "error; no decoded output",
       "log_sha256": "fd3f4ea830c9c391fdfc479deb6c3160ba50f96136df28f2f29b18aa77061fa4",
       "vector_artifact": "not created because Bootstrap returned error"
+    },
+    {
+      "attempt_index": 3,
+      "backend": "fast",
+      "status": "RESERVED",
+      "reserved_at": "2026-10-12T14:56:03Z",
+      "backend_ref": "origin/fast-qprefix",
+      "backend_commit": "e05283690fcb0262540a2f979b570dc979f49682",
+      "binary_sha256": "1ec5c97ae145e6becbd002d631594a63f7a72a71ee8bc040366926eac971ddb8",
+      "bts_source_manifest_sha256": "53205b37abd1fb57a960394256b958f5d5e5b1a66f527bfb7cbadabfe3cf0cda",
+      "measurement_adapter_sha256": "12b047e9f736cf8f2f0feb60052026aed9632f669b9770e899a66222de7b66fb",
+      "command": "BTS_VECTOR_OUT=/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/results/BTS-FAST-E2E-FIRST-006/fast-attempt-03-vectors.json /private/tmp/bts-fast-e2e-first-006.A1qAGy/build/bts-fast-attempt-03",
+      "log_path": "results/BTS-FAST-E2E-FIRST-006/fast-attempt-03.log",
+      "vector_path": "results/BTS-FAST-E2E-FIRST-006/fast-attempt-03-vectors.json",
+      "entered_bootstrap": false,
+      "completed": false,
+      "failure_position": null
     }
   ]
 }
