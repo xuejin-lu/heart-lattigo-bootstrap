@@ -1,7 +1,7 @@
 # BTS-FAST-PUBLIC-API-COVERAGE-004 — durable batch journal
 
-- Status: `BATCH_IN_PROGRESS`; checkpoints A–C passed; attempt 01 failed at ScaleDown; attempt 02 not reserved.
-- Latest Primary checkpoint before this result update: `9f50e34a7a9675209683db03d700e810b43259fa` (attempt-01 launch state pushed and verified by GitHub API).
+- Status: `BATCH_IN_PROGRESS`; checkpoints A–C passed; attempt 01 failed at ScaleDown; attempt 02 reserved but not launched.
+- Latest Primary checkpoint before this reservation: `f3fbee94ccce01828b3649b872f23126a61a89ca`, `main`, equal to GitHub `main` by read-only branch API.
 - Secondary implementation: `dcb46a0028af56e6caaa6f3daf8c3b49b53349bb`, normally pushed to official `origin/fast-qprefix`; independent checkout is clean and `HEAD=origin/fast-qprefix`.
 - Original Secondary checkout: `fast-qprefix` at `0b922dc48315128a27db811a5f237e0a6c9813d6`; five authorized historical dirty files remain untouched. Tracked-diff SHA-256 remains `a052b913ee6e575d88b3cff5416ac21477e563bbbcd3536ad7014ab2f4f64a60`.
 - Task 003 is immutable: its one failed Bootstrap attempt, raw log, summary, and journal were not modified. Batch 004 actual Bootstrap calls: **1 / 2**; attempt 01 failed and must not be relaunched.
@@ -42,4 +42,15 @@ A started invocation consumes its reservation even if it fails; never rerun the 
 
 ### Attempt 02
 
-`NOT_RESERVED — NOT_RUN`
+`RESERVED — NOT_LAUNCHED` at `2026-10-12T06:28:07Z`. This second reservation is eligible under the charter because attempt 01 exposed the ordinary integer scalar `Mul`/L0 validation gap, the regression passed without Bootstrap, and the bounded fix is independently committed and pushed as `d1b6dc9963b0df95a7c149306fb62660e1020f7b`.
+
+- Source/config manifest digest remains `53205b37abd1fb57a960394256b958f5d5e5b1a66f527bfb7cbadabfe3cf0cda`; pre-existing `external/BTS/btstest` was unchanged and excluded.
+- Fast backend commit and fetched official `origin/fast-qprefix` HEAD: `d1b6dc9963b0df95a7c149306fb62660e1020f7b`; independent checkout clean.
+- Alternate modfile: `/private/tmp/bts004-fast-attempt02.ZK0jhx/fast.mod`; replacement `github.com/tuneinsight/lattigo/v6 => /private/tmp/lattigo-bts-003-working.HnjCjy/repo`.
+- Build working directory: `/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/external/BTS`.
+- Exact build command: `GOWORK=off GOCACHE=/private/tmp/bts004-gocache.ZwwTt1 go build -mod=mod -modfile=/private/tmp/bts004-fast-attempt02.ZK0jhx/fast.mod -o /private/tmp/bts004-fast-attempt02.ZK0jhx/bts-fast .`
+- Binary SHA-256: `8455e180d08675dcdc78abd961ef8276c3bca272ca9225b168994b354881f36d`, distinct from attempt 01 `ac65e791232a0935400baa81eaee777ab32f7074544dd7e706923e5bbf28bd5d`.
+- Exact No-Trace run command (same working directory; default original BTS flags): `set -o pipefail; GOWORK=off /private/tmp/bts004-fast-attempt02.ZK0jhx/bts-fast 2>&1 | tee /Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/results/BTS-FAST-PUBLIC-API-COVERAGE-004-attempt-02.log`
+- Unique full raw log path: `results/BTS-FAST-PUBLIC-API-COVERAGE-004-attempt-02.log`.
+- Actual invocations remain `1/2` until this distinct binary is launched; after launch the Batch is `2/2`. Do not rerun either binary.
+- This reservation must be committed, normally pushed to `origin/main`, and remotely verified before launch.
