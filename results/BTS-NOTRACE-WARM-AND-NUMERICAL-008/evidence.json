@@ -1,8 +1,34 @@
 {
   "schema_version": "bts-notrace-warm-and-numerical-008-preflight.v1",
   "task": "BTS-NOTRACE-WARM-AND-NUMERICAL-008",
-  "status": "RESOURCE_BLOCKED",
+  "status": "TABLE_COMPLETE_AND_OUTPUTS_COMPARED",
   "checked_at_utc": "2026-10-12T16:50:18Z",
+  "policy_amendment": {
+    "authorized_by_user": true,
+    "date": "2026-10-13",
+    "memory_telemetry_is_advisory": true,
+    "historical_resource_blocked_records_preserved": 3,
+    "bootstrap_budget_reset": false,
+    "macos_memory_protection_bypassed": false,
+    "bts_parameters_changed": false,
+    "next_order": ["standard", "fast"]
+  },
+  "latest_host_observation": {
+    "checked_at_utc": "2026-10-12T22:19:55Z",
+    "os_version": "macOS 26.6.2 / Darwin 25.6.0",
+    "architecture": "arm64",
+    "physical_ram_bytes": 17179869184,
+    "memory_pressure_free_percent": 49,
+    "vm_stat_free_pages": 7424,
+    "vm_stat_page_size_bytes": 16384,
+    "compressor_occupied_pages": 352621,
+    "swap_usage": "sysctl vm.swapusage returned Operation not permitted",
+    "top_and_ps": "execution returned Operation not permitted",
+    "available_disk_gib": 23,
+    "ulimit_processes": 2666,
+    "ulimit_open_files": 1048575,
+    "decision": "OBSERVED_NOT_GATING"
+  },
   "platform_reuse": {
     "maintained_owners": [
       "cmd/perfprobe",
@@ -47,12 +73,33 @@
   },
   "measurement_budget": {
     "standard_max_bootstrap_calls": 6,
-    "standard_reserved": 0,
-    "standard_entered": 0,
+    "standard_reserved": 6,
+    "standard_entered": 6,
     "fast_max_bootstrap_calls": 6,
-    "fast_reserved": 0,
-    "fast_entered": 0,
-    "measurement_processes_per_backend": 0
+    "fast_reserved": 6,
+    "fast_entered": 6,
+    "standard_measurement_processes": 1,
+    "fast_measurement_processes": 1
+  },
+  "standard_run": {
+    "status": "COMPLETE",
+    "run_manifest": "standard/run.json",
+    "full_log": "standard/full.log",
+    "new_bts_seconds": 72.000813917,
+    "cold_bootstrap_ms": 103327.915833,
+    "warm_bootstrap_ms": [154536.048708, 157511.625875, 167255.3735, 145448.56, 133207.716083],
+    "warm_median_ms": 154536.048708,
+    "output_ciphertext_level": 18,
+    "output_ciphertext_scale": 4294967296,
+    "decoded_plaintext_level": 18,
+    "decoded_plaintext_scale": 4294967296,
+    "decoded_slots": 32768,
+    "finite_slots": 32768,
+    "input_sha256": "5ca151755bd8232e0b581939fb1b2c079fa4451b454c0e1b0ad9f2b1a6198373",
+    "decoded_vector_sha256_all_six": "d934d832c4ae4383268c948fb31e43b38b6127965c9da468881dad1820106c3b",
+    "max_absolute_error_vs_input": 0.001154309475804638,
+    "mean_absolute_error_vs_input": 0.00011658376182023395,
+    "worst_error_slot": 27650
   },
   "task007_pairing_candidate": {
     "input_vector_sha256": "5ca151755bd8232e0b581939fb1b2c079fa4451b454c0e1b0ad9f2b1a6198373",
@@ -61,11 +108,42 @@
     "usable_as_batch008_timing_sample": false,
     "paired_metrics_available": false
   },
+  "fast_run": {
+    "status": "COMPLETE",
+    "run_manifest": "fast/run.json",
+    "full_log": "fast/full.log",
+    "new_bts_seconds": 43.319619125,
+    "cold_bootstrap_ms": 5889.668958,
+    "warm_bootstrap_ms": [5044.745125, 4956.468042, 5161.158958, 4996.88575, 10526.021209],
+    "warm_median_ms": 5044.745125,
+    "output_ciphertext_level": 18,
+    "output_ciphertext_scale": 4294967296,
+    "decoded_plaintext_level": 3,
+    "decoded_plaintext_scale": 4294967296,
+    "decoded_slots": 32768,
+    "finite_slots": 32768,
+    "input_sha256": "5ca151755bd8232e0b581939fb1b2c079fa4451b454c0e1b0ad9f2b1a6198373",
+    "decoded_vector_sha256_all_six": "577c0ff802da8036ce2557cc37cac04416f0b185d5393e1de617083b35e17f0b",
+    "max_absolute_error_vs_input": 0.000025252121271135408,
+    "mean_absolute_error_vs_input": 0.000004533633891305686,
+    "worst_error_slot": 18078
+  },
+  "numerical_comparison": {
+    "status": "STANDARD_FAST_OUTPUT_COMPARED",
+    "same_input_sha256": "5ca151755bd8232e0b581939fb1b2c079fa4451b454c0e1b0ad9f2b1a6198373",
+    "report_json": "comparison.json",
+    "report_markdown": "numerical-report.md",
+    "aggregate_over_six_pairs_and_196608_slots": {
+      "fast_vs_standard": {"max_abs": 0.0011594573281435983, "rmse": 0.0001627932602894568, "mean_abs": 0.00011670484521093247, "worst_slot": 27650, "orders": ["10^-3", "10^-4", "10^-4"]},
+      "standard_vs_input": {"max_abs": 0.001154309475804638, "rmse": 0.00016275505032439672, "mean_abs": 0.00011658376182023486, "worst_slot": 27650, "orders": ["10^-3", "10^-4", "10^-4"]},
+      "fast_vs_input": {"max_abs": 0.000025252121271135408, "rmse": 0.0000057084768690815704, "mean_abs": 0.000004533633891305726, "worst_slot": 18078, "orders": ["10^-5", "10^-6", "10^-6"]}
+    },
+    "fast_warm_speedup": 30.633073600125634,
+    "plaintext_level_note": "Standard native plaintext L18; Fast zero-secret Q-prefix projection plaintext L3 from logical ciphertext L18."
+  },
   "limitations": [
-    "No Batch008 binary was built, so no binary SHA or go version -m provenance is claimed.",
-    "No measurement overlay, bootstrap attempt reservation, NewBTS process, or Bootstrap call was started.",
-    "Cold/warm timings, warm medians, speedup, and new Standard/Fast decoded vector metrics remain unavailable.",
-    "Fast zero-secret output remains an intentionally insecure experimental mode; no security-equivalence claim is made."
+    "Fast remains the intentionally insecure zero-secret research mode; numerical results must not be claimed as security equivalence or full-RNS semantic equivalence.",
+    "The initial pre-amendment resource-gate record is historical; current policy no longer treats memory telemetry as an automatic launch veto."
   ],
   "recovery_preflights": [
     {

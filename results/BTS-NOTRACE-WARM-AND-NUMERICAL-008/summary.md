@@ -1,48 +1,75 @@
-# BTS-NOTRACE-WARM-AND-NUMERICAL-008 — resource preflight
+# BTS-NOTRACE-WARM-AND-NUMERICAL-008 — resumed measurement
 
-**Status: `RESOURCE_BLOCKED`**
+**Status: `TABLE_COMPLETE_AND_OUTPUTS_COMPARED`**
 
-**Bootstrap calls entered in Batch 008: Standard 0/6, Fast 0/6.** No call was reserved, and no measurement process was launched.
+**Bootstrap calls entered in Batch 008: Standard 6/6, Fast 6/6.** The three pre-amendment resource-stop records remain in `journal.json` / `evidence.json`; no budget was reset.
 
 ## Required No-Trace Cold/Warm table
 
 | 環維度 | CKKS slots | 實作 | Cold (ms) | Warm 中位數 (ms) | Warm 倍率 |
 |---|---:|---|---:|---:|---:|
-| LogN16 (N=65,536) | 32,768 | Standard | 未測量 | 未測量 | 未計算 |
-| LogN16 (N=65,536) | 32,768 | Fast | 未測量 | 未測量 | 未計算 |
+| LogN16 (N=65,536) | 32,768 | Standard | 103327.916 | 154536.049 | 1× |
+| LogN16 (N=65,536) | 32,768 | Fast | 5889.669 | 5044.745 | 30.6331× |
 
-The table is intentionally incomplete: the required Standard-first resource gate failed before any Batch 008 attempt. No historical timing was substituted. Task007's Standard process was killed by kernel memorystatus after `NewBTS`; Task001's 139.653 s Standard cold observation and Task007's 7.369 s Fast single cold observation remain historical single-call notes only and are not samples for this table.
+Both table rows are new Batch008 measurements on the same Mac. The earlier resource assessments remain historical evidence but are no longer launch gates. No historical timing was substituted: Task001's 139.653 s Standard cold observation and Task007's 7.369 s Fast single cold observation remain historical single-call notes only and are not samples for this table.
 
-## Resource stop evidence
+## Historical resource-stop evidence — three records retained
 
 - Host: macOS 26.6.2, Darwin 25.6.0, arm64; physical memory 16 GiB.
 - At the preflight snapshot, swap was 5,120 MiB total, 3,748.38 MiB used, 1,371.62 MiB free. `memory_pressure` reported system-wide free percentage decreasing from 55% to 45% during the inspection window.
 - Disk had 25 GiB available. Process/file limits were not near exhaustion (`maxproc` soft/hard 2,666/4,000; file descriptors 1,048,575).
 - Read-only unified-log evidence at `2026-10-12 23:54:23.317` records kernel `memorystatus: killing largest compressed process bts-standard-decode-007 [66842] 25608 MB`. The Task007 Standard log ends immediately after `NewBTS()` (1m30.373s), before `[enc]` and before `bts.Bootstrap()`, with process exit 137. This is direct evidence of a kernel memory-pressure kill for that prior process, not an inference from exit code alone.
-- The available execution host is this 16 GiB Mac; no larger-memory host is configured in this session. Therefore the identical Standard workload cannot be safely relaunched here. Per the Batch008 Standard-first rule, Fast measurement must not begin when Standard cannot safely launch.
+- At the time of the original pre-amendment decision, the available host was this 16 GiB Mac and the historical evidence was treated as a stop condition. That decision is preserved as historical context and was superseded by the user-authorized policy amendment below.
 
-The result is `RESOURCE_BLOCKED`, not an assertion that BTS is mathematically unsupported. Resume only after a capable, comparable execution environment is available and a fresh resource preflight passes.
+These readings and the prior kernel termination remain observations, not proof of a deterministic memory requirement. The initial and two recovery `RESOURCE_BLOCKED` decisions remain preserved as historical records; the user-authorized amendment below supersedes their former hard-gate policy for this existing Batch.
 
 ## Numerical comparison
 
-`STANDARD_FAST_OUTPUT_COMPARED` was not reached. There is no Batch008 Standard vector. The Task007 Fast vector may later be considered only for the paired numerical artifact after re-verifying input/source/config identity; it is not a Batch008 performance sample. Its previously recorded input/vector hashes remain in the immutable Task007 result. Max difference, RMSE, mean absolute difference, per-backend error metrics, and speedup are unavailable here.
+`STANDARD_FAST_OUTPUT_COMPARED` was reached using the same original input fingerprint and all six newly decoded vectors per backend. Full per-sample metrics and aggregate metrics, including scientific notation, `log10`, and decimal order, are in [numerical-report.md](numerical-report.md) and [comparison.json](comparison.json). Standard native decode is plaintext L18; Fast uses the intentionally insecure zero-secret Q-prefix projection at plaintext L3 from a logical L18 ciphertext. This is an observed real-slot numerical comparison, not security or full-RNS semantic equivalence.
 
 ## Reuse, provenance, and integrity
 
-- Read and followed the maintained-platform contract. `cmd/perfprobe` already has an explicit six-call `public-repeatability` policy, but it measures the separate public-native CKKS fixture, not the teammate's original BTS. Task007's existing measurement-only BTS overlay is the relevant output-capture prior art. No new runner, timer, stats tool, build, or overlay was created because the Standard resource stop was reached first.
+- Read and followed the maintained-platform contract. `cmd/perfprobe` already has an explicit six-call `public-repeatability` policy, but it measures the separate public-native CKKS fixture, not the teammate's original BTS. Task007's existing measurement-only BTS overlay informed the bounded adapter now implemented inside the maintained platform.
 - Original `external/BTS` source/config manifest was recomputed over the 13 `*.go`, `go.mod`, `go.sum`, and `run.sh` files: `53205b37abd1fb57a960394256b958f5d5e5b1a66f527bfb7cbadabfe3cf0cda` (matches the frozen task pin). The pre-existing executable is excluded. No original BTS file was changed.
-- Pinned Genuine Standard source: `5dbffbdea05394de2ca3a432ed5318aa832e3f40`. Pinned Fast source: `ee308c9743000b5f281a84a871e7c4bd59b176c4`. Both existing isolated checkouts were clean at their exact commits. The original Secondary checkout remains untouched at `0b922dc48315128a27db811a5f237e0a6c9813d6` with its five pre-existing dirty files.
+- Pinned Genuine Standard source: `5dbffbdea05394de2ca3a432ed5318aa832e3f40`. Pinned Fast source: `ee308c9743000b5f281a84a871e7c4bd59b176c4`. Both measurement checkouts were clean at their exact commits. The old note about five Secondary dirty files is historical; the user confirmed those edits were upstreamed and the current `fast-qprefix` worktree is clean at `ee308c9`.
 - Primary startup sync completed by fast-forward to `bccddf0972dd0e4f54594808d384b1dfb34b6ea4`; the worktree was clean before this result artifact was created.
-- No Batch008 Bootstrap reservation, process, build, or cryptographic operation occurred. Historical Batch006/007 records and budgets remain unchanged.
+- At the original pre-amendment checkpoint, no Batch008 Bootstrap reservation or measurement process had occurred. The current binaries are built, but the measurement result below is authoritative for subsequent attempt accounting. Historical Batch006/007 records and budgets remain unchanged.
 
 ## Validation
 
-- Resource/source preflight: completed; Standard gate: blocked.
-- `go test ./internal/numericalmetrics -count=1`: passed; this package test invokes no Bootstrap.
-- `go vet ./internal/numericalmetrics`: passed.
+- Resource readings: recorded as advisory; the user-authorized policy amendment permits proceeding.
+- `GOCACHE=/private/tmp/bts008-gocache.OBnTDE go test ./cmd/perfprobe -run 'Test(BTS|BootstrapBudget|ZeroBootstrapBudget|PublicRepeatabilityUsesSixIndependentCopiesAndReservations)' -count=1`: passed; all Bootstrap callbacks were fakes and no BTS Bootstrap was invoked.
+- `GOCACHE=/private/tmp/bts008-gocache.OBnTDE go test ./internal/perfmeasure ./internal/numericalmetrics -count=1`: passed.
+- `GOCACHE=/private/tmp/bts008-gocache.OBnTDE go vet ./cmd/perfprobe ./internal/perfmeasure ./internal/numericalmetrics`: passed.
+- Standard/Fast adapter binaries compiled against their pinned clean checkouts; module provenance and binary SHA-256 checks passed.
 - `python3 scripts/task_worktree_policy.py ...`: passed for the three exact task result paths; `python3 -m unittest discover -s scripts -p 'test_task_worktree_policy.py' -v`: 2 tests passed.
-- No BTS adapter test was run because the Standard resource gate blocked before adapter creation.
 - JSON syntax (`jq empty`) and final staged `git diff --check`: passed before commit.
+
+## User-authorized policy amendment and resumed preflight — 2026-10-13
+
+RAM unused, swap availability, `memory_pressure`, and Task007's historical memorystatus termination are retained as observations and are no longer sufficient to auto-block Standard. The current host snapshot: macOS 26.6.2 / Darwin 25.6.0 arm64, 16 GiB physical RAM, `memory_pressure` 49% free, `vm_stat` 7,424 free 16-KiB pages and 352,621 compressor-occupied pages, 23 GiB available disk. `sysctl vm.swapusage`, `top`, and `ps` returned `Operation not permitted` in this environment; those values are reported unavailable rather than guessed. This did not stop the authorized run and no OS memory protection was bypassed.
+
+Adapter SHA-256: `b88f8397f74764775a563f0a72ed3c1ce4fa43761b6cfc3edab1da393add3ccd`. Genuine Standard binary SHA-256: `f3d4f89558abbe1665313b13fea54ade8bf291802cad448a6d70bc9f25934720` (Lattigo `5dbffbdea05394de2ca3a432ed5318aa832e3f40`). Fast binary SHA-256: `16d6f8010f6c272b66d0b27524f3508c069174b0b231a81218a4d5ddf2fc0d3a` (Lattigo `ee308c9743000b5f281a84a871e7c4bd59b176c4`). Both use the unchanged 13-file BTS manifest `53205b37abd1fb57a960394256b958f5d5e5b1a66f527bfb7cbadabfe3cf0cda`.
+
+## Standard No-Trace Cold/Warm result
+
+One Standard measurement process completed all six reserved Bootstrap calls. `NewBTS()` took 72.000814 s separately. Cold Bootstrap took 103327.916 ms; warm samples were 154536.049, 157511.626, 167255.374, 145448.560, and 133207.716 ms, with median 154536.049 ms. All returned ciphertexts were L18 / Scale 2³² and native Standard plaintext decodes were L18 / Scale 2³² with 32,768 finite slots.
+
+All six decoded vectors had SHA-256 `d934d832c4ae4383268c948fb31e43b38b6127965c9da468881dad1820106c3b`. Standard vs original input: max absolute error `1.15430948e-3`, mean absolute error `1.16583762e-4`, worst slot 27,650. The complete raw log, six `f64le` vectors, run manifest, and per-call reservation/result records are under `standard/`.
+
+## Fast No-Trace Cold/Warm result and paired numerical comparison
+
+One Fast measurement process completed all six reserved calls. `NewBTS()` took 43.319619 s; cold Bootstrap took 5,889.669 ms; warm samples were 5,044.745, 4,956.468, 5,161.159, 4,996.886, and 10,526.021 ms, with median 5,044.745 ms. Warm speedup is 30.6331× (Standard warm median / Fast warm median). All ciphertexts were L18 / Scale 2³²; Fast projection plaintexts were L3 / Scale 2³² with 32,768 finite real slots.
+
+All six Fast vectors had SHA-256 `577c0ff802da8036ce2557cc37cac04416f0b185d5393e1de617083b35e17f0b`. Fast vs original input: max absolute error `2.52521213e-5`, mean absolute error `4.53363389e-6`, worst slot 18,078.
+
+Aggregate over six 32,768-slot paired runs (196,608 real values):
+
+- Fast vs Standard: MaxAbs `1.15945733e-3` (`log10=-2.935745`, `10^-3`), RMSE `1.62793260e-4` (`log10=-3.788364`, `10^-4`), MeanAbs `1.16704845e-4` (`log10=-3.932911`, `10^-4`), worst slot 27,650.
+- Standard vs original input: MaxAbs `1.15430948e-3` (`log10=-2.937678`, `10^-3`), RMSE `1.62755050e-4` (`log10=-3.788466`, `10^-4`), MeanAbs `1.16583762e-4` (`log10=-3.933362`, `10^-4`).
+- Fast vs original input: MaxAbs `2.52521213e-5` (`log10=-4.597702`, `10^-5`), RMSE `5.70847687e-6` (`log10=-5.243480`, `10^-6`), MeanAbs `4.53363389e-6` (`log10=-5.343554`, `10^-6`).
+
+Each run's six repeated vectors was bitwise identical by SHA. Fast's projection plaintext Level 3 differs intentionally from the Genuine Standard native plaintext Level 18; no security or full-RNS equivalence is implied. Full per-attempt metrics are in [numerical-report.md](numerical-report.md); raw logs, run manifests, vectors, and per-call journals remain under `standard/` and `fast/`.
 
 ## Recovery resource preflight — 2026-10-13 (UTC 2026-10-12T19:18:45Z)
 

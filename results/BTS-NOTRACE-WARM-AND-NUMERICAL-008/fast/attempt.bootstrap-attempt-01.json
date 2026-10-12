@@ -1,0 +1,19 @@
+{
+  "schema_version": "perfprobe-bootstrap-attempt.v1",
+  "attempt_index": 1,
+  "bootstrap_budget": 6,
+  "phase": "first_cold_bootstrap",
+  "reserved_at": "2026-10-12T22:39:42.343748Z",
+  "status": "irrevocably_reserved_before_call",
+  "metadata": {
+    "backend": "fast",
+    "backend_commit": "ee308c9743000b5f281a84a871e7c4bd59b176c4",
+    "binary_sha256": "16d6f8010f6c272b66d0b27524f3508c069174b0b231a81218a4d5ddf2fc0d3a",
+    "bts_source_manifest_sha256": "53205b37abd1fb57a960394256b958f5d5e5b1a66f527bfb7cbadabfe3cf0cda",
+    "command": "/private/tmp/bts008-fast-binary-final",
+    "input_vector_sha256": "5ca151755bd8232e0b581939fb1b2c079fa4451b454c0e1b0ad9f2b1a6198373",
+    "measurement_adapter_sha256": "b88f8397f74764775a563f0a72ed3c1ce4fa43761b6cfc3edab1da393add3ccd",
+    "primary_commit": "5637436de496641debab8c82547755e5b39a6588",
+    "task": "BTS-NOTRACE-WARM-AND-NUMERICAL-008"
+  }
+}

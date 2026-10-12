@@ -172,6 +172,20 @@ func main() {
 		}
 		return
 	}
+	if len(os.Args) > 1 && os.Args[1] == "bts-build" {
+		if err := runBTSBuild(os.Args[2:]); err != nil {
+			fmt.Fprintln(os.Stderr, "perfprobe bts-build:", err)
+			os.Exit(1)
+		}
+		return
+	}
+	if len(os.Args) > 1 && os.Args[1] == "bts-report" {
+		if err := runBTSReport(os.Args[2:]); err != nil {
+			fmt.Fprintln(os.Stderr, "perfprobe bts-report:", err)
+			os.Exit(1)
+		}
+		return
+	}
 	if err := run(); err != nil {
 		fmt.Fprintln(os.Stderr, "perfprobe:", err)
 		os.Exit(1)
@@ -537,40 +551,29 @@ type bootstrapBudget struct {
 	attempts    int
 	journalBase string
 	phase       string
-}
-
-type bootstrapAttemptReservation struct {
-	SchemaVersion string    `json:"schema_version"`
-	Index         int       `json:"attempt_index"`
-	Budget        int       `json:"bootstrap_budget"`
-	Phase         string    `json:"phase"`
-	ReservedAt    time.Time `json:"reserved_at"`
-	Status        string    `json:"status"`
+	shared      *perfmeasure.BootstrapAttemptBudget
 }
 
 func (budget *bootstrapBudget) invoke(phase string, call func() (*rlwe.Ciphertext, error)) (*rlwe.Ciphertext, error) {
 	if budget == nil || budget.limit < 0 {
 		return nil, errors.New("Bootstrap invocation has no explicit non-negative budget")
 	}
-	if budget.attempts >= budget.limit {
-		return nil, fmt.Errorf("Bootstrap budget exhausted at %d/%d attempts", budget.attempts, budget.limit)
-	}
-	if phase == "" {
-		phase = "bootstrap"
-	}
-	index := budget.attempts + 1
-	if budget.journalBase != "" {
-		reservation := bootstrapAttemptReservation{
-			SchemaVersion: "perfprobe-bootstrap-attempt.v1", Index: index, Budget: budget.limit,
-			Phase: phase, ReservedAt: time.Now().UTC(), Status: "irrevocably_reserved_before_call",
-		}
-		journalPath := fmt.Sprintf("%s.bootstrap-attempt-%02d.json", budget.journalBase, index)
-		if err := writeExclusiveJSON(journalPath, reservation); err != nil {
-			return nil, fmt.Errorf("reserve Bootstrap attempt %d before invocation: %w", index, err)
+	if budget.shared == nil {
+		budget.shared = &perfmeasure.BootstrapAttemptBudget{
+			Limit: budget.limit, Attempts: budget.attempts, JournalBase: budget.journalBase,
 		}
 	}
-	budget.attempts++ // Failed calls and interrupted processes consume the reservation.
-	return call()
+	var output *rlwe.Ciphertext
+	_, err := budget.shared.Invoke(phase, func() error {
+		var callErr error
+		output, callErr = call()
+		return callErr
+	})
+	budget.attempts = budget.shared.Attempts
+	if err != nil {
+		return output, err
+	}
+	return output, nil
 }
 
 type budgetedBackend struct {

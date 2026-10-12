@@ -1,8 +1,64 @@
 {
   "schema_version": "bts-notrace-warm-and-numerical-008-journal.v1",
   "task": "BTS-NOTRACE-WARM-AND-NUMERICAL-008",
-  "status": "RESOURCE_BLOCKED",
-  "updated_at_utc": "2026-10-12T21:57:53Z",
+  "status": "TABLE_COMPLETE_AND_OUTPUTS_COMPARED",
+  "updated_at_utc": "2026-10-12T22:40:40Z",
+  "policy_amendment": {
+    "authorized_by_user": true,
+    "date": "2026-10-13",
+    "change": "RAM/Swap/memory_pressure and the historical Task007 memorystatus kill are observations, not automatic RESOURCE_BLOCKED criteria.",
+    "historical_resource_blocked_records_preserved": 3,
+    "batch_budget_reset": false,
+    "standard_then_fast": true,
+    "macos_memory_protection_bypassed": false,
+    "bts_parameters_changed": false
+  },
+  "measurement_preflight": {
+    "adapter": "cmd/perfprobe BTS overlay; original external/BTS source manifest unchanged",
+    "adapter_sha256": "b88f8397f74764775a563f0a72ed3c1ce4fa43761b6cfc3edab1da393add3ccd",
+    "standard_binary_sha256": "f3d4f89558abbe1665313b13fea54ade8bf291802cad448a6d70bc9f25934720",
+    "fast_binary_sha256": "16d6f8010f6c272b66d0b27524f3508c069174b0b231a81218a4d5ddf2fc0d3a",
+    "standard_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+    "fast_commit": "ee308c9743000b5f281a84a871e7c4bd59b176c4",
+    "current_primary_head_at_build": "5637436de496641debab8c82547755e5b39a6588",
+    "standard_checkout": {"path": "/private/tmp/bts008-standard-5dbffbdea053", "clean": true, "detached_head": "5dbffbdea05394de2ca3a432ed5318aa832e3f40"},
+    "fast_checkout": {"path": "/private/tmp/bts-fast-e2e-first-006.A1qAGy/secondary", "clean": true, "branch": "fast-qprefix"},
+    "zero_bootstrap_tests": "PASS",
+    "focused_go_vet": "PASS",
+    "git_diff_check": "PASS",
+    "resource_telemetry_policy": "OBSERVATIONAL_NOT_GATING",
+    "fresh_host_observation": {
+      "os": "macOS 26.6.2 / Darwin 25.6.0 arm64",
+      "physical_memory_bytes": 17179869184,
+      "memory_pressure_free_percent": 49,
+      "vm_stat_free_pages": 7424,
+      "page_size_bytes": 16384,
+      "vm_stat_compressor_occupied_pages": 352621,
+      "swap_usage": "Unavailable: sysctl vm.swapusage returned Operation not permitted",
+      "process_listing": "Unavailable: top and ps execution returned Operation not permitted",
+      "available_disk_gib": 23,
+      "ulimit_processes": 2666,
+      "ulimit_open_files": 1048575,
+      "historical_task007_memorystatus_kill": "Recorded as context only; not a launch veto"
+    }
+  },
+  "process_launch_intent": {
+    "backend": "standard",
+    "binary_sha256": "f3d4f89558abbe1665313b13fea54ade8bf291802cad448a6d70bc9f25934720",
+    "process_budget": 1,
+    "bootstrap_budget": 6,
+    "status": "COMPLETE",
+    "fast_must_wait_for_standard_completion": true
+  },
+  "fast_process_launch_intent": {
+    "backend": "fast",
+    "binary_sha256": "16d6f8010f6c272b66d0b27524f3508c069174b0b231a81218a4d5ddf2fc0d3a",
+    "process_budget": 1,
+    "bootstrap_budget": 6,
+    "status": "COMPLETE",
+    "standard_calls_completed": 6,
+    "fast_must_run_on_same_host_and_profile": true
+  },
   "primary": {
     "approved_baseline": "f3eb665e35f15b91d5f290626fbb7a3bb360a95c",
     "task_spec_commit": "abc8613",
@@ -53,13 +109,13 @@
   },
   "budgets": {
     "standard_bootstrap_max": 6,
-    "standard_bootstrap_reserved": 0,
-    "standard_bootstrap_entered": 0,
-    "standard_measurement_processes": 0,
+    "standard_bootstrap_reserved": 6,
+    "standard_bootstrap_entered": 6,
+    "standard_measurement_processes": 1,
     "fast_bootstrap_max": 6,
-    "fast_bootstrap_reserved": 0,
-    "fast_bootstrap_entered": 0,
-    "fast_measurement_processes": 0,
+    "fast_bootstrap_reserved": 6,
+    "fast_bootstrap_entered": 6,
+    "fast_measurement_processes": 1,
     "task007_attempts_reused": false
   },
   "checkpoints": [
@@ -102,6 +158,41 @@
       "name": "recovery_resource_preflight_retry_2026-10-13",
       "status": "BLOCKED",
       "detail": "Second fresh host check: 16 GiB RAM, top reported 15 GiB used/190 MiB unused and 5444 MiB compressor; swap 4096 MiB total with 1139.69 MiB free; memory_pressure 50% twice; CPU idle 45.50%, load 3.97/2.69/2.23. No Standard or Fast attempt was started; counters remain 0/6 each."
+    },
+    {
+      "name": "resource_policy_amendment_and_measurement_adapter",
+      "status": "PASS",
+      "detail": "The user-authorized amendment makes all memory metrics advisory. Adapter, binary provenance, focused zero-Bootstrap tests, go vet, and diff check passed; Standard is authorized to start first."
+    },
+    {
+      "name": "fresh_resource_observation_2026-10-13",
+      "status": "OBSERVED_NOT_GATING",
+      "detail": "memory_pressure reported 49% free; vm_stat showed 7424 free 16-KiB pages and 352621 compressor-occupied pages; swap and process-list queries were denied by the execution environment; /private/tmp has 23 GiB available. Per user policy this observation does not block Standard."
+    },
+    {
+      "name": "standard_binary_build_and_provenance",
+      "status": "PASS",
+      "detail": "Genuine Standard binary built against clean pinned 5dbffbdea05394de2ca3a432ed5318aa832e3f40; SHA-256 f3d4f89558abbe1665313b13fea54ade8bf291802cad448a6d70bc9f25934720."
+    },
+    {
+      "name": "fast_binary_build_and_provenance",
+      "status": "PASS",
+      "detail": "Fast binary built against clean pinned ee308c9743000b5f281a84a871e7c4bd59b176c4; SHA-256 16d6f8010f6c272b66d0b27524f3508c069174b0b231a81218a4d5ddf2fc0d3a."
+    },
+    {
+      "name": "standard_cold_warm_measurement",
+      "status": "PASS",
+      "detail": "One Standard process completed exactly six reserved calls. NewBTS=72.000813917 s; cold=103327.915833 ms; warm samples=154536.048708, 157511.625875, 167255.373500, 145448.560000, 133207.716083 ms; all output vectors were finite, L18/2^32, and had SHA-256 d934d832c4ae4383268c948fb31e43b38b6127965c9da468881dad1820106c3b."
+    },
+    {
+      "name": "fast_cold_warm_measurement",
+      "status": "PASS",
+      "detail": "One Fast process completed exactly six reserved calls. NewBTS=43.319619125 s; cold=5889.668958 ms; warm samples=5044.745125, 4956.468042, 5161.158958, 4996.885750, 10526.021209 ms; all decoded vectors were finite, ciphertext L18/2^32, Fast projected plaintext L3/2^32, and SHA-256 577c0ff802da8036ce2557cc37cac04416f0b185d5393e1de617083b35e17f0b."
+    },
+    {
+      "name": "paired_vector_comparison",
+      "status": "PASS",
+      "detail": "The existing perfprobe report validated both run manifests, pinned backend provenance, identical original input SHA, all vector hashes, 32768 finite real slots, and produced per-attempt plus aggregate Standard/Fast and input error metrics."
     }
   ],
   "resource_evidence": {
@@ -247,15 +338,21 @@
     }
   ],
   "outputs": {
-    "cold_warm_table_status": "RESOURCE_BLOCKED",
-    "standard_fast_output_compared": false,
-    "standard_samples_ms": [],
-    "fast_samples_ms": [],
-    "warm_medians_ms": null,
-    "warm_speedup": null,
-    "standard_decoded_vector_sha256": null,
-    "fast_batch008_decoded_vector_sha256": null,
-    "numeric_metrics": null
+    "cold_warm_table_status": "TABLE_COMPLETE_AND_OUTPUTS_COMPARED",
+    "standard_fast_output_compared": true,
+    "standard_samples_ms": [103327.915833, 154536.048708, 157511.625875, 167255.3735, 145448.56, 133207.716083],
+    "fast_samples_ms": [5889.668958, 5044.745125, 4956.468042, 5161.158958, 4996.88575, 10526.021209],
+    "warm_medians_ms": {"standard": 154536.048708, "fast": 5044.745125},
+    "warm_speedup": 30.633073600125634,
+    "standard_decoded_vector_sha256": "d934d832c4ae4383268c948fb31e43b38b6127965c9da468881dad1820106c3b",
+    "fast_batch008_decoded_vector_sha256": "577c0ff802da8036ce2557cc37cac04416f0b185d5393e1de617083b35e17f0b",
+    "numeric_report_json": "results/BTS-NOTRACE-WARM-AND-NUMERICAL-008/comparison.json",
+    "numeric_report_markdown": "results/BTS-NOTRACE-WARM-AND-NUMERICAL-008/numerical-report.md",
+    "numeric_metrics": {
+      "fast_vs_standard": {"max_abs": 0.0011594573281435983, "rmse": 0.0001627932602894568, "mean_abs": 0.00011670484521093247, "worst_slot": 27650, "order": {"max_abs": "10^-3", "rmse": "10^-4", "mean_abs": "10^-4"}},
+      "standard_vs_input": {"max_abs": 0.001154309475804638, "rmse": 0.00016275505032439672, "mean_abs": 0.00011658376182023486, "worst_slot": 27650, "order": {"max_abs": "10^-3", "rmse": "10^-4", "mean_abs": "10^-4"}},
+      "fast_vs_input": {"max_abs": 0.000025252121271135408, "rmse": 0.0000057084768690815704, "mean_abs": 0.000004533633891305726, "worst_slot": 18078, "order": {"max_abs": "10^-5", "rmse": "10^-6", "mean_abs": "10^-6"}}
+    }
   },
-  "next_action": "Resume only after a capable, comparable execution environment is available and a fresh bounded resource preflight passes. Preserve all Batch008 counters at 0/6; do not run Fast before Standard succeeds."
+  "next_action": "Batch008 measurements and vector comparison are complete; perform final artifact, source-integrity, test, diff, and safe-push checks without any additional Bootstrap call."
 }

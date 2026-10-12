@@ -85,6 +85,54 @@ func Unavailable(reason string) SNR {
 	return SNR{Status: NotComparable, Reason: reason}
 }
 
+// RealVectorError contains the shared decoded-real-vector error statistics
+// used by experiment reports. WorstIndex is the first slot attaining MaxAbs.
+type RealVectorError struct {
+	Count      int     `json:"count"`
+	MaxAbs     float64 `json:"max_abs"`
+	MeanAbs    float64 `json:"mean_abs"`
+	RMSE       float64 `json:"rmse"`
+	WorstIndex int     `json:"worst_index"`
+	Status     string  `json:"status"`
+	Reason     string  `json:"reason,omitempty"`
+}
+
+// CompareRealVectors computes absolute-error metrics for aligned real vectors.
+// It rejects empty, mismatched, non-finite, or overflowed inputs explicitly.
+func CompareRealVectors(reference, output []float64) RealVectorError {
+	if len(reference) == 0 || len(reference) != len(output) {
+		return RealVectorError{Status: "NOT_COMPARABLE", Reason: "vectors must have the same non-zero length"}
+	}
+	var absoluteSum, squaredSum float64
+	var maxAbs float64
+	worstIndex := 0
+	for index, ref := range reference {
+		observed := output[index]
+		if !finite(ref) || !finite(observed) {
+			return RealVectorError{Status: "NOT_COMPARABLE", Reason: "vector contains a non-finite value"}
+		}
+		difference := math.Abs(observed - ref)
+		if !finite(difference) {
+			return RealVectorError{Status: "NOT_COMPARABLE", Reason: "absolute difference is not finite"}
+		}
+		absoluteSum += difference
+		squaredSum += difference * difference
+		if difference > maxAbs {
+			maxAbs, worstIndex = difference, index
+		}
+	}
+	count := len(reference)
+	meanAbs := absoluteSum / float64(count)
+	rmse := math.Sqrt(squaredSum / float64(count))
+	if !finite(absoluteSum) || !finite(squaredSum) || !finite(meanAbs) || !finite(rmse) {
+		return RealVectorError{Status: "NOT_COMPARABLE", Reason: "error aggregation overflowed the finite float64 range"}
+	}
+	return RealVectorError{
+		Count: count, MaxAbs: maxAbs, MeanAbs: meanAbs, RMSE: rmse,
+		WorstIndex: worstIndex, Status: "FINITE",
+	}
+}
+
 func finiteComplex(value complex128) bool {
 	return finite(real(value)) && finite(imag(value))
 }

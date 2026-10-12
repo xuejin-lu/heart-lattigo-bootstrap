@@ -1,0 +1,38 @@
+params: LogN=16 N=65536 MaxLevel=L29 slots=32768 SlotLimbs=15 mode=%!s(main.BTSMode=2)
+===== NewBTS 準備完成 =====
+  Mode=2  κ=1.000  gap=10  qDiff=1.000000  LogQP=1290.0
+===== MyEvalMod 參數設定 =====
+  LevelQ=26  LogScale=42  Mod1Type=CosContinuous  Mod1Degree=31
+  DoubleAngle=3  K=16  LogMessageRatio=10  PureSin=false  Scaling=0
+  EvalMethod=PS(深度 5)  OutputLogScale=32
+  推導:qDiff=0.999999642372359  sqrt2pi=0.794744437712510  [A,B]=[-2,2]
+        offset=-0.0156250000  MessageRatio=2^10  q0=4398044938241
+  Level 消耗:poly 5 + double-angle 3 = 8(26 → 18)
+==============================
+===== Mod1 多項式(Chebyshev 基底,u = x/(K/2^r),deg=31,even=true odd=false)=====
+  區間 [A,B]=[-2,2](係數已摺入 sqrt2pi=0.794744437712510)
+  c[ 0] = +1.25178124073780733e-01   (~2^  -3.0)
+  c[ 2] = +2.89448682999158713e-01   (~2^  -1.8)
+  c[ 4] = +3.62735062806164466e-01   (~2^  -1.5)
+  c[ 6] = +3.01115299590682561e-01   (~2^  -1.7)
+  c[ 8] = -1.05500633868115742e-01   (~2^  -3.2)
+  c[10] = -4.35882464541523018e-01   (~2^  -1.2)
+  c[12] = +3.74831019188856140e-01   (~2^  -1.4)
+  c[14] = -1.48207624166493412e-01   (~2^  -2.8)
+  c[16] = +3.66562739168387886e-02   (~2^  -4.8)
+  c[18] = -6.38718841507110707e-03   (~2^  -7.3)
+  c[20] = +8.37377934007959342e-04   (~2^ -10.2)
+  c[22] = -8.62080087033548079e-05   (~2^ -13.5)
+  c[24] = +7.18471399379611891e-06   (~2^ -17.1)
+  c[26] = -4.96015883504356780e-07   (~2^ -20.9)
+  c[28] = +2.88846391380708051e-08   (~2^ -25.0)
+  c[30] = -1.43745925267411474e-09   (~2^ -29.4)
+=====================================================================
+[NewBTS] 1m12.000813917s (72.000814 s) κ=1.000
+[enc] L3 scale=4294967296 slots=32768 input_sha256=5ca151755bd8232e0b581939fb1b2c079fa4451b454c0e1b0ad9f2b1a6198373
+[Bootstrap 1/6 first_cold_bootstrap] 1m43.327915833s (103327915833 ns) -> ciphertext L18 scale=4294967296 plaintext L18 scale=4294967296; max|err|=1.154309e-03 mean|err|=1.165838e-04 @slot 27650; vector_sha256=d934d832c4ae4383268c948fb31e43b38b6127965c9da468881dad1820106c3b
+[Bootstrap 2/6 warm_bootstrap_01] 2m34.536048708s (154536048708 ns) -> ciphertext L18 scale=4294967296 plaintext L18 scale=4294967296; max|err|=1.154309e-03 mean|err|=1.165838e-04 @slot 27650; vector_sha256=d934d832c4ae4383268c948fb31e43b38b6127965c9da468881dad1820106c3b
+[Bootstrap 3/6 warm_bootstrap_02] 2m37.511625875s (157511625875 ns) -> ciphertext L18 scale=4294967296 plaintext L18 scale=4294967296; max|err|=1.154309e-03 mean|err|=1.165838e-04 @slot 27650; vector_sha256=d934d832c4ae4383268c948fb31e43b38b6127965c9da468881dad1820106c3b
+[Bootstrap 4/6 warm_bootstrap_03] 2m47.2553735s (167255373500 ns) -> ciphertext L18 scale=4294967296 plaintext L18 scale=4294967296; max|err|=1.154309e-03 mean|err|=1.165838e-04 @slot 27650; vector_sha256=d934d832c4ae4383268c948fb31e43b38b6127965c9da468881dad1820106c3b
+[Bootstrap 5/6 warm_bootstrap_04] 2m25.44856s (145448560000 ns) -> ciphertext L18 scale=4294967296 plaintext L18 scale=4294967296; max|err|=1.154309e-03 mean|err|=1.165838e-04 @slot 27650; vector_sha256=d934d832c4ae4383268c948fb31e43b38b6127965c9da468881dad1820106c3b
+[Bootstrap 6/6 warm_bootstrap_05] 2m13.207716083s (133207716083 ns) -> ciphertext L18 scale=4294967296 plaintext L18 scale=4294967296; max|err|=1.154309e-03 mean|err|=1.165838e-04 @slot 27650; vector_sha256=d934d832c4ae4383268c948fb31e43b38b6127965c9da468881dad1820106c3b

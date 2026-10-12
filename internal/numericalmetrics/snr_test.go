@@ -64,3 +64,34 @@ func TestNonComparableVectorsAreExplicit(t *testing.T) {
 		}
 	}
 }
+
+func TestCompareRealVectorsComputesAbsoluteErrorMetrics(t *testing.T) {
+	metric := CompareRealVectors([]float64{1, -1, 4}, []float64{1.5, -0.5, 1})
+	if metric.Status != "FINITE" || metric.Count != 3 || metric.WorstIndex != 2 {
+		t.Fatalf("unexpected real-vector status/count/worst index: %+v", metric)
+	}
+	if math.Abs(metric.MaxAbs-3) > 1e-15 || math.Abs(metric.MeanAbs-(4.0/3.0)) > 1e-15 || math.Abs(metric.RMSE-math.Sqrt(19.0/6.0)) > 1e-15 {
+		t.Fatalf("unexpected real-vector metrics: %+v", metric)
+	}
+}
+
+func TestCompareRealVectorsRejectsInvalidInputs(t *testing.T) {
+	for _, vectors := range []struct{ reference, output []float64 }{
+		{nil, nil},
+		{[]float64{1}, nil},
+		{[]float64{math.NaN()}, []float64{0}},
+		{[]float64{math.Inf(1)}, []float64{0}},
+		{[]float64{math.MaxFloat64}, []float64{-math.MaxFloat64}},
+	} {
+		if metric := CompareRealVectors(vectors.reference, vectors.output); metric.Status != "NOT_COMPARABLE" || metric.Reason == "" {
+			t.Fatalf("invalid vectors accepted: %+v", metric)
+		}
+	}
+}
+
+func TestCompareRealVectorsZeroErrorIsFiniteAndZero(t *testing.T) {
+	metric := CompareRealVectors([]float64{0.5, -2}, []float64{0.5, -2})
+	if metric.Status != "FINITE" || metric.MaxAbs != 0 || metric.MeanAbs != 0 || metric.RMSE != 0 {
+		t.Fatalf("unexpected exact comparison: %+v", metric)
+	}
+}
