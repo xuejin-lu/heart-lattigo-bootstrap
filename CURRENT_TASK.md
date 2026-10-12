@@ -1,7 +1,7 @@
-# CURRENT TASK — BTS Fast Scale Alignment Batch 005
+# CURRENT TASK — BTS Fast End-to-End First Batch 006
 
-Task: `BTS-FAST-SCALE-ALIGNMENT-005`
-Status: `BATCH_BLOCKED_NEEDS_WEB_REVIEW`
-Authoritative spec: `specs/BTS-FAST-SCALE-ALIGNMENT-005.md`
+Task: `BTS-FAST-E2E-FIRST-006`
+Status: `BATCH_IN_PROGRESS`
+Authoritative spec: `specs/BTS-FAST-E2E-FIRST-006.md`
 
-Source audit and existing non-Bootstrap regressions are recorded in `results/BTS-FAST-SCALE-ALIGNMENT-005-summary.md`. Stop before production changes: the public evaluator has no trusted coefficient-bound provenance for the captured T3 capacity premise; do not infer it from centered residues or embed captured-seed bounds. Await Web decision on the bound contract. Batch 004/evidence and the original Secondary dirty worktree remain unchanged; Batch 005 has used zero Bootstrap calls, zero BTS front-half execution, and zero Standard BTS.
+This user-authorized Batch prioritizes completing the unchanged LogN16 BTS on the intentionally insecure Fast zero-secret backend, then comparing decoded output with genuine Standard. The user's experimental capacity-proof waiver supersedes only Batch 005's capacity-certificate stop for this Fast zero-secret mode; Batch 005 history/evidence remains unchanged. Record missing prefix-bound proof as `CAPACITY_UNPROVEN_EXPERIMENTAL`, not as a correctness proof. Fast budget: 0/3; conditional new Standard budget: 0/1 only if no adequate historical decoded vector exists. Preserve the original Secondary dirty worktree and use an independent clean checkout.
