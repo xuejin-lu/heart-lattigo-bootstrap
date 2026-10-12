@@ -1,0 +1,70 @@
+{
+  "schema_version": "bts-notrace-warm-and-numerical-008-preflight.v1",
+  "task": "BTS-NOTRACE-WARM-AND-NUMERICAL-008",
+  "status": "RESOURCE_BLOCKED",
+  "checked_at_utc": "2026-10-12T16:50:18Z",
+  "platform_reuse": {
+    "maintained_owners": [
+      "cmd/perfprobe",
+      "cmd/fastdiag",
+      "internal/perfmeasure",
+      "internal/numericalmetrics"
+    ],
+    "existing_repeatability_call_policy": "cmd/perfprobe public-repeatability reserves exactly 1 cold + 5 warm calls",
+    "bts_workload_supported_by_perfprobe_public_native": false,
+    "bts_prior_art": "Task007 measurement-only overlay captures decoded vector and output checkpoint for unchanged original BTS",
+    "new_tooling_created": false
+  },
+  "source_integrity": {
+    "bts_source_manifest_sha256": "53205b37abd1fb57a960394256b958f5d5e5b1a66f527bfb7cbadabfe3cf0cda",
+    "file_count": 13,
+    "manifest_method": "sorted per-file SHA-256 lines over external/BTS/*.go, go.mod, go.sum, and run.sh, then SHA-256 of the manifest",
+    "manifest_matches_authoritative_spec": true,
+    "external_bts_modified": false,
+    "preexisting_external_bts_executable_used_or_overwritten": false
+  },
+  "resource_preflight": {
+    "os": "macOS 26.6.2",
+    "kernel": "Darwin 25.6.0",
+    "architecture": "arm64",
+    "ram_bytes": 17179869184,
+    "swap_total_mib": 5120.0,
+    "swap_used_mib": 3748.38,
+    "swap_free_mib": 1371.62,
+    "memory_pressure_free_percent": [55, 45],
+    "available_disk_gib": 25,
+    "process_limit_soft_hard": "2666/4000",
+    "previous_standard_exit_137": {
+      "process": "bts-standard-decode-007",
+      "kernel_action": "memorystatus killed largest compressed process",
+      "compressed_size_mb": 25608,
+      "timestamp_local": "2026-10-12 23:54:23.317",
+      "last_application_phase": "NewBTS completed; process died before encryption log and Bootstrap"
+    },
+    "safe_to_start_standard": false,
+    "safe_to_start_fast_before_standard": false,
+    "reason": "The previous identical-profile Standard setup was kernel-killed at 25,608 MB on this 16 GiB host; current memory pressure and swap availability do not provide a safe basis for relaunch. No alternative higher-memory host is configured in this session."
+  },
+  "measurement_budget": {
+    "standard_max_bootstrap_calls": 6,
+    "standard_reserved": 0,
+    "standard_entered": 0,
+    "fast_max_bootstrap_calls": 6,
+    "fast_reserved": 0,
+    "fast_entered": 0,
+    "measurement_processes_per_backend": 0
+  },
+  "task007_pairing_candidate": {
+    "input_vector_sha256": "5ca151755bd8232e0b581939fb1b2c079fa4451b454c0e1b0ad9f2b1a6198373",
+    "fast_output_vector_sha256": "577c0ff802da8036ce2557cc37cac04416f0b185d5393e1de617083b35e17f0b",
+    "source_manifest_sha256": "53205b37abd1fb57a960394256b958f5d5e5b1a66f527bfb7cbadabfe3cf0cda",
+    "usable_as_batch008_timing_sample": false,
+    "paired_metrics_available": false
+  },
+  "limitations": [
+    "No Batch008 binary was built, so no binary SHA or go version -m provenance is claimed.",
+    "No measurement overlay, bootstrap attempt reservation, NewBTS process, or Bootstrap call was started.",
+    "Cold/warm timings, warm medians, speedup, and new Standard/Fast decoded vector metrics remain unavailable.",
+    "Fast zero-secret output remains an intentionally insecure experimental mode; no security-equivalence claim is made."
+  ]
+}

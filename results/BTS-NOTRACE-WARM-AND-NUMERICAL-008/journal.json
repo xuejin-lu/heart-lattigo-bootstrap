@@ -1,0 +1,134 @@
+{
+  "schema_version": "bts-notrace-warm-and-numerical-008-journal.v1",
+  "task": "BTS-NOTRACE-WARM-AND-NUMERICAL-008",
+  "status": "RESOURCE_BLOCKED",
+  "updated_at_utc": "2026-10-12T16:50:18Z",
+  "primary": {
+    "approved_baseline": "f3eb665e35f15b91d5f290626fbb7a3bb360a95c",
+    "task_spec_commit": "abc8613",
+    "active_task_pointer_commit": "bccddf0972dd0e4f54594808d384b1dfb34b6ea4",
+    "head_after_safe_sync": "bccddf0972dd0e4f54594808d384b1dfb34b6ea4",
+    "branch": "main",
+    "worktree_clean_before_result_artifacts": true
+  },
+  "source": {
+    "path": "external/BTS",
+    "profile": {
+      "log_n": 16,
+      "ring_n": 65536,
+      "slots": 32768,
+      "slot_limbs": 15,
+      "mode": "BTSModePlain",
+      "seed": 0,
+      "amplitude": 1,
+      "input_level": 3,
+      "input_scale": "2^32",
+      "expected_output_level": 18,
+      "expected_output_scale": "2^32"
+    },
+    "manifest_file_count": 13,
+    "manifest_sha256": "53205b37abd1fb57a960394256b958f5d5e5b1a66f527bfb7cbadabfe3cf0cda",
+    "manifest_verified": true,
+    "modified": false,
+    "task007_input_vector_sha256": "5ca151755bd8232e0b581939fb1b2c079fa4451b454c0e1b0ad9f2b1a6198373"
+  },
+  "backends": {
+    "standard": {
+      "kind": "genuine_standard",
+      "commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+      "isolated_checkout_clean_at_pin": true
+    },
+    "fast": {
+      "kind": "fast_zero_secret_experimental",
+      "commit": "ee308c9743000b5f281a84a871e7c4bd59b176c4",
+      "isolated_checkout_clean_at_pin": true
+    },
+    "original_secondary_checkout": {
+      "branch": "fast-qprefix",
+      "head": "0b922dc48315128a27db811a5f237e0a6c9813d6",
+      "behind_origin_by": 3,
+      "preexisting_dirty_tracked_files": 5,
+      "modified_by_this_task": false
+    }
+  },
+  "budgets": {
+    "standard_bootstrap_max": 6,
+    "standard_bootstrap_reserved": 0,
+    "standard_bootstrap_entered": 0,
+    "standard_measurement_processes": 0,
+    "fast_bootstrap_max": 6,
+    "fast_bootstrap_reserved": 0,
+    "fast_bootstrap_entered": 0,
+    "fast_measurement_processes": 0,
+    "task007_attempts_reused": false
+  },
+  "checkpoints": [
+    {
+      "name": "primary_startup_sync",
+      "status": "PASS",
+      "detail": "Fetched origin and fast-forwarded clean main from f3eb665 to bccddf0."
+    },
+    {
+      "name": "maintained_platform_inventory",
+      "status": "PASS_WITH_WORKLOAD_GAP",
+      "detail": "perfprobe public-repeatability has a six-call budget but covers a separate public-native CKKS fixture; Task007 overlay is the only BTS-specific output-capture prior art inspected. No duplicate tooling was created."
+    },
+    {
+      "name": "source_manifest",
+      "status": "PASS",
+      "detail": "The 13-file external/BTS manifest matches the task pin; original source remains unchanged."
+    },
+    {
+      "name": "standard_resource_preflight",
+      "status": "BLOCKED",
+      "detail": "Prior Task007 process was directly identified in kernel memorystatus logs as the largest compressed process killed at 25608 MB; current 16 GiB host has 3748.38/5120 MiB swap used and 45% system-wide free memory. No larger-memory host is available in this session."
+    },
+    {
+      "name": "bootstrap_measurement",
+      "status": "NOT_STARTED",
+      "detail": "Standard-first stop condition prevents consuming either backend's call budget."
+    },
+    {
+      "name": "numerical_comparison",
+      "status": "NOT_AVAILABLE",
+      "detail": "No new Standard vector exists; no timing or vector metrics were fabricated from historical measurements."
+    }
+  ],
+  "resource_evidence": {
+    "host": "macOS 26.6.2 / Darwin 25.6.0 / arm64",
+    "physical_memory_bytes": 17179869184,
+    "swap_total_mib": 5120.0,
+    "swap_used_mib": 3748.38,
+    "swap_free_mib": 1371.62,
+    "memory_pressure_free_percent_observations": [55, 45],
+    "available_disk_gib": 25,
+    "max_process_soft_hard": [2666, 4000],
+    "file_descriptor_limit": 1048575,
+    "largest_observed_non_task_processes_kib": [
+      {"process": "WebKit WebContent", "rss_kib": 1120384},
+      {"process": "Codex Renderer", "rss_kib": 660064},
+      {"process": "VS Code Renderer", "rss_kib": 647104},
+      {"process": "VS Code Node service", "rss_kib": 481936}
+    ],
+    "prior_task007_standard_exit": {
+      "exit_code": 137,
+      "log_phase": "after NewBTS and before [enc] / bts.Bootstrap",
+      "new_bts_elapsed": "1m30.373s",
+      "kernel_log_local_time": "2026-10-12 23:54:23.317",
+      "kernel_message": "memorystatus: killing largest compressed process bts-standard-decode-007 [66842] 25608 MB"
+    },
+    "assessment": "UNSAFE_TO_RELAUNCH_STANDARD_ON_CURRENT_HOST"
+  },
+  "outputs": {
+    "cold_warm_table_status": "RESOURCE_BLOCKED",
+    "standard_fast_output_compared": false,
+    "standard_samples_ms": [],
+    "fast_samples_ms": [],
+    "warm_medians_ms": null,
+    "warm_speedup": null,
+    "standard_decoded_vector_sha256": null,
+    "fast_batch008_decoded_vector_sha256": null,
+    "numeric_metrics": null
+  },
+  "next_action": "Resume only after a capable, comparable execution environment is available and a fresh bounded resource preflight passes. Preserve all Batch008 counters at 0/6; do not run Fast before Standard succeeds."
+}
