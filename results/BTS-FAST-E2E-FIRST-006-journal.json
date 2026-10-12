@@ -1,9 +1,9 @@
 {
   "task": "BTS-FAST-E2E-FIRST-006",
-  "status": "BATCH_IN_PROGRESS",
+  "status": "NEEDS_WEB_REVIEW",
   "primary_base": "8d807c1b607a884c3a155118f3c6a20ba8b61923",
   "primary_origin_main_at_start": "8d807c1b607a884c3a155118f3c6a20ba8b61923",
-  "fast_bootstrap_budget": {"max": 3, "reserved": 3, "entered": 2, "completed": 0},
+  "fast_bootstrap_budget": {"max": 3, "reserved": 3, "entered": 3, "completed": 1},
   "standard_bootstrap_budget": {"max": 1, "conditional": "only if no adequate historical 32768-slot decoded Standard vector exists", "reserved": 0, "entered": 0, "completed": 0},
   "batch004_budget_reused": false,
   "batch005_history_modified": false,
@@ -89,6 +89,20 @@
       "secondary_push": "success; origin/fast-qprefix verified at repair commit",
       "fast_binary_sha256": "1ec5c97ae145e6becbd002d631594a63f7a72a71ee8bc040366926eac971ddb8",
       "fast_binary_linked_secondary": "e05283690fcb0262540a2f979b570dc979f49682"
+    },
+    {
+      "phase": "attempt-03-result-and-correction",
+      "attempt_index": 3,
+      "bootstrap_returned_ciphertext": true,
+      "bts_end_to_end_completed": false,
+      "failure": "original main panicked in rlwe.Decryptor.Decrypt after Bootstrap returned; ring.addvec read the missing q4 row of c1 (length 0)",
+      "decoded_slots": 0,
+      "output_level_scale": "not emitted before original decrypt call; no verified metadata available",
+      "vector_artifact": "absent; adapter exports only after successful original Decode",
+      "log_sha256": "769462e36f5f0dc9b1374de1ff0ec10a86dbfd871dea7d173362d6c0fc7afa5a",
+      "source_evidence_correction": "attempt-01 event described the prior expected degree-2 T3 shape; live runtime metadata was not instrumented. Source shows BTS GenPower uses ordinary MulRelinNew on the non-lazy path, and Fast zero-secret MulRelinNew returns compact degree 1, explaining why attempt 02 still missed the helper. No BTS source was changed.",
+      "remaining_fast_bootstrap_budget": 0,
+      "standard_bootstrap_budget_used": 0
     }
   ],
   "attempts": [
@@ -139,7 +153,7 @@
     {
       "attempt_index": 3,
       "backend": "fast",
-      "status": "RESERVED",
+      "status": "BOOTSTRAP_RETURNED_DECRYPTION_PANIC",
       "reserved_at": "2026-10-12T14:56:03Z",
       "backend_ref": "origin/fast-qprefix",
       "backend_commit": "e05283690fcb0262540a2f979b570dc979f49682",
@@ -149,9 +163,16 @@
       "command": "BTS_VECTOR_OUT=/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/results/BTS-FAST-E2E-FIRST-006/fast-attempt-03-vectors.json /private/tmp/bts-fast-e2e-first-006.A1qAGy/build/bts-fast-attempt-03",
       "log_path": "results/BTS-FAST-E2E-FIRST-006/fast-attempt-03.log",
       "vector_path": "results/BTS-FAST-E2E-FIRST-006/fast-attempt-03-vectors.json",
-      "entered_bootstrap": false,
-      "completed": false,
-      "failure_position": null
+      "entered_bootstrap": true,
+      "completed": true,
+      "end_to_end_completed": false,
+      "failure_position": "bts.Bootstrap returned a ciphertext; original BTS panicked during decryptor.Decrypt before vector export: ring.addvec read component c1 q4 with length 0",
+      "process_exit_code": 2,
+      "new_bts_initialization": "43.814s",
+      "bootstrap_return": "success; ciphertext returned; exact Level/Scale not emitted before original decrypt call",
+      "decode": "failed with panic; no decoded output",
+      "log_sha256": "769462e36f5f0dc9b1374de1ff0ec10a86dbfd871dea7d173362d6c0fc7afa5a",
+      "vector_artifact": "not created because original decryptor panicked before measurement adapter export"
     }
   ]
 }

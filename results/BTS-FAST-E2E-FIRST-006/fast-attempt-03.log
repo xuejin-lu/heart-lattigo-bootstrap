@@ -1,0 +1,47 @@
+params: LogN=16  MaxLevel=L29  LogQP=1290.0  S2CStart=L3  BTS 輸出=L18  slots=32768
+===== NewBTS 準備完成 =====
+  Mode=2  κ=1.000  gap=10  qDiff=1.000000  LogQP=1290.0
+===== MyEvalMod 參數設定 =====
+  LevelQ=26  LogScale=42  Mod1Type=CosContinuous  Mod1Degree=31
+  DoubleAngle=3  K=16  LogMessageRatio=10  PureSin=false  Scaling=0
+  EvalMethod=PS(深度 5)  OutputLogScale=32
+  推導:qDiff=0.999999642372359  sqrt2pi=0.794744437712510  [A,B]=[-2,2]
+        offset=-0.0156250000  MessageRatio=2^10  q0=4398044938241
+  Level 消耗:poly 5 + double-angle 3 = 8(26 → 18)
+==============================
+===== Mod1 多項式(Chebyshev 基底,u = x/(K/2^r),deg=31,even=true odd=false)=====
+  區間 [A,B]=[-2,2](係數已摺入 sqrt2pi=0.794744437712510)
+  c[ 0] = +1.25178124073780733e-01   (~2^  -3.0)
+  c[ 2] = +2.89448682999158713e-01   (~2^  -1.8)
+  c[ 4] = +3.62735062806164466e-01   (~2^  -1.5)
+  c[ 6] = +3.01115299590682561e-01   (~2^  -1.7)
+  c[ 8] = -1.05500633868115742e-01   (~2^  -3.2)
+  c[10] = -4.35882464541523018e-01   (~2^  -1.2)
+  c[12] = +3.74831019188856140e-01   (~2^  -1.4)
+  c[14] = -1.48207624166493412e-01   (~2^  -2.8)
+  c[16] = +3.66562739168387886e-02   (~2^  -4.8)
+  c[18] = -6.38718841507110707e-03   (~2^  -7.3)
+  c[20] = +8.37377934007959342e-04   (~2^ -10.2)
+  c[22] = -8.62080087033548079e-05   (~2^ -13.5)
+  c[24] = +7.18471399379611891e-06   (~2^ -17.1)
+  c[26] = -4.96015883504356780e-07   (~2^ -20.9)
+  c[28] = +2.88846391380708051e-08   (~2^ -25.0)
+  c[30] = -1.43745925267411474e-09   (~2^ -29.4)
+=====================================================================
+[NewBTS] 43.814s  κ=1.000
+[enc] L3  scale=2^32.00  amp=1.000
+panic: runtime error: index out of range [0] with length 0
+
+goroutine 1 [running]:
+github.com/tuneinsight/lattigo/v6/ring.addvec({0x4de8c940000?, 0x1029c6728?, 0x21?}, {0x0?, 0x10004de7865f180?, 0x12?}, {0x4de8c940000?, 0x1?, 0x10000?}, 0x13?)
+	/private/tmp/bts-fast-e2e-first-006.A1qAGy/secondary/ring/vec_ops.go:16 +0x154
+github.com/tuneinsight/lattigo/v6/ring.(*SubRing).Add(...)
+	/private/tmp/bts-fast-e2e-first-006.A1qAGy/secondary/ring/subring_ops.go:7
+github.com/tuneinsight/lattigo/v6/ring.Ring.Add({{0x4d6f5a7c0f0, 0x1e, 0x1e}, {0x4d6f5a7c000, 0x1e, 0x1e}, {0x4d6f5875608, 0x1d, 0x1d}, 0x12, ...}, ...)
+	/private/tmp/bts-fast-e2e-first-006.A1qAGy/secondary/ring/operations.go:13 +0x84
+github.com/tuneinsight/lattigo/v6/core/rlwe.Decryptor.Decrypt({{0x10, {0x4d6f5a48000, 0x1e, 0x1e}, {0x4d6f5a21b60, 0x5, 0x5}, {{0x102fd09d0, 0x4d6f57d2af0}, 0x400999999999999a, ...}, ...}, ...}, ...)
+	/private/tmp/bts-fast-e2e-first-006.A1qAGy/secondary/core/rlwe/decryptor.go:78 +0x384
+github.com/tuneinsight/lattigo/v6/core/rlwe.Decryptor.DecryptNew({{0x10, {0x4d6f5a48000, 0x1e, 0x1e}, {0x4d6f5a21b60, 0x5, 0x5}, {{0x102fd09d0, 0x4d6f57d2af0}, 0x400999999999999a, ...}, ...}, ...}, ...)
+	/private/tmp/bts-fast-e2e-first-006.A1qAGy/secondary/core/rlwe/decryptor.go:44 +0x134
+main.main()
+	/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/external/BTS/main.go:98 +0xca4
