@@ -66,5 +66,61 @@
     "No measurement overlay, bootstrap attempt reservation, NewBTS process, or Bootstrap call was started.",
     "Cold/warm timings, warm medians, speedup, and new Standard/Fast decoded vector metrics remain unavailable.",
     "Fast zero-secret output remains an intentionally insecure experimental mode; no security-equivalence claim is made."
+  ],
+  "recovery_preflights": [
+    {
+      "checked_at_utc": "2026-10-12T19:18:45Z",
+      "status": "RESOURCE_BLOCKED",
+      "primary_sync": {
+        "branch": "main",
+        "head": "1727c88a9db00be41e127fd91cd9f94ed30e2a3b",
+        "origin_main": "1727c88a9db00be41e127fd91cd9f94ed30e2a3b",
+        "ahead_behind": [0, 0],
+        "worktree_clean_before_recovery_artifacts": true
+      },
+      "secondary_sync": {
+        "branch": "fast-qprefix",
+        "head": "ee308c9743000b5f281a84a871e7c4bd59b176c4",
+        "origin_fast_qprefix": "ee308c9743000b5f281a84a871e7c4bd59b176c4",
+        "ahead_behind": [0, 0],
+        "worktree_clean": true,
+        "historical_five_dirty_files_note_current": false
+      },
+      "host_resources": {
+        "os_version": "macOS 26.6.2",
+        "kernel": "Darwin 25.6.0",
+        "architecture": "arm64",
+        "physical_ram_bytes": 17179869184,
+        "top_physmem_used_gib_rounded": 15,
+        "top_physmem_unused_mib": 87,
+        "compressor_occupied_mib": 3598,
+        "memory_pressure_free_percent_observations": [63, 62],
+        "swap_total_mib": 3072.0,
+        "swap_used_mib": 1942.94,
+        "swap_free_mib": 1129.06,
+        "load_average_1_5_15": [2.02, 2.26, 2.32],
+        "cpu_idle_percent": 84.23,
+        "available_disk_gib": 25,
+        "max_process_soft_hard": "2666/4000",
+        "open_file_limit": 1048575,
+        "largest_resident_processes_kib": [
+          {"process": "WebKit WebContent", "rss_kib": 2454576},
+          {"process": "WebKit WebContent", "rss_kib": 929680},
+          {"process": "Codex Renderer", "rss_kib": 745216},
+          {"process": "Safari", "rss_kib": 422192},
+          {"process": "ChatGPT", "rss_kib": 337600},
+          {"process": "VS Code Renderer", "rss_kib": 253280}
+        ]
+      },
+      "assessment": "UNSAFE_TO_START_STANDARD",
+      "reason": "Current physical-memory headroom is only 87 MiB and swap headroom is 1129.06 MiB, while a prior same-profile Standard setup was directly killed by memorystatus at 25608 MB on the same 16 GiB host. The improved memory_pressure percentage and low CPU load are preserved as counterevidence; this remains a resource-safety assessment, not a deterministic memory-minimum claim.",
+      "batch008_calls": {
+        "standard_reserved": 0,
+        "standard_entered": 0,
+        "fast_reserved": 0,
+        "fast_entered": 0
+      },
+      "no_measurement_process_or_binary_started": true
+    }
   ]
 }

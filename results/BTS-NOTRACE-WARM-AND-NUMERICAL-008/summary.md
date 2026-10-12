@@ -43,3 +43,13 @@ The result is `RESOURCE_BLOCKED`, not an assertion that BTS is mathematically un
 - `python3 scripts/task_worktree_policy.py ...`: passed for the three exact task result paths; `python3 -m unittest discover -s scripts -p 'test_task_worktree_policy.py' -v`: 2 tests passed.
 - No BTS adapter test was run because the Standard resource gate blocked before adapter creation.
 - JSON syntax (`jq empty`) and final staged `git diff --check`: passed before commit.
+
+## Recovery resource preflight — 2026-10-13 (UTC 2026-10-12T19:18:45Z)
+
+The previous `RESOURCE_BLOCKED` record is retained; this is a fresh resume check, not a reset of the Batch or its counters. Primary was clean on `main` at `1727c88a9db00be41e127fd91cd9f94ed30e2a3b`, equal to fetched `origin/main`. Secondary was clean on `fast-qprefix` at `ee308c9743000b5f281a84a871e7c4bd59b176c4`, equal to fetched `origin/fast-qprefix`. The earlier journal note about five dirty Secondary files describes the previous run only; no such dirty files exist in this current checkout.
+
+Fresh local resource readings: 16 GiB physical RAM; `top` reported 15 GiB used, 3,598 MiB in the compressor and 87 MiB unused; swap 3,072 MiB total, 1,942.94 MiB used and 1,129.06 MiB free; `memory_pressure` reported 63% and then 62% system-wide free; load averages 2.02/2.26/2.32 with 84.23% CPU idle; disk available 25 GiB; `maxproc` 2,666/4,000 and open-file limit 1,048,575. The largest observed resident process was WebKit WebContent at 2,454,576 KiB; the remaining top processes included another WebKit process at 929,680 KiB and Codex Renderer at 745,216 KiB.
+
+**Decision: remain `RESOURCE_BLOCKED`.** The improved `memory_pressure` percentage and low CPU load are recorded, but the contemporaneous physical-memory/swap headroom is very small. Combined with the directly recorded prior kernel termination of the matching Standard setup at a 25,608 MB footprint, this does not provide a safe basis to launch the Standard-first series on this 16 GiB host. This is a safety assessment, not a claim that 25,608 MB is the workload's deterministic minimum. No measurement process or binary was started; Standard and Fast reservations/entered calls remain 0/6 each. Fast was not run because Standard must be first. No BTS source or backend code was changed.
+
+The exact live readings and both repository synchronization checks were appended to `journal.json` and `evidence.json`. A later resume must perform another fresh resource preflight; historical Batch 008 calls remain 0/6 and are not reset or consumed by this check.

@@ -2,7 +2,7 @@
   "schema_version": "bts-notrace-warm-and-numerical-008-journal.v1",
   "task": "BTS-NOTRACE-WARM-AND-NUMERICAL-008",
   "status": "RESOURCE_BLOCKED",
-  "updated_at_utc": "2026-10-12T16:50:18Z",
+  "updated_at_utc": "2026-10-12T19:18:45Z",
   "primary": {
     "approved_baseline": "f3eb665e35f15b91d5f290626fbb7a3bb360a95c",
     "task_spec_commit": "abc8613",
@@ -92,6 +92,11 @@
       "name": "numerical_comparison",
       "status": "NOT_AVAILABLE",
       "detail": "No new Standard vector exists; no timing or vector metrics were fabricated from historical measurements."
+    },
+    {
+      "name": "recovery_resource_preflight_2026-10-13",
+      "status": "BLOCKED",
+      "detail": "Fresh host check: 16 GiB RAM, top reported 15 GiB used/87 MiB unused and 3598 MiB compressor; swap 3072 MiB total with 1129.06 MiB free; memory_pressure 63% then 62%; CPU idle 84.23%, load 2.02/2.26/2.32. The matching Standard setup was previously kernel-terminated at 25608 MB. No Standard or Fast attempt was started."
     }
   ],
   "resource_evidence": {
@@ -119,6 +124,65 @@
     },
     "assessment": "UNSAFE_TO_RELAUNCH_STANDARD_ON_CURRENT_HOST"
   },
+  "recovery_preflights": [
+    {
+      "checked_at_utc": "2026-10-12T19:18:45Z",
+      "status": "RESOURCE_BLOCKED",
+      "primary": {
+        "branch": "main",
+        "head": "1727c88a9db00be41e127fd91cd9f94ed30e2a3b",
+        "origin_main": "1727c88a9db00be41e127fd91cd9f94ed30e2a3b",
+        "ahead_behind": [0, 0],
+        "worktree_clean": true
+      },
+      "secondary": {
+        "branch": "fast-qprefix",
+        "head": "ee308c9743000b5f281a84a871e7c4bd59b176c4",
+        "origin_fast_qprefix": "ee308c9743000b5f281a84a871e7c4bd59b176c4",
+        "ahead_behind": [0, 0],
+        "worktree_clean": true,
+        "older_five_dirty_files_note_is_historical": true
+      },
+      "host": {
+        "os": "macOS",
+        "architecture": "arm64",
+        "physical_memory_bytes": 17179869184,
+        "top_physmem_used_gib_rounded": 15,
+        "top_physmem_unused_mib": 87,
+        "compressor_occupied_mib": 3598,
+        "memory_pressure_free_percent_observations": [63, 62],
+        "swap_total_mib": 3072.0,
+        "swap_used_mib": 1942.94,
+        "swap_free_mib": 1129.06,
+        "load_average_1_5_15": [2.02, 2.26, 2.32],
+        "cpu_idle_percent": 84.23,
+        "available_disk_gib": 25,
+        "max_process_soft_hard": [2666, 4000],
+        "open_file_limit": 1048575,
+        "largest_resident_processes_kib": [
+          {"process": "WebKit WebContent", "rss_kib": 2454576},
+          {"process": "WebKit WebContent", "rss_kib": 929680},
+          {"process": "Codex Renderer", "rss_kib": 745216},
+          {"process": "Safari", "rss_kib": 422192},
+          {"process": "ChatGPT", "rss_kib": 337600},
+          {"process": "VS Code Renderer", "rss_kib": 253280}
+        ]
+      },
+      "prior_standard_kill_context": {
+        "same_host_physical_memory_bytes": 17179869184,
+        "kernel_reported_footprint_mb": 25608,
+        "kernel_action": "memorystatus killed largest compressed process",
+        "phase": "after NewBTS and before [enc] / Bootstrap"
+      },
+      "decision": "UNSAFE_TO_START_STANDARD",
+      "basis": "Current available physical memory and swap headroom are very small despite improved memory_pressure free percentage and low CPU load; combined with the prior direct kernel kill, this is not a safe Standard-first launch condition. This does not assert 25608 MB is a deterministic minimum.",
+      "measurement_processes_started": 0,
+      "standard_bootstrap_reserved": 0,
+      "standard_bootstrap_entered": 0,
+      "fast_bootstrap_reserved": 0,
+      "fast_bootstrap_entered": 0
+    }
+  ],
   "outputs": {
     "cold_warm_table_status": "RESOURCE_BLOCKED",
     "standard_fast_output_compared": false,
