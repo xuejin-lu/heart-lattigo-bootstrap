@@ -43,7 +43,7 @@
 
 ## Invocation record
 
-- Exact run command, from `external/BTS/`: `set -o pipefail; /private/tmp/bts-fast-003-build.XJZ4gy/bts-fast 2>&1 | tee results/BTS-FAST-NOTRACE-VALIDATION-003-attempt-01.log`
+- Exact run command, from `external/BTS/`: `set -o pipefail; /private/tmp/bts-fast-003-build.XJZ4gy/bts-fast 2>&1 | tee /Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/results/BTS-FAST-NOTRACE-VALIDATION-003-attempt-01.log`
 - Process launched: **no**.
 - Entered `bts.Bootstrap`: **no**.
 - `NewBTS()` result/time: not run.
