@@ -1,6 +1,6 @@
 # BTS-FAST-SCALE-ALIGNMENT-005
 
-Status: `BATCH_IN_PROGRESS`
+Status: `BATCH_BLOCKED_NEEDS_WEB_REVIEW`
 Class: bounded CKKS public-API implementation (I)
 Primary base: `da014d695c3680e486bbf5f2c9e048fbc41d2fa1`
 Secondary base: `xuejin-lu/lattigo` `fast-qprefix` at `d1b6dc9963b0df95a7c149306fb62660e1020f7b`
@@ -24,15 +24,15 @@ The user-approved offline review classified the fixed-path capacity proof as `T1
 
 All products and inequalities below are exact integer arithmetic; no floating-point approximation is used as a proof.
 
-1. At S2C stage 3, logical Level 1 has full logical Q `q0*q1`, and the maintained Q-prefix contains both rows. The old raw conservative bound `232076387351619387697099559` exceeds `(q0*q1-1)/2 = 9442423748056159354880`. This is not, by itself, a Fast-vs-Standard modular Rescale error: for a representative shifted by `t*q0*q1`, rounded division by `q1` changes the quotient by `t*q0`, which is zero modulo the output modulus `q0`. This establishes modular Level-1-to-0 Rescale consistency, not closeness to an unmodded ideal integer result. It does not relax centered-uniqueness requirements for any operation that actually reconstructs an integer, performs a prefix conversion, or relies on a unique lift.
+1. At S2C stage 3, logical Level 1 has `q0=4398044938241`, `q1=4293918721`, full logical Q `q0*q1=18884847496112318709761`, and the maintained Q-prefix contains both rows. The old raw conservative bound `232076387351619387697099559` exceeds `(q0*q1-1)/2 = 9442423748056159354880`. This is not, by itself, a Fast-vs-Standard modular Rescale error: for a representative shifted by `t*q0*q1`, rounded division by `q1` changes the quotient by `t*q0`, which is zero modulo the output modulus `q0`. This establishes modular Level-1-to-0 Rescale consistency, not closeness to an unmodded ideal integer result. It does not relax centered-uniqueness requirements for any operation that actually reconstructs an integer, performs a prefix conversion, or relies on a unique lift.
 2. The exact captured ModUp source has complete-Q rows and a verified q0-canonical lift with coefficient bound `B0=4294966417`; this is evidence for this captured seed/input, not a generic ciphertext bound.
 3. For the audited C2S diagonal transforms, the accepted recurrence is `B_raw <= B_input*D + 1`, then `B_post <= floor((B_raw + floor(q/2))/q)`. The source-backed diagonal L1 sums and dropped primes are:
 
-   | C2S stage | `D` | dropped `q` | exact `B_post` |
-   |---|---:|---:|---:|
-   | 1 | `279980005292245` | `4398034845697` (`q29`) | `273418643178` |
-   | 2 | `66151809604518` | `4398058045441` (`q28`) | `4112528265648` |
-   | 3 | `11838663137549` | `4398055555073` (`q27`) | `11070082260443` |
+   | C2S stage | `D` | dropped `q` | exact `B_raw` | exact `B_post` |
+   |---|---:|---:|---:|---:|
+   | 1 | `279980005292245` | `4398034845697` (`q29`) | `1202504720161674545536166` | `273418643178` |
+   | 2 | `66151809604518` | `4398058045441` (`q28`) | `18087138025836700338678205` | `4112528265648` |
+   | 3 | `11838663137549` | `4398055555073` (`q27`) | `48686836780655299035616753` | `11070082260443` |
 
    The accepted proof review checked the actual `myBSGS` chain: diagonal L1 bounds include all terms; rotations preserve coefficient infinity norm; lazy QP automorphisms preserve the P-scaled form; under the captured zero-secret `c1=0` condition, the relevant gadget/key-switch contribution is zero; ModDown's rounded divide-P is exact for that captured P-scaled zero-lane representation. The `Conjugate(zV)+zV` real split is checked against complete-Q residues, with the subsequent Q0123 output's centered lift justified by the derived bound. These statements are specific to the reviewed source path and its checked preconditions.
 4. The real split gives `B_ctReal <= 22140164520886`. `Step1_Relabel` changes metadata only. `Step2_Offset` encodes `-1/64` at scale `2^42` as coefficient `-68719476736`, so `B_T1 <= 22208883997622`. This is below the previously fixed T1 gate `354567853947127`.
@@ -82,3 +82,9 @@ Forbidden for this Batch: any `bts.Bootstrap`, any CKKS Bootstrap, Standard BTS,
 ## Completion status
 
 Batch completion requires the supported scope to be explicit, all mandatory tests/self-review to pass, the Secondary commit pushed normally, Primary evidence/journal/pointer pushed normally, both used clean checkouts verified, and the original Secondary worktree unchanged. Completion reports implementation coverage and numerical evidence separately. No subsequent BTS attempt is authorized by this Batch.
+
+## Current checkpoint — stopped before production changes
+
+At the authorized base, the ordinary CKKS evaluator has no trusted per-ciphertext coefficient-bound/provenance input or state. Its capacity-related observer exists only on the separate explicit Fast evaluator and reconstructs current centered values; it cannot establish that a compact ciphertext's earlier history did not wrap. `fastcore.ScalarWorkspace.MulRows` performs the requested exact row-wise integer multiplication but accepts no bound and does not prove the resulting lift. Therefore the captured-path `T1/T2/T3` bounds cannot safely authorize a general ordinary public API dispatch. Compact different-Scale Add/Sub remains rejected by the existing full-active-row guard; complete-Q inputs can still take the existing ordinary full-Q path.
+
+No Secondary production or test file was changed. The source audit, bounded baseline tests, environment workaround, zero-call journal, and precise Web decision requested are recorded in `results/BTS-FAST-SCALE-ALIGNMENT-005-summary.md` and `results/BTS-FAST-SCALE-ALIGNMENT-005-evidence.json`. Resume implementation only after Web resolves how an ordinary API call obtains trusted capacity evidence without seed-specific constants or a new unapproved representation contract.

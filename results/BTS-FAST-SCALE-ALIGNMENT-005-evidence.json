@@ -1,0 +1,70 @@
+{
+  "task_id": "BTS-FAST-SCALE-ALIGNMENT-005",
+  "classification": "NEEDS_WEB_REVIEW",
+  "status": "BATCH_BLOCKED_NEEDS_WEB_REVIEW",
+  "provenance": {
+    "primary_task_commit": "04d5c198d8f3528b37d1ca13b13b5430b18cf114",
+    "secondary_commit": "d1b6dc9963b0df95a7c149306fb62660e1020f7b",
+    "secondary_checkout": "/private/tmp/bts-fast-scale-align-005.47bVSR/repo",
+    "secondary_checkout_clean": true,
+    "secondary_origin": "git@github-xuejin:xuejin-lu/lattigo.git",
+    "secondary_original_head": "0b922dc48315128a27db811a5f237e0a6c9813d6",
+    "secondary_original_dirty_path_count": 5,
+    "secondary_original_worktree_changed_by_task": false,
+    "genuine_standard_reference": "5dbffbdea05394de2ca3a432ed5318aa832e3f40"
+  },
+  "accepted_fixed_path_bounds": {
+    "classification": "T1_BOUND_PROVEN_OFFLINE",
+    "scope": "LogN16 seed=0 BTSModePlain amp=1 captured chain only",
+    "T1": "22208883997622",
+    "T2_pre": "64649255451857143382418104254464",
+    "T2_post": "14699510789662016947",
+    "T3_preSub": "42789729724024999377720936179651527668",
+    "q0123": "348246915784587767546753829371582913576961",
+    "strict_half_capacity": "174123457892293883773376914685791456788480",
+    "t3_integer_alignment_k": "4398038122510",
+    "q0_level1": "4398044938241",
+    "q1_level1": "4293918721",
+    "q0q1_level1": "18884847496112318709761",
+    "s2c_stage_raw_bounds": [
+      "1202504720161674545536166",
+      "18087138025836700338678205",
+      "48686836780655299035616753"
+    ],
+    "generic_bound_guarantee": false
+  },
+  "source_findings": {
+    "ordinary_fast_addsub_requires_equal_scale": true,
+    "different_scale_compact_inputs_reach_full_active_row_guard": true,
+    "scalar_workspace_integer_mul_rows_available": true,
+    "scalar_workspace_has_capacity_bound_input": false,
+    "addsub_workspace_requires_equal_scale": true,
+    "ordinary_evaluator_carries_bound_provenance": false,
+    "explicit_fast_capacity_observer_uses_current_centered_residues": true,
+    "standard_alignment_rule": "floor(high_scale/low_scale), multiply lower-scale operand; output Scale=max(input scales)",
+    "standard_t3_alias_rule": "opOut==op0, high-scale op0; multiply lower-scale op1 into temporary",
+    "full_q_route_preserved_when_all_logical_rows_present": true,
+    "dormant_rows_read_or_materialized": false
+  },
+  "tests": {
+    "focused_public_equal_scale_addsub": "PASS",
+    "focused_public_equal_scale_addsub_command": "GOCACHE=/private/tmp/bts-fast-scale-align-005.47bVSR/gocache go test ./schemes/ckks -run '^TestPublicFastZeroSecretAddSubUsesSharedQPrefixCoreAndDecodes$' -count=1",
+    "fastcore": "PASS",
+    "fastcore_command": "GOCACHE=/private/tmp/bts-fast-scale-align-005.47bVSR/gocache go test ./schemes/ckks/internal/fastcore -count=1",
+    "go_vet": "PASS",
+    "go_vet_command": "GOCACHE=/private/tmp/bts-fast-scale-align-005.47bVSR/gocache go vet ./schemes/ckks ./schemes/ckks/internal/fastcore",
+    "t3_regression": "NOT_RUN_NO_SAFE_CAPACITY_CONTRACT",
+    "bootstrap_invocations": 0,
+    "standard_bts_invocations": 0,
+    "s2c_invocations": 0,
+    "c2s_invocations": 0,
+    "evalmod_invocations": 0
+  },
+  "secondary_changes": {
+    "production_files": 0,
+    "test_files": 0,
+    "commit": null,
+    "push": "NOT_APPLICABLE"
+  },
+  "blocker": "No trusted coefficient-bound/provenance source reaches ordinary ckks.Evaluator. Do not use centered residues or captured-path constants as a general proof. Web must define the bound contract or defer compact different-Scale Add/Sub."
+}

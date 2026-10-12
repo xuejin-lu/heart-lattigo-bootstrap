@@ -1,6 +1,6 @@
 {
   "task_id": "BTS-FAST-SCALE-ALIGNMENT-005",
-  "status": "BATCH_IN_PROGRESS",
+  "status": "BATCH_BLOCKED_NEEDS_WEB_REVIEW",
   "primary": {
     "base_commit": "da014d695c3680e486bbf5f2c9e048fbc41d2fa1",
     "branch": "main",
@@ -15,9 +15,14 @@
     "repository": "xuejin-lu/lattigo",
     "branch": "fast-qprefix",
     "authorized_base_commit": "d1b6dc9963b0df95a7c149306fb62660e1020f7b",
-    "implementation_checkout": null,
-    "implementation_commit": null,
-    "push_status": "NOT_STARTED",
+    "implementation_checkout": "/private/tmp/bts-fast-scale-align-005.47bVSR/repo",
+    "implementation_commit": "d1b6dc9963b0df95a7c149306fb62660e1020f7b",
+    "implementation_checkout_clean": true,
+    "origin_url": "git@github-xuejin:xuejin-lu/lattigo.git (SSH host resolves to github.com)",
+    "remote_fast_qprefix_verified_at_base": true,
+    "production_files_changed": 0,
+    "test_files_changed": 0,
+    "push_status": "NO_SECONDARY_CHANGES_TO_PUSH",
     "original_worktree_head": "0b922dc48315128a27db811a5f237e0a6c9813d6",
     "original_worktree_dirty_paths": [
       "schemes/ckks/ckks_test.go",
@@ -39,11 +44,23 @@
     "old_artifacts_modified": false
   },
   "verification": {
-    "focused_tests": "NOT_STARTED",
-    "fast_core_tests": "NOT_STARTED",
-    "go_vet": "NOT_STARTED",
-    "diff_check": "NOT_STARTED",
-    "self_review": "NOT_STARTED"
+    "focused_tests": "PASS: TestPublicFastZeroSecretAddSubUsesSharedQPrefixCoreAndDecodes; GOCACHE redirected to the task temp directory after default cache write denial",
+    "focused_test_command": "GOCACHE=/private/tmp/bts-fast-scale-align-005.47bVSR/gocache go test ./schemes/ckks -run '^TestPublicFastZeroSecretAddSubUsesSharedQPrefixCoreAndDecodes$' -count=1",
+    "fast_core_tests": "PASS: go test ./schemes/ckks/internal/fastcore -count=1",
+    "fast_core_test_command": "GOCACHE=/private/tmp/bts-fast-scale-align-005.47bVSR/gocache go test ./schemes/ckks/internal/fastcore -count=1",
+    "go_vet": "PASS: go vet ./schemes/ckks ./schemes/ckks/internal/fastcore",
+    "go_vet_command": "GOCACHE=/private/tmp/bts-fast-scale-align-005.47bVSR/gocache go vet ./schemes/ckks ./schemes/ckks/internal/fastcore",
+    "secondary_diff_check": "NOT_APPLICABLE: no Secondary files changed",
+    "primary_diff_check": "PENDING_FINAL_REPORT",
+    "self_review": "BLOCKED_BEFORE_IMPLEMENTATION: no trusted bound provenance reaches ordinary public evaluator"
   },
-  "next_action": "verify official Secondary origin/ref and clean isolated checkout; inspect Standard/Fast Add/Sub and scalar/capacity source before implementation"
+  "blocker": {
+    "classification": "NEEDS_WEB_REVIEW",
+    "evidence": "ordinary ckks.Evaluator has no bound/provenance field; fastcore ScalarWorkspace.MulRows performs row-wise modular scalar multiplication without a capacity bound; explicit Fast capacity observer uses reconstructed current centered residues and is not a historical no-wrap proof",
+    "captured_T3_bounds_are_generic": false,
+    "full_q_route_available_when_all_active_rows_are_present": true,
+    "compact_T3_route_remains_rejected": true,
+    "decision_needed": "Specify how the public operation obtains a trusted coefficient bound/certificate, or explicitly defer compact different-Scale Add/Sub while retaining the existing complete-Q path. Do not use centered residues or captured-seed constants as a generic proof."
+  },
+  "next_action": "await Web decision; do not modify Secondary production code or execute any Bootstrap/BTS stage"
 }

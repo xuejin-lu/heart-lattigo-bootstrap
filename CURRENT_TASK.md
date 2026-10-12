@@ -1,7 +1,7 @@
 # CURRENT TASK — BTS Fast Scale Alignment Batch 005
 
 Task: `BTS-FAST-SCALE-ALIGNMENT-005`
-Status: `BATCH_IN_PROGRESS`
+Status: `BATCH_BLOCKED_NEEDS_WEB_REVIEW`
 Authoritative spec: `specs/BTS-FAST-SCALE-ALIGNMENT-005.md`
 
-Implement and verify only the bounded ordinary CKKS different-Scale Add/Sub integration in the active spec. Preserve Batch 004 and the accepted offline capacity evidence unchanged. The original Secondary dirty worktree must remain untouched; use a verified clean independent checkout at the authorized `fast-qprefix` base. This Batch authorizes zero Bootstrap calls, zero BTS front-half execution, and no Standard BTS.
+Source audit and existing non-Bootstrap regressions are recorded in `results/BTS-FAST-SCALE-ALIGNMENT-005-summary.md`. Stop before production changes: the public evaluator has no trusted coefficient-bound provenance for the captured T3 capacity premise; do not infer it from centered residues or embed captured-seed bounds. Await Web decision on the bound contract. Batch 004/evidence and the original Secondary dirty worktree remain unchanged; Batch 005 has used zero Bootstrap calls, zero BTS front-half execution, and zero Standard BTS.
