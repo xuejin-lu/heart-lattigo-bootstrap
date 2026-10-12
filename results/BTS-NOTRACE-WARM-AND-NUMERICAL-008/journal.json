@@ -2,7 +2,7 @@
   "schema_version": "bts-notrace-warm-and-numerical-008-journal.v1",
   "task": "BTS-NOTRACE-WARM-AND-NUMERICAL-008",
   "status": "RESOURCE_BLOCKED",
-  "updated_at_utc": "2026-10-12T19:18:45Z",
+  "updated_at_utc": "2026-10-12T21:57:53Z",
   "primary": {
     "approved_baseline": "f3eb665e35f15b91d5f290626fbb7a3bb360a95c",
     "task_spec_commit": "abc8613",
@@ -97,6 +97,11 @@
       "name": "recovery_resource_preflight_2026-10-13",
       "status": "BLOCKED",
       "detail": "Fresh host check: 16 GiB RAM, top reported 15 GiB used/87 MiB unused and 3598 MiB compressor; swap 3072 MiB total with 1129.06 MiB free; memory_pressure 63% then 62%; CPU idle 84.23%, load 2.02/2.26/2.32. The matching Standard setup was previously kernel-terminated at 25608 MB. No Standard or Fast attempt was started."
+    },
+    {
+      "name": "recovery_resource_preflight_retry_2026-10-13",
+      "status": "BLOCKED",
+      "detail": "Second fresh host check: 16 GiB RAM, top reported 15 GiB used/190 MiB unused and 5444 MiB compressor; swap 4096 MiB total with 1139.69 MiB free; memory_pressure 50% twice; CPU idle 45.50%, load 3.97/2.69/2.23. No Standard or Fast attempt was started; counters remain 0/6 each."
     }
   ],
   "resource_evidence": {
@@ -176,6 +181,64 @@
       },
       "decision": "UNSAFE_TO_START_STANDARD",
       "basis": "Current available physical memory and swap headroom are very small despite improved memory_pressure free percentage and low CPU load; combined with the prior direct kernel kill, this is not a safe Standard-first launch condition. This does not assert 25608 MB is a deterministic minimum.",
+      "measurement_processes_started": 0,
+      "standard_bootstrap_reserved": 0,
+      "standard_bootstrap_entered": 0,
+      "fast_bootstrap_reserved": 0,
+      "fast_bootstrap_entered": 0
+    },
+    {
+      "checked_at_utc": "2026-10-12T21:57:53Z",
+      "status": "RESOURCE_BLOCKED",
+      "primary": {
+        "branch": "main",
+        "head": "895101fc59d8fcf4d90471062a8766e756dcbed9",
+        "origin_main": "895101fc59d8fcf4d90471062a8766e756dcbed9",
+        "ahead_behind": [0, 0],
+        "worktree_clean": true
+      },
+      "secondary": {
+        "branch": "fast-qprefix",
+        "head": "ee308c9743000b5f281a84a871e7c4bd59b176c4",
+        "origin_fast_qprefix": "ee308c9743000b5f281a84a871e7c4bd59b176c4",
+        "ahead_behind": [0, 0],
+        "worktree_clean": true,
+        "historical_five_dirty_files_note_is_historical": true
+      },
+      "host": {
+        "os_version": "macOS 26.6.2",
+        "kernel": "Darwin 25.6.0",
+        "architecture": "arm64",
+        "physical_memory_bytes": 17179869184,
+        "top_physmem_used_gib_rounded": 15,
+        "top_physmem_unused_mib": 190,
+        "compressor_occupied_mib": 5444,
+        "memory_pressure_free_percent_observations": [50, 50],
+        "swap_total_mib": 4096.0,
+        "swap_used_mib": 2956.31,
+        "swap_free_mib": 1139.69,
+        "load_average_1_5_15": [3.97, 2.69, 2.23],
+        "cpu_idle_percent": 45.5,
+        "available_disk_gib": 24,
+        "max_process_soft_hard": [2666, 4000],
+        "open_file_limit": 1048575,
+        "largest_resident_processes_kib": [
+          {"process": "WebKit WebContent", "rss_kib": 1074480},
+          {"process": "WebKit WebContent", "rss_kib": 684944},
+          {"process": "Codex Renderer", "rss_kib": 548192},
+          {"process": "WebKit WebContent", "rss_kib": 416240},
+          {"process": "Safari", "rss_kib": 402368},
+          {"process": "WebKit WebContent", "rss_kib": 247088}
+        ]
+      },
+      "prior_standard_kill_context": {
+        "same_host_physical_memory_bytes": 17179869184,
+        "kernel_reported_footprint_mb": 25608,
+        "kernel_action": "memorystatus killed largest compressed process",
+        "phase": "after NewBTS and before [enc] / Bootstrap"
+      },
+      "decision": "UNSAFE_TO_START_STANDARD",
+      "basis": "This second live snapshot shows only 190 MiB unused physical memory, 5444 MiB in the compressor, 1139.69 MiB free swap, and 50% memory_pressure free on both reads. Combined with the prior direct kernel kill during the same-profile Standard setup, the six-call Standard series is not a safe launch under current conditions; this is not an assertion of deterministic memory minimum.",
       "measurement_processes_started": 0,
       "standard_bootstrap_reserved": 0,
       "standard_bootstrap_entered": 0,

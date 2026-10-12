@@ -121,6 +121,60 @@
         "fast_entered": 0
       },
       "no_measurement_process_or_binary_started": true
+    },
+    {
+      "checked_at_utc": "2026-10-12T21:57:53Z",
+      "status": "RESOURCE_BLOCKED",
+      "primary_sync": {
+        "branch": "main",
+        "head": "895101fc59d8fcf4d90471062a8766e756dcbed9",
+        "origin_main": "895101fc59d8fcf4d90471062a8766e756dcbed9",
+        "ahead_behind": [0, 0],
+        "worktree_clean_before_recovery_artifacts": true
+      },
+      "secondary_sync": {
+        "branch": "fast-qprefix",
+        "head": "ee308c9743000b5f281a84a871e7c4bd59b176c4",
+        "origin_fast_qprefix": "ee308c9743000b5f281a84a871e7c4bd59b176c4",
+        "ahead_behind": [0, 0],
+        "worktree_clean": true,
+        "historical_five_dirty_files_note_current": false
+      },
+      "host_resources": {
+        "os_version": "macOS 26.6.2",
+        "kernel": "Darwin 25.6.0",
+        "architecture": "arm64",
+        "physical_ram_bytes": 17179869184,
+        "top_physmem_used_gib_rounded": 15,
+        "top_physmem_unused_mib": 190,
+        "compressor_occupied_mib": 5444,
+        "memory_pressure_free_percent_observations": [50, 50],
+        "swap_total_mib": 4096.0,
+        "swap_used_mib": 2956.31,
+        "swap_free_mib": 1139.69,
+        "load_average_1_5_15": [3.97, 2.69, 2.23],
+        "cpu_idle_percent": 45.5,
+        "available_disk_gib": 24,
+        "max_process_soft_hard": "2666/4000",
+        "open_file_limit": 1048575,
+        "largest_resident_processes_kib": [
+          {"process": "WebKit WebContent", "rss_kib": 1074480},
+          {"process": "WebKit WebContent", "rss_kib": 684944},
+          {"process": "Codex Renderer", "rss_kib": 548192},
+          {"process": "WebKit WebContent", "rss_kib": 416240},
+          {"process": "Safari", "rss_kib": 402368},
+          {"process": "WebKit WebContent", "rss_kib": 247088}
+        ]
+      },
+      "assessment": "UNSAFE_TO_START_STANDARD",
+      "reason": "Only 190 MiB physical memory was unused, 5444 MiB was occupied by the compressor, and 1139.69 MiB swap remained free; memory_pressure reported 50% twice. Together with the prior same-profile Standard setup kernel kill, current evidence does not support safely launching the Standard-first series. The earlier improved-pressure reading is preserved in the previous recovery event.",
+      "batch008_calls": {
+        "standard_reserved": 0,
+        "standard_entered": 0,
+        "fast_reserved": 0,
+        "fast_entered": 0
+      },
+      "no_measurement_process_or_binary_started": true
     }
   ]
 }
