@@ -1,9 +1,7 @@
-# CURRENT TASK — BTS Fast public API coverage Batch 004
+# CURRENT TASK — BTS Fast Scale Alignment Batch 005
 
-Task: `BTS-FAST-PUBLIC-API-COVERAGE-004`
-Status: `NEEDS_WEB_REVIEW`
-Authoritative spec: `specs/BTS-FAST-PUBLIC-API-COVERAGE-004.md`
+Task: `BTS-FAST-SCALE-ALIGNMENT-005`
+Status: `BATCH_IN_PROGRESS`
+Authoritative spec: `specs/BTS-FAST-SCALE-ALIGNMENT-005.md`
 
-Stop condition: both authorized Fast BTS Bootstrap calls are consumed. Attempt 02 reached EvalSine `T[6]` and failed in ordinary ciphertext `Sub` because component 0 lacked `q4`; do not run another attempt or change representation/scale behavior until Web review resolves the boundary.
-
-Execute the authorized sequential checkpoints A–D in the spec. Preserve Task 003 and Task 002 results/journals unchanged. This Batch has a separate maximum of two actual Fast `bts.Bootstrap` calls, each requiring a durable reservation first. `external/BTS/` remains unchanged and must never be committed or pushed. Preserve the original Secondary dirty worktree; use only a clean independent checkout synced to the official GitHub origin.
+Implement and verify only the bounded ordinary CKKS different-Scale Add/Sub integration in the active spec. Preserve Batch 004 and the accepted offline capacity evidence unchanged. The original Secondary dirty worktree must remain untouched; use a verified clean independent checkout at the authorized `fast-qprefix` base. This Batch authorizes zero Bootstrap calls, zero BTS front-half execution, and no Standard BTS.

@@ -1,0 +1,49 @@
+{
+  "task_id": "BTS-FAST-SCALE-ALIGNMENT-005",
+  "status": "BATCH_IN_PROGRESS",
+  "primary": {
+    "base_commit": "da014d695c3680e486bbf5f2c9e048fbc41d2fa1",
+    "branch": "main",
+    "initial_worktree_clean": true,
+    "bootstrap_calls": 0,
+    "standard_bts_calls": 0,
+    "s2c_calls": 0,
+    "c2s_calls": 0,
+    "evalmod_calls": 0
+  },
+  "secondary": {
+    "repository": "xuejin-lu/lattigo",
+    "branch": "fast-qprefix",
+    "authorized_base_commit": "d1b6dc9963b0df95a7c149306fb62660e1020f7b",
+    "implementation_checkout": null,
+    "implementation_commit": null,
+    "push_status": "NOT_STARTED",
+    "original_worktree_head": "0b922dc48315128a27db811a5f237e0a6c9813d6",
+    "original_worktree_dirty_paths": [
+      "schemes/ckks/ckks_test.go",
+      "schemes/ckks/evaluator.go",
+      "schemes/ckks/evaluator_fast_qp_compat.go",
+      "schemes/ckks/evaluator_fast_qp_compat_test.go",
+      "schemes/ckks/evaluator_fast_zero_secret_automorphism_test.go"
+    ],
+    "original_worktree_modified": false
+  },
+  "accepted_capacity_proof": {
+    "classification": "T1_BOUND_PROVEN_OFFLINE",
+    "scope": "saved LogN16 seed=0 BTSModePlain amp=1 source path only",
+    "T1_bound": "22208883997622",
+    "T2_pre_bound": "64649255451857143382418104254464",
+    "T2_post_bound": "14699510789662016947",
+    "T3_preSub_bound": "42789729724024999377720936179651527668",
+    "old_source_artifact_classification_preserved": "T1_SOURCE_EVIDENCE_MISSING",
+    "old_artifacts_modified": false
+  },
+  "verification": {
+    "focused_tests": "NOT_STARTED",
+    "fast_core_tests": "NOT_STARTED",
+    "go_vet": "NOT_STARTED",
+    "diff_check": "NOT_STARTED",
+    "self_review": "NOT_STARTED"
+  },
+  "next_action": "verify official Secondary origin/ref and clean isolated checkout; inspect Standard/Fast Add/Sub and scalar/capacity source before implementation"
+}
