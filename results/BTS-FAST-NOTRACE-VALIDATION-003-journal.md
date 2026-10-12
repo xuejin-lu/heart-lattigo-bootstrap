@@ -3,7 +3,7 @@
 ## Durable invocation budget
 
 - Task-wide maximum: **one** actual `bts.Bootstrap` invocation.
-- Attempt 01: **RESERVED; PROCESS LAUNCHED; BOOTSTRAP NOT YET ENTERED**. At this checkpoint, actual `bts.Bootstrap` invocations = 0; the one reserved process is running.
+- Attempt 01: **CONSUMED; `bts.Bootstrap` ENTERED; PANICKED**. Actual invocation count = 1 of 1. No retry is permitted.
 - Exclusive reservation timestamp: `2026-10-12T02:36:10Z`.
 - Do not retry if the process starts and then fails, panics, or is interrupted. This journal is independent of BTS task 002; task 002's journal and consumed attempt remain unchanged.
 
@@ -44,10 +44,11 @@
 ## Invocation record
 
 - Exact run command, from `external/BTS/`: `set -o pipefail; /private/tmp/bts-fast-003-build.XJZ4gy/bts-fast 2>&1 | tee /Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/results/BTS-FAST-NOTRACE-VALIDATION-003-attempt-01.log`
-- Process launched: **yes**, single reserved No-Trace process; current output is in `NewBTS()` initialization.
-- Entered `bts.Bootstrap`: **no, as of this checkpoint**; only the parameter banner has been emitted.
-- `NewBTS()` result/time: pending.
-- Bootstrap result/time: not run.
-- Output Level/Scale and numerical errors: not available.
-- Raw log: will be created only by the single reserved invocation above.
+- Process launched: **yes**, one reserved No-Trace process.
+- Entered `bts.Bootstrap`: **yes**; invocation panicked in `MyC2S_DHManual` during the C2S path.
+- `NewBTS()` result/time: initialized successfully in **45.048 s**.
+- Bootstrap result/time: **failed by panic**; completed Bootstrap latency is unavailable and is not reported as a successful timing.
+- Input observed at encryption: Level 3, Scale `2^32`. No post-Bootstrap output Level/Scale or decrypted numerical error is available.
+- Panic: `runtime error: slice bounds out of range [:32768] with capacity 0` in `ring.Ring.MulDoubleRNSScalar` (`ring/operations.go:253`), called through `ckks.Evaluator.evaluateWithScalar` / `Mul`, from `MyC2S_DHManual` (`external/BTS/myc2s.go:317`), inside `(*BTS).Bootstrap` (`external/BTS/bts.go:262`).
+- Raw log: `results/BTS-FAST-NOTRACE-VALIDATION-003-attempt-01.log`, complete stdout/stderr from the single invocation.
 - Existing historical Standard baseline (not rerun): 139.653 s; max absolute error 1.708e-3; mean absolute error 1.172e-4.
