@@ -748,7 +748,16 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 }
 
 func ensurePublicNativeOutputsAvailable(opts cliOptions) error {
-	paths := []string{opts.out, opts.vectorsOut}
+	paths := make([]string, 0, 4+opts.bootstrapBudget)
+	if opts.out != "" {
+		paths = append(paths, opts.out)
+	}
+	if opts.vectorsOut != "" {
+		paths = append(paths, opts.vectorsOut)
+	}
+	if len(paths) == 0 {
+		return errors.New("at least one output path is required")
+	}
 	if opts.publicBootstrap || opts.publicRepeatability {
 		paths = append(paths, opts.out+".failure.json")
 		for index := 1; index <= opts.bootstrapBudget; index++ {

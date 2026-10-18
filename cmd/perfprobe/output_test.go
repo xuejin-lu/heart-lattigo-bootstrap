@@ -91,6 +91,29 @@ func TestOutputSmokeCallsPublicBootstrapOnceAndComputesBothComparisons(t *testin
 	}
 }
 
+func TestOutputSmokeAZeroModeAcceptsOnlyLabeledNativeZeroC1Input(t *testing.T) {
+	backend, input, original, preDecoded, evidence, q, maxLevel := outputSmokeTestFixture(t, "standard", []complex128{0.13})
+	evidence.Kind = standardAZeroInputKind
+	evidence.Constructor = standardAZeroConstructor
+	evidence.C1Nonzero = false
+	result := executeOutputSmokeMode(backend, input, original, preDecoded, evidence, 0, maxLevel, q, true)
+	if result.FailureStage != "" || backend.bootstrapCalls != 1 || backend.decodeCalls != 1 {
+		t.Fatalf("labeled native A=0 diagnostic failed or exceeded one call: result=%+v bootstrap/decode=%d/%d", result, backend.bootstrapCalls, backend.decodeCalls)
+	}
+	if result.OutputAgainstOriginal == nil || result.PreBootstrapVsPostBootstrap == nil {
+		t.Fatal("A=0 diagnostic did not compute both decoded comparisons")
+	}
+
+	backend, input, original, preDecoded, evidence, q, maxLevel = outputSmokeTestFixture(t, "standard", []complex128{0.13})
+	evidence.Kind = standardAZeroInputKind
+	evidence.Constructor = standardAZeroConstructor
+	evidence.C1Nonzero = true
+	result = executeOutputSmokeMode(backend, input, original, preDecoded, evidence, 0, maxLevel, q, true)
+	if result.FailureStage != "input_provenance_validation" || backend.bootstrapCalls != 0 {
+		t.Fatalf("A=0 diagnostic accepted inconsistent c1 evidence: result=%+v calls=%d", result, backend.bootstrapCalls)
+	}
+}
+
 func TestOutputSmokeRejectsInvalidOutputMetadata(t *testing.T) {
 	backend, input, original, preDecoded, evidence, q, maxLevel := outputSmokeTestFixture(t, "standard", []complex128{0.13})
 	backend.output.Value = backend.output.Value[:1]

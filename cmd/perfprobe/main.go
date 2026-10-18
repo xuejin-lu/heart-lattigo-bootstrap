@@ -194,7 +194,7 @@ func main() {
 
 func run() error {
 	var opts cliOptions
-	flag.StringVar(&opts.mode, "mode", "legacy-diagnostic", "legacy-diagnostic or public-native")
+	flag.StringVar(&opts.mode, "mode", "legacy-diagnostic", "legacy-diagnostic, public-native, or standard-a-zero-diagnostic")
 	flag.IntVar(&opts.ephemeralSecretWeight, "ephemeral-secret-weight", -1, "explicit E for public-native mode; legacy mode remains E=0")
 	flag.IntVar(&opts.bootstrapBudget, "bootstrap-budget", -1, "hard maximum actual Bootstrap attempts for this process; required when mode can invoke Bootstrap")
 	flag.BoolVar(&opts.publicBootstrap, "public-bootstrap", false, "public-native mode: run exactly one cold and one warm Bootstrap after validating --preflight-pair")
@@ -274,6 +274,34 @@ func run() error {
 			}
 		}
 		return runPublicNative(opts, configHash, residual, params, effective)
+	}
+	if opts.mode == "standard-a-zero-diagnostic" {
+		if publicBackendName() != "standard" {
+			return errors.New("standard-a-zero-diagnostic requires a perf_standard build")
+		}
+		if opts.ephemeralSecretWeight != 32 {
+			return errors.New("standard-a-zero-diagnostic requires --ephemeral-secret-weight=32")
+		}
+		if !opts.outputSmoke || opts.inputSmoke || opts.fastBootstrapAcceptance || opts.vectorsOut != "" {
+			return errors.New("standard-a-zero-diagnostic requires --output-smoke and does not accept input-only, Fast, or vector-output modes")
+		}
+		residual, params, effective, err := perfmeasure.ParametersFromConfigWithE(cfg, 32)
+		if err != nil {
+			return err
+		}
+		opts.profile, err = perfmeasure.ResolveProfileName(opts.profile, effective)
+		if err != nil {
+			return err
+		}
+		if effective.LogN != 13 && effective.LogN != 16 {
+			return fmt.Errorf("standard-a-zero-diagnostic supports only the configured LogN13 and LogN16 profiles, got LogN=%d", effective.LogN)
+		}
+		values := perfmeasure.DeterministicInput(effective.InputSlots)
+		inputHash := perfmeasure.Fingerprint(values)
+		if opts.profile == "logn13" && inputHash != canonicalLogN13InputSHA256 {
+			return fmt.Errorf("canonical LogN13 input fingerprint mismatch: %s", inputHash)
+		}
+		return runOutputSmoke(opts, configHash, residual, params, effective, values)
 	}
 	if opts.mode != "legacy-diagnostic" {
 		return fmt.Errorf("unsupported --mode %q", opts.mode)
@@ -462,6 +490,18 @@ func validateTraceFixtureRequest(opts cliOptions) error {
 }
 
 func validateExecutionLimits(opts cliOptions) error {
+	if opts.mode == "standard-a-zero-diagnostic" {
+		if !opts.outputSmoke || opts.inputSmoke || opts.fastBootstrapAcceptance || opts.publicBootstrap || opts.publicRepeatability || opts.preflightPair != "" || opts.traceFixtureOut != "" || opts.vectorsOut != "" {
+			return errors.New("standard-a-zero-diagnostic requires the bounded output-smoke path only")
+		}
+		if opts.ephemeralSecretWeight != 32 {
+			return errors.New("standard-a-zero-diagnostic requires E=32")
+		}
+		if opts.bootstrapBudget != 1 {
+			return errors.New("standard-a-zero-diagnostic requires --bootstrap-budget=1")
+		}
+		return validateBootstrapBudget(opts.bootstrapBudget, 1)
+	}
 	if opts.mode == "public-native" {
 		wantBudget := 0
 		if opts.publicBootstrap || opts.publicRepeatability {

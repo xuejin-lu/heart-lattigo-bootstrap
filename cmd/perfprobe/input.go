@@ -25,8 +25,10 @@ const (
 	pinnedFastSHA             = "5feb44917fca40c93abec6def6f26bc81a82c536"
 	standardNativeInputKind   = "standard_native_rlwe_encrypt_v1"
 	fastDirectInputKind       = "fast_zero_secret_direct_encoded_v1"
+	standardAZeroInputKind    = "standard_a_zero_native_rlwe_encrypt_v1"
 	standardNativeConstructor = "ckks.NewEncoder.Encode -> rlwe.NewEncryptor(residual, generated Standard secret).EncryptNew"
 	fastDirectConstructor     = "ckks.NewEncoder.Encode -> Fast test-helper-equivalent c0 copy + c1 zero (simulation, not encryption)"
+	standardAZeroConstructor  = "ckks.NewEncoder.Encode -> ordinary rlwe.NewEncryptor(residual, generated Standard secret).EncryptNew; the experiment branch zeros sampled a inside encryptZeroSk"
 	inputQualityLimit         = 1e-6
 )
 
@@ -86,6 +88,13 @@ type inputSmokeDocument struct {
 }
 
 func prepareAndValidateInput(backend backendAdapter, residual ckks.Parameters, params bootstrapping.Parameters, values []complex128, logSlots int) (*rlwe.Ciphertext, []complex128, inputRecord, error) {
+	return prepareAndValidateInputMode(backend, residual, params, values, logSlots, false)
+}
+
+func prepareAndValidateInputMode(backend backendAdapter, residual ckks.Parameters, params bootstrapping.Parameters, values []complex128, logSlots int, standardAZeroDiagnostic bool) (*rlwe.Ciphertext, []complex128, inputRecord, error) {
+	if standardAZeroDiagnostic && backend.Name() != "standard" {
+		return nil, nil, inputRecord{}, fmt.Errorf("Standard A=0 diagnostic cannot use backend %q", backend.Name())
+	}
 	if backend.Name() == "standard" && backend.SecretKeyForTrial() == nil {
 		return nil, nil, inputRecord{}, fmt.Errorf("Standard input has no generated matching secret key")
 	}
@@ -93,11 +102,18 @@ func prepareAndValidateInput(backend backendAdapter, residual ckks.Parameters, p
 	if err != nil {
 		return nil, nil, inputRecord{}, fmt.Errorf("prepare %s input: %w", backend.Name(), err)
 	}
-	decoded, record, err := validateInputCiphertext(backend, residual, params, values, logSlots, ct)
+	decoded, record, err := validateInputCiphertextMode(backend, residual, params, values, logSlots, ct, standardAZeroDiagnostic)
 	return ct, decoded, record, err
 }
 
 func validateInputCiphertext(backend backendAdapter, residual ckks.Parameters, params bootstrapping.Parameters, values []complex128, logSlots int, ct *rlwe.Ciphertext) ([]complex128, inputRecord, error) {
+	return validateInputCiphertextMode(backend, residual, params, values, logSlots, ct, false)
+}
+
+func validateInputCiphertextMode(backend backendAdapter, residual ckks.Parameters, params bootstrapping.Parameters, values []complex128, logSlots int, ct *rlwe.Ciphertext, standardAZeroDiagnostic bool) ([]complex128, inputRecord, error) {
+	if standardAZeroDiagnostic && backend.Name() != "standard" {
+		return nil, inputRecord{}, fmt.Errorf("Standard A=0 diagnostic cannot use backend %q", backend.Name())
+	}
 	if ct == nil || ct.Level() != 0 || ct.Degree() != 1 || !ct.IsNTT || ct.IsMontgomery || ct.LogDimensions.Rows != 0 || ct.LogDimensions.Cols != logSlots || !ct.Scale.Equal(residual.DefaultScale()) {
 		return nil, inputRecord{}, fmt.Errorf("%s input violates residual Level-0 ciphertext metadata contract", backend.Name())
 	}
@@ -114,7 +130,11 @@ func validateInputCiphertext(backend backendAdapter, residual ckks.Parameters, p
 	}
 	switch backend.Name() {
 	case "standard":
-		if backend.InputKind() != standardNativeInputKind || !c1Nonzero {
+		if standardAZeroDiagnostic {
+			if backend.InputKind() != standardNativeInputKind || backend.InputConstructor() != standardNativeConstructor || c1Nonzero {
+				return nil, inputRecord{}, fmt.Errorf("Standard A=0 diagnostic input did not come from the native EncryptNew lifecycle with c1=0")
+			}
+		} else if backend.InputKind() != standardNativeInputKind || !c1Nonzero {
 			return nil, inputRecord{}, fmt.Errorf("Standard formal input is not a native nontrivial-c1 encryption")
 		}
 	case "fast":
@@ -150,8 +170,12 @@ func validateInputCiphertext(backend backendAdapter, residual ckks.Parameters, p
 		return nil, inputRecord{}, err
 	}
 	metadataHash := sha256.Sum256(metadata)
+	kind, constructor := backend.InputKind(), backend.InputConstructor()
+	if standardAZeroDiagnostic {
+		kind, constructor = standardAZeroInputKind, standardAZeroConstructor
+	}
 	return decoded, inputRecord{
-		Kind: backend.InputKind(), Constructor: backend.InputConstructor(), State: state,
+		Kind: kind, Constructor: constructor, State: state,
 		MetadataSHA256: hex.EncodeToString(metadataHash[:]), C1SHA256: hex.EncodeToString(c1Hash.Sum(nil)),
 		C1Nonzero: c1Nonzero, PreDecodedSHA256: perfmeasure.Fingerprint(decoded),
 		MaxComplexDeviation: maxDeviation, InputQualityLimit: inputQualityLimit,

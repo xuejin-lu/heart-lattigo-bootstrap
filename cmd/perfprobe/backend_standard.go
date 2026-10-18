@@ -13,6 +13,7 @@ import (
 
 type standardBackend struct {
 	eval                  *bootstrapping.Evaluator
+	bootstrapKeys         *bootstrapping.EvaluationKeys
 	residual              ckks.Parameters
 	bootstrappingParams   ckks.Parameters
 	secret                *rlwe.SecretKey
@@ -39,6 +40,7 @@ func newBackend(params bootstrapping.Parameters, residual ckks.Parameters) (back
 		return nil, fmt.Errorf("construct Standard evaluator: %w", err)
 	}
 	backend.eval = eval
+	backend.bootstrapKeys = keys
 	backend.evaluatorConstruction = phase
 	return backend, nil
 }

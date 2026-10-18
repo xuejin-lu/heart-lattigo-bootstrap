@@ -162,6 +162,30 @@ func TestPublicNativeModeIsExplicitlyZeroBootstrap(t *testing.T) {
 	}
 }
 
+func TestStandardAZeroDiagnosticRequiresExactlyOneE32OutputSmokeCall(t *testing.T) {
+	valid := cliOptions{
+		mode: "standard-a-zero-diagnostic", ephemeralSecretWeight: 32,
+		outputSmoke: true, bootstrapBudget: 1,
+	}
+	if err := validateExecutionLimits(valid); err != nil {
+		t.Fatalf("valid one-call E32 diagnostic rejected: %v", err)
+	}
+	for _, mutate := range []func(*cliOptions){
+		func(o *cliOptions) { o.bootstrapBudget = 0 },
+		func(o *cliOptions) { o.bootstrapBudget = 2 },
+		func(o *cliOptions) { o.outputSmoke = false },
+		func(o *cliOptions) { o.ephemeralSecretWeight = 0 },
+		func(o *cliOptions) { o.fastBootstrapAcceptance = true },
+		func(o *cliOptions) { o.vectorsOut = "vectors.json" },
+	} {
+		candidate := valid
+		mutate(&candidate)
+		if err := validateExecutionLimits(candidate); err == nil {
+			t.Fatalf("invalid A=0 diagnostic options accepted: %+v", candidate)
+		}
+	}
+}
+
 func TestPublicRepeatabilityUsesSixIndependentCopiesAndReservations(t *testing.T) {
 	input := publicTestCiphertext(t)
 	baseFingerprint, err := publicCiphertextFingerprint(input)

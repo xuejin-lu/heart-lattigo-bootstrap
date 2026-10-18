@@ -47,6 +47,9 @@ type outputComparison struct {
 
 type outputSmokeDocument struct {
 	SchemaVersion               string                    `json:"schema_version"`
+	Mode                        string                    `json:"mode,omitempty"`
+	Classification              string                    `json:"classification,omitempty"`
+	AZeroDiagnostic             bool                      `json:"a_zero_diagnostic,omitempty"`
 	Timestamp                   time.Time                 `json:"timestamp"`
 	RunStatus                   string                    `json:"run_status"`
 	QualityAssessment           string                    `json:"quality_assessment"`
@@ -85,6 +88,7 @@ type outputSmokeDocument struct {
 	Arch                        string                    `json:"arch"`
 	CPU                         string                    `json:"cpu"`
 	BootstrapCalls              int                       `json:"public_bootstrap_calls"`
+	BootstrapBudget             int                       `json:"bootstrap_budget"`
 	TimingPerformed             bool                      `json:"timing_performed"`
 	LastVerifiedStage           string                    `json:"last_verified_stage,omitempty"`
 	LastVerifiedMetadata        *outputCiphertextMetadata `json:"last_verified_metadata,omitempty"`
@@ -108,6 +112,12 @@ type outputSmokeExecution struct {
 }
 
 func runOutputSmoke(opts cliOptions, configHash string, residual ckks.Parameters, params bootstrapping.Parameters, effective perfmeasure.EffectiveParameters, values []complex128) error {
+	standardAZeroDiagnostic := opts.mode == "standard-a-zero-diagnostic"
+	if standardAZeroDiagnostic {
+		if err := ensurePublicNativeOutputsAvailable(cliOptions{out: opts.out, publicBootstrap: true, bootstrapBudget: opts.bootstrapBudget}); err != nil {
+			return err
+		}
+	}
 	doc := outputSmokeDocument{
 		SchemaVersion: "fast-standard-output-preflight.v1", Timestamp: time.Now().UTC(),
 		RunStatus: "FAILED", QualityAssessment: "UNASSESSED", Profile: opts.profile,
@@ -115,12 +125,23 @@ func runOutputSmoke(opts cliOptions, configHash string, residual ckks.Parameters
 		BackendCommit: opts.backendCommit, BackendRef: opts.backendRef,
 		ConfigPath: opts.config, ConfigSHA256: configHash, OriginalSHA256: perfmeasure.Fingerprint(values),
 		Parameters: effective, DescriptiveComponentCutoff: defaultComparisonThreshold,
-		GoVersion: runtime.Version(), OS: runtime.GOOS, Arch: runtime.GOARCH, CPU: cpuModel(),
+		GoVersion: runtime.Version(), OS: runtime.GOOS, Arch: runtime.GOARCH, CPU: cpuModel(), BootstrapBudget: opts.bootstrapBudget,
 		TimingPerformed: false,
 		Limitations: []string{
 			"Exactly one public Bootstrap is attempted; no warmup, timing campaign, stage replay, or speedup claim is performed.",
 			"Output accuracy is recorded against the original input but remains UNASSESSED; the descriptive component cutoff is not a pass/fail gate.",
 		},
+	}
+	if standardAZeroDiagnostic {
+		doc.SchemaVersion = "standard-a-zero-output-diagnostic.v1"
+		doc.Mode = "standard-a-zero-diagnostic"
+		doc.Classification = "DIAGNOSTIC_ONLY_NOT_FORMAL_STANDARD_BASELINE"
+		doc.AZeroDiagnostic = true
+		doc.Limitations = append(doc.Limitations,
+			"This is a deliberately insecure Standard A=0 diagnostic from the explicitly identified experiment branch; it is not a formal Standard baseline or security-preserving result.",
+			"The input uses ordinary native Standard key generation, EncryptNew, Bootstrap, DecryptNew, and Decode APIs. Only the sampled RLWE a generation is changed in the Secondary experiment branch.",
+			"QP public-key encryption errors can be reduced by the unchanged QP-to-Q modulus-down; this run uses the native secret-key encryption input path.",
+		)
 	}
 	fail := func(stage string, cause error) error {
 		doc.FailureStage, doc.FailureError = stage, cause.Error()
@@ -150,10 +171,22 @@ func runOutputSmoke(opts cliOptions, configHash string, residual ckks.Parameters
 	}
 	doc.Backend, doc.BuildTag = backend.Name(), "perf_"+backend.Name()
 	doc.BackendCommit = secondaryCommit
-	if err := validatePinnedBackend(backend.Name(), secondaryCommit); err != nil {
-		return fail("pinned backend validation", err)
+	if standardAZeroDiagnostic {
+		if backend.Name() != "standard" || secondaryRef != "experiment/standard-a-zero-noise-preserved" || secondaryCommit != opts.backendCommit {
+			return fail("diagnostic backend validation", fmt.Errorf("A=0 diagnostic requires clean Standard branch experiment/standard-a-zero-noise-preserved at the supplied commit"))
+		}
+		doc.Backend = "standard-a-zero-diagnostic"
+	} else {
+		if err := validatePinnedBackend(backend.Name(), secondaryCommit); err != nil {
+			return fail("pinned backend validation", err)
+		}
 	}
-	input, preDecoded, evidence, err := prepareAndValidateInput(backend, residual, params, values, effective.LogSlots)
+	if standardAZeroDiagnostic {
+		if err := verifyAZeroBootstrapKeys(backend); err != nil {
+			return fail("bootstrap_key_audit", err)
+		}
+	}
+	input, preDecoded, evidence, err := prepareAndValidateInputMode(backend, residual, params, values, effective.LogSlots, standardAZeroDiagnostic)
 	if err != nil {
 		return fail("input preparation and preflight", err)
 	}
@@ -162,7 +195,7 @@ func runOutputSmoke(opts cliOptions, configHash string, residual ckks.Parameters
 	doc.InputEvidence, doc.InputQualityStatus = &evidence, "PASSED"
 	doc.PreBootstrapDecodedSHA256 = evidence.PreDecodedSHA256
 	guardedBackend := &budgetedOutputBackend{outputSmokeBackend: backend, budget: &bootstrapBudget{limit: opts.bootstrapBudget, journalBase: opts.out}}
-	execution := executeOutputSmoke(guardedBackend, input, values, preDecoded, evidence, effective.LogSlots, params.BootstrappingParameters.MaxLevel(), params.BootstrappingParameters.Q())
+	execution := executeOutputSmokeMode(guardedBackend, input, values, preDecoded, evidence, effective.LogSlots, params.BootstrappingParameters.MaxLevel(), params.BootstrappingParameters.Q(), standardAZeroDiagnostic)
 	doc.BootstrapCalls, doc.BootstrapStatus = execution.BootstrapCalls, execution.BootstrapStatus
 	doc.LastVerifiedStage = execution.LastVerifiedStage
 	if execution.LastVerifiedStage != "configuration_validated" {
@@ -195,6 +228,10 @@ func runOutputSmoke(opts cliOptions, configHash string, residual ckks.Parameters
 }
 
 func executeOutputSmoke(backend outputSmokeBackend, input *rlwe.Ciphertext, original, preDecoded []complex128, evidence inputRecord, logSlots, maxLevel int, q []uint64) outputSmokeExecution {
+	return executeOutputSmokeMode(backend, input, original, preDecoded, evidence, logSlots, maxLevel, q, false)
+}
+
+func executeOutputSmokeMode(backend outputSmokeBackend, input *rlwe.Ciphertext, original, preDecoded []complex128, evidence inputRecord, logSlots, maxLevel int, q []uint64, standardAZeroDiagnostic bool) outputSmokeExecution {
 	result := outputSmokeExecution{LastVerifiedStage: "configuration_validated", BootstrapStatus: "NOT_STARTED"}
 	fail := func(stage string, cause error) outputSmokeExecution {
 		result.FailureStage, result.FailureError = stage, cause.Error()
@@ -212,7 +249,7 @@ func executeOutputSmoke(backend outputSmokeBackend, input *rlwe.Ciphertext, orig
 	}
 	result.InputMetadata = snapshotOutputMetadata(input, inputState, len(preDecoded))
 	result.LastVerifiedStage, result.LastVerifiedMetadata = "input_metadata", result.InputMetadata
-	if err := validateOutputSmokeInputEvidence(backend.Name(), evidence, inputState, original, preDecoded, logSlots); err != nil {
+	if err := validateOutputSmokeInputEvidenceMode(backend.Name(), evidence, inputState, original, preDecoded, logSlots, standardAZeroDiagnostic); err != nil {
 		return fail("input_provenance_validation", err)
 	}
 	result.LastVerifiedStage = "input_preflight"
@@ -265,6 +302,13 @@ func executeOutputSmoke(backend outputSmokeBackend, input *rlwe.Ciphertext, orig
 }
 
 func validateOutputSmokeInputEvidence(backend string, evidence inputRecord, state ciphertextState, original, preDecoded []complex128, logSlots int) error {
+	return validateOutputSmokeInputEvidenceMode(backend, evidence, state, original, preDecoded, logSlots, false)
+}
+
+func validateOutputSmokeInputEvidenceMode(backend string, evidence inputRecord, state ciphertextState, original, preDecoded []complex128, logSlots int, standardAZeroDiagnostic bool) error {
+	if standardAZeroDiagnostic && backend != "standard" {
+		return fmt.Errorf("Standard A=0 diagnostic cannot use backend %q", backend)
+	}
 	if len(original) == 0 || len(original) != len(preDecoded) || len(original) != 1<<logSlots || !allFinite(original) || !allFinite(preDecoded) {
 		return fmt.Errorf("input vectors have invalid slot count or non-finite values")
 	}
@@ -272,6 +316,9 @@ func validateOutputSmokeInputEvidence(backend string, evidence inputRecord, stat
 	switch backend {
 	case "standard":
 		expectedKind, expectedConstructor, c1Nonzero = standardNativeInputKind, standardNativeConstructor, true
+		if standardAZeroDiagnostic {
+			expectedKind, expectedConstructor, c1Nonzero = standardAZeroInputKind, standardAZeroConstructor, false
+		}
 	case "fast":
 		expectedKind, expectedConstructor = fastDirectInputKind, fastDirectConstructor
 	default:
