@@ -771,6 +771,78 @@ func TestPublicPairProvenanceRequiresPinnedCoverageAndCleanSources(t *testing.T)
 	}
 }
 
+func TestFixedSigmaFastPinIsTaskScopedToLogN13(t *testing.T) {
+	if err := validatePublicBackendPin("fast", publicFixedSigmaFastSHA, "logn13"); err != nil {
+		t.Fatalf("official fixed-sigma LogN13 Fast pin rejected: %v", err)
+	}
+	if err := validatePublicBackendPin("fast", publicFixedSigmaFastSHA, "logn16"); err == nil {
+		t.Fatal("fixed-sigma LogN13 pin was accepted for LogN16")
+	}
+}
+
+func TestPublicOperationResidualEvidenceBindsDecodedInputsAndOutput(t *testing.T) {
+	standard, standardVectors := makePublicPairArtifactFixture(t, "standard")
+	fast, fastVectors := makePublicPairArtifactFixture(t, "fast")
+	standard.BinarySHA256 = strings.Repeat("1", 64)
+	fast.BinarySHA256 = strings.Repeat("2", 64)
+	fast.BackendCommit = publicFixedSigmaFastSHA
+	fastVectors.BackendCommit = publicFixedSigmaFastSHA
+	attachPublicOperationResidualEvidence(t, &standard, &standardVectors)
+	attachPublicOperationResidualEvidence(t, &fast, &fastVectors)
+	if err := validatePublicPairArtifacts(standard, fast, standardVectors, fastVectors); err != nil {
+		t.Fatalf("task-scoped residual evidence rejected: %v", err)
+	}
+	corrupted := standardVectors
+	corrupted.MulRelinRescaleIncrementalResidual = append([]complexValue(nil), standardVectors.MulRelinRescaleIncrementalResidual...)
+	corrupted.MulRelinRescaleIncrementalResidual[0].Real += 1
+	if err := validatePublicOperationResidualEvidence(standard, corrupted); err == nil {
+		t.Fatal("residual validator accepted a modified incremental vector")
+	}
+}
+
+func attachPublicOperationResidualEvidence(t *testing.T, doc *publicNativeDocument, vectors *publicVectorDocument) {
+	t.Helper()
+	oracles, err := publicOracleCheckpoints(doc.InputSlots)
+	if err != nil {
+		t.Fatal(err)
+	}
+	residual, total, residualVector, totalVector, err := makePublicOperationResidual(
+		decodeComplexValues(vectors.Checkpoints["add_level5"]),
+		decodeComplexValues(vectors.Checkpoints["encrypt_c_q5_level5"]),
+		decodeComplexValues(vectors.Checkpoints["rescale_q5_level4"]),
+		oracles["rescale_q5_level4"],
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	residual.ElapsedNS = 10
+	doc.MulRelinRescaleResidual = residual
+	doc.MulRelinRescaleTotalError = total
+	vectors.MulRelinRescaleIncrementalResidual = residualVector
+	vectors.MulRelinRescaleTotalError = totalVector
+}
+
+func TestMakePublicOperationResidualSubtractsDecodedInputProduct(t *testing.T) {
+	x := []complex128{2 + 1i, 3 - 2i}
+	y := []complex128{4 - 1i, -1 + 2i}
+	z := []complex128{x[0]*y[0] + 0.5i, x[1]*y[1] - 0.25}
+	oracle := []complex128{x[0] * y[0], x[1] * y[1]}
+	residual, total, residualVector, totalVector, err := makePublicOperationResidual(x, y, z, oracle)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if residual.Classification != "DIAGNOSTIC_ONLY" || residual.Statistics.Count != 2 || residual.Statistics.MeanReal != -0.125 ||
+		residual.Statistics.MeanImag != 0.25 || math.Abs(residual.Statistics.RMS-math.Sqrt(0.15625)) > 1e-15 {
+		t.Fatalf("unexpected decoded incremental residual: %+v", residual)
+	}
+	if total.Status != "FINITE" || total.RMS != residual.Statistics.RMS || len(residualVector) != 2 || len(totalVector) != 2 {
+		t.Fatalf("unexpected total-error summary or vectors: total=%+v residual=%v totalVector=%v", total, residualVector, totalVector)
+	}
+	if _, _, _, _, err := makePublicOperationResidual(x, y[:1], z, oracle); err == nil {
+		t.Fatal("mismatched decoded vectors were accepted")
+	}
+}
+
 func TestLogN16PublicNativeProfileUsesOnlyObservedOracleCapacityPolicy(t *testing.T) {
 	profile, err := publicProfileFor("logn16")
 	if err != nil {

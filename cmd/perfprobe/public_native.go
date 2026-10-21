@@ -31,6 +31,7 @@ const (
 	publicStandardSHA                  = "5dbffbdea05394de2ca3a432ed5318aa832e3f40"
 	publicFastSHA                      = "2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac"
 	publicCurrentFastSHA               = "2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f"
+	publicFixedSigmaFastSHA            = "ee308c9743000b5f281a84a871e7c4bd59b176c4"
 	publicConfigSHA                    = "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98"
 	publicInputSHA                     = "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285"
 	publicWorkloadSHA                  = "00b70a2e77887c7d6a41db1859246f6513f2c984915de648734e5dd8c584cf74"
@@ -181,74 +182,97 @@ type publicCheckpoint struct {
 }
 
 type publicNativeDocument struct {
-	SchemaVersion              string                          `json:"schema_version"`
-	Mode                       string                          `json:"mode"`
-	Status                     string                          `json:"status"`
-	Timestamp                  time.Time                       `json:"timestamp"`
-	Profile                    string                          `json:"profile"`
-	ProfileKind                string                          `json:"profile_kind,omitempty"`
-	Backend                    string                          `json:"backend"`
-	BackendCommit              string                          `json:"backend_commit"`
-	BackendRef                 string                          `json:"backend_ref"`
-	BackendCheckoutRef         string                          `json:"backend_checkout_ref"`
-	BackendPath                string                          `json:"backend_path"`
-	BackendClean               bool                            `json:"backend_clean"`
-	PrimaryPath                string                          `json:"primary_path"`
-	PrimaryCommit              string                          `json:"primary_commit"`
-	PrimaryClean               bool                            `json:"primary_clean"`
-	PrimarySourceSHA256        string                          `json:"primary_measurement_source_sha256"`
-	BuildTag                   string                          `json:"build_tag"`
-	GoVersion                  string                          `json:"go_version"`
-	OS                         string                          `json:"os"`
-	Arch                       string                          `json:"arch"`
-	CPU                        string                          `json:"cpu"`
-	NumCPU                     int                             `json:"num_cpu"`
-	GOMAXPROCS                 int                             `json:"gomaxprocs"`
-	GOGC                       string                          `json:"gogc"`
-	GOMEMLIMIT                 string                          `json:"gomemlimit"`
-	GODEBUG                    string                          `json:"godebug"`
-	ConfigPath                 string                          `json:"config_path"`
-	ConfigSHA256               string                          `json:"config_sha256"`
-	QPSHA256                   string                          `json:"qp_sha256"`
-	InputSHA256                string                          `json:"canonical_input_sha256"`
-	WorkloadSHA256             string                          `json:"workload_sha256"`
-	Parameters                 perfmeasure.EffectiveParameters `json:"effective_parameters"`
-	EphemeralSecretWeight      int                             `json:"ephemeral_secret_weight"`
-	InputSlots                 int                             `json:"input_slots"`
-	InputKind                  string                          `json:"input_kind"`
-	InputConstructor           string                          `json:"input_constructor"`
-	InputC1Nonzero             bool                            `json:"input_c1_nonzero"`
-	PublicEvaluatorDispatch    string                          `json:"public_evaluator_dispatch"`
-	PreflightPairSHA256        string                          `json:"preflight_pair_sha256,omitempty"`
-	CapacityEvidenceVersion    string                          `json:"capacity_evidence_version"`
-	CapacityPolicy             string                          `json:"capacity_policy"`
-	ConservativeBoundStatus    string                          `json:"conservative_bound_status"`
-	ObservedNativeOracleStatus string                          `json:"observed_native_oracle_status"`
-	Level0Continuity           vectorMetrics                   `json:"level4_to_level0_continuity"`
-	Capacity                   perfmeasure.PublicCapacityPlan  `json:"capacity_plan"`
-	NumericalGate              float64                         `json:"max_complex_numerical_gate"`
-	BootstrapBudget            int                             `json:"bootstrap_budget"`
-	BootstrapCalls             int                             `json:"actual_bootstrap_calls"`
-	ExecutionPhases            []phaseTiming                   `json:"execution_phases"`
-	Checkpoints                []publicCheckpoint              `json:"checkpoints"`
-	BootstrapResults           []publicBootstrapResult         `json:"bootstrap_results,omitempty"`
-	Limitations                []string                        `json:"limitations"`
+	SchemaVersion              string                              `json:"schema_version"`
+	Mode                       string                              `json:"mode"`
+	Status                     string                              `json:"status"`
+	Timestamp                  time.Time                           `json:"timestamp"`
+	Profile                    string                              `json:"profile"`
+	ProfileKind                string                              `json:"profile_kind,omitempty"`
+	Backend                    string                              `json:"backend"`
+	BackendCommit              string                              `json:"backend_commit"`
+	BackendRef                 string                              `json:"backend_ref"`
+	BackendCheckoutRef         string                              `json:"backend_checkout_ref"`
+	BackendPath                string                              `json:"backend_path"`
+	BackendClean               bool                                `json:"backend_clean"`
+	BinarySHA256               string                              `json:"built_binary_sha256"`
+	PrimaryPath                string                              `json:"primary_path"`
+	PrimaryCommit              string                              `json:"primary_commit"`
+	PrimaryClean               bool                                `json:"primary_clean"`
+	PrimarySourceSHA256        string                              `json:"primary_measurement_source_sha256"`
+	BuildTag                   string                              `json:"build_tag"`
+	GoVersion                  string                              `json:"go_version"`
+	OS                         string                              `json:"os"`
+	Arch                       string                              `json:"arch"`
+	CPU                        string                              `json:"cpu"`
+	NumCPU                     int                                 `json:"num_cpu"`
+	GOMAXPROCS                 int                                 `json:"gomaxprocs"`
+	GOGC                       string                              `json:"gogc"`
+	GOMEMLIMIT                 string                              `json:"gomemlimit"`
+	GODEBUG                    string                              `json:"godebug"`
+	ConfigPath                 string                              `json:"config_path"`
+	ConfigSHA256               string                              `json:"config_sha256"`
+	QPSHA256                   string                              `json:"qp_sha256"`
+	InputSHA256                string                              `json:"canonical_input_sha256"`
+	WorkloadSHA256             string                              `json:"workload_sha256"`
+	Parameters                 perfmeasure.EffectiveParameters     `json:"effective_parameters"`
+	EphemeralSecretWeight      int                                 `json:"ephemeral_secret_weight"`
+	InputSlots                 int                                 `json:"input_slots"`
+	InputKind                  string                              `json:"input_kind"`
+	InputConstructor           string                              `json:"input_constructor"`
+	InputC1Nonzero             bool                                `json:"input_c1_nonzero"`
+	PublicEvaluatorDispatch    string                              `json:"public_evaluator_dispatch"`
+	PreflightPairSHA256        string                              `json:"preflight_pair_sha256,omitempty"`
+	CapacityEvidenceVersion    string                              `json:"capacity_evidence_version"`
+	CapacityPolicy             string                              `json:"capacity_policy"`
+	ConservativeBoundStatus    string                              `json:"conservative_bound_status"`
+	ObservedNativeOracleStatus string                              `json:"observed_native_oracle_status"`
+	Level0Continuity           vectorMetrics                       `json:"level4_to_level0_continuity"`
+	Capacity                   perfmeasure.PublicCapacityPlan      `json:"capacity_plan"`
+	NumericalGate              float64                             `json:"max_complex_numerical_gate"`
+	BootstrapBudget            int                                 `json:"bootstrap_budget"`
+	BootstrapCalls             int                                 `json:"actual_bootstrap_calls"`
+	ExecutionPhases            []phaseTiming                       `json:"execution_phases"`
+	Checkpoints                []publicCheckpoint                  `json:"checkpoints"`
+	MulRelinRescaleResidual    *publicOperationResidual            `json:"mul_relin_rescale_incremental_residual,omitempty"`
+	MulRelinRescaleTotalError  numericalmetrics.ComplexVectorStats `json:"mul_relin_rescale_total_error,omitempty"`
+	BootstrapResults           []publicBootstrapResult             `json:"bootstrap_results,omitempty"`
+	Limitations                []string                            `json:"limitations"`
 }
 
 type publicVectorDocument struct {
-	SchemaVersion    string                    `json:"schema_version"`
-	Mode             string                    `json:"mode"`
-	Backend          string                    `json:"backend"`
-	BackendCommit    string                    `json:"backend_commit"`
-	PrimaryCommit    string                    `json:"primary_commit"`
-	SourceSHA256     string                    `json:"primary_measurement_source_sha256"`
-	ConfigSHA256     string                    `json:"config_sha256"`
-	QPSHA256         string                    `json:"qp_sha256"`
-	InputSHA256      string                    `json:"input_sha256"`
-	WorkloadSHA256   string                    `json:"workload_sha256"`
-	E                int                       `json:"ephemeral_secret_weight"`
-	Checkpoints      map[string][]complexValue `json:"checkpoints"`
-	BootstrapOutputs map[string][]complexValue `json:"bootstrap_outputs,omitempty"`
+	SchemaVersion                      string                    `json:"schema_version"`
+	Mode                               string                    `json:"mode"`
+	Backend                            string                    `json:"backend"`
+	BackendCommit                      string                    `json:"backend_commit"`
+	PrimaryCommit                      string                    `json:"primary_commit"`
+	SourceSHA256                       string                    `json:"primary_measurement_source_sha256"`
+	ConfigSHA256                       string                    `json:"config_sha256"`
+	QPSHA256                           string                    `json:"qp_sha256"`
+	InputSHA256                        string                    `json:"input_sha256"`
+	WorkloadSHA256                     string                    `json:"workload_sha256"`
+	E                                  int                       `json:"ephemeral_secret_weight"`
+	Checkpoints                        map[string][]complexValue `json:"checkpoints"`
+	MulRelinRescaleIncrementalResidual []complexValue            `json:"mul_relin_rescale_incremental_residual,omitempty"`
+	MulRelinRescaleTotalError          []complexValue            `json:"mul_relin_rescale_total_error,omitempty"`
+	BootstrapOutputs                   map[string][]complexValue `json:"bootstrap_outputs,omitempty"`
+}
+
+type publicOperationResidual struct {
+	SchemaVersion          string                              `json:"schema_version"`
+	Classification         string                              `json:"classification"`
+	Definition             string                              `json:"definition"`
+	EncryptionMode         string                              `json:"encryption_mode"`
+	PKStatus               string                              `json:"pk_comparison_status"`
+	LogicalCtCtMulCount    int                                 `json:"logical_ct_ct_mul_count"`
+	LogicalNoiseInjections int                                 `json:"logical_noise_injections"`
+	SigmaCoefficient       *float64                            `json:"sigma_coefficient,omitempty"`
+	SigmaStatus            string                              `json:"sigma_coefficient_status"`
+	SamplingSeedStatus     string                              `json:"sampling_seed_status"`
+	ElapsedNS              int64                               `json:"mul_relin_rescale_elapsed_ns"`
+	InputXSHA256           string                              `json:"decoded_input_x_sha256"`
+	InputYSHA256           string                              `json:"decoded_input_y_sha256"`
+	OutputSHA256           string                              `json:"decoded_output_sha256"`
+	Statistics             numericalmetrics.ComplexVectorStats `json:"statistics"`
 }
 
 type publicBootstrapResult struct {
@@ -357,8 +381,22 @@ type publicPairDocument struct {
 	BootstrapCalls             int                             `json:"actual_bootstrap_calls"`
 	MatchedEnvironment         bool                            `json:"matched_environment"`
 	Checkpoints                []publicPairCheckpoint          `json:"checkpoints"`
+	MulRelinRescaleResidual    *publicPairOperationResidual    `json:"mul_relin_rescale_incremental_residual,omitempty"`
 	Bootstrap                  []publicPairBootstrapComparison `json:"bootstrap_comparisons,omitempty"`
 	Limitations                []string                        `json:"limitations"`
+}
+
+type publicPairOperationResidual struct {
+	SchemaVersion             string                              `json:"schema_version"`
+	Standard                  numericalmetrics.ComplexVectorStats `json:"standard_incremental_residual"`
+	Fast                      numericalmetrics.ComplexVectorStats `json:"fast_incremental_residual"`
+	StandardTotalError        numericalmetrics.ComplexVectorStats `json:"standard_total_error"`
+	FastTotalError            numericalmetrics.ComplexVectorStats `json:"fast_total_error"`
+	StandardMinusFastVariance float64                             `json:"standard_minus_fast_variance"`
+	VarianceDeltaStatus       string                              `json:"variance_delta_status"`
+	CrossBackendCovariance    numericalmetrics.ComplexCovariance  `json:"cross_backend_covariance"`
+	CoefficientSigmaStatus    string                              `json:"coefficient_sigma_status"`
+	Interpretation            string                              `json:"interpretation"`
 }
 
 func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameters, params bootstrapping.Parameters, effective perfmeasure.EffectiveParameters) error {
@@ -384,6 +422,14 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 	primaryRoot, primaryCommit, err := cleanRepositoryState(".")
 	if err != nil {
 		return fmt.Errorf("Primary provenance: %w", err)
+	}
+	executable, err := os.Executable()
+	if err != nil {
+		return fmt.Errorf("resolve perfprobe executable: %w", err)
+	}
+	binarySHA256, err := sha256File(executable)
+	if err != nil {
+		return fmt.Errorf("hash perfprobe executable: %w", err)
 	}
 	secondaryRoot, secondaryCommit, secondaryRef, err := cleanSecondaryState(opts.secondaryRoot, opts.backendCommit)
 	if err != nil {
@@ -452,6 +498,9 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 	checkpoints := make([]publicCheckpoint, 0, 8)
 	vectorMap := make(map[string][]complexValue, 8)
 	decodedByCheckpoint := make(map[string][]complex128, 8)
+	var mulRelinRescaleResidual *publicOperationResidual
+	var mulRelinRescaleTotalError numericalmetrics.ComplexVectorStats
+	var mulRelinRescaleResidualVector, mulRelinRescaleTotalErrorVector []complexValue
 	addCheckpoint := func(name string, ct *rlwe.Ciphertext, expected []complex128, fastCompactOutput bool) error {
 		var decodePath string
 		decoded, phase, decodeErr := measurePublicPhase("checkpoint_decode_"+name, func() ([]complex128, error) {
@@ -573,6 +622,17 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 		return errors.New("Rescale(q5) did not yield Level4/Scale2^45")
 	}
 	if err := addCheckpoint("rescale_q5_level4", rescaled, expectedProduct, true); err != nil {
+		return err
+	}
+	mulRelinRescaleResidual, mulRelinRescaleTotalError, mulRelinRescaleResidualVector, mulRelinRescaleTotalErrorVector, err = makePublicOperationResidual(
+		decodedByCheckpoint["add_level5"], decodedByCheckpoint["encrypt_c_q5_level5"],
+		decodedByCheckpoint["rescale_q5_level4"], expectedProduct,
+	)
+	if err != nil {
+		return fmt.Errorf("MulRelin+Rescale incremental residual: %w", err)
+	}
+	mulRelinRescaleResidual.ElapsedNS, err = sumPublicPhaseElapsedNS(phaseTimings, "public_MulRelinNew", "public_Rescale_q5")
+	if err != nil {
 		return err
 	}
 
@@ -716,6 +776,7 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 		SchemaVersion: schemaVersion, Mode: mode, Status: status,
 		Timestamp: time.Now().UTC(), Profile: opts.profile, ProfileKind: profile.Kind, Backend: backend.name, BackendCommit: secondaryCommit,
 		BackendRef: opts.backendRef, BackendCheckoutRef: secondaryRef, BackendPath: secondaryRoot, BackendClean: true, PrimaryPath: primaryRoot,
+		BinarySHA256:  binarySHA256,
 		PrimaryCommit: primaryCommit, PrimaryClean: true, PrimarySourceSHA256: sourceHash, BuildTag: "perf_" + backend.name,
 		GoVersion: runtime.Version(), OS: runtime.GOOS, Arch: runtime.GOARCH,
 		CPU: cpuModel(), NumCPU: runtime.NumCPU(), GOMAXPROCS: runtime.GOMAXPROCS(0),
@@ -728,14 +789,19 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 		ObservedNativeOracleStatus: observedOracleStatus, Level0Continuity: level0Continuity,
 		Capacity: capacity, NumericalGate: publicNumericalGate,
 		BootstrapBudget: opts.bootstrapBudget, BootstrapCalls: bootstrapCalls,
-		ExecutionPhases: phaseTimings, Checkpoints: checkpoints, BootstrapResults: bootstrapResults,
-		Limitations: limitations,
+		ExecutionPhases: phaseTimings, Checkpoints: checkpoints,
+		MulRelinRescaleResidual: mulRelinRescaleResidual, MulRelinRescaleTotalError: mulRelinRescaleTotalError,
+		BootstrapResults: bootstrapResults,
+		Limitations:      limitations,
 	}
 	vectorDoc := publicVectorDocument{
 		SchemaVersion: vectorSchema, Mode: mode, Backend: backend.name,
 		BackendCommit: secondaryCommit, PrimaryCommit: primaryCommit, SourceSHA256: sourceHash, ConfigSHA256: configHash,
 		QPSHA256: qpHash, InputSHA256: inputHash, WorkloadSHA256: workloadHash, E: params.EphemeralSecretWeight,
-		Checkpoints: vectorMap, BootstrapOutputs: bootstrapOutputMap,
+		Checkpoints:                        vectorMap,
+		MulRelinRescaleIncrementalResidual: mulRelinRescaleResidualVector,
+		MulRelinRescaleTotalError:          mulRelinRescaleTotalErrorVector,
+		BootstrapOutputs:                   bootstrapOutputMap,
 	}
 	if err := writeExclusiveJSON(opts.out, doc); err != nil {
 		return err
@@ -1463,7 +1529,10 @@ func runPublicCompare(args []string) error {
 			}
 		}
 	} else {
-		pair.Limitations = []string{"Only the public pre-Bootstrap chain is compared; no public Bootstrap acceptance or Bootstrap output metric is claimed."}
+		pair.Limitations = []string{
+			"Diagnostic-only pre-Bootstrap evidence; no formal Standard-vs-Fast acceptance claim is made by the fixed-sigma task.",
+			"No public Bootstrap acceptance or Bootstrap output metric is claimed.",
+		}
 	}
 	names := make([]string, 0, len(standardStates))
 	for name := range standardStates {
@@ -1489,6 +1558,39 @@ func runPublicCompare(args []string) error {
 			pair.Status = "FAIL"
 		}
 		pair.Checkpoints = append(pair.Checkpoints, publicPairCheckpoint{Name: name, StateMatched: stateMatched, FastState: fastState.State, StandardState: standardState.State, Metrics: metrics, Pass: passed})
+	}
+	if standard.MulRelinRescaleResidual != nil || fast.MulRelinRescaleResidual != nil ||
+		len(standardVectors.MulRelinRescaleIncrementalResidual) != 0 || len(fastVectors.MulRelinRescaleIncrementalResidual) != 0 {
+		if standard.MulRelinRescaleResidual == nil || fast.MulRelinRescaleResidual == nil ||
+			len(standardVectors.MulRelinRescaleIncrementalResidual) == 0 || len(fastVectors.MulRelinRescaleIncrementalResidual) == 0 {
+			return errors.New("paired artifacts contain incomplete MulRelin+Rescale residual evidence")
+		}
+		standardResidual := decodeComplexValues(standardVectors.MulRelinRescaleIncrementalResidual)
+		fastResidual := decodeComplexValues(fastVectors.MulRelinRescaleIncrementalResidual)
+		if !allFinite(standardResidual) || !allFinite(fastResidual) || len(standardResidual) != standard.InputSlots || len(fastResidual) != standard.InputSlots {
+			return errors.New("paired MulRelin+Rescale residual vectors are non-finite or have an unexpected slot count")
+		}
+		standardStats := numericalmetrics.SummarizeComplexVector(standardResidual)
+		fastStats := numericalmetrics.SummarizeComplexVector(fastResidual)
+		if !sameComplexVectorStats(standardStats, standard.MulRelinRescaleResidual.Statistics) ||
+			!sameComplexVectorStats(fastStats, fast.MulRelinRescaleResidual.Statistics) {
+			return errors.New("paired MulRelin+Rescale residual summary does not match its decoded vector")
+		}
+		varianceDelta := standardStats.Variance - fastStats.Variance
+		varianceStatus := "NONNEGATIVE_SLOT_VARIANCE_DELTA_ONLY"
+		if varianceDelta < 0 {
+			varianceStatus = "UNMODELLED_NEGATIVE_SLOT_VARIANCE_DELTA"
+		}
+		pair.MulRelinRescaleResidual = &publicPairOperationResidual{
+			SchemaVersion: "fixed-sigma-mul-relin-rescale-pair.v1",
+			Standard:      standardStats, Fast: fastStats,
+			StandardTotalError:        standard.MulRelinRescaleTotalError,
+			FastTotalError:            fast.MulRelinRescaleTotalError,
+			StandardMinusFastVariance: varianceDelta, VarianceDeltaStatus: varianceStatus,
+			CrossBackendCovariance: numericalmetrics.CompareComplexCovariance(standardResidual, fastResidual),
+			CoefficientSigmaStatus: "NOT_IDENTIFIABLE_WITHOUT_REPEATED_TRIALS_AND_EMPIRICAL_COEFFICIENT_TO_SLOT_CALIBRATION",
+			Interpretation:         "One paired vector supplies descriptive slot-domain moments only; it does not prove independent zero-mean noise or identify coefficient-domain sigma.",
+		}
 	}
 	if bootstrapMode {
 		for index, standardResult := range standard.BootstrapResults {
@@ -1536,6 +1638,11 @@ func validatePublicPairArtifacts(standard, fast publicNativeDocument, standardVe
 		standard.BootstrapCalls != 0 || fast.BootstrapCalls != 0 || standard.BootstrapBudget != 0 || fast.BootstrapBudget != 0 ||
 		!standard.PrimaryClean || !fast.PrimaryClean || !standard.BackendClean || !fast.BackendClean {
 		return fmt.Errorf("paired artifacts violate pinned %s/E32 clean-provenance zero-Bootstrap contract", profile.Name)
+	}
+	if standard.MulRelinRescaleResidual != nil || fast.MulRelinRescaleResidual != nil {
+		if !validSHA256Hex(standard.BinarySHA256) || !validSHA256Hex(fast.BinarySHA256) || standard.BinarySHA256 == fast.BinarySHA256 {
+			return errors.New("paired residual artifacts lack distinct valid Standard/Fast executable SHA-256 identities")
+		}
 	}
 	if err := validatePublicBackendPin(standard.Backend, standard.BackendCommit, profile.Name); err != nil {
 		return err
@@ -1588,6 +1695,12 @@ func validatePublicPairArtifacts(standard, fast publicNativeDocument, standardVe
 	}
 	if err := validatePublicBackendEvidence(fast, fastVectors, oracles); err != nil {
 		return fmt.Errorf("Fast public evidence: %w", err)
+	}
+	if err := validatePublicOperationResidualEvidence(standard, standardVectors); err != nil {
+		return fmt.Errorf("Standard MulRelin+Rescale residual evidence: %w", err)
+	}
+	if err := validatePublicOperationResidualEvidence(fast, fastVectors); err != nil {
+		return fmt.Errorf("Fast MulRelin+Rescale residual evidence: %w", err)
 	}
 	for _, checkpoint := range standard.Checkpoints {
 		if checkpoint.FastCompactPrefix || checkpoint.DecodePath != "rlwe.NewDecryptor(...).DecryptNew -> ckks.NewEncoder.Decode" || !checkpoint.C1Nonzero {
@@ -1803,6 +1916,55 @@ func validatePublicBackendEvidence(doc publicNativeDocument, vectors publicVecto
 	}
 	if err := validatePublicLevel0ContinuityEvidence(profile.CapacityPolicy, doc, vectors); err != nil {
 		return err
+	}
+	return nil
+}
+
+func validatePublicOperationResidualEvidence(doc publicNativeDocument, vectors publicVectorDocument) error {
+	if doc.MulRelinRescaleResidual == nil && len(vectors.MulRelinRescaleIncrementalResidual) == 0 &&
+		len(vectors.MulRelinRescaleTotalError) == 0 {
+		return nil // Historical public-native artifacts predate this task-specific extension.
+	}
+	if doc.MulRelinRescaleResidual == nil || len(vectors.MulRelinRescaleIncrementalResidual) == 0 || len(vectors.MulRelinRescaleTotalError) == 0 {
+		return errors.New("incremental residual document and both vector sidecars must be present together")
+	}
+	if doc.MulRelinRescaleResidual.SchemaVersion != "fixed-sigma-mul-relin-rescale-residual.v1" ||
+		doc.MulRelinRescaleResidual.Classification != "DIAGNOSTIC_ONLY" || doc.MulRelinRescaleResidual.EncryptionMode != "sk" ||
+		doc.MulRelinRescaleResidual.PKStatus != "UNSUPPORTED_FAST_ZERO_SECRET_MULRELIN_REQUIRES_C1_ZERO" ||
+		doc.MulRelinRescaleResidual.LogicalCtCtMulCount != 1 || doc.MulRelinRescaleResidual.LogicalNoiseInjections != 0 ||
+		doc.MulRelinRescaleResidual.SigmaCoefficient != nil || doc.MulRelinRescaleResidual.SigmaStatus != "NOT_ESTIMATED_CP_B_BASELINE" ||
+		doc.MulRelinRescaleResidual.SamplingSeedStatus != "NOT_APPLICABLE_BASELINE_NO_INJECTION" ||
+		doc.MulRelinRescaleResidual.ElapsedNS <= 0 ||
+		doc.MulRelinRescaleResidual.Definition != "Decode(Rescale(Relin(Mul(ct_x,ct_y)))) - Decode(ct_x) * Decode(ct_y), elementwise in slot domain" {
+		return errors.New("incremental residual has an unknown classification or definition")
+	}
+	inputX, inputXOK := vectors.Checkpoints["add_level5"]
+	inputY, inputYOK := vectors.Checkpoints["encrypt_c_q5_level5"]
+	output, outputOK := vectors.Checkpoints["rescale_q5_level4"]
+	if !inputXOK || !inputYOK || !outputOK {
+		return errors.New("incremental residual inputs or MulRelin+Rescale output checkpoint are missing")
+	}
+	x, y := decodeComplexValues(inputX), decodeComplexValues(inputY)
+	z := decodeComplexValues(output)
+	expected, err := publicOracleCheckpoints(doc.InputSlots)
+	if err != nil {
+		return err
+	}
+	oracle, oracleOK := expected["rescale_q5_level4"]
+	if !oracleOK {
+		return errors.New("MulRelin+Rescale plaintext oracle is unavailable")
+	}
+	residual, total, residualVector, totalVector, err := makePublicOperationResidual(x, y, z, oracle)
+	if err != nil {
+		return err
+	}
+	stored := doc.MulRelinRescaleResidual
+	if stored.InputXSHA256 != perfmeasure.Fingerprint(x) || stored.InputYSHA256 != perfmeasure.Fingerprint(y) ||
+		stored.OutputSHA256 != perfmeasure.Fingerprint(z) || !sameComplexVectorStats(residual.Statistics, stored.Statistics) ||
+		!sameComplexVectorStats(total, doc.MulRelinRescaleTotalError) ||
+		!reflect.DeepEqual(residualVector, vectors.MulRelinRescaleIncrementalResidual) ||
+		!reflect.DeepEqual(totalVector, vectors.MulRelinRescaleTotalError) {
+		return errors.New("stored residual hashes, summary, or vectors do not match decoded inputs/output and plaintext oracle")
 	}
 	return nil
 }
@@ -2127,6 +2289,66 @@ func samePublicCheckpointNames(checkpoints []publicCheckpoint, want []string) bo
 	return true
 }
 
+func makePublicOperationResidual(inputX, inputY, output, oracle []complex128) (*publicOperationResidual, numericalmetrics.ComplexVectorStats, []complexValue, []complexValue, error) {
+	if len(inputX) == 0 || len(inputX) != len(inputY) || len(inputX) != len(output) || len(inputX) != len(oracle) ||
+		!allFinite(inputX) || !allFinite(inputY) || !allFinite(output) || !allFinite(oracle) {
+		return nil, numericalmetrics.ComplexVectorStats{}, nil, nil, errors.New("decoded inputs, output and oracle must be finite vectors with the same non-zero slot count")
+	}
+	incremental := make([]complex128, len(output))
+	totalError := make([]complex128, len(output))
+	for i := range output {
+		incremental[i] = output[i] - inputX[i]*inputY[i]
+		totalError[i] = output[i] - oracle[i]
+	}
+	incrementalStats := numericalmetrics.SummarizeComplexVector(incremental)
+	totalStats := numericalmetrics.SummarizeComplexVector(totalError)
+	if incrementalStats.Status != "FINITE" || totalStats.Status != "FINITE" {
+		return nil, numericalmetrics.ComplexVectorStats{}, nil, nil, errors.New("incremental residual or total error is not finite")
+	}
+	return &publicOperationResidual{
+		SchemaVersion:          "fixed-sigma-mul-relin-rescale-residual.v1",
+		Classification:         "DIAGNOSTIC_ONLY",
+		Definition:             "Decode(Rescale(Relin(Mul(ct_x,ct_y)))) - Decode(ct_x) * Decode(ct_y), elementwise in slot domain",
+		EncryptionMode:         "sk",
+		PKStatus:               "UNSUPPORTED_FAST_ZERO_SECRET_MULRELIN_REQUIRES_C1_ZERO",
+		LogicalCtCtMulCount:    1,
+		LogicalNoiseInjections: 0,
+		SigmaStatus:            "NOT_ESTIMATED_CP_B_BASELINE",
+		SamplingSeedStatus:     "NOT_APPLICABLE_BASELINE_NO_INJECTION",
+		InputXSHA256:           perfmeasure.Fingerprint(inputX),
+		InputYSHA256:           perfmeasure.Fingerprint(inputY),
+		OutputSHA256:           perfmeasure.Fingerprint(output),
+		Statistics:             incrementalStats,
+	}, totalStats, encodeVector(incremental), encodeVector(totalError), nil
+}
+
+func sumPublicPhaseElapsedNS(phases []phaseTiming, names ...string) (int64, error) {
+	byName := make(map[string]phaseTiming, len(phases))
+	for _, phase := range phases {
+		if phase.Available {
+			byName[phase.Phase] = phase
+		}
+	}
+	var total int64
+	for _, name := range names {
+		phase, ok := byName[name]
+		if !ok || phase.Samples != 1 || phase.ElapsedNS <= 0 {
+			return 0, fmt.Errorf("required single-call phase %s is missing or invalid", name)
+		}
+		total += phase.ElapsedNS
+	}
+	return total, nil
+}
+
+func sameComplexVectorStats(left, right numericalmetrics.ComplexVectorStats) bool {
+	return left == right
+}
+
+func validSHA256Hex(value string) bool {
+	decoded, err := hex.DecodeString(value)
+	return err == nil && len(decoded) == sha256.Size
+}
+
 func validatePublicBackendPin(backend, commit string, profileNames ...string) error {
 	profileName := "logn13"
 	if len(profileNames) > 0 {
@@ -2139,10 +2361,10 @@ func validatePublicBackendPin(backend, commit string, profileNames ...string) er
 		}
 		return fmt.Errorf("Standard backend commit %s differs from pinned Standard %s", commit, publicStandardSHA)
 	case "fast":
-		if commit == publicCurrentFastSHA || (profileName == "logn13" && commit == publicFastSHA) {
+		if commit == publicCurrentFastSHA || (profileName == "logn13" && (commit == publicFastSHA || commit == publicFixedSigmaFastSHA)) {
 			return nil
 		}
-		return fmt.Errorf("Fast backend commit %s is not approved for %s (current=%s; historical LogN13=%s)", commit, profileName, publicCurrentFastSHA, publicFastSHA)
+		return fmt.Errorf("Fast backend commit %s is not approved for %s (current=%s; fixed-sigma task=%s; historical LogN13=%s)", commit, profileName, publicCurrentFastSHA, publicFixedSigmaFastSHA, publicFastSHA)
 	default:
 		return fmt.Errorf("unsupported public-native backend %q", backend)
 	}

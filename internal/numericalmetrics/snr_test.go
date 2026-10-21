@@ -95,3 +95,36 @@ func TestCompareRealVectorsZeroErrorIsFiniteAndZero(t *testing.T) {
 		t.Fatalf("unexpected exact comparison: %+v", metric)
 	}
 }
+
+func TestSummarizeComplexVectorUsesPopulationVariance(t *testing.T) {
+	metric := SummarizeComplexVector([]complex128{1 + 1i, 3 + 3i})
+	if metric.Status != "FINITE" || metric.Count != 2 || metric.WorstSlot != 1 {
+		t.Fatalf("unexpected complex-vector result: %+v", metric)
+	}
+	if metric.MeanReal != 2 || metric.MeanImag != 2 || math.Abs(metric.Variance-2) > 1e-15 || math.Abs(metric.RMS-math.Sqrt(10)) > 1e-15 || math.Abs(metric.MaxAbs-math.Sqrt(18)) > 1e-15 {
+		t.Fatalf("unexpected complex-vector statistics: %+v", metric)
+	}
+}
+
+func TestSummarizeComplexVectorRejectsInvalidInputs(t *testing.T) {
+	for _, values := range [][]complex128{
+		nil,
+		{complex(math.NaN(), 0)},
+		{complex(0, math.Inf(1))},
+		{complex(math.MaxFloat64, math.MaxFloat64)},
+	} {
+		if metric := SummarizeComplexVector(values); metric.Status != "NOT_COMPARABLE" || metric.Reason == "" {
+			t.Fatalf("invalid vector accepted: %+v", metric)
+		}
+	}
+}
+
+func TestCompareComplexCovarianceUsesCenteredPairedCoordinates(t *testing.T) {
+	metric := CompareComplexCovariance([]complex128{1, -1}, []complex128{1i, -1i})
+	if metric.Status != "FINITE" || metric.Count != 2 || math.Abs(metric.Real) > 1e-15 || math.Abs(metric.Imag+1) > 1e-15 || math.Abs(metric.CorrelationMagnitude-1) > 1e-15 {
+		t.Fatalf("unexpected complex covariance: %+v", metric)
+	}
+	if invalid := CompareComplexCovariance([]complex128{1}, nil); invalid.Status != "NOT_COMPARABLE" {
+		t.Fatalf("mismatched vectors were accepted: %+v", invalid)
+	}
+}
