@@ -1,0 +1,877 @@
+{
+  "schema_version": "fast-standard-public-native-preflight.v1",
+  "mode": "public-native",
+  "status": "PASS_ZERO_BOOTSTRAP_PREBOOTSTRAP_CHAIN",
+  "timestamp": "2026-10-21T16:31:48.171875Z",
+  "profile": "logn13",
+  "profile_kind": "frozen-historical-fixture-v1",
+  "backend": "standard",
+  "backend_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+  "backend_ref": "standard@5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+  "backend_checkout_ref": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+  "backend_path": "/private/tmp/fixed-sigma-mul-noise-001-standard",
+  "backend_clean": true,
+  "built_binary_sha256": "081041b3971117c262c1a0759d3e2923efe168f30fd55f84503e337e0c95eb84",
+  "primary_path": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap",
+  "primary_commit": "b99f63710718ac4373e704afef3023d62fc17f3d",
+  "primary_clean": true,
+  "primary_measurement_source_sha256": "6f8a9237ebf2152c369abc2fe797c4f168793f056954a753d706126fda38d3ad",
+  "build_tag": "perf_standard",
+  "go_version": "go1.26.4",
+  "os": "darwin",
+  "arch": "arm64",
+  "cpu": "Apple M4",
+  "num_cpu": 10,
+  "gomaxprocs": 10,
+  "gogc": "runtime-default",
+  "gomemlimit": "runtime-default",
+  "godebug": "runtime-default",
+  "config_path": "configs/bootstrap_config.logN13.json",
+  "config_sha256": "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98",
+  "qp_sha256": "1f045e603a856968779d62e045a037274bba08cbfce8b1dd3dec2828f1f6a46b",
+  "canonical_input_sha256": "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285",
+  "workload_sha256": "00b70a2e77887c7d6a41db1859246f6513f2c984915de648734e5dd8c584cf74",
+  "effective_parameters": {
+    "ephemeral_secret_weight": 32,
+    "log_n": 13,
+    "log_slots": 12,
+    "input_slots": 4096,
+    "ring_n": 8192,
+    "residual_ring_n": 8192,
+    "q0_config_target_bits": 55,
+    "q0_bits": 55,
+    "q_chain_bits": [
+      55,
+      39,
+      40,
+      39,
+      40,
+      60,
+      60,
+      61,
+      60,
+      60,
+      60,
+      61,
+      61,
+      56,
+      57,
+      56,
+      56
+    ],
+    "p_bits": [
+      61,
+      61,
+      62,
+      61,
+      62
+    ],
+    "q_primes": [
+      "36028797018652673",
+      "549755731969",
+      "549756026881",
+      "549755486209",
+      "549756174337",
+      "1152921504606830593",
+      "1152921504606748673",
+      "1152921504606994433",
+      "1152921504606683137",
+      "1152921504606601217",
+      "1152921504606584833",
+      "1152921504607191041",
+      "1152921504607223809",
+      "72057594037616641",
+      "72057594038321153",
+      "72057594037370881",
+      "72057594037338113"
+    ],
+    "p_primes": [
+      "2305843009213317121",
+      "2305843009213120513",
+      "2305843009214414849",
+      "2305843009212694529",
+      "2305843009214758913"
+    ],
+    "default_scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+    "mod1_log_scale": 60,
+    "mod1_degree": 30,
+    "double_angle": 3,
+    "k": 16,
+    "log_message_ratio": 10,
+    "circuit_order": 0,
+    "q_prefix_rows_at_max_level": 4
+  },
+  "ephemeral_secret_weight": 32,
+  "input_slots": 4096,
+  "input_kind": "standard_native_rlwe_encrypt_v1",
+  "input_constructor": "rlwe.NewEncryptor(full, extended generated Standard secret).EncryptNew",
+  "input_c1_nonzero": true,
+  "public_evaluator_dispatch": "bootstrapping.NewEvaluator genuine Standard evaluator",
+  "capacity_evidence_version": "public-capacity-evidence.v1",
+  "capacity_policy": "strict-sufficient-bound-v1",
+  "conservative_bound_status": "SUFFICIENT",
+  "observed_native_oracle_status": "PASS_EIGHT_CHECKPOINT_PLAINTEXT_ORACLES",
+  "level4_to_level0_continuity": {
+    "complex_rmse": 0,
+    "max_complex_difference": 0,
+    "max_real_difference": 0,
+    "max_imag_difference": 0,
+    "worst_slot": 0,
+    "real_components_above_threshold": 0,
+    "imag_components_above_threshold": 0,
+    "median_precision_bits": 99.65784284662087
+  },
+  "capacity_plan": {
+    "input_a_bound": "2348557866436",
+    "input_b_bound": "1804822278899",
+    "input_c_bound": "76957544167327219",
+    "add_bound": "4153380145335",
+    "mulrelin_bound": "2618441203534382746900245490606080",
+    "rescale_bound": "2271135713118062",
+    "q0123_product": "5986308565615587353347023386369277282933624144412673",
+    "q0": "36028797018652673",
+    "mul_divisor_q5": "1152921504606830593",
+    "terminal_q0_sufficient_condition": "SUFFICIENT"
+  },
+  "max_complex_numerical_gate": 0.000001,
+  "bootstrap_budget": 0,
+  "actual_bootstrap_calls": 0,
+  "execution_phases": [
+    {
+      "phase": "secret_key_generation",
+      "elapsed_ns": 134958,
+      "allocated_bytes": 198496,
+      "allocations": 208,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "public_GenEvaluationKeys",
+      "elapsed_ns": 438176583,
+      "allocated_bytes": 395376768,
+      "allocations": 94242,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "public_ckks_evaluator_construction",
+      "elapsed_ns": 1064208,
+      "allocated_bytes": 2719992,
+      "allocations": 16610,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "public_bootstrapping_evaluator_construction",
+      "elapsed_ns": 424632541,
+      "allocated_bytes": 710670672,
+      "allocations": 14232906,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "public_encrypt_a_level5",
+      "elapsed_ns": 2250959,
+      "allocated_bytes": 5225688,
+      "allocations": 21566,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "public_encrypt_b_level5",
+      "elapsed_ns": 2487250,
+      "allocated_bytes": 5225656,
+      "allocations": 21565,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "public_encrypt_c_q5_level5",
+      "elapsed_ns": 2454833,
+      "allocated_bytes": 5225720,
+      "allocations": 21566,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "checkpoint_decode_encrypt_a_level5",
+      "elapsed_ns": 5254209,
+      "allocated_bytes": 5656176,
+      "allocations": 188585,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "checkpoint_decode_encrypt_b_level5",
+      "elapsed_ns": 4056125,
+      "allocated_bytes": 5656896,
+      "allocations": 188586,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "checkpoint_decode_encrypt_c_q5_level5",
+      "elapsed_ns": 4055708,
+      "allocated_bytes": 5658096,
+      "allocations": 188585,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "public_AddNew",
+      "elapsed_ns": 276250,
+      "allocated_bytes": 1576616,
+      "allocations": 63,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "checkpoint_decode_add_level5",
+      "elapsed_ns": 3952583,
+      "allocated_bytes": 5657640,
+      "allocations": 188592,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "public_MulRelinNew",
+      "elapsed_ns": 5284666,
+      "allocated_bytes": 5589384,
+      "allocations": 444,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "checkpoint_decode_mulrelin_level5",
+      "elapsed_ns": 4034042,
+      "allocated_bytes": 6473776,
+      "allocations": 188586,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "public_Rescale_q5",
+      "elapsed_ns": 426375,
+      "allocated_bytes": 789832,
+      "allocations": 48,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "checkpoint_decode_rescale_q5_level4",
+      "elapsed_ns": 3508333,
+      "allocated_bytes": 5122688,
+      "allocations": 163996,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "public_RotateNew_1",
+      "elapsed_ns": 2154750,
+      "allocated_bytes": 1126352,
+      "allocations": 287,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "checkpoint_decode_rotate_level4",
+      "elapsed_ns": 3162208,
+      "allocated_bytes": 5130544,
+      "allocations": 163997,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "public_DropLevelNew_4",
+      "elapsed_ns": 32709,
+      "allocated_bytes": 655824,
+      "allocations": 17,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "checkpoint_decode_drop_level0",
+      "elapsed_ns": 422333,
+      "allocated_bytes": 636152,
+      "allocations": 52,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "first_cold_bootstrap",
+      "available": false,
+      "reason": "zero-call public-native preflight does not invoke Bootstrap"
+    },
+    {
+      "phase": "later_warm_bootstrap",
+      "available": false,
+      "reason": "zero-call public-native preflight does not invoke Bootstrap"
+    }
+  ],
+  "checkpoints": [
+    {
+      "name": "encrypt_a_level5",
+      "state": {
+        "level": 5,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "decode_path": "rlwe.NewDecryptor(...).DecryptNew -\u003e ckks.NewEncoder.Decode",
+      "physical_row_lengths_by_component": [
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          8192,
+          8192
+        ],
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          8192,
+          8192
+        ]
+      ],
+      "active_row_sha256_by_component": [
+        [
+          "45abecea14b2057f4942dd1a114815a9b9a91024ae60692fa20ca8b0015d0ada",
+          "38a106e150e1fa3898131b8dbb780b39b94321a6f027e110af7aeb171575a8a6",
+          "fa7061263a4ba65e889d6cda887271e6090c317f1bb4959e7d04770af0286fc2",
+          "dadb70d2d83af1c6a806c78aa8c0fbf7e6973033cbd61b16d4b2bf1045fa2d26"
+        ],
+        [
+          "87becd2ecf4fd42e0921f9ab16ab510b4549254acb96adfb4d90deb94387a848",
+          "3909f67787a10defb213c62000d5f5b45594c89b8d2c2fcd1bff5d11d24a1564",
+          "9fa19ac36c4079d265f255ae5362c7d56f2ab21e28c2061d8b2e402cb4a5ce7c",
+          "921e6d0c0931938d8bb73b50e01f98281e5892fe97d5c1a314dfdd7c6e4fa3fc"
+        ]
+      ],
+      "fast_compact_prefix_layout": false,
+      "c1_nonzero": true,
+      "decoded_sha256": "f563b3b1beaf5993d5f5430a143fa51c3e2a420c5e313e11a40aba83ee1bd5eb",
+      "oracle_metrics": {
+        "complex_rmse": 8.269523217901263e-12,
+        "max_complex_difference": 2.3747545216010604e-11,
+        "max_real_difference": 2.322033190726991e-11,
+        "max_imag_difference": 2.3511474017690048e-11,
+        "worst_slot": 378,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 37.08203794148304
+      },
+      "oracle_snr": {
+        "signal_power": 0.00041948817670345306,
+        "signal_rms": 0.020481410515476053,
+        "noise_power": 6.838501425140807e-23,
+        "noise_rmse": 8.269523217901263e-12,
+        "snr_db": 187.8775878295973,
+        "status": "FINITE"
+      },
+      "oracle_pass": true
+    },
+    {
+      "name": "encrypt_b_level5",
+      "state": {
+        "level": 5,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "decode_path": "rlwe.NewDecryptor(...).DecryptNew -\u003e ckks.NewEncoder.Decode",
+      "physical_row_lengths_by_component": [
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          8192,
+          8192
+        ],
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          8192,
+          8192
+        ]
+      ],
+      "active_row_sha256_by_component": [
+        [
+          "cdd6fa5a3030ff5b9d3847543c35e2a5cc1fd69131107e8577c632f8615bb6f5",
+          "4ae7ee3dd80eee57b07f8f992739fb1088cc741f74ddf93a4da7402ee87fbf4e",
+          "ffed019a715db542a5b613cd8d80ab1530710ccbb12bb630b1425418d0bb9652",
+          "5b5be0d0bb6defda54a11ef3214bd0768312624706a991124910230a49a6808a"
+        ],
+        [
+          "20d1cfd4c9f4a7972cf9d41d2b838504c1763a04868e380580b70ddadd80db24",
+          "aa8819ec9490852d8f6ecd87fb2773377b9abb6f90aeed3d63b1eb1a5f558f14",
+          "c2e2a472f562045c6b0108fb24bbed899975f8b836e365de75c5a37054c0b6bb",
+          "2ee71567e2e72b99675dd40339a9ca5c1858a0c6384e2959af091dc80ed04462"
+        ]
+      ],
+      "fast_compact_prefix_layout": false,
+      "c1_nonzero": true,
+      "decoded_sha256": "551a3636c7ef1868d27a5750a5e077b3f1e7a4ad116298b42f8916bc03e9885a",
+      "oracle_metrics": {
+        "complex_rmse": 8.233831933123846e-12,
+        "max_complex_difference": 2.49500916353252e-11,
+        "max_real_difference": 2.427748800604146e-11,
+        "max_imag_difference": 2.3364036400019828e-11,
+        "worst_slot": 3957,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 37.098124180436436
+      },
+      "oracle_snr": {
+        "signal_power": 0.00024407108624776205,
+        "signal_rms": 0.015622774601451627,
+        "noise_power": 6.779598830292996e-23,
+        "noise_rmse": 8.233831933123846e-12,
+        "snr_db": 185.56312337910475,
+        "status": "FINITE"
+      },
+      "oracle_pass": true
+    },
+    {
+      "name": "encrypt_c_q5_level5",
+      "state": {
+        "level": 5,
+        "degree": 1,
+        "scale": "1.15292150460683059300000000000000000000000000000000000000000000000000000000000000e+18",
+        "scale_log2": 59.99999999999998,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "decode_path": "rlwe.NewDecryptor(...).DecryptNew -\u003e ckks.NewEncoder.Decode",
+      "physical_row_lengths_by_component": [
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          8192,
+          8192
+        ],
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          8192,
+          8192
+        ]
+      ],
+      "active_row_sha256_by_component": [
+        [
+          "0d1d715d4d12b021fded9cbf7309ca61827acc4c907222bcf30a11e710e58710",
+          "931e5530ed31c8227e082851885e309ee741113d8be55a4a0bdb632f3b3ec041",
+          "921c5dca06d1f4e6aef36368b636d56e1409aa45be07f0896bd3bc9675d82722",
+          "eabc54e443dfef6e48e7a70054040dcac3cefc51a248aa7f50f1d4979ce558f0"
+        ],
+        [
+          "f4f46ccea3a4d939ab350d3643c9b44b37793687692364d1d538f2edd6df433e",
+          "9cfabe0edc6cb5d56a0d0635225055b60db452521be73841e10c7638615a04cb",
+          "3b3a4701ea1b3f879767c0ebab06944e33d12947d157b283875ee85449f63911",
+          "09dce43d619b00b806bd15473b8d11411693a565a7d985c6798e772ab001f0b4"
+        ]
+      ],
+      "fast_compact_prefix_layout": false,
+      "c1_nonzero": true,
+      "decoded_sha256": "d7dd1a6ad9c085bd3ea0bb41ba340415daef92cbbc1fc46fcf55eca12416534b",
+      "oracle_metrics": {
+        "complex_rmse": 2.525694149126684e-16,
+        "max_complex_difference": 7.520706521308077e-16,
+        "max_real_difference": 7.008282842946301e-16,
+        "max_imag_difference": 6.696032617270475e-16,
+        "worst_slot": 1455,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 52.07333912988746
+      },
+      "oracle_snr": {
+        "signal_power": 0.00041948817670345306,
+        "signal_rms": 0.020481410515476053,
+        "noise_power": 6.379130934932764e-32,
+        "noise_rmse": 2.525694149126684e-16,
+        "snr_db": 278.1795820836534,
+        "status": "FINITE"
+      },
+      "oracle_pass": true
+    },
+    {
+      "name": "add_level5",
+      "state": {
+        "level": 5,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "decode_path": "rlwe.NewDecryptor(...).DecryptNew -\u003e ckks.NewEncoder.Decode",
+      "physical_row_lengths_by_component": [
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          8192,
+          8192
+        ],
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          8192,
+          8192
+        ]
+      ],
+      "active_row_sha256_by_component": [
+        [
+          "094846f5f32b38aa2f4daafba8affaaf944603962483854cfe05274be44d5287",
+          "7242c91bc24340e555045ce2040ce65c524582869201d32391fa590569e39279",
+          "145d19bb9b29acc8f57899a0ac4d1167ac9530732b10c6c77f42b6c4151bf976",
+          "dc9545e84f5cd39a8d4cf88f5fe98220b97939d0c5e89cd7efcb4b6859d596e0"
+        ],
+        [
+          "199d3e3872dc6e5ce428636ccb8b765e70d72e64c199429214aefbc3b21765bb",
+          "f0d4c7e580f2fabd98c1726d25f1b791f23dd389653fa295cbb6e466be0e0d0c",
+          "3e5402e162464335026b3e5d022446419cfcafcee81273ad5da554799a1cc859",
+          "0e572d296dd4dd79eec7e39fd316599beb7f50885432e5c53cae85e81b645a2e"
+        ]
+      ],
+      "fast_compact_prefix_layout": false,
+      "c1_nonzero": true,
+      "decoded_sha256": "d8013e3737efe5382dc408f9575a0f2a05d8fb9e54a0cadb30a486101743e822",
+      "oracle_metrics": {
+        "complex_rmse": 1.1662297172974747e-11,
+        "max_complex_difference": 3.487039086267509e-11,
+        "max_real_difference": 3.1042453330076825e-11,
+        "max_imag_difference": 3.134678280836134e-11,
+        "worst_slot": 3521,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 36.5673969405281
+      },
+      "oracle_snr": {
+        "signal_power": 0.0006648146857817971,
+        "signal_rms": 0.02578400057752476,
+        "noise_power": 1.360091753507748e-22,
+        "noise_rmse": 1.1662297172974747e-11,
+        "snr_db": 186.89132397050858,
+        "status": "FINITE"
+      },
+      "oracle_pass": true
+    },
+    {
+      "name": "mulrelin_level5",
+      "state": {
+        "level": 5,
+        "degree": 1,
+        "scale": "4.05648192073027644223265712373760000000000000000000000000000000000000000000000000e+31",
+        "scale_log2": 104.99999999999999,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "decode_path": "rlwe.NewDecryptor(...).DecryptNew -\u003e ckks.NewEncoder.Decode",
+      "physical_row_lengths_by_component": [
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          8192,
+          8192
+        ],
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          8192,
+          8192
+        ]
+      ],
+      "active_row_sha256_by_component": [
+        [
+          "91ed372b250a577543092efd055b8750d953050e7e2b1f48d2c3eabb71720d81",
+          "01f45b35f9488abf5ea02a2da3225aaf7f8c6dbb3d575c957338d78a9f74e82c",
+          "df6356aec5090b62906abf9cc4453fb5f31ec366334fc4746477095909621927",
+          "d43ebad37a9624a6f9f9b4fb8c880bbb3b30b990eadd676a3d9df3e90092c192"
+        ],
+        [
+          "1feb0dfc96ad958234f1c13f77cf8d1b0c6cd2f2d1d54e49de0248cc78f71037",
+          "0a78b9c1e4863dfad4c11798fcec35663e1ff78030635b955abcd48aad018a6a",
+          "210a464fda8144ed0f6dbe169e92f471fb9157e752ccb31f4f8bd07b74854b6f",
+          "e6aa348498682ae63c1fb88d7248d842d6f9f030699a59712c1cae27cd4d2c80"
+        ]
+      ],
+      "fast_compact_prefix_layout": false,
+      "c1_nonzero": true,
+      "decoded_sha256": "ea69b2008090615f310d02eccfa478f12f36f3642c04d7bc19775cf07bfb530f",
+      "oracle_metrics": {
+        "complex_rmse": 2.368088614665673e-13,
+        "max_complex_difference": 1.0691947456139975e-12,
+        "max_real_difference": 9.700742813201213e-13,
+        "max_imag_difference": 9.021286322130617e-13,
+        "worst_slot": 1989,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 42.51982015031189
+      },
+      "oracle_snr": {
+        "signal_power": 3.880093725822705e-7,
+        "signal_rms": 0.000622903983437472,
+        "noise_power": 5.607843686909186e-26,
+        "noise_rmse": 2.368088614665673e-13,
+        "snr_db": 188.40046316747151,
+        "status": "FINITE"
+      },
+      "oracle_pass": true
+    },
+    {
+      "name": "rescale_q5_level4",
+      "state": {
+        "level": 4,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "decode_path": "rlwe.NewDecryptor(...).DecryptNew -\u003e ckks.NewEncoder.Decode",
+      "physical_row_lengths_by_component": [
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          8192
+        ],
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          8192
+        ]
+      ],
+      "active_row_sha256_by_component": [
+        [
+          "80eabb57c08a1ec266496636c0507eda951de8c4f3107ea0996a7ab0aa2f000e",
+          "c3d486c9e7fa14d1baa2a7fb18fc69f878054f5fb61bf8c2500e4c7032cb42e4",
+          "e41586db562ec205ec2f7c4cedd42c8a7c89e491d3bbdc64e4952077a99c4f08",
+          "3d8270bc0857ae7a6ec2fcaf50decb700527e9a66ebb3fa0d294ac6ca20bfcf1"
+        ],
+        [
+          "00bf7f441ae44d0060a354fd64767200743b45849e548a08a4d330742d719a4d",
+          "8733293749052550face86d803ecb1914eb6c6737ba1f380cc5a0201a15e38d5",
+          "09db8acdb47321a48dcae52e43df0a432fac324f4e6e5a41cc4a77bcf5000b8f",
+          "f66bd629a70353bfe72e49aa207e5dc256a5fc5f9921d07658bb33939db74657"
+        ]
+      ],
+      "fast_compact_prefix_layout": false,
+      "c1_nonzero": true,
+      "decoded_sha256": "dc98a1358df30865297455f3aefbb672c1a55e0817a39d5acd5b1e1c43cdc6d0",
+      "oracle_metrics": {
+        "complex_rmse": 1.0442838964115119e-11,
+        "max_complex_difference": 8.23428162705992e-11,
+        "max_real_difference": 4.829315600033985e-11,
+        "max_imag_difference": 8.153131051151161e-11,
+        "worst_slot": 512,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 37.15812780670471
+      },
+      "oracle_snr": {
+        "signal_power": 3.880093725822705e-7,
+        "signal_rms": 0.000622903983437472,
+        "noise_power": 1.090528856304409e-22,
+        "noise_rmse": 1.0442838964115119e-11,
+        "snr_db": 155.51205054484248,
+        "status": "FINITE"
+      },
+      "oracle_pass": true
+    },
+    {
+      "name": "rotate_level4",
+      "state": {
+        "level": 4,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "decode_path": "rlwe.NewDecryptor(...).DecryptNew -\u003e ckks.NewEncoder.Decode",
+      "physical_row_lengths_by_component": [
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          8192
+        ],
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          8192
+        ]
+      ],
+      "active_row_sha256_by_component": [
+        [
+          "6dffe48a623e8bb08a052dec0c813f2840934dc97c687c22aceea40b0f56b237",
+          "afba1c8a723e2bcd38b50e533ef1a9c6a199701960751ab48c47f2653322d071",
+          "f4842da0946aeef38b46fe88d22e330307e596f3929c56582ca5514dfb59c2f2",
+          "07bc99e7325ce6088b52d93fd1e5dbd9a242afad47c13aa58267325ca0e371a0"
+        ],
+        [
+          "a6163064aaaf0a411956d7179fd7e9dccb2b48ae5b509d6f31efc67c3b7d719f",
+          "386b77a330a36f441f1179bf89d709fa8e6a13e6eb23da666a410b86555786f1",
+          "0d666231633481b543c35d9a274aceba8d83182077d26eca749563e67fc5ca1f",
+          "d7bb9dc72f7cc3d92af15ae47704adbf4d5e167799c608398176ebfdb56b99ef"
+        ]
+      ],
+      "fast_compact_prefix_layout": false,
+      "c1_nonzero": true,
+      "decoded_sha256": "1a293f2050de45e2ab7374ef2f49a3493e0c1753e0e83ac58a816960f7baae6d",
+      "oracle_metrics": {
+        "complex_rmse": 1.4648724603191027e-11,
+        "max_complex_difference": 8.030762703696772e-11,
+        "max_real_difference": 6.689197709196931e-11,
+        "max_imag_difference": 7.618119121101906e-11,
+        "worst_slot": 511,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 36.463777953284
+      },
+      "oracle_snr": {
+        "signal_power": 3.8800937258227034e-7,
+        "signal_rms": 0.0006229039834374719,
+        "noise_power": 2.145851325001341e-22,
+        "noise_rmse": 1.4648724603191027e-11,
+        "snr_db": 152.5724258770383,
+        "status": "FINITE"
+      },
+      "oracle_pass": true
+    },
+    {
+      "name": "drop_level0",
+      "state": {
+        "level": 0,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 1,
+        "prefix_q": "36028797018652673"
+      },
+      "decode_path": "rlwe.NewDecryptor(...).DecryptNew -\u003e ckks.NewEncoder.Decode",
+      "physical_row_lengths_by_component": [
+        [
+          8192
+        ],
+        [
+          8192
+        ]
+      ],
+      "active_row_sha256_by_component": [
+        [
+          "6dffe48a623e8bb08a052dec0c813f2840934dc97c687c22aceea40b0f56b237"
+        ],
+        [
+          "a6163064aaaf0a411956d7179fd7e9dccb2b48ae5b509d6f31efc67c3b7d719f"
+        ]
+      ],
+      "fast_compact_prefix_layout": false,
+      "c1_nonzero": true,
+      "decoded_sha256": "1a293f2050de45e2ab7374ef2f49a3493e0c1753e0e83ac58a816960f7baae6d",
+      "oracle_metrics": {
+        "complex_rmse": 1.4648724603191027e-11,
+        "max_complex_difference": 8.030762703696772e-11,
+        "max_real_difference": 6.689197709196931e-11,
+        "max_imag_difference": 7.618119121101906e-11,
+        "worst_slot": 511,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 36.463777953284
+      },
+      "oracle_snr": {
+        "signal_power": 3.8800937258227034e-7,
+        "signal_rms": 0.0006229039834374719,
+        "noise_power": 2.145851325001341e-22,
+        "noise_rmse": 1.4648724603191027e-11,
+        "snr_db": 152.5724258770383,
+        "status": "FINITE"
+      },
+      "oracle_pass": true
+    }
+  ],
+  "mul_relin_rescale_incremental_residual": {
+    "schema_version": "fixed-sigma-mul-relin-rescale-residual.v1",
+    "classification": "DIAGNOSTIC_ONLY",
+    "definition": "Decode(Rescale(Relin(Mul(ct_x,ct_y)))) - Decode(ct_x) * Decode(ct_y), elementwise in slot domain",
+    "encryption_mode": "sk",
+    "pk_comparison_status": "UNSUPPORTED_FAST_ZERO_SECRET_MULRELIN_REQUIRES_C1_ZERO",
+    "logical_ct_ct_mul_count": 1,
+    "logical_noise_injections": 0,
+    "sigma_coefficient_status": "NOT_ESTIMATED_CP_B_BASELINE",
+    "sampling_seed_status": "NOT_APPLICABLE_BASELINE_NO_INJECTION",
+    "mul_relin_rescale_elapsed_ns": 5711041,
+    "decoded_input_x_sha256": "d8013e3737efe5382dc408f9575a0f2a05d8fb9e54a0cadb30a486101743e822",
+    "decoded_input_y_sha256": "d7dd1a6ad9c085bd3ea0bb41ba340415daef92cbbc1fc46fcf55eca12416534b",
+    "decoded_output_sha256": "dc98a1358df30865297455f3aefbb672c1a55e0817a39d5acd5b1e1c43cdc6d0",
+    "statistics": {
+      "count": 4096,
+      "mean_real": 8.249250210283323e-14,
+      "mean_imag": 8.203873321971647e-14,
+      "variance": 1.088767133446543e-22,
+      "rms": 1.0435049051696197e-11,
+      "max_abs": 8.218360133970715e-11,
+      "worst_slot": 512,
+      "status": "FINITE"
+    }
+  },
+  "mul_relin_rescale_total_error": {
+    "count": 4096,
+    "mean_real": 8.526512790150656e-14,
+    "mean_imag": 8.526513355208072e-14,
+    "variance": 1.0903834534540513e-22,
+    "rms": 1.0442838964115119e-11,
+    "max_abs": 8.23428162705992e-11,
+    "worst_slot": 512,
+    "status": "FINITE"
+  },
+  "limitations": [
+    "This is a public pre-Bootstrap lifecycle only; no Bootstrap method was called, so public Bootstrap acceptance/output and cold/warm timings remain unverified.",
+    "Fast zero-c1 is the pinned implementation's declared zero-secret simulation mode, not secure public-key encryption; Standard uses native generated-secret encryption.",
+    "Existing fastdiag P93/E0 traces are not E32 evidence. This public-native run performs no in-circuit tracing; the separate test-only E32 trace is a distinct diagnostic lane."
+  ]
+}

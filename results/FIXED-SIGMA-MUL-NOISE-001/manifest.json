@@ -1,0 +1,175 @@
+{
+  "schema_version": "fixed-sigma-mul-noise-001-artifact-manifest.v1",
+  "status": "CP_B_COMPLETE_CP_C_IN_PROGRESS",
+  "task_id": "FIXED-SIGMA-MUL-NOISE-001",
+  "primary_commit": "b99f63710718ac4373e704afef3023d62fc17f3d",
+  "primary_measurement_source_sha256": "6f8a9237ebf2152c369abc2fe797c4f168793f056954a753d706126fda38d3ad",
+  "standard_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+  "standard_binary_sha256": "081041b3971117c262c1a0759d3e2923efe168f30fd55f84503e337e0c95eb84",
+  "fast_commit": "ee308c9743000b5f281a84a871e7c4bd59b176c4",
+  "fast_binary_sha256": "b988c99c78da11c263c930f7e90b1723839717f1a707759e49d7629a21b9f877",
+  "profile": "logn13",
+  "effective_parameters": {
+    "ephemeral_secret_weight": 32,
+    "log_n": 13,
+    "log_slots": 12,
+    "input_slots": 4096,
+    "ring_n": 8192,
+    "residual_ring_n": 8192,
+    "q0_config_target_bits": 55,
+    "q0_bits": 55,
+    "q_chain_bits": [
+      55,
+      39,
+      40,
+      39,
+      40,
+      60,
+      60,
+      61,
+      60,
+      60,
+      60,
+      61,
+      61,
+      56,
+      57,
+      56,
+      56
+    ],
+    "p_bits": [
+      61,
+      61,
+      62,
+      61,
+      62
+    ],
+    "q_primes": [
+      "36028797018652673",
+      "549755731969",
+      "549756026881",
+      "549755486209",
+      "549756174337",
+      "1152921504606830593",
+      "1152921504606748673",
+      "1152921504606994433",
+      "1152921504606683137",
+      "1152921504606601217",
+      "1152921504606584833",
+      "1152921504607191041",
+      "1152921504607223809",
+      "72057594037616641",
+      "72057594038321153",
+      "72057594037370881",
+      "72057594037338113"
+    ],
+    "p_primes": [
+      "2305843009213317121",
+      "2305843009213120513",
+      "2305843009214414849",
+      "2305843009212694529",
+      "2305843009214758913"
+    ],
+    "default_scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+    "mod1_log_scale": 60,
+    "mod1_degree": 30,
+    "double_angle": 3,
+    "k": 16,
+    "log_message_ratio": 10,
+    "circuit_order": 0,
+    "q_prefix_rows_at_max_level": 4
+  },
+  "config_sha256": "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98",
+  "qp_sha256": "1f045e603a856968779d62e045a037274bba08cbfce8b1dd3dec2828f1f6a46b",
+  "input_sha256": "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285",
+  "workload_sha256": "00b70a2e77887c7d6a41db1859246f6513f2c984915de648734e5dd8c584cf74",
+  "ephemeral_secret_weight": 32,
+  "logical_noise_injections": 0,
+  "bootstrap_budget": 0,
+  "bootstrap_calls": 0,
+  "fast_vector_sidecar_shared_across_runs": true,
+  "fast_vector_sidecar_sha256": "af7de0aeeda4e65f2e1401b68378ebeb5e81d0d239b63e86565183ccf7cd6137",
+  "artifacts": [
+    {
+      "file": "fast-run-01.json",
+      "bytes": 29267,
+      "sha256": "8b8f625cf690a29ba169917b2ea8e2a6cd1e1e2644dd66664a0b313b72982579"
+    },
+    {
+      "file": "fast-run-02.json",
+      "bytes": 29265,
+      "sha256": "5edf2b7746c8c8e87c54b4be72bebb8044d4645a55bddb8d44cc4c6e51d4a54a"
+    },
+    {
+      "file": "fast-run-03.json",
+      "bytes": 29264,
+      "sha256": "7f7057689cbdeede0a8d058cb88533a355ad1465d39d5ab9c3b14855ca280cb5"
+    },
+    {
+      "file": "fast-vectors-shared.json",
+      "bytes": 3810725,
+      "sha256": "af7de0aeeda4e65f2e1401b68378ebeb5e81d0d239b63e86565183ccf7cd6137"
+    },
+    {
+      "file": "paired-run-01.json",
+      "bytes": 15494,
+      "sha256": "3db6c6b8e33d0d1c180f43c99b340d9dcc7f5095213b5ce0e238dd4c79efe7df"
+    },
+    {
+      "file": "paired-run-02.json",
+      "bytes": 15498,
+      "sha256": "7998ce786b9304c9469f1d19f2b1ee7852181a6a04620a506536f46b53fd1b90"
+    },
+    {
+      "file": "paired-run-03.json",
+      "bytes": 15490,
+      "sha256": "083e4848c23f9ba079f39d6cbcacc1882eada9c02efa8ef47b90e522144c90ee"
+    },
+    {
+      "file": "standard-run-01-vectors.json",
+      "bytes": 3816591,
+      "sha256": "df98a25965bda8f5014751f8f090051180a005dbb59a247d13e4bff75871e4c9"
+    },
+    {
+      "file": "standard-run-01.json",
+      "bytes": 29055,
+      "sha256": "a275224afe9c782b70479eed01289040e3c5625b1054bfe5eb50e9d9a121de8a"
+    },
+    {
+      "file": "standard-run-02-vectors.json",
+      "bytes": 3816610,
+      "sha256": "3a8a0f7913fcf62e49e4823ba682be567b5c728f0bce8c9309fba2670429931f"
+    },
+    {
+      "file": "standard-run-02.json",
+      "bytes": 29069,
+      "sha256": "2ba39c5a1ec0d8ce34a5437d624b6e3bad85c5ee05f73a1e577a3c861ba22e29"
+    },
+    {
+      "file": "standard-run-03-vectors.json",
+      "bytes": 3816354,
+      "sha256": "cbdc40d709643317a634d118ca716a770dc7aa41b59674ee76fcdf5c0b35c6aa"
+    },
+    {
+      "file": "standard-run-03.json",
+      "bytes": 29047,
+      "sha256": "6bcf0f726c7606e695c7c221d8b6bfebeef702ef95c679d35bc9e7a8f52f7900"
+    }
+  ],
+  "candidate_sigma_coefficient": 4.004280012097432,
+  "sigma_calibration": {
+    "source_pair": "paired-run-01.json",
+    "held_out_pairs": [
+      "paired-run-02.json",
+      "paired-run-03.json"
+    ],
+    "formula": "sqrt(slot_variance_delta * output_scale^2 / ring_degree)",
+    "ring_degree": 8192,
+    "output_scale": "2^45",
+    "held_out_sigma_implied": [
+      3.9806088657467544,
+      4.04591114352061
+    ],
+    "calibration_only": true
+  }
+}

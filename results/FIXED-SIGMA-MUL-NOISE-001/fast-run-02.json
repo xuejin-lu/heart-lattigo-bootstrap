@@ -1,0 +1,877 @@
+{
+  "schema_version": "fast-standard-public-native-preflight.v1",
+  "mode": "public-native",
+  "status": "PASS_ZERO_BOOTSTRAP_PREBOOTSTRAP_CHAIN",
+  "timestamp": "2026-10-21T16:31:38.563057Z",
+  "profile": "logn13",
+  "profile_kind": "frozen-historical-fixture-v1",
+  "backend": "fast",
+  "backend_commit": "ee308c9743000b5f281a84a871e7c4bd59b176c4",
+  "backend_ref": "fast-qprefix@ee308c9743000b5f281a84a871e7c4bd59b176c4",
+  "backend_checkout_ref": "fast-qprefix",
+  "backend_path": "/Users/xuejinlu/Developer/xuejin-lu/lattigo",
+  "backend_clean": true,
+  "built_binary_sha256": "b988c99c78da11c263c930f7e90b1723839717f1a707759e49d7629a21b9f877",
+  "primary_path": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap",
+  "primary_commit": "b99f63710718ac4373e704afef3023d62fc17f3d",
+  "primary_clean": true,
+  "primary_measurement_source_sha256": "6f8a9237ebf2152c369abc2fe797c4f168793f056954a753d706126fda38d3ad",
+  "build_tag": "perf_fast",
+  "go_version": "go1.26.4",
+  "os": "darwin",
+  "arch": "arm64",
+  "cpu": "Apple M4",
+  "num_cpu": 10,
+  "gomaxprocs": 10,
+  "gogc": "runtime-default",
+  "gomemlimit": "runtime-default",
+  "godebug": "runtime-default",
+  "config_path": "configs/bootstrap_config.logN13.json",
+  "config_sha256": "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98",
+  "qp_sha256": "1f045e603a856968779d62e045a037274bba08cbfce8b1dd3dec2828f1f6a46b",
+  "canonical_input_sha256": "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285",
+  "workload_sha256": "00b70a2e77887c7d6a41db1859246f6513f2c984915de648734e5dd8c584cf74",
+  "effective_parameters": {
+    "ephemeral_secret_weight": 32,
+    "log_n": 13,
+    "log_slots": 12,
+    "input_slots": 4096,
+    "ring_n": 8192,
+    "residual_ring_n": 8192,
+    "q0_config_target_bits": 55,
+    "q0_bits": 55,
+    "q_chain_bits": [
+      55,
+      39,
+      40,
+      39,
+      40,
+      60,
+      60,
+      61,
+      60,
+      60,
+      60,
+      61,
+      61,
+      56,
+      57,
+      56,
+      56
+    ],
+    "p_bits": [
+      61,
+      61,
+      62,
+      61,
+      62
+    ],
+    "q_primes": [
+      "36028797018652673",
+      "549755731969",
+      "549756026881",
+      "549755486209",
+      "549756174337",
+      "1152921504606830593",
+      "1152921504606748673",
+      "1152921504606994433",
+      "1152921504606683137",
+      "1152921504606601217",
+      "1152921504606584833",
+      "1152921504607191041",
+      "1152921504607223809",
+      "72057594037616641",
+      "72057594038321153",
+      "72057594037370881",
+      "72057594037338113"
+    ],
+    "p_primes": [
+      "2305843009213317121",
+      "2305843009213120513",
+      "2305843009214414849",
+      "2305843009212694529",
+      "2305843009214758913"
+    ],
+    "default_scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+    "mod1_log_scale": 60,
+    "mod1_degree": 30,
+    "double_angle": 3,
+    "k": 16,
+    "log_message_ratio": 10,
+    "circuit_order": 0,
+    "q_prefix_rows_at_max_level": 4
+  },
+  "ephemeral_secret_weight": 32,
+  "input_slots": 4096,
+  "input_kind": "fast_zero_secret_public_encrypt_v1",
+  "input_constructor": "rlwe.NewEncryptor(full, extended bootstrap secret).EncryptNew; pinned Fast CKKS zero-secret capability yields observed c1=0",
+  "input_c1_nonzero": false,
+  "public_evaluator_dispatch": "bootstrapping.NewEvaluator public wrapper; Fast dispatch selected by pinned zero-secret capability",
+  "capacity_evidence_version": "public-capacity-evidence.v1",
+  "capacity_policy": "strict-sufficient-bound-v1",
+  "conservative_bound_status": "SUFFICIENT",
+  "observed_native_oracle_status": "PASS_EIGHT_CHECKPOINT_PLAINTEXT_ORACLES",
+  "level4_to_level0_continuity": {
+    "complex_rmse": 0,
+    "max_complex_difference": 0,
+    "max_real_difference": 0,
+    "max_imag_difference": 0,
+    "worst_slot": 0,
+    "real_components_above_threshold": 0,
+    "imag_components_above_threshold": 0,
+    "median_precision_bits": 99.65784284662087
+  },
+  "capacity_plan": {
+    "input_a_bound": "2348557866436",
+    "input_b_bound": "1804822278899",
+    "input_c_bound": "76957544167327219",
+    "add_bound": "4153380145335",
+    "mulrelin_bound": "2618441203534382746900245490606080",
+    "rescale_bound": "2271135713118062",
+    "q0123_product": "5986308565615587353347023386369277282933624144412673",
+    "q0": "36028797018652673",
+    "mul_divisor_q5": "1152921504606830593",
+    "terminal_q0_sufficient_condition": "SUFFICIENT"
+  },
+  "max_complex_numerical_gate": 0.000001,
+  "bootstrap_budget": 0,
+  "actual_bootstrap_calls": 0,
+  "execution_phases": [
+    {
+      "phase": "secret_key_generation",
+      "elapsed_ns": 192708,
+      "allocated_bytes": 198448,
+      "allocations": 208,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "public_GenEvaluationKeys",
+      "elapsed_ns": 1037578291,
+      "allocated_bytes": 894027616,
+      "allocations": 428371,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "public_ckks_evaluator_construction",
+      "elapsed_ns": 1117458,
+      "allocated_bytes": 6195696,
+      "allocations": 16682,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "public_bootstrapping_evaluator_construction",
+      "elapsed_ns": 2922459,
+      "allocated_bytes": 9640480,
+      "allocations": 32101,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "public_encrypt_a_level5",
+      "elapsed_ns": 1361083,
+      "allocated_bytes": 5223152,
+      "allocations": 21554,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "public_encrypt_b_level5",
+      "elapsed_ns": 1210000,
+      "allocated_bytes": 5223152,
+      "allocations": 21554,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "public_encrypt_c_q5_level5",
+      "elapsed_ns": 1236291,
+      "allocated_bytes": 5223152,
+      "allocations": 21554,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "checkpoint_decode_encrypt_a_level5",
+      "elapsed_ns": 2991208,
+      "allocated_bytes": 4768376,
+      "allocations": 139399,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "checkpoint_decode_encrypt_b_level5",
+      "elapsed_ns": 3140833,
+      "allocated_bytes": 4768120,
+      "allocations": 139398,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "checkpoint_decode_encrypt_c_q5_level5",
+      "elapsed_ns": 2871792,
+      "allocated_bytes": 4768120,
+      "allocations": 139398,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "public_AddNew",
+      "elapsed_ns": 167250,
+      "allocated_bytes": 525376,
+      "allocations": 18,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "checkpoint_decode_add_level5",
+      "elapsed_ns": 2885166,
+      "allocated_bytes": 4768120,
+      "allocations": 139398,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "public_MulRelinNew",
+      "elapsed_ns": 311708,
+      "allocated_bytes": 525504,
+      "allocations": 19,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "checkpoint_decode_mulrelin_level5",
+      "elapsed_ns": 3220166,
+      "allocated_bytes": 5423480,
+      "allocations": 139398,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "public_Rescale_q5",
+      "elapsed_ns": 1762458,
+      "allocated_bytes": 658528,
+      "allocations": 41,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "checkpoint_decode_rescale_q5_level4",
+      "elapsed_ns": 3334250,
+      "allocated_bytes": 4784848,
+      "allocations": 139418,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "public_RotateNew_1",
+      "elapsed_ns": 126166,
+      "allocated_bytes": 591600,
+      "allocations": 30,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "checkpoint_decode_rotate_level4",
+      "elapsed_ns": 2681000,
+      "allocated_bytes": 4768104,
+      "allocations": 139399,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "public_DropLevelNew_4",
+      "elapsed_ns": 31667,
+      "allocated_bytes": 524752,
+      "allocations": 15,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "checkpoint_decode_drop_level0",
+      "elapsed_ns": 166292,
+      "allocated_bytes": 636296,
+      "allocations": 53,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "first_cold_bootstrap",
+      "available": false,
+      "reason": "zero-call public-native preflight does not invoke Bootstrap"
+    },
+    {
+      "phase": "later_warm_bootstrap",
+      "available": false,
+      "reason": "zero-call public-native preflight does not invoke Bootstrap"
+    }
+  ],
+  "checkpoints": [
+    {
+      "name": "encrypt_a_level5",
+      "state": {
+        "level": 5,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "decode_path": "Fast c0 projection to the authoritative Q-prefix plaintext (zero-secret measurement adapter)",
+      "physical_row_lengths_by_component": [
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          8192,
+          8192
+        ],
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          8192,
+          8192
+        ]
+      ],
+      "active_row_sha256_by_component": [
+        [
+          "d28e82688ffdbd2cc5a067f0c0919952063278a6fb23c64d8ae2ebcda096cd30",
+          "724917793423a820e00ab221be62d612d194964691521bc5e1f526c3314e8f51",
+          "0e159a22e2eaeb65682f26ab01052c4a2bb9aba79a6fa6ea5b71ca9200396801",
+          "f0f6204c281d8a49465540dfa1062b705f9b070b40fdb741e0f30f8c937d219f"
+        ],
+        [
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        ]
+      ],
+      "fast_compact_prefix_layout": false,
+      "c1_nonzero": false,
+      "decoded_sha256": "d107a20b1606f9d73a65b21299ead4d24f177adf74edcecb65dc7648aa4bdc5f",
+      "oracle_metrics": {
+        "complex_rmse": 7.449975091875706e-13,
+        "max_complex_difference": 2.101955261562136e-12,
+        "max_real_difference": 1.842290209275177e-12,
+        "max_imag_difference": 1.982903424790905e-12,
+        "worst_slot": 2334,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 40.52421353622066
+      },
+      "oracle_snr": {
+        "signal_power": 0.00041948817670345306,
+        "signal_rms": 0.020481410515476053,
+        "noise_power": 5.550212886956844e-25,
+        "noise_rmse": 7.449975091875706e-13,
+        "snr_db": 208.78410083248798,
+        "status": "FINITE"
+      },
+      "oracle_pass": true
+    },
+    {
+      "name": "encrypt_b_level5",
+      "state": {
+        "level": 5,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "decode_path": "Fast c0 projection to the authoritative Q-prefix plaintext (zero-secret measurement adapter)",
+      "physical_row_lengths_by_component": [
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          8192,
+          8192
+        ],
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          8192,
+          8192
+        ]
+      ],
+      "active_row_sha256_by_component": [
+        [
+          "408ba5ddf37859fd5e3048f2831e2ded673e40e7c9f0cf650f21075631edfc16",
+          "ea14c70852a7cc4d6bcdb109641e0559d8bc556856c58eab1286e3213157ee6a",
+          "0b506237353a4128854463f38c0a0279b78f2d110954c69285e60d0b38e147e1",
+          "24ea341a176c669ac1f3fc7a706c4a73b5909c8c67154be5b71ef3cb032d27fb"
+        ],
+        [
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        ]
+      ],
+      "fast_compact_prefix_layout": false,
+      "c1_nonzero": false,
+      "decoded_sha256": "0c29c3cc5bdf1f565c76b88e5b427144a8e19b8f0ca5f1080fffd6f89361429a",
+      "oracle_metrics": {
+        "complex_rmse": 7.382880658194348e-13,
+        "max_complex_difference": 2.191383068089531e-12,
+        "max_real_difference": 1.889695431384064e-12,
+        "max_imag_difference": 1.9923188532972036e-12,
+        "worst_slot": 2932,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 40.56131344694563
+      },
+      "oracle_snr": {
+        "signal_power": 0.00024407108624776205,
+        "signal_rms": 0.015622774601451627,
+        "noise_power": 5.450692681314021e-25,
+        "noise_rmse": 7.382880658194348e-13,
+        "snr_db": 206.51064637490836,
+        "status": "FINITE"
+      },
+      "oracle_pass": true
+    },
+    {
+      "name": "encrypt_c_q5_level5",
+      "state": {
+        "level": 5,
+        "degree": 1,
+        "scale": "1.15292150460683059300000000000000000000000000000000000000000000000000000000000000e+18",
+        "scale_log2": 59.99999999999998,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "decode_path": "Fast c0 projection to the authoritative Q-prefix plaintext (zero-secret measurement adapter)",
+      "physical_row_lengths_by_component": [
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          8192,
+          8192
+        ],
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          8192,
+          8192
+        ]
+      ],
+      "active_row_sha256_by_component": [
+        [
+          "69d87fce726de01145c433fcbc5b8e9311fd5259635100bf70945bc305f053db",
+          "106233c62f5b40d24946f7ef34b876b08990b2a551bee454d0e1563aae03ca28",
+          "ca0e0a68f04c739433466aae1f691de58a5bebeb2768dac2565894ee5d63cc7d",
+          "40b61947bd484a291ecdf7eb819262637be2c57ed5030332c72270a73759ef2c"
+        ],
+        [
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        ]
+      ],
+      "fast_compact_prefix_layout": false,
+      "c1_nonzero": false,
+      "decoded_sha256": "91c2a25b2d75fa40deb40bcd8321509cae73066a67b6bd8bafc9e0df090bad68",
+      "oracle_metrics": {
+        "complex_rmse": 2.659799382068405e-17,
+        "max_complex_difference": 8.326672684688674e-17,
+        "max_real_difference": 8.326672684688674e-17,
+        "max_imag_difference": 6.331740687315346e-17,
+        "worst_slot": 3162,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 55.339035952556316
+      },
+      "oracle_snr": {
+        "signal_power": 0.00041948817670345306,
+        "signal_rms": 0.020481410515476053,
+        "noise_power": 7.074532752851468e-34,
+        "noise_rmse": 2.659799382068405e-17,
+        "snr_db": 297.73021963151064,
+        "status": "FINITE"
+      },
+      "oracle_pass": true
+    },
+    {
+      "name": "add_level5",
+      "state": {
+        "level": 5,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "decode_path": "Fast c0 projection to the authoritative Q-prefix plaintext (zero-secret measurement adapter)",
+      "physical_row_lengths_by_component": [
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          0,
+          0
+        ],
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          0,
+          0
+        ]
+      ],
+      "active_row_sha256_by_component": [
+        [
+          "2f740566a04d063b804b3f2e97c9fb2659d094c3c13fca9a7ccf12b42d2b86ea",
+          "0b497dfd9111bad625082df3bf4efba999b505562fdc190b41d73d4675291959",
+          "47e3ae359a6465f4b32ec60e2418c0e173ff6c4162b03a63e689c5ea610e89a7",
+          "626312873a777ce2f36526d74ba08ee30c05819b35a52383515e28cf93c5e2fb"
+        ],
+        [
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        ]
+      ],
+      "fast_compact_prefix_layout": true,
+      "c1_nonzero": false,
+      "decoded_sha256": "b8f854b3f27ab5300c30814d731b22d34dd5a6019285598322bce6b6b842b9b5",
+      "oracle_metrics": {
+        "complex_rmse": 1.0496952361433498e-12,
+        "max_complex_difference": 3.3770553321207438e-12,
+        "max_real_difference": 2.9155601544150755e-12,
+        "max_imag_difference": 3.2763227894583302e-12,
+        "worst_slot": 933,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 40.04517232314127
+      },
+      "oracle_snr": {
+        "signal_power": 0.0006648146857817971,
+        "signal_rms": 0.02578400057752476,
+        "noise_power": 1.101860088782043e-24,
+        "noise_rmse": 1.0496952361433498e-12,
+        "snr_db": 207.8057415198741,
+        "status": "FINITE"
+      },
+      "oracle_pass": true
+    },
+    {
+      "name": "mulrelin_level5",
+      "state": {
+        "level": 5,
+        "degree": 1,
+        "scale": "4.05648192073027644223265712373760000000000000000000000000000000000000000000000000e+31",
+        "scale_log2": 104.99999999999999,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "decode_path": "Fast c0 projection to the authoritative Q-prefix plaintext (zero-secret measurement adapter)",
+      "physical_row_lengths_by_component": [
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          0,
+          0
+        ],
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          0,
+          0
+        ]
+      ],
+      "active_row_sha256_by_component": [
+        [
+          "11f3ee93dff4374f2ff6599671d7cd8f27a3b06f51f8782b6d1f75a56911b34d",
+          "4f8aa51f7922a1981d781e05efd0a34db9f327b7e3a3077db4ed002edb5514b0",
+          "6046471ea7b999228fdca2f9142131aead194f16107b8e4d39bd678d900044c0",
+          "cc8b43f490bb2b4a55589dd8c5fcfe61504eddc3b60cd93e1e8eed15ebb2ad50"
+        ],
+        [
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        ]
+      ],
+      "fast_compact_prefix_layout": true,
+      "c1_nonzero": false,
+      "decoded_sha256": "f8730d66e0d59dcd63d8a83b01c512697e97d5a92b4c070c76d37df6018a4235",
+      "oracle_metrics": {
+        "complex_rmse": 2.1194631787520048e-14,
+        "max_complex_difference": 9.327888160812376e-14,
+        "max_real_difference": 8.361779151033755e-14,
+        "max_imag_difference": 9.278491061408267e-14,
+        "worst_slot": 933,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 45.96208237438647
+      },
+      "oracle_snr": {
+        "signal_power": 3.880093725822705e-7,
+        "signal_rms": 0.000622903983437472,
+        "noise_power": 4.492124166085552e-28,
+        "noise_rmse": 2.1194631787520048e-14,
+        "snr_db": 209.36390464326112,
+        "status": "FINITE"
+      },
+      "oracle_pass": true
+    },
+    {
+      "name": "rescale_q5_level4",
+      "state": {
+        "level": 4,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "decode_path": "Fast c0 projection to the authoritative Q-prefix plaintext (zero-secret measurement adapter)",
+      "physical_row_lengths_by_component": [
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          0
+        ],
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          0
+        ]
+      ],
+      "active_row_sha256_by_component": [
+        [
+          "1fe05cbcdacd37010dc8f2f0347f9fb7705ea2f4d881d94cf94c1f81170f9fa3",
+          "651918c327297fd91724b1950e8378d3a6e36244fd5ae546e7a6e084771e14d5",
+          "1c167bd5ff90fc0a47e95b77eb401bddc0771ce03154ec7b461547387a364fa7",
+          "db0996d1aaa7ff4506b79e539d6c0d6a948d4b90e31a23f7c6b50bdd5d10f32f"
+        ],
+        [
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        ]
+      ],
+      "fast_compact_prefix_layout": true,
+      "c1_nonzero": false,
+      "decoded_sha256": "33636c6803312d3d6c84343692b0777090725365c0a0048e2762bc0417b43812",
+      "oracle_metrics": {
+        "complex_rmse": 7.442066244315931e-13,
+        "max_complex_difference": 2.1986016215527257e-12,
+        "max_real_difference": 2.1110522184508707e-12,
+        "max_imag_difference": 1.931055738490367e-12,
+        "worst_slot": 96,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 40.53969562015025
+      },
+      "oracle_snr": {
+        "signal_power": 3.880093725822705e-7,
+        "signal_rms": 0.000622903983437472,
+        "noise_power": 5.538434998478663e-25,
+        "noise_rmse": 7.442066244315931e-13,
+        "snr_db": 178.45455153339992,
+        "status": "FINITE"
+      },
+      "oracle_pass": true
+    },
+    {
+      "name": "rotate_level4",
+      "state": {
+        "level": 4,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "decode_path": "Fast c0 projection to the authoritative Q-prefix plaintext (zero-secret measurement adapter)",
+      "physical_row_lengths_by_component": [
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          0
+        ],
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          0
+        ]
+      ],
+      "active_row_sha256_by_component": [
+        [
+          "b3402752992ca1a4b5434b75abac827e8effecbcfd79da5cf371293464e89c20",
+          "50b9ca951fa5c4a9a1ebbdfe3cd82a4e70bc9b67fc6886bfbbd870a73284ec7e",
+          "67fc55cb3e9a58abbd4f3307254226e022ff9fd54209b1dfadadd0494c5e1f4c",
+          "ce7aef9b6c1ac75119724093178a2d02c75963ff3bf928b68f62a9f8d68c105e"
+        ],
+        [
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        ]
+      ],
+      "fast_compact_prefix_layout": true,
+      "c1_nonzero": false,
+      "decoded_sha256": "ca39000b2b25e3f00f61acf2c086712c85b0f03e797c9f78b7bd641796f812e1",
+      "oracle_metrics": {
+        "complex_rmse": 7.442066238955308e-13,
+        "max_complex_difference": 2.1986015127059466e-12,
+        "max_real_difference": 2.111052164240762e-12,
+        "max_imag_difference": 1.93105600954091e-12,
+        "worst_slot": 95,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 40.53969617683673
+      },
+      "oracle_snr": {
+        "signal_power": 3.8800937258227034e-7,
+        "signal_rms": 0.0006229039834374719,
+        "noise_power": 5.53843499049984e-25,
+        "noise_rmse": 7.442066238955308e-13,
+        "snr_db": 178.45455153965648,
+        "status": "FINITE"
+      },
+      "oracle_pass": true
+    },
+    {
+      "name": "drop_level0",
+      "state": {
+        "level": 0,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 1,
+        "prefix_q": "36028797018652673"
+      },
+      "decode_path": "rlwe.NewDecryptor(...).DecryptNew -\u003e ckks.NewEncoder.Decode",
+      "physical_row_lengths_by_component": [
+        [
+          8192
+        ],
+        [
+          8192
+        ]
+      ],
+      "active_row_sha256_by_component": [
+        [
+          "b3402752992ca1a4b5434b75abac827e8effecbcfd79da5cf371293464e89c20"
+        ],
+        [
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        ]
+      ],
+      "fast_compact_prefix_layout": true,
+      "c1_nonzero": false,
+      "decoded_sha256": "ca39000b2b25e3f00f61acf2c086712c85b0f03e797c9f78b7bd641796f812e1",
+      "oracle_metrics": {
+        "complex_rmse": 7.442066238955308e-13,
+        "max_complex_difference": 2.1986015127059466e-12,
+        "max_real_difference": 2.111052164240762e-12,
+        "max_imag_difference": 1.93105600954091e-12,
+        "worst_slot": 95,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 40.53969617683673
+      },
+      "oracle_snr": {
+        "signal_power": 3.8800937258227034e-7,
+        "signal_rms": 0.0006229039834374719,
+        "noise_power": 5.53843499049984e-25,
+        "noise_rmse": 7.442066238955308e-13,
+        "snr_db": 178.45455153965648,
+        "status": "FINITE"
+      },
+      "oracle_pass": true
+    }
+  ],
+  "mul_relin_rescale_incremental_residual": {
+    "schema_version": "fixed-sigma-mul-relin-rescale-residual.v1",
+    "classification": "DIAGNOSTIC_ONLY",
+    "definition": "Decode(Rescale(Relin(Mul(ct_x,ct_y)))) - Decode(ct_x) * Decode(ct_y), elementwise in slot domain",
+    "encryption_mode": "sk",
+    "pk_comparison_status": "UNSUPPORTED_FAST_ZERO_SECRET_MULRELIN_REQUIRES_C1_ZERO",
+    "logical_ct_ct_mul_count": 1,
+    "logical_noise_injections": 0,
+    "sigma_coefficient_status": "NOT_ESTIMATED_CP_B_BASELINE",
+    "sampling_seed_status": "NOT_APPLICABLE_BASELINE_NO_INJECTION",
+    "mul_relin_rescale_elapsed_ns": 2074166,
+    "decoded_input_x_sha256": "b8f854b3f27ab5300c30814d731b22d34dd5a6019285598322bce6b6b842b9b5",
+    "decoded_input_y_sha256": "91c2a25b2d75fa40deb40bcd8321509cae73066a67b6bd8bafc9e0df090bad68",
+    "decoded_output_sha256": "33636c6803312d3d6c84343692b0777090725365c0a0048e2762bc0417b43812",
+    "statistics": {
+      "count": 4096,
+      "mean_real": 1.8371733706743724e-17,
+      "mean_imag": 9.123235779000881e-17,
+      "variance": 5.531307679675344e-25,
+      "rms": 7.43727622606826e-13,
+      "max_abs": 2.2054128106146474e-12,
+      "worst_slot": 96,
+      "status": "FINITE"
+    }
+  },
+  "mul_relin_rescale_total_error": {
+    "count": 4096,
+    "mean_real": 1.1939318166437263e-21,
+    "mean_imag": 4.358207853966486e-21,
+    "variance": 5.538434998478652e-25,
+    "rms": 7.442066244315931e-13,
+    "max_abs": 2.1986016215527257e-12,
+    "worst_slot": 96,
+    "status": "FINITE"
+  },
+  "limitations": [
+    "This is a public pre-Bootstrap lifecycle only; no Bootstrap method was called, so public Bootstrap acceptance/output and cold/warm timings remain unverified.",
+    "Fast zero-c1 is the pinned implementation's declared zero-secret simulation mode, not secure public-key encryption; Standard uses native generated-secret encryption.",
+    "Existing fastdiag P93/E0 traces are not E32 evidence. This public-native run performs no in-circuit tracing; the separate test-only E32 trace is a distinct diagnostic lane."
+  ]
+}
