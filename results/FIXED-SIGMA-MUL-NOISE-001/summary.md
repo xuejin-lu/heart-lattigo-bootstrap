@@ -9,6 +9,7 @@
 - CP-B 原始 Fast baseline：`ee308c9743000b5f281a84a871e7c4bd59b176c4`。
 - CP-C Fast fixed-σ helper：Secondary `fast-qprefix@9ef0315feaf59dbee03bf0852b72c76fdeb6b800`，已推送。
 - CP-C Primary harness：`a47e402a31e9181ac94dfb430e1cc337fbd8b3a0`；pair-01 證據 checkpoint `e543cf8a9aac5199ebc849e044328cbfac835d3d`。所有 CP-C runs 的 measurement source SHA-256 相同：`79b13e0978030f575458230d7068f572976ae29b3ebeed13f3a9fbc66fa8d8e5`。
+- CP-D 完整結果、journal、summary、manifest 與原始證據已提交並推送：Primary `ba9c54ba9cea89e6e2a2278c28a08e87fd640dbe`；目前 Primary `main`／Secondary `fast-qprefix` 均與 origin 同步、工作樹乾淨。
 - CP-C Standard/Fast+Noise binary SHA-256：`7521b4e33dfeeb80c266d5526d82845f1cf54c619b61dfe151bcd73af050ea76` / `8e6eb3934ed5bb545524344654314cdf7fbff67928fdd5268b18d75ad39153d8`。
 - 執行環境：Go `go1.26.4`、`darwin/arm64`；E=32、LogN13、4096 slots、N=8192、Level5→4、輸入 Scale `2^45×q5`、輸出 Scale `2^45`、SK cohort。PK unsupported，沒有將 SK 冒充 PK。
 
