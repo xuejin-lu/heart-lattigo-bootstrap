@@ -504,9 +504,13 @@ func run() error {
 
 func validateFixedSigmaNoiseOptions(opts cliOptions) error {
 	if opts.fixedSigmaNoise {
+		fastCommit := publicFixedSigmaNoiseFastSHA
+		if opts.mulRescaleChain {
+			fastCommit = publicFixedSigmaChainFastSHA
+		}
 		if opts.mode != "public-native" || publicBackendName() != "fast" || opts.publicBootstrap || opts.publicRepeatability ||
-			opts.bootstrapBudget != 0 || opts.profile != "logn13" || opts.backendCommit != publicFixedSigmaNoiseFastSHA || opts.traceFixtureOut != "" {
-			return errors.New("--fixed-sigma-noise requires zero-Bootstrap public-native LogN13 Fast at the exact fixed-sigma helper commit")
+			opts.bootstrapBudget != 0 || opts.profile != "logn13" || opts.backendCommit != fastCommit || opts.traceFixtureOut != "" {
+			return errors.New("--fixed-sigma-noise requires zero-Bootstrap public-native LogN13 Fast with its mode-specific approved helper pin")
 		}
 		if !opts.fixedSigmaSigmaProvided || !opts.fixedSigmaSeedProvided || math.IsNaN(opts.fixedSigmaNoiseSigma) || math.IsInf(opts.fixedSigmaNoiseSigma, 0) || opts.fixedSigmaNoiseSigma <= 0 {
 			return errors.New("--fixed-sigma-noise requires an explicit finite positive --fixed-sigma-noise-sigma and --fixed-sigma-noise-seed")

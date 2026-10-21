@@ -801,6 +801,15 @@ func TestFixedSigmaChainFastPinIsTaskScoped(t *testing.T) {
 	if err := validatePublicFixedSigmaChainBackendPin("standard", publicFixedSigmaChainFastSHA, "logn13"); err == nil {
 		t.Fatal("Fast chain candidate pin was accepted for Standard")
 	}
+	candidate := cliOptions{
+		mode: "public-native", profile: "logn13", backendCommit: publicFixedSigmaChainFastSHA,
+		bootstrapBudget: 0, mulRescaleChain: true, fixedSigmaNoise: true,
+		fixedSigmaNoiseSigma: 4.004280012097432, fixedSigmaNoiseSeed: 20261025,
+		fixedSigmaSigmaProvided: true, fixedSigmaSeedProvided: true,
+	}
+	if err := validateFixedSigmaNoiseOptions(candidate); (publicBackendName() == "fast") != (err == nil) {
+		t.Fatalf("chain-scoped fixed-sigma option validation mismatch for %s build: %v", publicBackendName(), err)
+	}
 }
 
 func TestFixedSigmaChainBinaryProvenanceRequiresExactCleanSource(t *testing.T) {
