@@ -835,6 +835,36 @@ func TestFixedSigmaChainBinaryProvenanceRequiresExactCleanSource(t *testing.T) {
 	}
 }
 
+func TestFixedSigmaChainV3RequiresCompleteOrderedPhaseMeasurements(t *testing.T) {
+	phases := []fixedSigmaNoisePhaseEvidence{
+		{Name: "sampling_hash_moments", ElapsedNS: 1, AllocBytes: 2, Allocs: 3},
+		{Name: "coefficient_to_qprefix_ntt", ElapsedNS: 4, AllocBytes: 5, Allocs: 6},
+		{Name: "candidate_c0_add", ElapsedNS: 7, AllocBytes: 8, Allocs: 9},
+		{Name: "qprefix_centered_capacity_check", ElapsedNS: 10, AllocBytes: 11, Allocs: 12},
+		{Name: "commit_c0", ElapsedNS: 13, AllocBytes: 14, Allocs: 15},
+	}
+	if !validFixedSigmaNoisePhaseMeasurements(phases) {
+		t.Fatal("complete ordered CP-D phase measurements rejected")
+	}
+	if validFixedSigmaNoisePhaseMeasurements(phases[:4]) {
+		t.Fatal("incomplete CP-D phase measurements accepted")
+	}
+	phases[2].Name, phases[3].Name = phases[3].Name, phases[2].Name
+	if validFixedSigmaNoisePhaseMeasurements(phases) {
+		t.Fatal("out-of-order CP-D phase measurements accepted")
+	}
+	phases[2].Name, phases[3].Name = phases[3].Name, phases[2].Name
+	phases[1].ElapsedNS = -1
+	if validFixedSigmaNoisePhaseMeasurements(phases) {
+		t.Fatal("negative CP-D phase duration accepted")
+	}
+	if !validFixedSigmaChainSchema("fast-standard-fixed-sigma-two-step-chain.v3") ||
+		!validFixedSigmaChainEvidenceSchema("fixed-sigma-two-step-chain.v3") ||
+		fixedSigmaChainVectorSchema("fast-standard-fixed-sigma-two-step-chain.v3") != "fast-standard-fixed-sigma-two-step-chain-vectors.v3" {
+		t.Fatal("v3 CP-D chain schemas are not wired together")
+	}
+}
+
 func TestFixedSigmaNoiseOptInRequiresExactFastZeroBootstrapContract(t *testing.T) {
 	valid := cliOptions{
 		mode: "public-native", profile: "logn13", backendCommit: publicFixedSigmaNoiseFastSHA,

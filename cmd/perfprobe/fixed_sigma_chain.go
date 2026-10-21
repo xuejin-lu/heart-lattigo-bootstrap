@@ -289,6 +289,9 @@ func runPublicFixedSigmaChain(
 				evidence.QPrefixCheckedCoefficients != full.N() || !evidence.QPrefixStrictFit || !validSHA256Hex(evidence.CoefficientSHA256) {
 				return nil, nil, fmt.Errorf("%s fixed-sigma helper returned incomplete strict Q-prefix evidence", name)
 			}
+			if !validFixedSigmaNoisePhaseMeasurements(evidence.PhaseMeasurements) {
+				return nil, nil, fmt.Errorf("%s fixed-sigma helper returned incomplete CP-D phase measurements", name)
+			}
 			if perfmeasure.CiphertextStateOf(rescaled, q, outputLevel) != beforeState || !reflect.DeepEqual(*rescaled.MetaData, beforeMetadata) ||
 				rescaled.IsNTT != beforeNTT || rescaled.IsMontgomery != beforeMontgomery {
 				return nil, nil, fmt.Errorf("%s fixed-sigma injection changed Level/Scale/domain metadata", name)
@@ -392,7 +395,7 @@ func runPublicFixedSigmaChain(
 		"C": perfmeasure.Fingerprint(valuesC),
 	}
 	chain := &fixedSigmaChainEvidence{
-		SchemaVersion: "fixed-sigma-two-step-chain.v2", Classification: "DIAGNOSTIC_ONLY",
+		SchemaVersion: "fixed-sigma-two-step-chain.v3", Classification: "DIAGNOSTIC_ONLY",
 		PrimaryBuildCommit: primaryBuildCommit, PrimaryBuildClean: primaryBuildClean,
 		LogicalCtCtOperations: 2, LogicalNoiseInjections: 0,
 		InputMessageSHA256: inputMessageHashes, Operations: stageOperations,
@@ -408,7 +411,7 @@ func runPublicFixedSigmaChain(
 		chain.SigmaCoefficient = &sigma
 		chain.Stage2SeedDerivation = "stage2 seed is stage1 seed + 1; both actual seeds are recorded on their operation evidence"
 	}
-	mode, schema, vectorSchema := "fixed-sigma-two-step-chain", "fast-standard-fixed-sigma-two-step-chain.v2", "fast-standard-fixed-sigma-two-step-chain-vectors.v2"
+	mode, schema, vectorSchema := "fixed-sigma-two-step-chain", "fast-standard-fixed-sigma-two-step-chain.v3", "fast-standard-fixed-sigma-two-step-chain-vectors.v3"
 	status := "PASS_ZERO_BOOTSTRAP_TWO_STEP_CHAIN"
 	limitations := []string{
 		"Diagnostic-only two-step MulRelin+Rescale evidence; no Bootstrap call, output, or performance claim is included.",
@@ -535,6 +538,11 @@ func validatePublicFixedSigmaChainArtifact(doc publicNativeDocument, vectors pub
 	}
 	if doc.SchemaVersion == "fast-standard-fixed-sigma-two-step-chain.v2" &&
 		(doc.FixedSigmaChain.SchemaVersion != "fixed-sigma-two-step-chain.v2" ||
+			doc.FixedSigmaChain.PrimaryBuildCommit != doc.PrimaryCommit || !doc.FixedSigmaChain.PrimaryBuildClean) {
+		return errors.New("chain binary was not built from the clean recorded Primary commit")
+	}
+	if doc.SchemaVersion == "fast-standard-fixed-sigma-two-step-chain.v3" &&
+		(doc.FixedSigmaChain.SchemaVersion != "fixed-sigma-two-step-chain.v3" ||
 			doc.FixedSigmaChain.PrimaryBuildCommit != doc.PrimaryCommit || !doc.FixedSigmaChain.PrimaryBuildClean) {
 		return errors.New("chain binary was not built from the clean recorded Primary commit")
 	}
@@ -713,6 +721,10 @@ func validatePublicFixedSigmaChainArtifact(doc publicNativeDocument, vectors pub
 				!operation.Residual.FixedSigmaNoise.QPrefixStrictFit {
 				return fmt.Errorf("%s fixed-sigma residual, delta, or strict Q-prefix evidence does not recompute", stageName)
 			}
+			if doc.SchemaVersion == "fast-standard-fixed-sigma-two-step-chain.v3" &&
+				!validFixedSigmaNoisePhaseMeasurements(operation.Residual.FixedSigmaNoise.PhaseMeasurements) {
+				return fmt.Errorf("%s fixed-sigma phase measurements are incomplete", stageName)
+			}
 		}
 	}
 	if backend == "standard" && doc.FixedSigmaChain.LogicalNoiseInjections != 0 ||
@@ -750,11 +762,13 @@ func fixedSigmaChainDispatchEvidence(backend string) string {
 }
 
 func validFixedSigmaChainSchema(value string) bool {
-	return value == "fast-standard-fixed-sigma-two-step-chain.v1" || value == "fast-standard-fixed-sigma-two-step-chain.v2"
+	return value == "fast-standard-fixed-sigma-two-step-chain.v1" || value == "fast-standard-fixed-sigma-two-step-chain.v2" ||
+		value == "fast-standard-fixed-sigma-two-step-chain.v3"
 }
 
 func validFixedSigmaChainEvidenceSchema(value string) bool {
-	return value == "fixed-sigma-two-step-chain.v1" || value == "fixed-sigma-two-step-chain.v2"
+	return value == "fixed-sigma-two-step-chain.v1" || value == "fixed-sigma-two-step-chain.v2" ||
+		value == "fixed-sigma-two-step-chain.v3"
 }
 
 func fixedSigmaChainVectorSchema(value string) string {
@@ -763,9 +777,27 @@ func fixedSigmaChainVectorSchema(value string) string {
 		return "fast-standard-fixed-sigma-two-step-chain-vectors.v1"
 	case "fast-standard-fixed-sigma-two-step-chain.v2":
 		return "fast-standard-fixed-sigma-two-step-chain-vectors.v2"
+	case "fast-standard-fixed-sigma-two-step-chain.v3":
+		return "fast-standard-fixed-sigma-two-step-chain-vectors.v3"
 	default:
 		return ""
 	}
+}
+
+func validFixedSigmaNoisePhaseMeasurements(phases []fixedSigmaNoisePhaseEvidence) bool {
+	want := [...]string{
+		"sampling_hash_moments", "coefficient_to_qprefix_ntt", "candidate_c0_add",
+		"qprefix_centered_capacity_check", "commit_c0",
+	}
+	if len(phases) != len(want) {
+		return false
+	}
+	for index, phase := range phases {
+		if phase.Name != want[index] || phase.ElapsedNS < 0 {
+			return false
+		}
+	}
+	return true
 }
 
 func validateFixedSigmaChainBinaryProvenance(primaryCommit, buildCommit, vcsModified string) (bool, error) {

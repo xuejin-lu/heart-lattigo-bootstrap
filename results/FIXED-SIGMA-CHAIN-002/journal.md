@@ -1,6 +1,6 @@
 # FIXED-SIGMA-CHAIN-002 — durable experiment journal
 
-**Status:** `IN_PROGRESS_CP_C`
+**Status:** `IN_PROGRESS_CP_D`
 **Date created:** 2026-10-22 (Asia/Taipei)
 **Prior reviewed result:** `FIXED-SIGMA-MUL-NOISE-001`: `ACCEPTED_SCOPED_RMSE_ONLY` (not Gaussian/tail equivalence).
 **Frozen coefficient σ:** `4.004280012097432` from prior calibration; not to be changed.
@@ -11,8 +11,8 @@
 |---|---|---|
 | CP-A source/math Level3 gate | PASS_SCOPED | source map/theory/scale/row-authority gate recorded below; no Secondary edit |
 | CP-B two-step baseline | PASS_SCOPED_ONE_PROVENANCE_CLEAN_PAIR | three captures attempted (budget exhausted); pair 01 is the accepted matched baseline; pair 02/03 excluded for stale-binary provenance |
-| CP-C opt-in fixed-σ two-step chain | IMPLEMENTED_NOT_CAPTURED | Secondary Level3 helper commit exists; Primary candidate pin and build-time revision gate are under validation; 2 explicit injections/run |
-| CP-D cost attribution + report | NOT_STARTED | cheap diagnostics; no Bootstrap |
+| CP-C opt-in fixed-σ two-step chain | PASS_SCOPED_RMSE_ONLY | Three matched Standard/Fast+σ pairs passed; exactly 2 explicit injections/run; no distribution/tail-equivalence claim |
+| CP-D cost attribution + report | IMPLEMENTED_CAPTURE_PENDING | Existing helper split into five timed/allocation phases; bounded Fast-only captures pending; no Bootstrap |
 
 At journal creation no implementation, measurement, σ adjustment or performance optimization had been run. Preserve checkpoints, source hashes, task-scoped budgets and safety rules.
 
@@ -64,3 +64,37 @@ CP-B Bootstrap spend: Standard `0/0`, Fast `0/0`; no LogN16, large benchmark, or
 Secondary commit `b5c55e0b82dd6ad4a333d079141d33745edcb379` extends only the opt-in helper's accepted output profile from Level4 to Level4-or-Level3 at LogN13/Scale2^45. Both profiles still require exactly four Q-prefix rows, NTT/non-Montgomery form, the Fast zero-secret c1=0 invariant, canonical active residues, and the existing strict centered-capacity checker. Level2/Level5 remain rejected. The zero-sigma early return and ordinary Fast operations are unchanged. Test evidence: `go test ./schemes/ckks -run 'TestFixedSigmaCoefficientNoise' -count=1`, the Fast Level1/Level3 MulRelin Q-prefix test, `go test ./schemes/ckks/internal/fastcore`, and `go vet ./schemes/ckks ./schemes/ckks/fast ./schemes/ckks/internal/fastcore` passed.
 
 Primary commit `db2f05de462ddee9a96d8d03c4857d7414ada034` adds a chain-only pin for that candidate commit and requires Go build metadata `vcs.revision == Primary HEAD` plus `vcs.modified=false` before a chain capture; schema v2 records both facts. The generic Fast pin remains unchanged. CP-C construction initially stopped at CLI validation because the existing fixed-sigma opt-in accepted only the Level4 helper pin; the chain mode now accepts the chain-only pin. This rejected attempt occurred before evaluator construction or ciphertext operations, wrote no artifact, and consumed zero Bootstrap calls. The fix passed the Fast suite, genuine Standard focused tests, and build-provenance unit tests.
+
+### CP-C capture results — completed, scoped RMSE-only evidence
+
+**Status: `PASS_SCOPED_RMSE_ONLY`.** The accepted CP-C binaries were built from clean Primary `718018cafdd6e2c7c86e6a14342e44b99598e07d` (`go version -m`: matching `vcs.revision`, `vcs.modified=false`), genuine Standard `5dbffbdea05394de2ca3a432ed5318aa832e3f40`, and then-current Fast candidate `b5c55e0b82dd6ad4a333d079141d33745edcb379`. Binary SHA-256: Standard `a2fbf1a0c94536b2bc1b5bd67999567bae05be1382638e7a6b5c7320fa002e32`; Fast `426f7b57e5f5e3223093248d06fc227a79c397ea4b9575aa103e9f899080103a`. Measurement source SHA-256 was `aa42bb4d2d753b0e909a5fbb3139bccf7e369737e4fb5ce4ec28cf7f0e314fb5`. Effective workload remained LogN13/LogSlots12/4096 slots/E32, Scale `2^45`, q5 then q4 divisors, output Levels 4 then 3; the same frozen coefficient sigma `4.004280012097432` was applied after each complete operation. Each run recorded exactly two injections with seeds `(20261025,20261026)`, `(20261027,20261028)`, `(20261029,20261030)`, strict Q-prefix fit, and 8192 checked coefficients per injection. Every pair comparator passed and reported zero Bootstrap calls.
+
+The compact pair artifacts are committed as `cp-c-pair-01.json`, `cp-c-pair-02.json`, and `cp-c-pair-03.json`; SHA-256 values are respectively `0f61f4e2e9945f8179a2ccaa29013b9f8761805a817b684f25e1763dbb64d5cf`, `248f9f96a7acd3eb522c53a9450ac94f88c23dd7c6f8e14139d47c2ce52f9f71`, and `d11a1dcede135f5fd9bd77bb98f45eb064c07786aa891ba183572206159b637c`. These 20-KB summaries retain per-stage decoded incremental/total metrics, cross-backend covariance, injection evidence, and provenance. The corresponding 8–10-MB raw result/vector files remain outside Git under `/private/tmp/fixed-sigma-chain-002-cp-c-v2-*`; exact result/vector hashes and paths were checked when captured and are retained in the local run log. The separate reference result hashes are Standard `b946bca0b65f56329b9415aab1eae1e4c2e43f997f2cfb98af39050c92ba88cd` and Fast helper-off `e6ecd3ee0010cebc477c0f960e3530ff63f3453e9ac440d8911dd0466cc0c63f`; their vectors remain outside Git.
+
+| Pair / stage | Standard incremental residual: mean (Re, Im), variance, RMS, max | Fast+σ incremental residual: mean (Re, Im), variance, RMS, max | Cross-backend covariance: (Re, Im), correlation magnitude |
+|---|---|---|---|
+| 01 / Stage 1 | `(-2.44842e-15, 6.03509e-14)`; `1.07018e-22`; `1.03451e-11`; `7.09024e-11` | `(8.52835e-14, -8.51739e-14)`; `1.07854e-22`; `1.03860e-11`; `2.99675e-11` | `(1.57821e-24, -4.38154e-25)`; `0.01525` |
+| 01 / Stage 2 | `(1.62203e-13, -2.42147e-14)`; `1.03668e-22`; `1.01831e-11`; `6.32288e-11` | `(-1.40198e-13, -4.67228e-14)`; `1.07631e-22`; `1.03756e-11`; `2.76059e-11` | `(-5.08130e-26, 1.20149e-25)`; `0.00123` |
+| 02 / Stage 1 | `(-8.59322e-14, 5.61296e-14)`; `1.08004e-22`; `1.03930e-11`; `5.08403e-11` | `(1.70549e-13, -5.67522e-14)`; `1.06034e-22`; `1.02988e-11`; `2.74403e-11` | `(3.22033e-24, 2.55383e-25)`; `0.03019` |
+| 02 / Stage 2 | `(9.11829e-14, -1.25810e-13)`; `1.06076e-22`; `1.03005e-11`; `5.02483e-11` | `(-5.65277e-14, 3.53843e-14)`; `1.06737e-22`; `1.03316e-11`; `2.96636e-11` | `(-1.06268e-24, -8.09105e-25)`; `0.01255` |
+| 03 / Stage 1 | `(-2.80681e-14, 5.71843e-14)`; `1.07011e-22`; `1.03448e-11`; `5.11833e-11` | `(2.84235e-13, -1.13596e-13)`; `1.05904e-22`; `1.02955e-11`; `3.06560e-11` | `(-1.05163e-24, -7.45360e-25)`; `0.01211` |
+| 03 / Stage 2 | `(8.84549e-14, -7.44213e-14)`; `1.09250e-22`; `1.04529e-11`; `6.50681e-11` | `(-4.23468e-15, 9.48080e-15)`; `1.07683e-22`; `1.03770e-11`; `3.06130e-11` | `(1.48672e-24, -1.28792e-24)`; `0.01814` |
+
+| Pair / stage | Total-oracle RMS Standard / Fast+σ | Frozen σ, seed, empirical coefficient RMS | One-shot helper elapsed |
+|---|---:|---|---:|
+| 01 / Stage 1 | `1.03474e-11 / 1.03858e-11` | `4.004280012097432`, `20261025`, `4.02563` | `1,146,625 ns` |
+| 01 / Stage 2 | `1.01945e-11 / 1.03781e-11` | `4.004280012097432`, `20261026`, `4.02602` | `1,171,125 ns` |
+| 02 / Stage 1 | `1.03947e-11 / 1.02985e-11` | `4.004280012097432`, `20261027`, `3.99067` | `1,047,917 ns` |
+| 02 / Stage 2 | `1.03059e-11 / 1.03325e-11` | `4.004280012097432`, `20261028`, `4.00486` | `1,148,625 ns` |
+| 03 / Stage 1 | `1.03438e-11 / 1.02957e-11` | `4.004280012097432`, `20261029`, `3.98859` | `1,211,625 ns` |
+| 03 / Stage 2 | `1.04587e-11 / 1.03807e-11` | `4.004280012097432`, `20261030`, `4.02492` | `1,127,458 ns` |
+
+The stagewise RMS values are close in these six observations, but variances differ and Fast+σ maximum residuals are much smaller than Standard. Covariance/correlation and empirical coefficient moments do not establish Gaussian, tail, or distribution equivalence. Classification remains **`RMSE_ONLY`**; sigma was not adjusted. The unmodified Fast baseline is the accepted CP-B pair 01 in the prior section, and the CP-C helper-off run confirms the opt-in path's reference without injection. Stage 2 total-oracle error is recorded separately and includes propagation of Stage 1 error.
+
+### CP-D instrumentation implementation — bounded capture pending
+
+Secondary commit `1e7828293c36f9845e30723ba4e9500d84bb50d2` adds phase timing and allocation deltas to the existing explicit helper only. It partitions the unchanged helper work into sampling/hash/moments, coefficient-to-four-row-residue plus NTT, candidate-c0 clone/add, the existing centered-Q-prefix capacity check, and the final c0 commit. The strict checker and all fail-closed gates remain in place; sigma-zero still returns before measuring or touching the ciphertext. It does not alter ordinary Fast arithmetic.
+
+The outer `perfprobe` phase records total helper elapsed time and allocation; phase elapsed time uses `time.Since`, while per-phase allocation uses deltas of `runtime.MemStats.TotalAlloc` and `Mallocs`. Allocation deltas are process-wide snapshots and may include runtime background activity. Each inner elapsed duration excludes its two `ReadMemStats` calls; the outer helper phase includes the measurement scaffolding. CP-D will report both the phase sum and outer helper duration so this measurement overhead is visible rather than silently attributed to arithmetic. No optimization or capacity-check relaxation is authorized.
+
+Verification after the instrumentation edit: `go test ./schemes/ckks -run '^TestFixedSigmaCoefficientNoise' -count=1` and `go vet ./schemes/ckks ./schemes/ckks/fast ./schemes/ckks/internal/fastcore` passed. Primary Fast perfprobe/perfmeasure/numericalmetrics tests and vet passed; the genuine Standard tagged focused tests passed. A broad Standard-tag package test also ran only its ordinary unit fixtures (no experimental Bootstrap build tag): it failed historical `TestStandardAZeroBootstrapKeyAuditChecksQAndP` / `TestStandardAZeroDiagnosticUsesNativeEncryptNewInput` assertions and the relative-source fixture `TestVerifyCompiledBackendSourceResolvesRelativeReplacePath`; these do not touch the CP-D path. The CP-D capture remains pending and must use the updated chain-only Fast pin above.

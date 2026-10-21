@@ -33,7 +33,7 @@ const (
 	publicCurrentFastSHA               = "2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f"
 	publicFixedSigmaFastSHA            = "ee308c9743000b5f281a84a871e7c4bd59b176c4"
 	publicFixedSigmaNoiseFastSHA       = "9ef0315feaf59dbee03bf0852b72c76fdeb6b800"
-	publicFixedSigmaChainFastSHA       = "b5c55e0b82dd6ad4a333d079141d33745edcb379"
+	publicFixedSigmaChainFastSHA       = "1e7828293c36f9845e30723ba4e9500d84bb50d2"
 	publicConfigSHA                    = "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98"
 	publicInputSHA                     = "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285"
 	publicWorkloadSHA                  = "00b70a2e77887c7d6a41db1859246f6513f2c984915de648734e5dd8c584cf74"
@@ -264,21 +264,29 @@ type publicVectorDocument struct {
 }
 
 type fixedSigmaNoiseEvidence struct {
-	SigmaCoefficient           float64 `json:"sigma_coefficient"`
-	SamplingSeed               int64   `json:"sampling_seed"`
-	CoefficientSampleCount     int     `json:"coefficient_sample_count"`
-	CoefficientMean            float64 `json:"coefficient_mean"`
-	CoefficientVariance        float64 `json:"coefficient_variance"`
-	CoefficientRMS             float64 `json:"coefficient_rms"`
-	CoefficientMaxAbs          uint64  `json:"coefficient_max_abs"`
-	CoefficientSHA256          string  `json:"coefficient_sha256"`
-	SamplingAlgorithm          string  `json:"sampling_algorithm"`
-	QPrefixRows                int     `json:"qprefix_rows"`
-	QPrefixCheckedCoefficients int     `json:"qprefix_checked_coefficients"`
-	QPrefixMaxAbs              string  `json:"qprefix_max_abs"`
-	QPrefixPrefixProduct       string  `json:"qprefix_prefix_product"`
-	QPrefixStrictFit           bool    `json:"qprefix_strict_fit"`
-	DispatchEvidence           string  `json:"dispatch_evidence"`
+	SigmaCoefficient           float64                        `json:"sigma_coefficient"`
+	SamplingSeed               int64                          `json:"sampling_seed"`
+	CoefficientSampleCount     int                            `json:"coefficient_sample_count"`
+	CoefficientMean            float64                        `json:"coefficient_mean"`
+	CoefficientVariance        float64                        `json:"coefficient_variance"`
+	CoefficientRMS             float64                        `json:"coefficient_rms"`
+	CoefficientMaxAbs          uint64                         `json:"coefficient_max_abs"`
+	CoefficientSHA256          string                         `json:"coefficient_sha256"`
+	SamplingAlgorithm          string                         `json:"sampling_algorithm"`
+	QPrefixRows                int                            `json:"qprefix_rows"`
+	QPrefixCheckedCoefficients int                            `json:"qprefix_checked_coefficients"`
+	QPrefixMaxAbs              string                         `json:"qprefix_max_abs"`
+	QPrefixPrefixProduct       string                         `json:"qprefix_prefix_product"`
+	QPrefixStrictFit           bool                           `json:"qprefix_strict_fit"`
+	DispatchEvidence           string                         `json:"dispatch_evidence"`
+	PhaseMeasurements          []fixedSigmaNoisePhaseEvidence `json:"phase_measurements,omitempty"`
+}
+
+type fixedSigmaNoisePhaseEvidence struct {
+	Name       string `json:"name"`
+	ElapsedNS  int64  `json:"elapsed_ns"`
+	AllocBytes uint64 `json:"alloc_bytes"`
+	Allocs     uint64 `json:"allocs"`
 }
 
 type publicOperationResidual struct {

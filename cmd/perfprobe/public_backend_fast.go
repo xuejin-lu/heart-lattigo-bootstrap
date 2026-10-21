@@ -4,6 +4,7 @@ package main
 
 import (
 	"fmt"
+	"reflect"
 
 	"github.com/tuneinsight/lattigo/v6/circuits/ckks/bootstrapping"
 	"github.com/tuneinsight/lattigo/v6/core/rlwe"
@@ -48,6 +49,39 @@ func injectPublicFixedSigmaNoise(evaluator *ckks.Evaluator, ct *rlwe.Ciphertext,
 		QPrefixPrefixProduct:       result.Capacity.PrefixProduct,
 		QPrefixStrictFit:           result.Capacity.StrictFit,
 		DispatchEvidence:           result.DispatchEvidence,
+		PhaseMeasurements:          fixedSigmaNoisePhaseMeasurements(result),
 	}
 	return evidence, err
+}
+
+func fixedSigmaNoisePhaseMeasurements(evidence any) []fixedSigmaNoisePhaseEvidence {
+	value := reflect.ValueOf(evidence)
+	if value.Kind() == reflect.Pointer {
+		value = value.Elem()
+	}
+	if !value.IsValid() || value.Kind() != reflect.Struct {
+		return nil
+	}
+	phases := value.FieldByName("Phases")
+	if !phases.IsValid() || phases.Kind() != reflect.Slice {
+		return nil
+	}
+	measurements := make([]fixedSigmaNoisePhaseEvidence, phases.Len())
+	for index := 0; index < phases.Len(); index++ {
+		phase := phases.Index(index)
+		if phase.Kind() != reflect.Struct {
+			return nil
+		}
+		name, elapsed, allocBytes, allocs := phase.FieldByName("Name"), phase.FieldByName("ElapsedNS"), phase.FieldByName("AllocBytes"), phase.FieldByName("Allocs")
+		if !name.IsValid() || !elapsed.IsValid() || !allocBytes.IsValid() || !allocs.IsValid() ||
+			name.Kind() != reflect.String || elapsed.Kind() != reflect.Int64 ||
+			allocBytes.Kind() != reflect.Uint64 || allocs.Kind() != reflect.Uint64 {
+			return nil
+		}
+		measurements[index] = fixedSigmaNoisePhaseEvidence{
+			Name: name.String(), ElapsedNS: elapsed.Int(),
+			AllocBytes: allocBytes.Uint(), Allocs: allocs.Uint(),
+		}
+	}
+	return measurements
 }
