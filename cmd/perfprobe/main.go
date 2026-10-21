@@ -155,6 +155,8 @@ type cliOptions struct {
 	fixedSigmaSigmaProvided bool
 	fixedSigmaSeedProvided  bool
 	mulRescaleChain         bool
+	fixedSigmaAblationArm   string
+	fixedSigmaCVariant      string
 }
 
 func main() {
@@ -175,6 +177,13 @@ func main() {
 	if len(os.Args) > 1 && os.Args[1] == "compare-public" {
 		if err := runPublicCompare(os.Args[2:]); err != nil {
 			fmt.Fprintln(os.Stderr, "perfprobe compare-public:", err)
+			os.Exit(1)
+		}
+		return
+	}
+	if len(os.Args) > 1 && os.Args[1] == "compare-public-ablation" {
+		if err := runPublicFixedSigmaAblationCompare(os.Args[2:]); err != nil {
+			fmt.Fprintln(os.Stderr, "perfprobe compare-public-ablation:", err)
 			os.Exit(1)
 		}
 		return
@@ -223,8 +232,10 @@ func run() error {
 	flag.IntVar(&opts.standardTrials, "standard-trials", 3, "independent Standard secret/evaluation-key numerical trials")
 	flag.BoolVar(&opts.fixedSigmaNoise, "fixed-sigma-noise", false, "public-native Fast-only diagnostic: explicitly inject fixed-sigma noise after each complete MulRelin+Rescale stage")
 	flag.Float64Var(&opts.fixedSigmaNoiseSigma, "fixed-sigma-noise-sigma", 0, "fixed-sigma diagnostic coefficient-domain standard deviation; requires --fixed-sigma-noise")
-	flag.Int64Var(&opts.fixedSigmaNoiseSeed, "fixed-sigma-noise-seed", 0, "deterministic fixed-sigma diagnostic sampler seed; requires --fixed-sigma-noise")
+	flag.Int64Var(&opts.fixedSigmaNoiseSeed, "fixed-sigma-noise-seed", 0, "deterministic fixed-sigma sampler seed; required by --fixed-sigma-noise or --fixed-sigma-ablation-arm")
 	flag.BoolVar(&opts.mulRescaleChain, "mul-rescale-chain", false, "public-native zero-Bootstrap two-step ct×ct MulRelin+Rescale diagnostic chain")
+	flag.StringVar(&opts.fixedSigmaAblationArm, "fixed-sigma-ablation-arm", "", "research-only chain arm: OFF/OFF, ON/OFF, OFF/ON, or ON/ON; uses the frozen task sigma")
+	flag.StringVar(&opts.fixedSigmaCVariant, "fixed-sigma-c-variant", "", "research-only chain C input: canonical or stronger-c4")
 	flag.Parse()
 	flag.Visit(func(item *flag.Flag) {
 		switch item.Name {
@@ -503,6 +514,35 @@ func run() error {
 }
 
 func validateFixedSigmaNoiseOptions(opts cliOptions) error {
+	if opts.fixedSigmaCVariant != "" && opts.fixedSigmaAblationArm == "" {
+		return errors.New("--fixed-sigma-c-variant requires --fixed-sigma-ablation-arm")
+	}
+	if opts.fixedSigmaAblationArm != "" {
+		if opts.fixedSigmaNoise || opts.fixedSigmaSigmaProvided {
+			return errors.New("fixed-sigma ablation arms use the charter-frozen sigma and cannot be combined with --fixed-sigma-noise options")
+		}
+		if _, _, err := fixedSigmaAblationInjectionStages(opts.fixedSigmaAblationArm); err != nil {
+			return err
+		}
+		if !opts.mulRescaleChain || opts.mode != "public-native" || opts.publicBootstrap || opts.publicRepeatability ||
+			opts.bootstrapBudget != 0 || opts.preflightPair != "" || opts.traceFixtureOut != "" ||
+			opts.profile != "logn13" || !opts.fixedSigmaSeedProvided {
+			return errors.New("--fixed-sigma-ablation-arm requires a seeded zero-Bootstrap LogN13 public-native --mul-rescale-chain run")
+		}
+		if opts.fixedSigmaCVariant != "canonical" && opts.fixedSigmaCVariant != "stronger-c4" {
+			return errors.New("--fixed-sigma-ablation-arm requires --fixed-sigma-c-variant=canonical or stronger-c4")
+		}
+		if opts.fixedSigmaNoiseSeed == int64(^uint64(0)>>1) {
+			return errors.New("--fixed-sigma-noise-seed must leave room for the derived stage2 seed")
+		}
+		if publicBackendName() == "standard" && opts.fixedSigmaAblationArm != "OFF/OFF" {
+			return errors.New("genuine Standard ablation reference must use OFF/OFF; artificial noise is Fast-only")
+		}
+		if publicBackendName() == "fast" && opts.backendCommit != publicFixedSigmaChainFastSHA {
+			return errors.New("fixed-sigma ablation requires the charter-pinned Fast source")
+		}
+		return nil
+	}
 	if opts.fixedSigmaNoise {
 		fastCommit := publicFixedSigmaNoiseFastSHA
 		if opts.mulRescaleChain {
@@ -515,7 +555,7 @@ func validateFixedSigmaNoiseOptions(opts cliOptions) error {
 		if !opts.fixedSigmaSigmaProvided || !opts.fixedSigmaSeedProvided || math.IsNaN(opts.fixedSigmaNoiseSigma) || math.IsInf(opts.fixedSigmaNoiseSigma, 0) || opts.fixedSigmaNoiseSigma <= 0 {
 			return errors.New("--fixed-sigma-noise requires an explicit finite positive --fixed-sigma-noise-sigma and --fixed-sigma-noise-seed")
 		}
-	} else if opts.fixedSigmaSigmaProvided || opts.fixedSigmaSeedProvided {
+	} else if opts.fixedSigmaSigmaProvided || opts.fixedSigmaSeedProvided || opts.fixedSigmaCVariant != "" {
 		return errors.New("--fixed-sigma-noise-sigma and --fixed-sigma-noise-seed require --fixed-sigma-noise")
 	}
 	if opts.mulRescaleChain && opts.mode != "public-native" {

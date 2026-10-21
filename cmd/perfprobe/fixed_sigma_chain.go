@@ -71,6 +71,11 @@ func runPublicFixedSigmaChain(
 	if err != nil {
 		return err
 	}
+	if opts.fixedSigmaAblationArm != "" && opts.fixedSigmaCVariant == "stronger-c4" {
+		for index := range valuesC {
+			valuesC[index] *= 4
+		}
+	}
 	inputHash := perfmeasure.Fingerprint(valuesA)
 	if profile.InputSHA256 != "" && inputHash != profile.InputSHA256 {
 		return fmt.Errorf("canonical fixed-sigma chain %s input fingerprint mismatch: %s", profile.Name, inputHash)
@@ -213,6 +218,22 @@ func runPublicFixedSigmaChain(
 	if backend.name == "standard" && !c1Nonzero {
 		return errors.New("genuine Standard EncryptNew(C,q4 scale) produced zero c1")
 	}
+	var fastInputRows map[string]string
+	if opts.fixedSigmaAblationArm != "" && backend.name == "fast" {
+		fastInputRows = make(map[string]string)
+		for _, input := range []struct {
+			name string
+			ct   *rlwe.Ciphertext
+		}{{"A", ctA}, {"B", ctB}, {"C_q5", ctCq5}, {"C_q4", ctCq4}} {
+			rows, err := fixedSigmaCiphertextActiveRowHashes(input.ct)
+			if err != nil {
+				return fmt.Errorf("hash Fast %s input rows: %w", input.name, err)
+			}
+			for row, hash := range rows {
+				fastInputRows[input.name+"."+row] = hash
+			}
+		}
+	}
 	decodedCq4, err := addCheckpoint("encrypt_c_q4_level4", ctCq4, valuesC, false)
 	if err != nil {
 		return err
@@ -220,6 +241,17 @@ func runPublicFixedSigmaChain(
 
 	stageOperations := make([]fixedSigmaChainOperation, 0, 2)
 	stageVectors := make(map[string]fixedSigmaChainStageVectors, 2)
+	injectStage1, injectStage2 := opts.fixedSigmaNoise, opts.fixedSigmaNoise
+	if opts.fixedSigmaAblationArm != "" {
+		injectStage1, injectStage2, err = fixedSigmaAblationInjectionStages(opts.fixedSigmaAblationArm)
+		if err != nil {
+			return err
+		}
+	}
+	injectionSigma := opts.fixedSigmaNoiseSigma
+	if opts.fixedSigmaAblationArm != "" {
+		injectionSigma = fixedSigmaChainCoefficientSigma
+	}
 	runStage := func(
 		name, inputXName, inputYName, productName, outputName string,
 		ctInputX, ctInputY *rlwe.Ciphertext,
@@ -267,7 +299,8 @@ func runPublicFixedSigmaChain(
 		}
 		var injection *fixedSigmaNoiseEvidence
 		var injectionElapsedNS int64
-		if opts.fixedSigmaNoise {
+		injectThisStage := name == "stage1" && injectStage1 || name == "stage2" && injectStage2
+		if injectThisStage {
 			beforeState := perfmeasure.CiphertextStateOf(rescaled, q, outputLevel)
 			beforeMetadata := *rescaled.MetaData
 			beforeNTT, beforeMontgomery := rescaled.IsNTT, rescaled.IsMontgomery
@@ -277,14 +310,14 @@ func runPublicFixedSigmaChain(
 				beforeC1Rows[row] = hashUint64Row(rescaled.Value[1].Coeffs[row])
 			}
 			evidence, phase, injectErr := measurePublicPhase(name+"_fixed_sigma_injection", func() (fixedSigmaNoiseEvidence, error) {
-				return injectPublicFixedSigmaNoise(backend.evaluator, rescaled, opts.fixedSigmaNoiseSigma, seed)
+				return injectPublicFixedSigmaNoise(backend.evaluator, rescaled, injectionSigma, seed)
 			})
 			phases = append(phases, phase)
 			if injectErr != nil {
 				return nil, nil, fmt.Errorf("%s fixed-sigma injection: %w", name, injectErr)
 			}
 			injectionElapsedNS = phase.ElapsedNS
-			if evidence.SigmaCoefficient != opts.fixedSigmaNoiseSigma || evidence.SamplingSeed != seed ||
+			if evidence.SigmaCoefficient != injectionSigma || evidence.SamplingSeed != seed ||
 				evidence.CoefficientSampleCount != full.N() || evidence.QPrefixRows != rows ||
 				evidence.QPrefixCheckedCoefficients != full.N() || !evidence.QPrefixStrictFit || !validSHA256Hex(evidence.CoefficientSHA256) {
 				return nil, nil, fmt.Errorf("%s fixed-sigma helper returned incomplete strict Q-prefix evidence", name)
@@ -405,13 +438,40 @@ func runPublicFixedSigmaChain(
 			"Standard uses genuine native SK encryption; Fast uses the pinned intentionally insecure zero-secret c1=0 mode. PK comparison remains unsupported.",
 		},
 	}
-	if opts.fixedSigmaNoise {
-		chain.LogicalNoiseInjections = 2
-		sigma := opts.fixedSigmaNoiseSigma
-		chain.SigmaCoefficient = &sigma
-		chain.Stage2SeedDerivation = "stage2 seed is stage1 seed + 1; both actual seeds are recorded on their operation evidence"
+	if opts.fixedSigmaNoise || opts.fixedSigmaAblationArm != "" {
+		chain.LogicalNoiseInjections = 0
+		if injectStage1 {
+			chain.LogicalNoiseInjections++
+		}
+		if injectStage2 {
+			chain.LogicalNoiseInjections++
+		}
+		if chain.LogicalNoiseInjections != 0 {
+			sigma := injectionSigma
+			chain.SigmaCoefficient = &sigma
+		}
+		if opts.fixedSigmaAblationArm != "" {
+			chain.Stage2SeedDerivation = "stage2 seed is stage1 seed + 1; OFF stages do not invoke the sampler"
+		} else {
+			chain.Stage2SeedDerivation = "stage2 seed is stage1 seed + 1; both actual seeds are recorded on their operation evidence"
+		}
+	}
+	if opts.fixedSigmaAblationArm != "" {
+		chain.AblationArm = opts.fixedSigmaAblationArm
+		chain.CVariant = opts.fixedSigmaCVariant
+		chain.StageSeeds = [2]int64{opts.fixedSigmaNoiseSeed, opts.fixedSigmaNoiseSeed + 1}
+		if backend.name == "fast" {
+			chain.FastInputRowsSHA256 = fastInputRows
+			chain.InputRandomnessStatus = "Fast zero-secret EncryptNew copies the deterministic encoded plaintext into c0 and clears c1 without sampling ciphertext randomness; only enabled noise stages use the recorded deterministic seeds."
+		} else {
+			chain.InputRandomnessStatus = "Genuine Standard native RLWE EncryptNew uses fresh randomness; this independent reference is not a cross-arm random-state match."
+		}
 	}
 	mode, schema, vectorSchema := "fixed-sigma-two-step-chain", "fast-standard-fixed-sigma-two-step-chain.v3", "fast-standard-fixed-sigma-two-step-chain-vectors.v3"
+	if opts.fixedSigmaAblationArm != "" {
+		schema, vectorSchema = "fast-standard-fixed-sigma-two-step-chain.v4", "fast-standard-fixed-sigma-two-step-chain-vectors.v4"
+		chain.SchemaVersion = "fixed-sigma-two-step-chain.v4"
+	}
 	status := "PASS_ZERO_BOOTSTRAP_TWO_STEP_CHAIN"
 	limitations := []string{
 		"Diagnostic-only two-step MulRelin+Rescale evidence; no Bootstrap call, output, or performance claim is included.",
@@ -419,6 +479,11 @@ func runPublicFixedSigmaChain(
 	}
 	if opts.fixedSigmaNoise {
 		limitations = append(limitations, "Fast-only fixed-sigma injection is explicit after each complete MulRelin+Rescale pair; it is not automatic for arbitrary MulRelin or Rescale calls.")
+	}
+	if opts.fixedSigmaAblationArm != "" {
+		limitations = append(limitations,
+			"Fixed-sigma ablation arm "+opts.fixedSigmaAblationArm+" explicitly controls only the two demonstrated post-Rescale boundaries; no Bootstrap or arbitrary-operation interception is claimed.",
+			"C variant "+opts.fixedSigmaCVariant+" changes slot-message values only; effective CKKS parameters and q5/q4 encoding scales are unchanged.")
 	}
 	observedOracleStatus := publicStrictOraclePassed
 	doc := publicNativeDocument{
@@ -515,7 +580,25 @@ func validatePublicFixedSigmaChainPairArtifacts(standard, fast publicNativeDocum
 	if !reflect.DeepEqual(standard.FixedSigmaChain.InputMessageSHA256, fast.FixedSigmaChain.InputMessageSHA256) {
 		return errors.New("paired chain artifacts do not use identical original plaintext inputs")
 	}
-	if standard.FixedSigmaChain.LogicalNoiseInjections != 0 ||
+	if standard.SchemaVersion == "fast-standard-fixed-sigma-two-step-chain.v4" {
+		if standard.FixedSigmaChain.AblationArm != "OFF/OFF" || standard.FixedSigmaChain.CVariant != fast.FixedSigmaChain.CVariant {
+			return errors.New("paired ablation does not share OFF/OFF Standard and the same C variant")
+		}
+		stage1, stage2, err := fixedSigmaAblationInjectionStages(fast.FixedSigmaChain.AblationArm)
+		if err != nil {
+			return err
+		}
+		wantCount := 0
+		if stage1 {
+			wantCount++
+		}
+		if stage2 {
+			wantCount++
+		}
+		if standard.FixedSigmaChain.LogicalNoiseInjections != 0 || fast.FixedSigmaChain.LogicalNoiseInjections != wantCount {
+			return errors.New("paired ablation has an invalid Standard/Fast injection count")
+		}
+	} else if standard.FixedSigmaChain.LogicalNoiseInjections != 0 ||
 		(fast.FixedSigmaChain.LogicalNoiseInjections != 0 && fast.FixedSigmaChain.LogicalNoiseInjections != 2) {
 		return errors.New("paired chain has an invalid Standard/Fast noise injection count")
 	}
@@ -546,6 +629,11 @@ func validatePublicFixedSigmaChainArtifact(doc publicNativeDocument, vectors pub
 			doc.FixedSigmaChain.PrimaryBuildCommit != doc.PrimaryCommit || !doc.FixedSigmaChain.PrimaryBuildClean) {
 		return errors.New("chain binary was not built from the clean recorded Primary commit")
 	}
+	if doc.SchemaVersion == "fast-standard-fixed-sigma-two-step-chain.v4" &&
+		(doc.FixedSigmaChain.SchemaVersion != "fixed-sigma-two-step-chain.v4" ||
+			doc.FixedSigmaChain.PrimaryBuildCommit != doc.PrimaryCommit || !doc.FixedSigmaChain.PrimaryBuildClean) {
+		return errors.New("ablation chain binary was not built from the clean recorded Primary commit")
+	}
 	if vectors.SchemaVersion != fixedSigmaChainVectorSchema(doc.SchemaVersion) || vectors.Mode != doc.Mode ||
 		vectors.Backend != backend || vectors.BackendCommit != doc.BackendCommit || vectors.PrimaryCommit != doc.PrimaryCommit ||
 		vectors.SourceSHA256 != doc.PrimarySourceSHA256 || vectors.ConfigSHA256 != doc.ConfigSHA256 ||
@@ -573,6 +661,29 @@ func validatePublicFixedSigmaChainArtifact(doc publicNativeDocument, vectors pub
 	if len(doc.FixedSigmaChain.InputMessageSHA256) != 3 {
 		return errors.New("chain message fingerprint map must contain exactly A, B, and C")
 	}
+	if doc.SchemaVersion == "fast-standard-fixed-sigma-two-step-chain.v4" {
+		if doc.FixedSigmaChain.CVariant != "canonical" && doc.FixedSigmaChain.CVariant != "stronger-c4" {
+			return errors.New("ablation artifact has an unsupported C input variant")
+		}
+		if _, _, err := fixedSigmaAblationInjectionStages(doc.FixedSigmaChain.AblationArm); err != nil {
+			return err
+		}
+		if backend == "standard" && doc.FixedSigmaChain.AblationArm != "OFF/OFF" {
+			return errors.New("genuine Standard ablation reference must be OFF/OFF")
+		}
+		wantA, wantB, wantC, err := perfmeasure.PublicMulRescaleWorkload(doc.InputSlots)
+		if err != nil {
+			return err
+		}
+		if doc.FixedSigmaChain.CVariant == "stronger-c4" {
+			for index := range wantC {
+				wantC[index] *= 4
+			}
+		}
+		if !complexVectorsEqual(inputs["A"], wantA) || !complexVectorsEqual(inputs["B"], wantB) || !complexVectorsEqual(inputs["C"], wantC) {
+			return errors.New("ablation artifact inputs do not match the predeclared canonical or stronger-c4 workload")
+		}
+	}
 	byName := make(map[string]publicCheckpoint, len(doc.Checkpoints))
 	for _, checkpoint := range doc.Checkpoints {
 		encoded, ok := vectors.Checkpoints[checkpoint.Name]
@@ -592,6 +703,29 @@ func validatePublicFixedSigmaChainArtifact(doc publicNativeDocument, vectors pub
 	}
 	if backend == "standard" && !doc.InputC1Nonzero || backend == "fast" && doc.InputC1Nonzero {
 		return errors.New("top-level input c1 provenance does not match the selected backend")
+	}
+	if doc.SchemaVersion == "fast-standard-fixed-sigma-two-step-chain.v4" {
+		q := make([]uint64, len(doc.Parameters.QPrimes))
+		for index, encoded := range doc.Parameters.QPrimes {
+			prime, ok := new(big.Int).SetString(encoded, 10)
+			if !ok || !prime.IsUint64() {
+				return fmt.Errorf("effective q%d is not a canonical uint64 prime", index)
+			}
+			q[index] = prime.Uint64()
+		}
+		capacity, err := perfmeasure.BoundPublicMulRescaleWorkload(inputs["A"], inputs["B"], inputs["C"], q, doc.Parameters.RingN)
+		if err != nil || !reflect.DeepEqual(capacity, doc.Capacity) {
+			return errors.New("ablation stage1 conservative capacity plan does not recompute from the effective Q chain and exact inputs")
+		}
+		if len(q) <= 5 {
+			return errors.New("ablation effective Q chain does not include q4 and q5")
+		}
+		workloadHash, err := perfmeasure.PublicFixedSigmaChainFingerprint(inputs["A"], inputs["B"], inputs["C"],
+			fixedSigmaChainScaleText(new(big.Int).Lsh(big.NewInt(1), 45)), fixedSigmaChainScaleText(new(big.Int).SetUint64(q[5])),
+			fixedSigmaChainScaleText(new(big.Int).SetUint64(q[4])))
+		if err != nil || workloadHash != doc.WorkloadSHA256 {
+			return errors.New("ablation workload fingerprint does not recompute from the exact messages and scale schedule")
+		}
 	}
 	addOracle := publicAdd(inputs["A"], inputs["B"])
 	stage1Oracle := publicMul(addOracle, inputs["C"])
@@ -669,6 +803,16 @@ func validatePublicFixedSigmaChainArtifact(doc publicNativeDocument, vectors pub
 			operation.Residual.DispatchEvidence != fixedSigmaChainDispatchEvidence(backend) {
 			return fmt.Errorf("%s operation metadata or phase timing is incomplete", stageName)
 		}
+		if doc.SchemaVersion == "fast-standard-fixed-sigma-two-step-chain.v4" {
+			wantStage1, wantStage2, err := fixedSigmaAblationInjectionStages(doc.FixedSigmaChain.AblationArm)
+			if err != nil {
+				return err
+			}
+			wantInjection := backend == "fast" && (index == 0 && wantStage1 || index == 1 && wantStage2)
+			if (operation.Residual.LogicalNoiseInjections == 1) != wantInjection {
+				return fmt.Errorf("%s injection count does not match ablation arm %s for backend %s", stageName, doc.FixedSigmaChain.AblationArm, backend)
+			}
+		}
 		productState := byName[productName].State
 		if operation.MultiplicationScale != productState.Scale || productState.Level != operation.InputXState.Level {
 			return fmt.Errorf("%s MulRelin checkpoint Level/Scale differs from operation metadata", stageName)
@@ -721,26 +865,91 @@ func validatePublicFixedSigmaChainArtifact(doc publicNativeDocument, vectors pub
 				!operation.Residual.FixedSigmaNoise.QPrefixStrictFit {
 				return fmt.Errorf("%s fixed-sigma residual, delta, or strict Q-prefix evidence does not recompute", stageName)
 			}
-			if doc.SchemaVersion == "fast-standard-fixed-sigma-two-step-chain.v3" &&
+			if (doc.SchemaVersion == "fast-standard-fixed-sigma-two-step-chain.v3" || doc.SchemaVersion == "fast-standard-fixed-sigma-two-step-chain.v4") &&
 				!validFixedSigmaNoisePhaseMeasurements(operation.Residual.FixedSigmaNoise.PhaseMeasurements) {
 				return fmt.Errorf("%s fixed-sigma phase measurements are incomplete", stageName)
 			}
 		}
 	}
-	if backend == "standard" && doc.FixedSigmaChain.LogicalNoiseInjections != 0 ||
-		backend == "fast" && doc.FixedSigmaChain.LogicalNoiseInjections != 0 && doc.FixedSigmaChain.LogicalNoiseInjections != 2 {
-		return errors.New("chain injection count does not match the Standard/Fast diagnostic mode")
-	}
-	if doc.FixedSigmaChain.LogicalNoiseInjections == 2 {
-		if backend != "fast" || doc.FixedSigmaChain.SigmaCoefficient == nil || *doc.FixedSigmaChain.SigmaCoefficient != fixedSigmaChainCoefficientSigma ||
-			doc.FixedSigmaChain.Operations[0].Residual.SamplingSeed == nil || doc.FixedSigmaChain.Operations[1].Residual.SamplingSeed == nil ||
-			*doc.FixedSigmaChain.Operations[0].Residual.SamplingSeed == int64(^uint64(0)>>1) ||
-			*doc.FixedSigmaChain.Operations[1].Residual.SamplingSeed != *doc.FixedSigmaChain.Operations[0].Residual.SamplingSeed+1 ||
-			doc.FixedSigmaChain.Stage2SeedDerivation != "stage2 seed is stage1 seed + 1; both actual seeds are recorded on their operation evidence" {
-			return errors.New("two-step chain does not contain the same frozen sigma and distinct reproducible stage seeds")
+	if doc.SchemaVersion == "fast-standard-fixed-sigma-two-step-chain.v4" {
+		if doc.FixedSigmaChain.InputRandomnessStatus == "" {
+			return errors.New("ablation input randomness provenance is missing")
 		}
-	} else if doc.FixedSigmaChain.SigmaCoefficient != nil {
-		return errors.New("chain reports a sigma without two explicit injections")
+		if backend == "fast" {
+			wantRows := make(map[string]bool)
+			for _, name := range []string{"A", "B", "C_q5"} {
+				for component := 0; component < 2; component++ {
+					for q := 0; q <= 5; q++ {
+						wantRows[fmt.Sprintf("%s.c%d.q%d", name, component, q)] = true
+					}
+				}
+			}
+			for component := 0; component < 2; component++ {
+				for q := 0; q <= 4; q++ {
+					wantRows[fmt.Sprintf("C_q4.c%d.q%d", component, q)] = true
+				}
+			}
+			if len(doc.FixedSigmaChain.FastInputRowsSHA256) != len(wantRows) {
+				return errors.New("Fast ablation active input-row hash coverage is incomplete")
+			}
+			for name := range wantRows {
+				if !validSHA256Hex(doc.FixedSigmaChain.FastInputRowsSHA256[name]) {
+					return fmt.Errorf("Fast ablation input row %s has a missing or invalid hash", name)
+				}
+			}
+		} else if len(doc.FixedSigmaChain.FastInputRowsSHA256) != 0 {
+			return errors.New("Standard ablation reference must not claim Fast input-row hashes")
+		}
+		wantStage1, wantStage2, err := fixedSigmaAblationInjectionStages(doc.FixedSigmaChain.AblationArm)
+		if err != nil {
+			return err
+		}
+		wantCount := 0
+		if backend == "fast" {
+			if wantStage1 {
+				wantCount++
+			}
+			if wantStage2 {
+				wantCount++
+			}
+		}
+		if doc.FixedSigmaChain.LogicalNoiseInjections != wantCount {
+			return errors.New("ablation chain total injection count does not match the selected arm")
+		}
+		if wantCount == 0 {
+			if doc.FixedSigmaChain.SigmaCoefficient != nil {
+				return errors.New("zero-injection ablation reports a sigma")
+			}
+		} else if doc.FixedSigmaChain.SigmaCoefficient == nil || *doc.FixedSigmaChain.SigmaCoefficient != fixedSigmaChainCoefficientSigma {
+			return errors.New("ablation injection does not use the frozen coefficient sigma")
+		}
+		seeds := doc.FixedSigmaChain.StageSeeds
+		if seeds[0] == int64(^uint64(0)>>1) || seeds[1] != seeds[0]+1 ||
+			doc.FixedSigmaChain.Stage2SeedDerivation != "stage2 seed is stage1 seed + 1; OFF stages do not invoke the sampler" {
+			return errors.New("ablation stage seed pair is not valid and reproducible")
+		}
+		for index, shouldInject := range []bool{backend == "fast" && wantStage1, backend == "fast" && wantStage2} {
+			seed := doc.FixedSigmaChain.Operations[index].Residual.SamplingSeed
+			if shouldInject && (seed == nil || *seed != seeds[index]) || !shouldInject && seed != nil {
+				return fmt.Errorf("ablation stage%d seed evidence does not match its injection arm", index+1)
+			}
+		}
+	} else {
+		if backend == "standard" && doc.FixedSigmaChain.LogicalNoiseInjections != 0 ||
+			backend == "fast" && doc.FixedSigmaChain.LogicalNoiseInjections != 0 && doc.FixedSigmaChain.LogicalNoiseInjections != 2 {
+			return errors.New("chain injection count does not match the Standard/Fast diagnostic mode")
+		}
+		if doc.FixedSigmaChain.LogicalNoiseInjections == 2 {
+			if backend != "fast" || doc.FixedSigmaChain.SigmaCoefficient == nil || *doc.FixedSigmaChain.SigmaCoefficient != fixedSigmaChainCoefficientSigma ||
+				doc.FixedSigmaChain.Operations[0].Residual.SamplingSeed == nil || doc.FixedSigmaChain.Operations[1].Residual.SamplingSeed == nil ||
+				*doc.FixedSigmaChain.Operations[0].Residual.SamplingSeed == int64(^uint64(0)>>1) ||
+				*doc.FixedSigmaChain.Operations[1].Residual.SamplingSeed != *doc.FixedSigmaChain.Operations[0].Residual.SamplingSeed+1 ||
+				doc.FixedSigmaChain.Stage2SeedDerivation != "stage2 seed is stage1 seed + 1; both actual seeds are recorded on their operation evidence" {
+				return errors.New("two-step chain does not contain the same frozen sigma and distinct reproducible stage seeds")
+			}
+		} else if doc.FixedSigmaChain.SigmaCoefficient != nil {
+			return errors.New("chain reports a sigma without two explicit injections")
+		}
 	}
 	return nil
 }
@@ -763,12 +972,12 @@ func fixedSigmaChainDispatchEvidence(backend string) string {
 
 func validFixedSigmaChainSchema(value string) bool {
 	return value == "fast-standard-fixed-sigma-two-step-chain.v1" || value == "fast-standard-fixed-sigma-two-step-chain.v2" ||
-		value == "fast-standard-fixed-sigma-two-step-chain.v3"
+		value == "fast-standard-fixed-sigma-two-step-chain.v3" || value == "fast-standard-fixed-sigma-two-step-chain.v4"
 }
 
 func validFixedSigmaChainEvidenceSchema(value string) bool {
 	return value == "fixed-sigma-two-step-chain.v1" || value == "fixed-sigma-two-step-chain.v2" ||
-		value == "fixed-sigma-two-step-chain.v3"
+		value == "fixed-sigma-two-step-chain.v3" || value == "fixed-sigma-two-step-chain.v4"
 }
 
 func fixedSigmaChainVectorSchema(value string) string {
@@ -779,9 +988,42 @@ func fixedSigmaChainVectorSchema(value string) string {
 		return "fast-standard-fixed-sigma-two-step-chain-vectors.v2"
 	case "fast-standard-fixed-sigma-two-step-chain.v3":
 		return "fast-standard-fixed-sigma-two-step-chain-vectors.v3"
+	case "fast-standard-fixed-sigma-two-step-chain.v4":
+		return "fast-standard-fixed-sigma-two-step-chain-vectors.v4"
 	default:
 		return ""
 	}
+}
+
+func fixedSigmaAblationInjectionStages(arm string) (stage1, stage2 bool, err error) {
+	switch arm {
+	case "OFF/OFF":
+		return false, false, nil
+	case "ON/OFF":
+		return true, false, nil
+	case "OFF/ON":
+		return false, true, nil
+	case "ON/ON":
+		return true, true, nil
+	default:
+		return false, false, fmt.Errorf("unsupported fixed-sigma ablation arm %q", arm)
+	}
+}
+
+func fixedSigmaCiphertextActiveRowHashes(ct *rlwe.Ciphertext) (map[string]string, error) {
+	if ct == nil || ct.Level() < 0 || len(ct.Value) != 2 {
+		return nil, errors.New("ciphertext must be non-nil, have a non-negative level, and contain c0/c1")
+	}
+	rows := make(map[string]string, len(ct.Value)*(ct.Level()+1))
+	for component := range ct.Value {
+		if len(ct.Value[component].Coeffs) <= ct.Level() {
+			return nil, fmt.Errorf("c%d has %d physical Q rows, fewer than active level %d", component, len(ct.Value[component].Coeffs), ct.Level())
+		}
+		for q := 0; q <= ct.Level(); q++ {
+			rows[fmt.Sprintf("c%d.q%d", component, q)] = hashUint64Row(ct.Value[component].Coeffs[q])
+		}
+	}
+	return rows, nil
 }
 
 func validFixedSigmaNoisePhaseMeasurements(phases []fixedSigmaNoisePhaseEvidence) bool {

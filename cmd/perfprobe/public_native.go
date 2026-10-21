@@ -319,6 +319,11 @@ type fixedSigmaChainEvidence struct {
 	Classification         string                     `json:"classification"`
 	PrimaryBuildCommit     string                     `json:"primary_build_commit,omitempty"`
 	PrimaryBuildClean      bool                       `json:"primary_build_clean,omitempty"`
+	AblationArm            string                     `json:"ablation_arm,omitempty"`
+	CVariant               string                     `json:"c_input_variant,omitempty"`
+	StageSeeds             [2]int64                   `json:"stage_seed_pair,omitempty"`
+	FastInputRowsSHA256    map[string]string          `json:"fast_input_active_row_sha256,omitempty"`
+	InputRandomnessStatus  string                     `json:"input_randomness_status,omitempty"`
 	LogicalCtCtOperations  int                        `json:"logical_ct_ct_operations"`
 	LogicalNoiseInjections int                        `json:"logical_noise_injections"`
 	SigmaCoefficient       *float64                   `json:"sigma_coefficient,omitempty"`

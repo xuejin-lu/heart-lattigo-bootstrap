@@ -3,6 +3,7 @@ package numericalmetrics
 import (
 	"math"
 	"math/cmplx"
+	"sort"
 )
 
 // ComplexVectorStats summarizes a finite decoded complex vector. Variance is
@@ -28,6 +29,19 @@ type ComplexCovariance struct {
 	CorrelationMagnitude float64 `json:"correlation_magnitude"`
 	Status               string  `json:"status"`
 	Reason               string  `json:"reason,omitempty"`
+}
+
+// ComplexMagnitudeTails summarizes nearest-rank upper quantiles of decoded
+// complex magnitudes. Quantiles describe this vector; they do not treat its
+// slots as independent trials.
+type ComplexMagnitudeTails struct {
+	Count  int     `json:"count"`
+	P95    float64 `json:"p95"`
+	P99    float64 `json:"p99"`
+	P999   float64 `json:"p999"`
+	MaxAbs float64 `json:"max_abs"`
+	Status string  `json:"status"`
+	Reason string  `json:"reason,omitempty"`
 }
 
 // SummarizeComplexVector computes population mean, complex variance, RMS and
@@ -67,6 +81,37 @@ func SummarizeComplexVector(values []complex128) ComplexVectorStats {
 	return ComplexVectorStats{
 		Count: len(values), MeanReal: real(mean), MeanImag: imag(mean),
 		Variance: variance, RMS: rms, MaxAbs: maxAbs, WorstSlot: worst, Status: "FINITE",
+	}
+}
+
+// SummarizeComplexMagnitudeTails computes nearest-rank p95, p99 and p99.9
+// absolute-magnitude quantiles for one finite decoded complex vector.
+func SummarizeComplexMagnitudeTails(values []complex128) ComplexMagnitudeTails {
+	if len(values) == 0 {
+		return ComplexMagnitudeTails{Status: "NOT_COMPARABLE", Reason: "vector must be non-empty"}
+	}
+	magnitudes := make([]float64, len(values))
+	for index, value := range values {
+		if !finiteComplex(value) {
+			return ComplexMagnitudeTails{Status: "NOT_COMPARABLE", Reason: "vector contains a non-finite value"}
+		}
+		magnitude := cmplx.Abs(value)
+		if !finite(magnitude) {
+			return ComplexMagnitudeTails{Status: "NOT_COMPARABLE", Reason: "magnitude overflowed the finite float64 range"}
+		}
+		magnitudes[index] = magnitude
+	}
+	sort.Float64s(magnitudes)
+	nearestRank := func(p float64) float64 {
+		rank := int(math.Ceil(p * float64(len(magnitudes))))
+		if rank < 1 {
+			rank = 1
+		}
+		return magnitudes[rank-1]
+	}
+	return ComplexMagnitudeTails{
+		Count: len(values), P95: nearestRank(0.95), P99: nearestRank(0.99),
+		P999: nearestRank(0.999), MaxAbs: magnitudes[len(magnitudes)-1], Status: "FINITE",
 	}
 }
 

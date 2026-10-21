@@ -863,6 +863,11 @@ func TestFixedSigmaChainV3RequiresCompleteOrderedPhaseMeasurements(t *testing.T)
 		fixedSigmaChainVectorSchema("fast-standard-fixed-sigma-two-step-chain.v3") != "fast-standard-fixed-sigma-two-step-chain-vectors.v3" {
 		t.Fatal("v3 CP-D chain schemas are not wired together")
 	}
+	if !validFixedSigmaChainSchema("fast-standard-fixed-sigma-two-step-chain.v4") ||
+		!validFixedSigmaChainEvidenceSchema("fixed-sigma-two-step-chain.v4") ||
+		fixedSigmaChainVectorSchema("fast-standard-fixed-sigma-two-step-chain.v4") != "fast-standard-fixed-sigma-two-step-chain-vectors.v4" {
+		t.Fatal("v4 propagation-ablation schemas are not wired together")
+	}
 }
 
 func TestFixedSigmaNoiseOptInRequiresExactFastZeroBootstrapContract(t *testing.T) {
@@ -1661,5 +1666,99 @@ func TestEffectiveProfilesComeFromTheirConfigFiles(t *testing.T) {
 				t.Fatalf("config did not preserve required effective inputs: cfg=%+v residual LogN=%d", cfg, residual.LogN())
 			}
 		})
+	}
+}
+
+func TestFixedSigmaAblationArmMapping(t *testing.T) {
+	want := map[string][2]bool{
+		"OFF/OFF": {false, false},
+		"ON/OFF":  {true, false},
+		"OFF/ON":  {false, true},
+		"ON/ON":   {true, true},
+	}
+	for arm, expected := range want {
+		stage1, stage2, err := fixedSigmaAblationInjectionStages(arm)
+		if err != nil || stage1 != expected[0] || stage2 != expected[1] {
+			t.Fatalf("arm %s mapped to (%t,%t), err=%v; want (%t,%t)", arm, stage1, stage2, err, expected[0], expected[1])
+		}
+	}
+	if _, _, err := fixedSigmaAblationInjectionStages("OFF/ON/ON"); err == nil {
+		t.Fatal("unsupported ablation arm was accepted")
+	}
+}
+
+func TestFixedSigmaAblationOptionsRequireExplicitFixture(t *testing.T) {
+	if err := validateFixedSigmaNoiseOptions(cliOptions{fixedSigmaCVariant: "stronger-c4"}); err == nil {
+		t.Fatal("C workload variant was accepted without an ablation arm")
+	}
+	base := cliOptions{
+		mode: "public-native", profile: "logn13", bootstrapBudget: 0,
+		mulRescaleChain: true, fixedSigmaAblationArm: "OFF/OFF", fixedSigmaCVariant: "canonical",
+		fixedSigmaSeedProvided: true, fixedSigmaNoiseSeed: 20261037,
+		backendCommit: publicFixedSigmaChainFastSHA,
+	}
+	if publicBackendName() == "fast" {
+		if err := validateFixedSigmaNoiseOptions(base); err != nil {
+			t.Fatalf("valid zero-bootstrap Fast ablation options rejected: %v", err)
+		}
+		base.fixedSigmaNoise = true
+		if err := validateFixedSigmaNoiseOptions(base); err == nil {
+			t.Fatal("ablation arm accepted simultaneous legacy fixed-sigma option")
+		}
+	}
+}
+
+func TestFixedSigmaAblationPropagationUsesActualDecodedVectors(t *testing.T) {
+	makeVectors := func(stage1, stage2 []complex128, helperDelta []complex128) publicVectorDocument {
+		return publicVectorDocument{
+			Checkpoints: map[string][]complexValue{
+				"chain_stage1_output_level4": encodeVector(stage1),
+				"chain_stage2_output_level3": encodeVector(stage2),
+				"encrypt_c_q4_level4":        encodeVector([]complex128{3, 4}),
+			},
+			FixedSigmaChain: &fixedSigmaChainVectors{Stages: map[string]fixedSigmaChainStageVectors{
+				"stage1": {DecodedNoiseDelta: encodeVector(helperDelta)},
+			}},
+		}
+	}
+	base := makeVectors([]complex128{1, 2}, []complex128{3, 8}, nil)
+	onStage1 := []complex128{1.1, 2.2}
+	offStage1 := []complex128{1, 2}
+	onOff := makeVectors(onStage1, []complex128{3.3, 8.8}, subtractComplexVectors(onStage1, offStage1))
+	runs := map[string]loadedFixedSigmaAblationArtifact{
+		"OFF/OFF": {vectors: base},
+		"ON/OFF":  {vectors: onOff},
+	}
+	result, err := computeFixedSigmaAblationPropagation(runs)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !result.InjectedDeltaEvidenceMatched || result.Stage1InjectedDelta.Statistics.RMS < 0.15 ||
+		result.Stage2PropagatedP1.Statistics.RMS < 0.6 || result.FirstOrderResidual.Statistics.RMS > 1e-12 {
+		t.Fatalf("propagation was not computed from paired decoded vectors: %+v", result)
+	}
+	bad := makeVectors([]complex128{1.1, 2.2}, []complex128{3.3, 8.8}, []complex128{1.1 - 1, 0.3})
+	runs["ON/OFF"] = loadedFixedSigmaAblationArtifact{vectors: bad}
+	if _, err := computeFixedSigmaAblationPropagation(runs); err == nil {
+		t.Fatal("mismatched helper delta and ablation output delta were accepted")
+	}
+}
+
+func TestFixedSigmaAblationBoundedJSONReaderChecksSizeBeforeDecode(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "artifact.json")
+	if err := os.WriteFile(path, []byte(`{"count":1}`), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	var decoded struct {
+		Count int `json:"count"`
+	}
+	if err := readJSONBounded(path, &decoded, 10); err == nil {
+		t.Fatal("oversized JSON artifact passed the pre-read limit")
+	}
+	if err := readJSONBounded(path, &decoded, 11); err != nil {
+		t.Fatalf("bounded JSON artifact rejected at its exact size: %v", err)
+	}
+	if decoded.Count != 1 {
+		t.Fatalf("bounded JSON decoded count=%d, want 1", decoded.Count)
 	}
 }
