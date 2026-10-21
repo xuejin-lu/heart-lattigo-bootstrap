@@ -788,6 +788,44 @@ func TestFixedSigmaFastPinIsTaskScopedToLogN13(t *testing.T) {
 	}
 }
 
+func TestFixedSigmaChainFastPinIsTaskScoped(t *testing.T) {
+	if err := validatePublicFixedSigmaChainBackendPin("fast", publicFixedSigmaChainFastSHA, "logn13"); err != nil {
+		t.Fatalf("fixed-sigma chain LogN13 candidate pin rejected: %v", err)
+	}
+	if err := validatePublicFixedSigmaChainBackendPin("fast", publicFixedSigmaChainFastSHA, "logn16"); err == nil {
+		t.Fatal("fixed-sigma chain candidate pin was accepted for LogN16")
+	}
+	if err := validatePublicBackendPin("fast", publicFixedSigmaChainFastSHA, "logn13"); err == nil {
+		t.Fatal("task-scoped chain candidate pin was accepted by the generic public backend gate")
+	}
+	if err := validatePublicFixedSigmaChainBackendPin("standard", publicFixedSigmaChainFastSHA, "logn13"); err == nil {
+		t.Fatal("Fast chain candidate pin was accepted for Standard")
+	}
+}
+
+func TestFixedSigmaChainBinaryProvenanceRequiresExactCleanSource(t *testing.T) {
+	const commit = "0123456789abcdef0123456789abcdef01234567"
+	clean, err := validateFixedSigmaChainBinaryProvenance(commit, commit, "false")
+	if err != nil || !clean {
+		t.Fatalf("matching clean binary provenance rejected: clean=%v err=%v", clean, err)
+	}
+	for _, tc := range []struct {
+		name       string
+		build      string
+		vcsChanged string
+	}{
+		{name: "stale revision", build: "89abcdef0123456789abcdef0123456789abcdef", vcsChanged: "false"},
+		{name: "modified source", build: commit, vcsChanged: "true"},
+		{name: "missing revision", build: "", vcsChanged: "false"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			if _, err := validateFixedSigmaChainBinaryProvenance(commit, tc.build, tc.vcsChanged); err == nil {
+				t.Fatal("binary provenance mismatch was accepted")
+			}
+		})
+	}
+}
+
 func TestFixedSigmaNoiseOptInRequiresExactFastZeroBootstrapContract(t *testing.T) {
 	valid := cliOptions{
 		mode: "public-native", profile: "logn13", backendCommit: publicFixedSigmaNoiseFastSHA,

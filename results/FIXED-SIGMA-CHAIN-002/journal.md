@@ -1,6 +1,6 @@
 # FIXED-SIGMA-CHAIN-002 — durable experiment journal
 
-**Status:** `PLANNED_NOT_RUN`
+**Status:** `IN_PROGRESS_CP_C`
 **Date created:** 2026-10-22 (Asia/Taipei)
 **Prior reviewed result:** `FIXED-SIGMA-MUL-NOISE-001`: `ACCEPTED_SCOPED_RMSE_ONLY` (not Gaussian/tail equivalence).
 **Frozen coefficient σ:** `4.004280012097432` from prior calibration; not to be changed.
@@ -10,11 +10,11 @@
 | Checkpoint | Status | Notes |
 |---|---|---|
 | CP-A source/math Level3 gate | PASS_SCOPED | source map/theory/scale/row-authority gate recorded below; no Secondary edit |
-| CP-B two-step baseline | IMPLEMENTED_UNMEASURED | shared perfprobe adapter and vector-recomputed pair validator; ≤3 matched pairs reserved |
-| CP-C opt-in fixed-σ two-step chain | NOT_STARTED | only if prior gates pass; 2 explicit injections |
+| CP-B two-step baseline | PASS_SCOPED_ONE_PROVENANCE_CLEAN_PAIR | three captures attempted (budget exhausted); pair 01 is the accepted matched baseline; pair 02/03 excluded for stale-binary provenance |
+| CP-C opt-in fixed-σ two-step chain | IMPLEMENTED_NOT_CAPTURED | Secondary Level3 helper commit exists; Primary candidate pin and build-time revision gate are under validation; 2 explicit injections/run |
 | CP-D cost attribution + report | NOT_STARTED | cheap diagnostics; no Bootstrap |
 
-No implementation, measurement, σ adjustment or performance optimization has been run under this new task as of creation. Preserve checkpoints, source hashes, task-scoped budgets and safety rules.
+At journal creation no implementation, measurement, σ adjustment or performance optimization had been run. Preserve checkpoints, source hashes, task-scoped budgets and safety rules.
 
 ## 2026-10-22 CP-A — source reuse and two-step math gate
 
@@ -40,4 +40,21 @@ The maintained `cmd/perfprobe` now has an explicit `--mul-rescale-chain` public-
 
 Implementation verification before any CP-B capture: `go test -tags perf_fast ./cmd/perfprobe ./internal/perfmeasure ./internal/numericalmetrics` passed; the isolated genuine Standard modfile focused `perf_standard` tests for the chain limits, residual evidence, and chain fingerprint passed; `go vet -tags perf_fast ./cmd/perfprobe ./internal/perfmeasure ./internal/numericalmetrics` passed. An initial compile-only check required a task-local writable Go build cache because the default user cache was not writable; no source/cache outside this task's temp path was changed.
 
-CP-B capture budget remains at most three Standard/Fast matched pairs, with zero Bootstrap. No pair has run under this journal yet. Preserve raw per-slot vectors outside Git where possible; commit only compact paired summaries, hashes, provenance, and any failure evidence.
+### CP-B — matched two-step baseline results and provenance review
+
+**Gate: `PASS_SCOPED` using pair 01 only.** Three Standard/Fast capture pairs were attempted (the full CP-B maximum); all six executions completed two real ct×ct `MulRelinNew → Rescale` operations and recorded `actual_bootstrap_calls=0`. All three `compare-public` outputs returned `PASS` with nine matched checkpoints. However, the binary audit below invalidates pairs 02/03 as source-provenance evidence, so they are excluded from the accepted numerical result and no further CP-B capture is authorized.
+
+Pair 01 used Primary `3b9ac5f4a10fb2e05d9016bda436eebed083413c`, measurement-source SHA-256 `2e356711edc11a1c0821fcad909210213b8bc5401e8822c8f86a1e2bc07eb0d3`, genuine Standard `5dbffbdea05394de2ca3a432ed5318aa832e3f40`, and unmodified Fast `9ef0315feaf59dbee03bf0852b72c76fdeb6b800`. `go version -m` on both binaries confirms `vcs.revision=3b9ac5f4a10fb2e05d9016bda436eebed083413c` and `vcs.modified=false`. Standard binary SHA-256 is `e7b079ab29e9a97bda89731b0e2227891bff0d1c69644f81df0efc0db6350b02`; Fast binary SHA-256 is `affc1aec05dbc080424b6f6970286a43f0048879dca10c798c98e07e443b7d2`. Both report Go `go1.26.4`, `darwin/arm64`, Apple M4, 10 CPUs. Config SHA-256 `919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98`; Q/P SHA-256 `1f045e603a856968779d62e045a037274bba08cbfce8b1dd3dec2828f1f6a46b`; canonical A input SHA-256 `d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285`; full A/B/C chain workload SHA-256 `484b245bf4dd4c91708da27f98f33aabe45988db0b275c0aa12a8f43bf0d61aa`. Effective parameters are LogN 13, LogSlots 12, 4096 input slots, E=32, Δ=2^45; q4=`549756174337`, q5=`1152921504606830593`. Both stages observed product Scale `Δ·q_i`, exact divisor q_i, and output Level/Scale `4/Δ` then `3/Δ`; the 4→3 output remained on exactly q0..q3.
+
+| Stage | Standard incremental RMS / variance / max | Fast incremental RMS / variance / max | Standard total-oracle RMS | Fast total-oracle RMS |
+|---|---:|---:|---:|---:|
+| 1: Level5→4 | `1.03186208e-11` / `1.06400717e-22` / `4.23940370e-11` | `7.43727623e-13` / `5.53130768e-25` / `2.20541281e-12` | `1.03216615e-11` | `7.44206624e-13` |
+| 2: Level4→3 | `1.03435118e-11` / `1.06978460e-22` / `5.91369577e-11` | `7.39085148e-13` / `5.46152329e-25` / `2.13308582e-12` | `1.03649044e-11` | `7.39395197e-13` |
+
+Incremental residuals are recomputed as `decoded output − decoded actual inputX × decoded actual inputY` for that stage; total oracle errors are reported separately, so Stage 2 total error includes propagated Stage 1 error. These are descriptive moments from one accepted matched pair; they do not claim distribution or tail equivalence. CP-B operation-only times in pair 01 (single observed call, not a performance campaign): Standard Stage 1 Mul/Rescale `3,705,208/463,875 ns`, Stage 2 `2,173,042/373,000 ns`; Fast Stage 1 `285,041/1,749,791 ns`, Stage 2 `300,792/1,615,791 ns`.
+
+**Excluded capture evidence:** Standard/Fast binaries reused for pairs 02/03 have the same SHA-256 values above, and `go version -m` confirms they were built at Primary `3b9ac5f4a10fb2e05d9016bda436eebed083413c`. Their execution artifacts instead record runtime Primary `42a846c8207fe5f1f5626fc06a004bfe19410ea8` and source SHA-256 `5aab3bd75ea799bcb54d1bbdadd01933cd951e41ae47c961440f51557fcd16e1`. They were therefore excluded rather than attributed to a binary/source pair they did not use. This exposed that the adapter previously checked only the clean runtime checkout, not the Go binary's embedded VCS revision. The current CP-C chain adapter now checks embedded `vcs.revision` against Primary HEAD and rejects `vcs.modified=true`; schema v2 records that evidence. The earlier pair 01 remains supported by its matching `go version -m` evidence. Raw result/vector and failure artifacts remain in `/private/tmp/fixed-sigma-chain-002-*`; the compact accepted pair summary is `cp-b-pair-01.json`.
+
+Raw accepted pair 01 SHA-256 values: pair `95a858ad8c893242ffcb1b18c19e0a98f078601b4f1272231ada7d62f7f970cb`; Standard result `1063c35c88bc73fdef1f0941311d79e385d1f9b3ed68e7b77be2cd03b3002565`, vector `037bd2a67e3f5b046794f41cb3d105989de950172e4a91b1a95202ed4109d228`; Fast result `940d828bf4130ab9b0c2b18e5506da93c55c10f9e9f572821b273ad6ef74c0cc`, vector `5b4a8c385d98800d08b99d897876d38b40e8297047cb1f13387cdd1c80336459`.
+
+CP-B Bootstrap spend: Standard `0/0`, Fast `0/0`; no LogN16, large benchmark, or teammate BTS call occurred. No further CP-B captures will be run.

@@ -33,6 +33,7 @@ const (
 	publicCurrentFastSHA               = "2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f"
 	publicFixedSigmaFastSHA            = "ee308c9743000b5f281a84a871e7c4bd59b176c4"
 	publicFixedSigmaNoiseFastSHA       = "9ef0315feaf59dbee03bf0852b72c76fdeb6b800"
+	publicFixedSigmaChainFastSHA       = "b5c55e0b82dd6ad4a333d079141d33745edcb379"
 	publicConfigSHA                    = "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98"
 	publicInputSHA                     = "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285"
 	publicWorkloadSHA                  = "00b70a2e77887c7d6a41db1859246f6513f2c984915de648734e5dd8c584cf74"
@@ -308,6 +309,8 @@ type publicOperationResidual struct {
 type fixedSigmaChainEvidence struct {
 	SchemaVersion          string                     `json:"schema_version"`
 	Classification         string                     `json:"classification"`
+	PrimaryBuildCommit     string                     `json:"primary_build_commit,omitempty"`
+	PrimaryBuildClean      bool                       `json:"primary_build_clean,omitempty"`
 	LogicalCtCtOperations  int                        `json:"logical_ct_ct_operations"`
 	LogicalNoiseInjections int                        `json:"logical_noise_injections"`
 	SigmaCoefficient       *float64                   `json:"sigma_coefficient,omitempty"`

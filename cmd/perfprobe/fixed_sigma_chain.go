@@ -7,6 +7,7 @@ import (
 	"os"
 	"reflect"
 	"runtime"
+	"runtime/debug"
 	"time"
 
 	"github.com/tuneinsight/lattigo/v6/circuits/ckks/bootstrapping"
@@ -43,6 +44,10 @@ func runPublicFixedSigmaChain(
 	if err != nil {
 		return fmt.Errorf("Primary provenance: %w", err)
 	}
+	primaryBuildCommit, primaryBuildClean, err := fixedSigmaChainBinaryProvenance(primaryCommit)
+	if err != nil {
+		return fmt.Errorf("Primary binary provenance: %w", err)
+	}
 	executable, err := os.Executable()
 	if err != nil {
 		return err
@@ -55,7 +60,7 @@ func runPublicFixedSigmaChain(
 	if err != nil {
 		return fmt.Errorf("backend provenance: %w", err)
 	}
-	if err := validatePublicBackendPin(publicBackendName(), secondaryCommit, profile.Name); err != nil {
+	if err := validatePublicFixedSigmaChainBackendPin(publicBackendName(), secondaryCommit, profile.Name); err != nil {
 		return fmt.Errorf("UNSUPPORTED_BACKEND_PROFILE: %s for %s: %w", publicBackendName(), profile.Name, err)
 	}
 	sourceHash, err := primaryMeasurementSourceFingerprint(primaryRoot)
@@ -387,7 +392,8 @@ func runPublicFixedSigmaChain(
 		"C": perfmeasure.Fingerprint(valuesC),
 	}
 	chain := &fixedSigmaChainEvidence{
-		SchemaVersion: "fixed-sigma-two-step-chain.v1", Classification: "DIAGNOSTIC_ONLY",
+		SchemaVersion: "fixed-sigma-two-step-chain.v2", Classification: "DIAGNOSTIC_ONLY",
+		PrimaryBuildCommit: primaryBuildCommit, PrimaryBuildClean: primaryBuildClean,
 		LogicalCtCtOperations: 2, LogicalNoiseInjections: 0,
 		InputMessageSHA256: inputMessageHashes, Operations: stageOperations,
 		Limitations: []string{
@@ -402,7 +408,7 @@ func runPublicFixedSigmaChain(
 		chain.SigmaCoefficient = &sigma
 		chain.Stage2SeedDerivation = "stage2 seed is stage1 seed + 1; both actual seeds are recorded on their operation evidence"
 	}
-	mode, schema, vectorSchema := "fixed-sigma-two-step-chain", "fast-standard-fixed-sigma-two-step-chain.v1", "fast-standard-fixed-sigma-two-step-chain-vectors.v1"
+	mode, schema, vectorSchema := "fixed-sigma-two-step-chain", "fast-standard-fixed-sigma-two-step-chain.v2", "fast-standard-fixed-sigma-two-step-chain-vectors.v2"
 	status := "PASS_ZERO_BOOTSTRAP_TWO_STEP_CHAIN"
 	limitations := []string{
 		"Diagnostic-only two-step MulRelin+Rescale evidence; no Bootstrap call, output, or performance claim is included.",
@@ -465,7 +471,7 @@ var fixedSigmaChainCheckpointNames = []string{
 
 func validatePublicFixedSigmaChainPairArtifacts(standard, fast publicNativeDocument, standardVectors, fastVectors publicVectorDocument) error {
 	if standard.Mode != "fixed-sigma-two-step-chain" || fast.Mode != standard.Mode ||
-		standard.SchemaVersion != "fast-standard-fixed-sigma-two-step-chain.v1" || fast.SchemaVersion != standard.SchemaVersion ||
+		!validFixedSigmaChainSchema(standard.SchemaVersion) || fast.SchemaVersion != standard.SchemaVersion ||
 		standard.Status != "PASS_ZERO_BOOTSTRAP_TWO_STEP_CHAIN" || fast.Status != standard.Status {
 		return errors.New("paired artifacts are not successful fixed-sigma two-step chain runs")
 	}
@@ -486,10 +492,10 @@ func validatePublicFixedSigmaChainPairArtifacts(standard, fast publicNativeDocum
 		!standard.PrimaryClean || !fast.PrimaryClean || !standard.BackendClean || !fast.BackendClean {
 		return errors.New("paired chain artifacts violate the pinned LogN13/E32 clean-provenance zero-Bootstrap contract")
 	}
-	if err := validatePublicBackendPin("standard", standard.BackendCommit, profile.Name); err != nil {
+	if err := validatePublicFixedSigmaChainBackendPin("standard", standard.BackendCommit, profile.Name); err != nil {
 		return err
 	}
-	if err := validatePublicBackendPin("fast", fast.BackendCommit, profile.Name); err != nil {
+	if err := validatePublicFixedSigmaChainBackendPin("fast", fast.BackendCommit, profile.Name); err != nil {
 		return err
 	}
 	if !validSHA256Hex(standard.BinarySHA256) || !validSHA256Hex(fast.BinarySHA256) || standard.BinarySHA256 == fast.BinarySHA256 ||
@@ -522,12 +528,17 @@ func validatePublicFixedSigmaChainPairArtifacts(standard, fast publicNativeDocum
 func validatePublicFixedSigmaChainArtifact(doc publicNativeDocument, vectors publicVectorDocument, backend string) error {
 	if doc.Backend != backend || doc.BuildTag != "perf_"+backend || doc.BootstrapBudget != 0 || doc.BootstrapCalls != 0 ||
 		doc.EphemeralSecretWeight != 32 || doc.InputSlots != 1<<12 || doc.CapacityPolicy != publicCapacityPolicyStrict ||
-		doc.FixedSigmaChain == nil || doc.FixedSigmaChain.SchemaVersion != "fixed-sigma-two-step-chain.v1" ||
+		doc.FixedSigmaChain == nil || !validFixedSigmaChainEvidenceSchema(doc.FixedSigmaChain.SchemaVersion) ||
 		doc.FixedSigmaChain.Classification != "DIAGNOSTIC_ONLY" || doc.FixedSigmaChain.LogicalCtCtOperations != 2 ||
 		len(doc.FixedSigmaChain.Operations) != 2 || !validSHA256Hex(doc.BinarySHA256) || !validSHA256Hex(doc.PrimarySourceSHA256) {
 		return errors.New("chain provenance, scope, or operation count is incomplete")
 	}
-	if vectors.SchemaVersion != "fast-standard-fixed-sigma-two-step-chain-vectors.v1" || vectors.Mode != doc.Mode ||
+	if doc.SchemaVersion == "fast-standard-fixed-sigma-two-step-chain.v2" &&
+		(doc.FixedSigmaChain.SchemaVersion != "fixed-sigma-two-step-chain.v2" ||
+			doc.FixedSigmaChain.PrimaryBuildCommit != doc.PrimaryCommit || !doc.FixedSigmaChain.PrimaryBuildClean) {
+		return errors.New("chain binary was not built from the clean recorded Primary commit")
+	}
+	if vectors.SchemaVersion != fixedSigmaChainVectorSchema(doc.SchemaVersion) || vectors.Mode != doc.Mode ||
 		vectors.Backend != backend || vectors.BackendCommit != doc.BackendCommit || vectors.PrimaryCommit != doc.PrimaryCommit ||
 		vectors.SourceSHA256 != doc.PrimarySourceSHA256 || vectors.ConfigSHA256 != doc.ConfigSHA256 ||
 		vectors.QPSHA256 != doc.QPSHA256 || vectors.InputSHA256 != doc.InputSHA256 ||
@@ -736,6 +747,63 @@ func fixedSigmaChainDispatchEvidence(backend string) string {
 	default:
 		return ""
 	}
+}
+
+func validFixedSigmaChainSchema(value string) bool {
+	return value == "fast-standard-fixed-sigma-two-step-chain.v1" || value == "fast-standard-fixed-sigma-two-step-chain.v2"
+}
+
+func validFixedSigmaChainEvidenceSchema(value string) bool {
+	return value == "fixed-sigma-two-step-chain.v1" || value == "fixed-sigma-two-step-chain.v2"
+}
+
+func fixedSigmaChainVectorSchema(value string) string {
+	switch value {
+	case "fast-standard-fixed-sigma-two-step-chain.v1":
+		return "fast-standard-fixed-sigma-two-step-chain-vectors.v1"
+	case "fast-standard-fixed-sigma-two-step-chain.v2":
+		return "fast-standard-fixed-sigma-two-step-chain-vectors.v2"
+	default:
+		return ""
+	}
+}
+
+func validateFixedSigmaChainBinaryProvenance(primaryCommit, buildCommit, vcsModified string) (bool, error) {
+	if primaryCommit == "" || buildCommit == "" || buildCommit != primaryCommit {
+		return false, fmt.Errorf("binary vcs.revision=%q does not match Primary HEAD=%q", buildCommit, primaryCommit)
+	}
+	if vcsModified != "false" {
+		return false, fmt.Errorf("binary vcs.modified=%q, want false", vcsModified)
+	}
+	return true, nil
+}
+
+func fixedSigmaChainBinaryProvenance(primaryCommit string) (string, bool, error) {
+	info, ok := debug.ReadBuildInfo()
+	if !ok {
+		return "", false, errors.New("Go build info is unavailable")
+	}
+	var buildCommit, vcsModified string
+	for _, setting := range info.Settings {
+		switch setting.Key {
+		case "vcs.revision":
+			buildCommit = setting.Value
+		case "vcs.modified":
+			vcsModified = setting.Value
+		}
+	}
+	clean, err := validateFixedSigmaChainBinaryProvenance(primaryCommit, buildCommit, vcsModified)
+	if err != nil {
+		return buildCommit, false, err
+	}
+	return buildCommit, clean, nil
+}
+
+func validatePublicFixedSigmaChainBackendPin(backend, commit, profile string) error {
+	if backend == "fast" && profile == "logn13" && commit == publicFixedSigmaChainFastSHA {
+		return nil
+	}
+	return validatePublicBackendPin(backend, commit, profile)
 }
 
 func productOracleForStage(stage string, add, c []complex128) []complex128 {
