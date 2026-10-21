@@ -6,6 +6,8 @@ import (
 	"fmt"
 
 	"github.com/tuneinsight/lattigo/v6/circuits/ckks/bootstrapping"
+	"github.com/tuneinsight/lattigo/v6/core/rlwe"
+	"github.com/tuneinsight/lattigo/v6/schemes/ckks"
 )
 
 func publicBackendName() string { return "standard" }
@@ -22,4 +24,12 @@ func publicEvaluatorDispatch(eval *bootstrapping.Evaluator) (string, error) {
 		return "", fmt.Errorf("public bootstrapping.NewEvaluator did not construct the genuine Standard evaluator")
 	}
 	return "bootstrapping.NewEvaluator genuine Standard evaluator", nil
+}
+
+func publicMulRelinRescaleDispatchEvidence() string {
+	return "ordinary ckks.Evaluator.MulRelinNew and Rescale on the isolated genuine Standard source"
+}
+
+func injectPublicFixedSigmaNoise(*ckks.Evaluator, *rlwe.Ciphertext, float64, int64) (fixedSigmaNoiseEvidence, error) {
+	return fixedSigmaNoiseEvidence{}, fmt.Errorf("fixed-sigma injection is Fast-only")
 }

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"math"
 	"os"
 	"os/exec"
 	"runtime"
@@ -148,6 +149,11 @@ type cliOptions struct {
 	warmup                  int
 	repetitions             int
 	standardTrials          int
+	fixedSigmaNoise         bool
+	fixedSigmaNoiseSigma    float64
+	fixedSigmaNoiseSeed     int64
+	fixedSigmaSigmaProvided bool
+	fixedSigmaSeedProvided  bool
 }
 
 func main() {
@@ -214,12 +220,26 @@ func run() error {
 	flag.IntVar(&opts.warmup, "warmup", 1, "untimed full Bootstrap warmups")
 	flag.IntVar(&opts.repetitions, "repetitions", 7, "timed full Bootstrap repetitions")
 	flag.IntVar(&opts.standardTrials, "standard-trials", 3, "independent Standard secret/evaluation-key numerical trials")
+	flag.BoolVar(&opts.fixedSigmaNoise, "fixed-sigma-noise", false, "public-native Fast-only diagnostic: opt in to one fixed-sigma c0 injection after MulRelin+Rescale")
+	flag.Float64Var(&opts.fixedSigmaNoiseSigma, "fixed-sigma-noise-sigma", 0, "fixed-sigma diagnostic coefficient-domain standard deviation; requires --fixed-sigma-noise")
+	flag.Int64Var(&opts.fixedSigmaNoiseSeed, "fixed-sigma-noise-seed", 0, "deterministic fixed-sigma diagnostic sampler seed; requires --fixed-sigma-noise")
 	flag.Parse()
+	flag.Visit(func(item *flag.Flag) {
+		switch item.Name {
+		case "fixed-sigma-noise-sigma":
+			opts.fixedSigmaSigmaProvided = true
+		case "fixed-sigma-noise-seed":
+			opts.fixedSigmaSeedProvided = true
+		}
+	})
 	if opts.config == "" || opts.out == "" || opts.backendCommit == "" || opts.secondaryRoot == "" || opts.backendRef == "" {
 		return errors.New("--config, --out, --backend-commit, --backend-ref, and --secondary-root are required")
 	}
 	if opts.inputSmoke && opts.outputSmoke {
 		return errors.New("--input-smoke and --output-smoke are mutually exclusive")
+	}
+	if err := validateFixedSigmaNoiseOptions(opts); err != nil {
+		return err
 	}
 	if !opts.inputSmoke && !opts.outputSmoke && opts.vectorsOut == "" {
 		return errors.New("measurement requires --vectors-out")
@@ -477,6 +497,21 @@ func run() error {
 		return err
 	}
 	fmt.Printf("%s %s timing=%s numerical_trials=%d checkpoints=%d\n", opts.profile, backend.Name(), opts.out, len(numericalTrials), len(stages))
+	return nil
+}
+
+func validateFixedSigmaNoiseOptions(opts cliOptions) error {
+	if opts.fixedSigmaNoise {
+		if opts.mode != "public-native" || publicBackendName() != "fast" || opts.publicBootstrap || opts.publicRepeatability ||
+			opts.bootstrapBudget != 0 || opts.profile != "logn13" || opts.backendCommit != publicFixedSigmaNoiseFastSHA || opts.traceFixtureOut != "" {
+			return errors.New("--fixed-sigma-noise requires zero-Bootstrap public-native LogN13 Fast at the exact fixed-sigma helper commit")
+		}
+		if !opts.fixedSigmaSigmaProvided || !opts.fixedSigmaSeedProvided || math.IsNaN(opts.fixedSigmaNoiseSigma) || math.IsInf(opts.fixedSigmaNoiseSigma, 0) || opts.fixedSigmaNoiseSigma <= 0 {
+			return errors.New("--fixed-sigma-noise requires an explicit finite positive --fixed-sigma-noise-sigma and --fixed-sigma-noise-seed")
+		}
+	} else if opts.fixedSigmaSigmaProvided || opts.fixedSigmaSeedProvided {
+		return errors.New("--fixed-sigma-noise-sigma and --fixed-sigma-noise-seed require --fixed-sigma-noise")
+	}
 	return nil
 }
 

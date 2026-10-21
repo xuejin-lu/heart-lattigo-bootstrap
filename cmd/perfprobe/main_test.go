@@ -5,8 +5,10 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"math/big"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -778,6 +780,54 @@ func TestFixedSigmaFastPinIsTaskScopedToLogN13(t *testing.T) {
 	if err := validatePublicBackendPin("fast", publicFixedSigmaFastSHA, "logn16"); err == nil {
 		t.Fatal("fixed-sigma LogN13 pin was accepted for LogN16")
 	}
+	if err := validatePublicBackendPin("fast", publicFixedSigmaNoiseFastSHA, "logn13"); err != nil {
+		t.Fatalf("fixed-sigma helper LogN13 Fast pin rejected: %v", err)
+	}
+	if err := validatePublicBackendPin("fast", publicFixedSigmaNoiseFastSHA, "logn16"); err == nil {
+		t.Fatal("fixed-sigma helper pin was accepted for LogN16")
+	}
+}
+
+func TestFixedSigmaNoiseOptInRequiresExactFastZeroBootstrapContract(t *testing.T) {
+	valid := cliOptions{
+		mode: "public-native", profile: "logn13", backendCommit: publicFixedSigmaNoiseFastSHA,
+		bootstrapBudget: 0, fixedSigmaNoise: true, fixedSigmaNoiseSigma: 4.004280012097432,
+		fixedSigmaNoiseSeed: 20261022, fixedSigmaSigmaProvided: true, fixedSigmaSeedProvided: true,
+	}
+	err := validateFixedSigmaNoiseOptions(valid)
+	if publicBackendName() == "fast" && err != nil {
+		t.Fatalf("valid fixed-sigma Fast opt-in rejected: %v", err)
+	}
+	if publicBackendName() != "fast" && err == nil {
+		t.Fatal("fixed-sigma opt-in was accepted outside the Fast build")
+	}
+
+	tests := []struct {
+		name string
+		edit func(*cliOptions)
+	}{
+		{name: "missing sigma flag", edit: func(opts *cliOptions) { opts.fixedSigmaSigmaProvided = false }},
+		{name: "missing seed flag", edit: func(opts *cliOptions) { opts.fixedSigmaSeedProvided = false }},
+		{name: "zero sigma", edit: func(opts *cliOptions) { opts.fixedSigmaNoiseSigma = 0 }},
+		{name: "nonfinite sigma", edit: func(opts *cliOptions) { opts.fixedSigmaNoiseSigma = math.Inf(1) }},
+		{name: "Bootstrap budget", edit: func(opts *cliOptions) { opts.bootstrapBudget = 1 }},
+		{name: "LogN16", edit: func(opts *cliOptions) { opts.profile = "logn16" }},
+		{name: "wrong helper commit", edit: func(opts *cliOptions) { opts.backendCommit = publicFixedSigmaFastSHA }},
+		{name: "Bootstrap enabled", edit: func(opts *cliOptions) { opts.publicBootstrap = true }},
+		{name: "trace export", edit: func(opts *cliOptions) { opts.traceFixtureOut = "trace.json" }},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			mutated := valid
+			test.edit(&mutated)
+			if validateFixedSigmaNoiseOptions(mutated) == nil {
+				t.Fatal("invalid fixed-sigma opt-in was accepted")
+			}
+		})
+	}
+	if validateFixedSigmaNoiseOptions(cliOptions{fixedSigmaSigmaProvided: true}) == nil {
+		t.Fatal("sigma argument without the explicit opt-in was accepted")
+	}
 }
 
 func TestPublicOperationResidualEvidenceBindsDecodedInputsAndOutput(t *testing.T) {
@@ -797,6 +847,63 @@ func TestPublicOperationResidualEvidenceBindsDecodedInputsAndOutput(t *testing.T
 	corrupted.MulRelinRescaleIncrementalResidual[0].Real += 1
 	if err := validatePublicOperationResidualEvidence(standard, corrupted); err == nil {
 		t.Fatal("residual validator accepted a modified incremental vector")
+	}
+}
+
+func TestPublicOperationResidualValidatesSingleFixedSigmaInjectionEvidence(t *testing.T) {
+	doc, vectors := makePublicPairArtifactFixture(t, "fast")
+	attachPublicOperationResidualEvidence(t, &doc, &vectors)
+	preNoise := decodeComplexValues(vectors.Checkpoints["rescale_q5_level4"])
+	x := decodeComplexValues(vectors.Checkpoints["add_level5"])
+	y := decodeComplexValues(vectors.Checkpoints["encrypt_c_q5_level5"])
+	oracles, err := publicOracleCheckpoints(doc.InputSlots)
+	if err != nil {
+		t.Fatal(err)
+	}
+	preResidual, _, _, _, err := makePublicOperationResidual(x, y, preNoise, oracles["rescale_q5_level4"])
+	if err != nil {
+		t.Fatal(err)
+	}
+	seed, sigma := int64(20261022), 4.004280012097432
+	capacityProduct := big.NewInt(1)
+	for _, raw := range doc.Parameters.QPrimes[:4] {
+		prime, parseErr := strconv.ParseUint(raw, 10, 64)
+		if parseErr != nil {
+			t.Fatal(parseErr)
+		}
+		capacityProduct.Mul(capacityProduct, new(big.Int).SetUint64(prime))
+	}
+	evidence := &fixedSigmaNoiseEvidence{
+		SigmaCoefficient: sigma, SamplingSeed: seed, CoefficientSampleCount: doc.Parameters.RingN,
+		CoefficientMean: 0, CoefficientVariance: sigma * sigma, CoefficientRMS: sigma, CoefficientMaxAbs: 17,
+		CoefficientSHA256: strings.Repeat("a", 64), SamplingAlgorithm: "Go math/rand NormFloat64 rounded with math.Round",
+		QPrefixRows: 4, QPrefixCheckedCoefficients: doc.Parameters.RingN, QPrefixMaxAbs: "123",
+		QPrefixPrefixProduct: capacityProduct.String(), QPrefixStrictFit: true,
+		DispatchEvidence: "existing fastcore centered-Q-prefix addition-capacity check",
+	}
+	zeroDelta := make([]complex128, len(preNoise))
+	deltaStats := numericalmetrics.SummarizeComplexVector(zeroDelta)
+	residual := doc.MulRelinRescaleResidual
+	residual.LogicalNoiseInjections = 1
+	residual.SigmaCoefficient = &sigma
+	residual.SigmaStatus = "FROZEN_CP_B_CANDIDATE_DIAGNOSTIC_ONLY"
+	residual.SamplingSeedStatus = "SEEDED_GO_MATH_RAND_RECORDED"
+	residual.SamplingSeed = &seed
+	residual.FixedSigmaNoise = evidence
+	residual.PreNoiseOutputSHA256 = perfmeasure.Fingerprint(preNoise)
+	residual.PreNoiseStatistics = &preResidual.Statistics
+	residual.DecodedNoiseDelta = &deltaStats
+	residual.InjectionElapsedNS = 100
+	vectors.MulRelinRescalePreNoiseOutput = encodeVector(preNoise)
+	vectors.MulRelinRescaleNoiseDelta = encodeVector(zeroDelta)
+	if err := validatePublicOperationResidualEvidence(doc, vectors); err != nil {
+		t.Fatalf("single fixed-sigma evidence rejected: %v", err)
+	}
+	corrupted := vectors
+	corrupted.MulRelinRescaleNoiseDelta = append([]complexValue(nil), vectors.MulRelinRescaleNoiseDelta...)
+	corrupted.MulRelinRescaleNoiseDelta[0].Real = 1
+	if err := validatePublicOperationResidualEvidence(doc, corrupted); err == nil {
+		t.Fatal("residual validator accepted a forged decoded injection delta")
 	}
 }
 

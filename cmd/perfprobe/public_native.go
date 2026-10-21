@@ -32,6 +32,7 @@ const (
 	publicFastSHA                      = "2d6145d7e1db0ca7351eb47a03e1b352fc4ef9ac"
 	publicCurrentFastSHA               = "2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f"
 	publicFixedSigmaFastSHA            = "ee308c9743000b5f281a84a871e7c4bd59b176c4"
+	publicFixedSigmaNoiseFastSHA       = "9ef0315feaf59dbee03bf0852b72c76fdeb6b800"
 	publicConfigSHA                    = "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98"
 	publicInputSHA                     = "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285"
 	publicWorkloadSHA                  = "00b70a2e77887c7d6a41db1859246f6513f2c984915de648734e5dd8c584cf74"
@@ -254,25 +255,52 @@ type publicVectorDocument struct {
 	Checkpoints                        map[string][]complexValue `json:"checkpoints"`
 	MulRelinRescaleIncrementalResidual []complexValue            `json:"mul_relin_rescale_incremental_residual,omitempty"`
 	MulRelinRescaleTotalError          []complexValue            `json:"mul_relin_rescale_total_error,omitempty"`
+	MulRelinRescalePreNoiseOutput      []complexValue            `json:"mul_relin_rescale_pre_noise_output,omitempty"`
+	MulRelinRescaleNoiseDelta          []complexValue            `json:"mul_relin_rescale_decoded_noise_delta,omitempty"`
 	BootstrapOutputs                   map[string][]complexValue `json:"bootstrap_outputs,omitempty"`
 }
 
+type fixedSigmaNoiseEvidence struct {
+	SigmaCoefficient           float64 `json:"sigma_coefficient"`
+	SamplingSeed               int64   `json:"sampling_seed"`
+	CoefficientSampleCount     int     `json:"coefficient_sample_count"`
+	CoefficientMean            float64 `json:"coefficient_mean"`
+	CoefficientVariance        float64 `json:"coefficient_variance"`
+	CoefficientRMS             float64 `json:"coefficient_rms"`
+	CoefficientMaxAbs          uint64  `json:"coefficient_max_abs"`
+	CoefficientSHA256          string  `json:"coefficient_sha256"`
+	SamplingAlgorithm          string  `json:"sampling_algorithm"`
+	QPrefixRows                int     `json:"qprefix_rows"`
+	QPrefixCheckedCoefficients int     `json:"qprefix_checked_coefficients"`
+	QPrefixMaxAbs              string  `json:"qprefix_max_abs"`
+	QPrefixPrefixProduct       string  `json:"qprefix_prefix_product"`
+	QPrefixStrictFit           bool    `json:"qprefix_strict_fit"`
+	DispatchEvidence           string  `json:"dispatch_evidence"`
+}
+
 type publicOperationResidual struct {
-	SchemaVersion          string                              `json:"schema_version"`
-	Classification         string                              `json:"classification"`
-	Definition             string                              `json:"definition"`
-	EncryptionMode         string                              `json:"encryption_mode"`
-	PKStatus               string                              `json:"pk_comparison_status"`
-	LogicalCtCtMulCount    int                                 `json:"logical_ct_ct_mul_count"`
-	LogicalNoiseInjections int                                 `json:"logical_noise_injections"`
-	SigmaCoefficient       *float64                            `json:"sigma_coefficient,omitempty"`
-	SigmaStatus            string                              `json:"sigma_coefficient_status"`
-	SamplingSeedStatus     string                              `json:"sampling_seed_status"`
-	ElapsedNS              int64                               `json:"mul_relin_rescale_elapsed_ns"`
-	InputXSHA256           string                              `json:"decoded_input_x_sha256"`
-	InputYSHA256           string                              `json:"decoded_input_y_sha256"`
-	OutputSHA256           string                              `json:"decoded_output_sha256"`
-	Statistics             numericalmetrics.ComplexVectorStats `json:"statistics"`
+	SchemaVersion          string                               `json:"schema_version"`
+	Classification         string                               `json:"classification"`
+	Definition             string                               `json:"definition"`
+	EncryptionMode         string                               `json:"encryption_mode"`
+	PKStatus               string                               `json:"pk_comparison_status"`
+	LogicalCtCtMulCount    int                                  `json:"logical_ct_ct_mul_count"`
+	LogicalNoiseInjections int                                  `json:"logical_noise_injections"`
+	SigmaCoefficient       *float64                             `json:"sigma_coefficient,omitempty"`
+	SigmaStatus            string                               `json:"sigma_coefficient_status"`
+	SamplingSeedStatus     string                               `json:"sampling_seed_status"`
+	SamplingSeed           *int64                               `json:"sampling_seed,omitempty"`
+	ElapsedNS              int64                                `json:"mul_relin_rescale_elapsed_ns"`
+	InputXSHA256           string                               `json:"decoded_input_x_sha256"`
+	InputYSHA256           string                               `json:"decoded_input_y_sha256"`
+	OutputSHA256           string                               `json:"decoded_output_sha256"`
+	Statistics             numericalmetrics.ComplexVectorStats  `json:"statistics"`
+	DispatchEvidence       string                               `json:"dispatch_evidence"`
+	FixedSigmaNoise        *fixedSigmaNoiseEvidence             `json:"fixed_sigma_noise,omitempty"`
+	PreNoiseOutputSHA256   string                               `json:"pre_noise_output_sha256,omitempty"`
+	PreNoiseStatistics     *numericalmetrics.ComplexVectorStats `json:"pre_noise_incremental_residual,omitempty"`
+	DecodedNoiseDelta      *numericalmetrics.ComplexVectorStats `json:"decoded_injection_delta,omitempty"`
+	InjectionElapsedNS     int64                                `json:"injection_elapsed_ns,omitempty"`
 }
 
 type publicBootstrapResult struct {
@@ -387,16 +415,22 @@ type publicPairDocument struct {
 }
 
 type publicPairOperationResidual struct {
-	SchemaVersion             string                              `json:"schema_version"`
-	Standard                  numericalmetrics.ComplexVectorStats `json:"standard_incremental_residual"`
-	Fast                      numericalmetrics.ComplexVectorStats `json:"fast_incremental_residual"`
-	StandardTotalError        numericalmetrics.ComplexVectorStats `json:"standard_total_error"`
-	FastTotalError            numericalmetrics.ComplexVectorStats `json:"fast_total_error"`
-	StandardMinusFastVariance float64                             `json:"standard_minus_fast_variance"`
-	VarianceDeltaStatus       string                              `json:"variance_delta_status"`
-	CrossBackendCovariance    numericalmetrics.ComplexCovariance  `json:"cross_backend_covariance"`
-	CoefficientSigmaStatus    string                              `json:"coefficient_sigma_status"`
-	Interpretation            string                              `json:"interpretation"`
+	SchemaVersion             string                               `json:"schema_version"`
+	Standard                  numericalmetrics.ComplexVectorStats  `json:"standard_incremental_residual"`
+	Fast                      numericalmetrics.ComplexVectorStats  `json:"fast_incremental_residual"`
+	StandardTotalError        numericalmetrics.ComplexVectorStats  `json:"standard_total_error"`
+	FastTotalError            numericalmetrics.ComplexVectorStats  `json:"fast_total_error"`
+	StandardMinusFastVariance float64                              `json:"standard_minus_fast_variance"`
+	VarianceDeltaStatus       string                               `json:"variance_delta_status"`
+	CrossBackendCovariance    numericalmetrics.ComplexCovariance   `json:"cross_backend_covariance"`
+	CoefficientSigmaStatus    string                               `json:"coefficient_sigma_status"`
+	FastFixedSigmaCoefficient *float64                             `json:"fast_fixed_sigma_coefficient,omitempty"`
+	FastSamplingSeed          *int64                               `json:"fast_sampling_seed,omitempty"`
+	FastCoefficientRMS        *float64                             `json:"fast_coefficient_empirical_rms,omitempty"`
+	FastCoefficientSHA256     string                               `json:"fast_coefficient_sha256,omitempty"`
+	FastDecodedNoiseDelta     *numericalmetrics.ComplexVectorStats `json:"fast_decoded_injection_delta,omitempty"`
+	FastInjectionElapsedNS    int64                                `json:"fast_injection_elapsed_ns,omitempty"`
+	Interpretation            string                               `json:"interpretation"`
 }
 
 func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameters, params bootstrapping.Parameters, effective perfmeasure.EffectiveParameters) error {
@@ -501,6 +535,10 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 	var mulRelinRescaleResidual *publicOperationResidual
 	var mulRelinRescaleTotalError numericalmetrics.ComplexVectorStats
 	var mulRelinRescaleResidualVector, mulRelinRescaleTotalErrorVector []complexValue
+	var mulRelinRescalePreNoiseOutput, mulRelinRescaleNoiseDelta []complexValue
+	var fixedSigmaEvidence *fixedSigmaNoiseEvidence
+	var decodedNoiseDeltaStats *numericalmetrics.ComplexVectorStats
+	var injectionElapsedNS int64
 	addCheckpoint := func(name string, ct *rlwe.Ciphertext, expected []complex128, fastCompactOutput bool) error {
 		var decodePath string
 		decoded, phase, decodeErr := measurePublicPhase("checkpoint_decode_"+name, func() ([]complex128, error) {
@@ -621,6 +659,69 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 	if rescaled.Level() != 4 || !rescaled.Scale.Equal(defaultScale) {
 		return errors.New("Rescale(q5) did not yield Level4/Scale2^45")
 	}
+	var preNoiseDecoded []complex128
+	if opts.fixedSigmaNoise {
+		preNoiseDecoded, phase, err = measurePublicPhase("checkpoint_decode_pre_fixed_sigma_noise", func() ([]complex128, error) {
+			values, _, decodeErr := backend.decode(rescaled)
+			return values, decodeErr
+		})
+		phaseTimings = append(phaseTimings, phase)
+		if err != nil {
+			return fmt.Errorf("decode pre-injection Rescale output: %w", err)
+		}
+		beforeState := perfmeasure.CiphertextStateOf(rescaled, q, 4)
+		beforeMetadata := *rescaled.MetaData
+		beforeNTT, beforeMontgomery := rescaled.IsNTT, rescaled.IsMontgomery
+		beforeC1Rows := make([]string, 4)
+		for row := range beforeC1Rows {
+			beforeC1Rows[row] = hashUint64Row(rescaled.Value[1].Coeffs[row])
+		}
+		var evidence fixedSigmaNoiseEvidence
+		evidence, phase, err = measurePublicPhase("public_fixed_sigma_noise_injection", func() (fixedSigmaNoiseEvidence, error) {
+			return injectPublicFixedSigmaNoise(backend.evaluator, rescaled, opts.fixedSigmaNoiseSigma, opts.fixedSigmaNoiseSeed)
+		})
+		phaseTimings = append(phaseTimings, phase)
+		if err != nil {
+			return fmt.Errorf("opt-in fixed-sigma injection: %w", err)
+		}
+		injectionElapsedNS = phase.ElapsedNS
+		if evidence.SigmaCoefficient != opts.fixedSigmaNoiseSigma || evidence.SamplingSeed != opts.fixedSigmaNoiseSeed ||
+			evidence.CoefficientSampleCount != full.N() || evidence.QPrefixRows != 4 ||
+			evidence.QPrefixCheckedCoefficients != full.N() || !evidence.QPrefixStrictFit ||
+			!validSHA256Hex(evidence.CoefficientSHA256) {
+			return errors.New("fixed-sigma helper returned incomplete coefficient or Q-prefix capacity evidence")
+		}
+		if perfmeasure.CiphertextStateOf(rescaled, q, 4) != beforeState || !reflect.DeepEqual(*rescaled.MetaData, beforeMetadata) ||
+			rescaled.IsNTT != beforeNTT || rescaled.IsMontgomery != beforeMontgomery {
+			return errors.New("fixed-sigma injection changed ciphertext Level/Scale/domain metadata")
+		}
+		for row := range beforeC1Rows {
+			if hashUint64Row(rescaled.Value[1].Coeffs[row]) != beforeC1Rows[row] {
+				return fmt.Errorf("fixed-sigma injection changed c1 q%d", row)
+			}
+		}
+		var postNoiseDecoded []complex128
+		postNoiseDecoded, phase, err = measurePublicPhase("checkpoint_decode_post_fixed_sigma_noise", func() ([]complex128, error) {
+			values, _, decodeErr := backend.decode(rescaled)
+			return values, decodeErr
+		})
+		phaseTimings = append(phaseTimings, phase)
+		if err != nil {
+			return fmt.Errorf("decode post-injection Rescale output: %w", err)
+		}
+		noiseDelta := make([]complex128, len(postNoiseDecoded))
+		for index := range noiseDelta {
+			noiseDelta[index] = postNoiseDecoded[index] - preNoiseDecoded[index]
+		}
+		stats := numericalmetrics.SummarizeComplexVector(noiseDelta)
+		if stats.Status != "FINITE" || stats.Count != effective.InputSlots {
+			return errors.New("decoded fixed-sigma injection delta has invalid dimensions or non-finite values")
+		}
+		fixedSigmaEvidence = &evidence
+		decodedNoiseDeltaStats = &stats
+		mulRelinRescalePreNoiseOutput = encodeVector(preNoiseDecoded)
+		mulRelinRescaleNoiseDelta = encodeVector(noiseDelta)
+	}
 	if err := addCheckpoint("rescale_q5_level4", rescaled, expectedProduct, true); err != nil {
 		return err
 	}
@@ -630,6 +731,27 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 	)
 	if err != nil {
 		return fmt.Errorf("MulRelin+Rescale incremental residual: %w", err)
+	}
+	mulRelinRescaleResidual.DispatchEvidence = publicMulRelinRescaleDispatchEvidence()
+	if fixedSigmaEvidence != nil {
+		preResidual, _, _, _, preErr := makePublicOperationResidual(
+			decodedByCheckpoint["add_level5"], decodedByCheckpoint["encrypt_c_q5_level5"], preNoiseDecoded, expectedProduct,
+		)
+		if preErr != nil {
+			return fmt.Errorf("pre-injection MulRelin+Rescale residual: %w", preErr)
+		}
+		seed := fixedSigmaEvidence.SamplingSeed
+		sigma := fixedSigmaEvidence.SigmaCoefficient
+		mulRelinRescaleResidual.LogicalNoiseInjections = 1
+		mulRelinRescaleResidual.SigmaCoefficient = &sigma
+		mulRelinRescaleResidual.SigmaStatus = "FROZEN_CP_B_CANDIDATE_DIAGNOSTIC_ONLY"
+		mulRelinRescaleResidual.SamplingSeedStatus = "SEEDED_GO_MATH_RAND_RECORDED"
+		mulRelinRescaleResidual.SamplingSeed = &seed
+		mulRelinRescaleResidual.FixedSigmaNoise = fixedSigmaEvidence
+		mulRelinRescaleResidual.PreNoiseOutputSHA256 = perfmeasure.Fingerprint(preNoiseDecoded)
+		mulRelinRescaleResidual.PreNoiseStatistics = &preResidual.Statistics
+		mulRelinRescaleResidual.DecodedNoiseDelta = decodedNoiseDeltaStats
+		mulRelinRescaleResidual.InjectionElapsedNS = injectionElapsedNS
 	}
 	mulRelinRescaleResidual.ElapsedNS, err = sumPublicPhaseElapsedNS(phaseTimings, "public_MulRelinNew", "public_Rescale_q5")
 	if err != nil {
@@ -801,6 +923,8 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 		Checkpoints:                        vectorMap,
 		MulRelinRescaleIncrementalResidual: mulRelinRescaleResidualVector,
 		MulRelinRescaleTotalError:          mulRelinRescaleTotalErrorVector,
+		MulRelinRescalePreNoiseOutput:      mulRelinRescalePreNoiseOutput,
+		MulRelinRescaleNoiseDelta:          mulRelinRescaleNoiseDelta,
 		BootstrapOutputs:                   bootstrapOutputMap,
 	}
 	if err := writeExclusiveJSON(opts.out, doc); err != nil {
@@ -1591,6 +1715,18 @@ func runPublicCompare(args []string) error {
 			CoefficientSigmaStatus: "NOT_IDENTIFIABLE_WITHOUT_REPEATED_TRIALS_AND_EMPIRICAL_COEFFICIENT_TO_SLOT_CALIBRATION",
 			Interpretation:         "One paired vector supplies descriptive slot-domain moments only; it does not prove independent zero-mean noise or identify coefficient-domain sigma.",
 		}
+		if fast.MulRelinRescaleResidual.LogicalNoiseInjections == 1 {
+			evidence := fast.MulRelinRescaleResidual.FixedSigmaNoise
+			sigma, seed, coefficientRMS := evidence.SigmaCoefficient, evidence.SamplingSeed, evidence.CoefficientRMS
+			pair.MulRelinRescaleResidual.FastFixedSigmaCoefficient = &sigma
+			pair.MulRelinRescaleResidual.FastSamplingSeed = &seed
+			pair.MulRelinRescaleResidual.FastCoefficientRMS = &coefficientRMS
+			pair.MulRelinRescaleResidual.FastCoefficientSHA256 = evidence.CoefficientSHA256
+			pair.MulRelinRescaleResidual.FastDecodedNoiseDelta = fast.MulRelinRescaleResidual.DecodedNoiseDelta
+			pair.MulRelinRescaleResidual.FastInjectionElapsedNS = fast.MulRelinRescaleResidual.InjectionElapsedNS
+			pair.MulRelinRescaleResidual.CoefficientSigmaStatus = "FROZEN_CP_B_CANDIDATE_APPLIED_DIAGNOSTIC_ONLY"
+			pair.MulRelinRescaleResidual.Interpretation = "The frozen CP-B coefficient sigma was injected once after this isolated Fast MulRelin+Rescale; decoded delta, coefficient moments and seed are recorded. This paired vector does not establish a general independent-noise model."
+		}
 	}
 	if bootstrapMode {
 		for index, standardResult := range standard.BootstrapResults {
@@ -1922,21 +2058,55 @@ func validatePublicBackendEvidence(doc publicNativeDocument, vectors publicVecto
 
 func validatePublicOperationResidualEvidence(doc publicNativeDocument, vectors publicVectorDocument) error {
 	if doc.MulRelinRescaleResidual == nil && len(vectors.MulRelinRescaleIncrementalResidual) == 0 &&
-		len(vectors.MulRelinRescaleTotalError) == 0 {
+		len(vectors.MulRelinRescaleTotalError) == 0 && len(vectors.MulRelinRescalePreNoiseOutput) == 0 &&
+		len(vectors.MulRelinRescaleNoiseDelta) == 0 {
 		return nil // Historical public-native artifacts predate this task-specific extension.
 	}
 	if doc.MulRelinRescaleResidual == nil || len(vectors.MulRelinRescaleIncrementalResidual) == 0 || len(vectors.MulRelinRescaleTotalError) == 0 {
 		return errors.New("incremental residual document and both vector sidecars must be present together")
 	}
-	if doc.MulRelinRescaleResidual.SchemaVersion != "fixed-sigma-mul-relin-rescale-residual.v1" ||
-		doc.MulRelinRescaleResidual.Classification != "DIAGNOSTIC_ONLY" || doc.MulRelinRescaleResidual.EncryptionMode != "sk" ||
-		doc.MulRelinRescaleResidual.PKStatus != "UNSUPPORTED_FAST_ZERO_SECRET_MULRELIN_REQUIRES_C1_ZERO" ||
-		doc.MulRelinRescaleResidual.LogicalCtCtMulCount != 1 || doc.MulRelinRescaleResidual.LogicalNoiseInjections != 0 ||
-		doc.MulRelinRescaleResidual.SigmaCoefficient != nil || doc.MulRelinRescaleResidual.SigmaStatus != "NOT_ESTIMATED_CP_B_BASELINE" ||
-		doc.MulRelinRescaleResidual.SamplingSeedStatus != "NOT_APPLICABLE_BASELINE_NO_INJECTION" ||
-		doc.MulRelinRescaleResidual.ElapsedNS <= 0 ||
-		doc.MulRelinRescaleResidual.Definition != "Decode(Rescale(Relin(Mul(ct_x,ct_y)))) - Decode(ct_x) * Decode(ct_y), elementwise in slot domain" {
+	stored := doc.MulRelinRescaleResidual
+	if stored.SchemaVersion != "fixed-sigma-mul-relin-rescale-residual.v1" ||
+		stored.Classification != "DIAGNOSTIC_ONLY" || stored.EncryptionMode != "sk" ||
+		stored.PKStatus != "UNSUPPORTED_FAST_ZERO_SECRET_MULRELIN_REQUIRES_C1_ZERO" ||
+		stored.LogicalCtCtMulCount != 1 || stored.ElapsedNS <= 0 ||
+		stored.Definition != "Decode(Rescale(Relin(Mul(ct_x,ct_y)))) - Decode(ct_x) * Decode(ct_y), elementwise in slot domain" {
 		return errors.New("incremental residual has an unknown classification or definition")
+	}
+	if doc.Backend == "standard" || stored.LogicalNoiseInjections == 0 {
+		if stored.LogicalNoiseInjections != 0 || stored.SigmaCoefficient != nil || stored.SigmaStatus != "NOT_ESTIMATED_CP_B_BASELINE" ||
+			stored.SamplingSeedStatus != "NOT_APPLICABLE_BASELINE_NO_INJECTION" || stored.SamplingSeed != nil || stored.FixedSigmaNoise != nil ||
+			stored.PreNoiseOutputSHA256 != "" || stored.PreNoiseStatistics != nil || stored.DecodedNoiseDelta != nil || stored.InjectionElapsedNS != 0 ||
+			len(vectors.MulRelinRescalePreNoiseOutput) != 0 || len(vectors.MulRelinRescaleNoiseDelta) != 0 {
+			return errors.New("baseline residual has unexpected fixed-sigma injection evidence")
+		}
+	} else {
+		if doc.Backend != "fast" || stored.LogicalNoiseInjections != 1 || stored.SigmaCoefficient == nil ||
+			math.IsNaN(*stored.SigmaCoefficient) || math.IsInf(*stored.SigmaCoefficient, 0) || *stored.SigmaCoefficient <= 0 || stored.SigmaStatus != "FROZEN_CP_B_CANDIDATE_DIAGNOSTIC_ONLY" ||
+			stored.SamplingSeedStatus != "SEEDED_GO_MATH_RAND_RECORDED" || stored.SamplingSeed == nil || stored.FixedSigmaNoise == nil ||
+			stored.InjectionElapsedNS <= 0 || stored.PreNoiseOutputSHA256 == "" || stored.PreNoiseStatistics == nil || stored.DecodedNoiseDelta == nil ||
+			len(vectors.MulRelinRescalePreNoiseOutput) != doc.InputSlots || len(vectors.MulRelinRescaleNoiseDelta) != doc.InputSlots {
+			return errors.New("Fast fixed-sigma evidence must describe exactly one seeded post-Rescale injection")
+		}
+		evidence := stored.FixedSigmaNoise
+		if evidence.SigmaCoefficient != *stored.SigmaCoefficient || evidence.SamplingSeed != *stored.SamplingSeed ||
+			evidence.CoefficientSampleCount != doc.Parameters.RingN || evidence.CoefficientVariance <= 0 || evidence.CoefficientRMS <= 0 ||
+			!validSHA256Hex(evidence.CoefficientSHA256) || evidence.SamplingAlgorithm == "" || evidence.QPrefixRows != 4 ||
+			evidence.QPrefixCheckedCoefficients != doc.Parameters.RingN || !evidence.QPrefixStrictFit ||
+			evidence.DispatchEvidence == "" || !strings.Contains(evidence.DispatchEvidence, "centered-Q-prefix addition-capacity check") {
+			return errors.New("fixed-sigma evidence has invalid sampler, residue, capacity, or dispatch provenance")
+		}
+		prefixProduct := big.NewInt(1)
+		for row := 0; row < evidence.QPrefixRows; row++ {
+			prime, parseErr := strconv.ParseUint(doc.Parameters.QPrimes[row], 10, 64)
+			if parseErr != nil || prime == 0 {
+				return fmt.Errorf("fixed-sigma capacity has invalid q%d metadata", row)
+			}
+			prefixProduct.Mul(prefixProduct, new(big.Int).SetUint64(prime))
+		}
+		if evidence.QPrefixPrefixProduct != prefixProduct.String() || evidence.QPrefixMaxAbs == "" {
+			return errors.New("fixed-sigma capacity evidence does not match effective q0..q3")
+		}
 	}
 	inputX, inputXOK := vectors.Checkpoints["add_level5"]
 	inputY, inputYOK := vectors.Checkpoints["encrypt_c_q5_level5"]
@@ -1958,13 +2128,30 @@ func validatePublicOperationResidualEvidence(doc publicNativeDocument, vectors p
 	if err != nil {
 		return err
 	}
-	stored := doc.MulRelinRescaleResidual
 	if stored.InputXSHA256 != perfmeasure.Fingerprint(x) || stored.InputYSHA256 != perfmeasure.Fingerprint(y) ||
 		stored.OutputSHA256 != perfmeasure.Fingerprint(z) || !sameComplexVectorStats(residual.Statistics, stored.Statistics) ||
 		!sameComplexVectorStats(total, doc.MulRelinRescaleTotalError) ||
 		!reflect.DeepEqual(residualVector, vectors.MulRelinRescaleIncrementalResidual) ||
 		!reflect.DeepEqual(totalVector, vectors.MulRelinRescaleTotalError) {
 		return errors.New("stored residual hashes, summary, or vectors do not match decoded inputs/output and plaintext oracle")
+	}
+	if stored.LogicalNoiseInjections == 1 {
+		preNoise := decodeComplexValues(vectors.MulRelinRescalePreNoiseOutput)
+		noiseDelta := decodeComplexValues(vectors.MulRelinRescaleNoiseDelta)
+		preResidual, _, _, _, err := makePublicOperationResidual(x, y, preNoise, oracle)
+		if err != nil {
+			return fmt.Errorf("pre-noise residual evidence: %w", err)
+		}
+		expectedDelta := make([]complex128, len(z))
+		for index := range z {
+			expectedDelta[index] = z[index] - preNoise[index]
+		}
+		deltaStats := numericalmetrics.SummarizeComplexVector(expectedDelta)
+		if !allFinite(preNoise) || !allFinite(noiseDelta) || perfmeasure.Fingerprint(preNoise) != stored.PreNoiseOutputSHA256 ||
+			!sameComplexVectorStats(preResidual.Statistics, *stored.PreNoiseStatistics) || !sameComplexVectorStats(deltaStats, *stored.DecodedNoiseDelta) ||
+			!reflect.DeepEqual(encodeVector(expectedDelta), vectors.MulRelinRescaleNoiseDelta) {
+			return errors.New("pre-injection output or decoded injection delta does not match the recorded ciphertext vectors")
+		}
 	}
 	return nil
 }
@@ -2315,6 +2502,7 @@ func makePublicOperationResidual(inputX, inputY, output, oracle []complex128) (*
 		LogicalNoiseInjections: 0,
 		SigmaStatus:            "NOT_ESTIMATED_CP_B_BASELINE",
 		SamplingSeedStatus:     "NOT_APPLICABLE_BASELINE_NO_INJECTION",
+		DispatchEvidence:       "public CKKS MulRelinNew followed by Rescale; operation residual derived from decoded public-boundary checkpoints",
 		InputXSHA256:           perfmeasure.Fingerprint(inputX),
 		InputYSHA256:           perfmeasure.Fingerprint(inputY),
 		OutputSHA256:           perfmeasure.Fingerprint(output),
@@ -2361,10 +2549,10 @@ func validatePublicBackendPin(backend, commit string, profileNames ...string) er
 		}
 		return fmt.Errorf("Standard backend commit %s differs from pinned Standard %s", commit, publicStandardSHA)
 	case "fast":
-		if commit == publicCurrentFastSHA || (profileName == "logn13" && (commit == publicFastSHA || commit == publicFixedSigmaFastSHA)) {
+		if commit == publicCurrentFastSHA || (profileName == "logn13" && (commit == publicFastSHA || commit == publicFixedSigmaFastSHA || commit == publicFixedSigmaNoiseFastSHA)) {
 			return nil
 		}
-		return fmt.Errorf("Fast backend commit %s is not approved for %s (current=%s; fixed-sigma task=%s; historical LogN13=%s)", commit, profileName, publicCurrentFastSHA, publicFixedSigmaFastSHA, publicFastSHA)
+		return fmt.Errorf("Fast backend commit %s is not approved for %s (current=%s; fixed-sigma baseline=%s; fixed-sigma helper=%s; historical LogN13=%s)", commit, profileName, publicCurrentFastSHA, publicFixedSigmaFastSHA, publicFixedSigmaNoiseFastSHA, publicFastSHA)
 	default:
 		return fmt.Errorf("unsupported public-native backend %q", backend)
 	}
