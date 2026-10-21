@@ -57,6 +57,34 @@ func PublicMulRescaleWorkloadFingerprint(a, b, c []complex128, cScale string) (s
 	return hex.EncodeToString(sum[:]), nil
 }
 
+// PublicFixedSigmaChainFingerprint binds the canonical input vectors to the
+// two explicit ct×ct MulRelin+Rescale stages and their effective scales.
+func PublicFixedSigmaChainFingerprint(a, b, c []complex128, defaultScale, q5Scale, q4Scale string) (string, error) {
+	if defaultScale == "" || q5Scale == "" || q4Scale == "" {
+		return "", errors.New("fixed-sigma chain fingerprint requires exact default, q5, and q4 scales")
+	}
+	inputHash, err := PublicMulRescaleWorkloadFingerprint(a, b, c, q5Scale)
+	if err != nil {
+		return "", err
+	}
+	data, err := json.Marshal(struct {
+		SchemaVersion string `json:"schema_version"`
+		InputHash     string `json:"input_sha256"`
+		Stage1        string `json:"stage1"`
+		Stage2        string `json:"stage2"`
+	}{
+		SchemaVersion: "fixed-sigma-two-step-chain-workload.v1",
+		InputHash:     inputHash,
+		Stage1:        "Level5:MulRelin(Scale=" + defaultScale + "*" + q5Scale + ")->Rescale(divisor=q5,output=Level4/Scale=" + defaultScale + ")",
+		Stage2:        "Level4:MulRelin(Scale=" + defaultScale + "*" + q4Scale + ")->Rescale(divisor=q4,output=Level3/Scale=" + defaultScale + ")",
+	})
+	if err != nil {
+		return "", err
+	}
+	sum := sha256.Sum256(data)
+	return hex.EncodeToString(sum[:]), nil
+}
+
 type PublicCapacityPlan struct {
 	InputA            string `json:"input_a_bound"`
 	InputB            string `json:"input_b_bound"`

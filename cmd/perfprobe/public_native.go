@@ -236,6 +236,7 @@ type publicNativeDocument struct {
 	Checkpoints                []publicCheckpoint                  `json:"checkpoints"`
 	MulRelinRescaleResidual    *publicOperationResidual            `json:"mul_relin_rescale_incremental_residual,omitempty"`
 	MulRelinRescaleTotalError  numericalmetrics.ComplexVectorStats `json:"mul_relin_rescale_total_error,omitempty"`
+	FixedSigmaChain            *fixedSigmaChainEvidence            `json:"fixed_sigma_two_step_chain,omitempty"`
 	BootstrapResults           []publicBootstrapResult             `json:"bootstrap_results,omitempty"`
 	Limitations                []string                            `json:"limitations"`
 }
@@ -257,6 +258,7 @@ type publicVectorDocument struct {
 	MulRelinRescaleTotalError          []complexValue            `json:"mul_relin_rescale_total_error,omitempty"`
 	MulRelinRescalePreNoiseOutput      []complexValue            `json:"mul_relin_rescale_pre_noise_output,omitempty"`
 	MulRelinRescaleNoiseDelta          []complexValue            `json:"mul_relin_rescale_decoded_noise_delta,omitempty"`
+	FixedSigmaChain                    *fixedSigmaChainVectors   `json:"fixed_sigma_two_step_chain,omitempty"`
 	BootstrapOutputs                   map[string][]complexValue `json:"bootstrap_outputs,omitempty"`
 }
 
@@ -301,6 +303,51 @@ type publicOperationResidual struct {
 	PreNoiseStatistics     *numericalmetrics.ComplexVectorStats `json:"pre_noise_incremental_residual,omitempty"`
 	DecodedNoiseDelta      *numericalmetrics.ComplexVectorStats `json:"decoded_injection_delta,omitempty"`
 	InjectionElapsedNS     int64                                `json:"injection_elapsed_ns,omitempty"`
+}
+
+type fixedSigmaChainEvidence struct {
+	SchemaVersion          string                     `json:"schema_version"`
+	Classification         string                     `json:"classification"`
+	LogicalCtCtOperations  int                        `json:"logical_ct_ct_operations"`
+	LogicalNoiseInjections int                        `json:"logical_noise_injections"`
+	SigmaCoefficient       *float64                   `json:"sigma_coefficient,omitempty"`
+	Stage2SeedDerivation   string                     `json:"stage2_seed_derivation,omitempty"`
+	InputMessageSHA256     map[string]string          `json:"input_message_sha256"`
+	Operations             []fixedSigmaChainOperation `json:"operations"`
+	Limitations            []string                   `json:"limitations"`
+}
+
+type fixedSigmaChainOperation struct {
+	Name                string                               `json:"name"`
+	InputXCheckpoint    string                               `json:"input_x_checkpoint"`
+	InputYCheckpoint    string                               `json:"input_y_checkpoint"`
+	OutputCheckpoint    string                               `json:"output_checkpoint"`
+	InputXState         ciphertextState                      `json:"input_x_state"`
+	InputYState         ciphertextState                      `json:"input_y_state"`
+	MultiplicationScale string                               `json:"multiplication_scale"`
+	RescaleDivisor      string                               `json:"rescale_divisor"`
+	ProductCheckpoint   string                               `json:"mul_relin_checkpoint"`
+	OutputState         ciphertextState                      `json:"output_state"`
+	MulRelinElapsedNS   int64                                `json:"mul_relin_elapsed_ns"`
+	RescaleElapsedNS    int64                                `json:"rescale_elapsed_ns"`
+	Residual            publicOperationResidual              `json:"incremental_residual"`
+	TotalError          numericalmetrics.ComplexVectorStats  `json:"total_oracle_error"`
+	PreNoiseResidual    *numericalmetrics.ComplexVectorStats `json:"pre_noise_incremental_residual,omitempty"`
+	DecodedNoiseDelta   *numericalmetrics.ComplexVectorStats `json:"decoded_injection_delta,omitempty"`
+}
+
+type fixedSigmaChainVectors struct {
+	Inputs map[string][]complexValue              `json:"original_plaintext_inputs"`
+	Stages map[string]fixedSigmaChainStageVectors `json:"stages"`
+}
+
+type fixedSigmaChainStageVectors struct {
+	IncrementalResidual []complexValue `json:"incremental_residual"`
+	TotalError          []complexValue `json:"total_oracle_error"`
+	MulRelinOracle      []complexValue `json:"mul_relin_plaintext_oracle"`
+	PlaintextOracle     []complexValue `json:"plaintext_oracle"`
+	PreNoiseOutput      []complexValue `json:"pre_noise_output,omitempty"`
+	DecodedNoiseDelta   []complexValue `json:"decoded_noise_delta,omitempty"`
 }
 
 type publicBootstrapResult struct {
@@ -385,6 +432,7 @@ type publicPairBootstrapComparison struct {
 type publicPairDocument struct {
 	SchemaVersion              string                          `json:"schema_version"`
 	GeneratedAt                time.Time                       `json:"generated_at"`
+	Mode                       string                          `json:"mode,omitempty"`
 	Status                     string                          `json:"status"`
 	Profile                    string                          `json:"profile,omitempty"`
 	NumericalGate              float64                         `json:"max_complex_gate"`
@@ -410,12 +458,14 @@ type publicPairDocument struct {
 	MatchedEnvironment         bool                            `json:"matched_environment"`
 	Checkpoints                []publicPairCheckpoint          `json:"checkpoints"`
 	MulRelinRescaleResidual    *publicPairOperationResidual    `json:"mul_relin_rescale_incremental_residual,omitempty"`
+	FixedSigmaChainOperations  []publicPairOperationResidual   `json:"fixed_sigma_two_step_operations,omitempty"`
 	Bootstrap                  []publicPairBootstrapComparison `json:"bootstrap_comparisons,omitempty"`
 	Limitations                []string                        `json:"limitations"`
 }
 
 type publicPairOperationResidual struct {
 	SchemaVersion             string                               `json:"schema_version"`
+	StageName                 string                               `json:"stage_name,omitempty"`
 	Standard                  numericalmetrics.ComplexVectorStats  `json:"standard_incremental_residual"`
 	Fast                      numericalmetrics.ComplexVectorStats  `json:"fast_incremental_residual"`
 	StandardTotalError        numericalmetrics.ComplexVectorStats  `json:"standard_total_error"`
@@ -449,6 +499,9 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 	}
 	if err := validatePublicEphemeralWeight(opts.ephemeralSecretWeight); err != nil {
 		return err
+	}
+	if opts.mulRescaleChain {
+		return runPublicFixedSigmaChain(opts, configHash, residual, params, effective, profile)
 	}
 	if err := verifyCompiledBackendSource(opts.secondaryRoot); err != nil {
 		return err
@@ -1613,6 +1666,10 @@ func runPublicCompare(args []string) error {
 		if err := validatePublicBootstrapPairArtifacts(standard, fast, standardVectors, fastVectors); err != nil {
 			return err
 		}
+	} else if standard.Mode == "fixed-sigma-two-step-chain" || fast.Mode == "fixed-sigma-two-step-chain" {
+		if err := validatePublicFixedSigmaChainPairArtifacts(standard, fast, standardVectors, fastVectors); err != nil {
+			return err
+		}
 	} else if err := validatePublicPairArtifacts(standard, fast, standardVectors, fastVectors); err != nil {
 		return err
 	}
@@ -1628,7 +1685,7 @@ func runPublicCompare(args []string) error {
 		return errors.New("paired artifacts have empty or mismatched checkpoint coverage")
 	}
 	pair := publicPairDocument{
-		SchemaVersion: "fast-standard-public-native-pair.v1", GeneratedAt: time.Now().UTC(), Status: "PASS",
+		SchemaVersion: "fast-standard-public-native-pair.v1", GeneratedAt: time.Now().UTC(), Mode: standard.Mode, Status: "PASS",
 		Profile: standard.Profile, ProfileKind: standard.ProfileKind,
 		NumericalGate: publicNumericalGate, FastCommit: fast.BackendCommit, StandardCommit: standard.BackendCommit,
 		PrimaryCommit: standard.PrimaryCommit, SourceSHA256: standard.PrimarySourceSHA256, InputSHA256: standard.InputSHA256,
@@ -1727,6 +1784,13 @@ func runPublicCompare(args []string) error {
 			pair.MulRelinRescaleResidual.CoefficientSigmaStatus = "FROZEN_CP_B_CANDIDATE_APPLIED_DIAGNOSTIC_ONLY"
 			pair.MulRelinRescaleResidual.Interpretation = "The frozen CP-B coefficient sigma was injected once after this isolated Fast MulRelin+Rescale; decoded delta, coefficient moments and seed are recorded. This paired vector does not establish a general independent-noise model."
 		}
+	}
+	if standard.FixedSigmaChain != nil || fast.FixedSigmaChain != nil {
+		operations, err := comparePublicFixedSigmaChainOperations(standard, fast, standardVectors, fastVectors)
+		if err != nil {
+			return err
+		}
+		pair.FixedSigmaChainOperations = operations
 	}
 	if bootstrapMode {
 		for index, standardResult := range standard.BootstrapResults {

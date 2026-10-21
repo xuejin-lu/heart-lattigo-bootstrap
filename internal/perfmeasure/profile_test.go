@@ -204,6 +204,31 @@ func TestBatch019PublicWorkloadUsesCanonicalInputAndCapacityGates(t *testing.T) 
 	}
 }
 
+func TestPublicFixedSigmaChainFingerprintBindsBothRescaleScales(t *testing.T) {
+	a, b, c, err := PublicMulRescaleWorkload(8)
+	if err != nil {
+		t.Fatal(err)
+	}
+	base, err := PublicFixedSigmaChainFingerprint(a, b, c, "35184372088832", "35000000000001", "35000000000003")
+	if err != nil {
+		t.Fatal(err)
+	}
+	changedQ4, err := PublicFixedSigmaChainFingerprint(a, b, c, "35184372088832", "35000000000001", "35000000000005")
+	if err != nil {
+		t.Fatal(err)
+	}
+	changedQ5, err := PublicFixedSigmaChainFingerprint(a, b, c, "35184372088832", "35000000000007", "35000000000003")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if base == changedQ4 || base == changedQ5 || changedQ4 == changedQ5 {
+		t.Fatal("fixed-sigma chain fingerprint did not bind both effective divisors")
+	}
+	if _, err := PublicFixedSigmaChainFingerprint(a, b, c, "", "1", "2"); err == nil {
+		t.Fatal("fixed-sigma chain fingerprint accepted a missing default Scale")
+	}
+}
+
 func TestLogN16PublicCapacityAssessmentRetainsStrictBoundWarning(t *testing.T) {
 	config, _, err := LoadConfig(filepath.Join("..", "..", "configs", "bootstrap_config.logN16.json"))
 	if err != nil {

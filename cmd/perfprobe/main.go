@@ -154,6 +154,7 @@ type cliOptions struct {
 	fixedSigmaNoiseSeed     int64
 	fixedSigmaSigmaProvided bool
 	fixedSigmaSeedProvided  bool
+	mulRescaleChain         bool
 }
 
 func main() {
@@ -220,9 +221,10 @@ func run() error {
 	flag.IntVar(&opts.warmup, "warmup", 1, "untimed full Bootstrap warmups")
 	flag.IntVar(&opts.repetitions, "repetitions", 7, "timed full Bootstrap repetitions")
 	flag.IntVar(&opts.standardTrials, "standard-trials", 3, "independent Standard secret/evaluation-key numerical trials")
-	flag.BoolVar(&opts.fixedSigmaNoise, "fixed-sigma-noise", false, "public-native Fast-only diagnostic: opt in to one fixed-sigma c0 injection after MulRelin+Rescale")
+	flag.BoolVar(&opts.fixedSigmaNoise, "fixed-sigma-noise", false, "public-native Fast-only diagnostic: explicitly inject fixed-sigma noise after each complete MulRelin+Rescale stage")
 	flag.Float64Var(&opts.fixedSigmaNoiseSigma, "fixed-sigma-noise-sigma", 0, "fixed-sigma diagnostic coefficient-domain standard deviation; requires --fixed-sigma-noise")
 	flag.Int64Var(&opts.fixedSigmaNoiseSeed, "fixed-sigma-noise-seed", 0, "deterministic fixed-sigma diagnostic sampler seed; requires --fixed-sigma-noise")
+	flag.BoolVar(&opts.mulRescaleChain, "mul-rescale-chain", false, "public-native zero-Bootstrap two-step ct×ct MulRelin+Rescale diagnostic chain")
 	flag.Parse()
 	flag.Visit(func(item *flag.Flag) {
 		switch item.Name {
@@ -512,6 +514,9 @@ func validateFixedSigmaNoiseOptions(opts cliOptions) error {
 	} else if opts.fixedSigmaSigmaProvided || opts.fixedSigmaSeedProvided {
 		return errors.New("--fixed-sigma-noise-sigma and --fixed-sigma-noise-seed require --fixed-sigma-noise")
 	}
+	if opts.mulRescaleChain && opts.mode != "public-native" {
+		return errors.New("--mul-rescale-chain requires --mode=public-native")
+	}
 	return nil
 }
 
@@ -539,6 +544,9 @@ func validateExecutionLimits(opts cliOptions) error {
 	}
 	if opts.mode == "public-native" {
 		wantBudget := 0
+		if opts.mulRescaleChain && (opts.publicBootstrap || opts.publicRepeatability || opts.preflightPair != "" || opts.traceFixtureOut != "") {
+			return errors.New("--mul-rescale-chain is a zero-Bootstrap path and does not accept Bootstrap or trace flags")
+		}
 		if opts.publicBootstrap || opts.publicRepeatability {
 			if opts.publicBootstrap && opts.publicRepeatability {
 				return errors.New("--public-bootstrap and --public-repeatability are mutually exclusive")

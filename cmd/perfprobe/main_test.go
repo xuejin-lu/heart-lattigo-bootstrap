@@ -830,6 +830,28 @@ func TestFixedSigmaNoiseOptInRequiresExactFastZeroBootstrapContract(t *testing.T
 	}
 }
 
+func TestMulRescaleChainRequiresZeroBootstrapPublicNativeMode(t *testing.T) {
+	valid := cliOptions{mode: "public-native", mulRescaleChain: true, bootstrapBudget: 0}
+	if err := validateFixedSigmaNoiseOptions(valid); err != nil {
+		t.Fatalf("valid public-native chain mode rejected: %v", err)
+	}
+	if err := validateExecutionLimits(valid); err != nil {
+		t.Fatalf("valid zero-Bootstrap chain budget rejected: %v", err)
+	}
+	for _, invalid := range []cliOptions{
+		{mode: "legacy-diagnostic", mulRescaleChain: true, bootstrapBudget: 0},
+		{mode: "public-native", mulRescaleChain: true, publicBootstrap: true, bootstrapBudget: 2},
+		{mode: "public-native", mulRescaleChain: true, traceFixtureOut: "trace", bootstrapBudget: 0},
+	} {
+		if err := validateExecutionLimits(invalid); err == nil {
+			t.Fatalf("invalid chain execution limits were accepted: %+v", invalid)
+		}
+	}
+	if err := validateFixedSigmaNoiseOptions(cliOptions{mode: "legacy-diagnostic", mulRescaleChain: true}); err == nil {
+		t.Fatal("chain mode accepted a non-public-native application path")
+	}
+}
+
 func TestPublicOperationResidualEvidenceBindsDecodedInputsAndOutput(t *testing.T) {
 	standard, standardVectors := makePublicPairArtifactFixture(t, "standard")
 	fast, fastVectors := makePublicPairArtifactFixture(t, "fast")
