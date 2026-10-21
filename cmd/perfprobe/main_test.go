@@ -852,6 +852,17 @@ func TestMulRescaleChainRequiresZeroBootstrapPublicNativeMode(t *testing.T) {
 	}
 }
 
+func TestFixedSigmaChainDispatchEvidenceIsBackendSpecific(t *testing.T) {
+	standard := fixedSigmaChainDispatchEvidence("standard")
+	fast := fixedSigmaChainDispatchEvidence("fast")
+	if standard == "" || fast == "" || standard == fast {
+		t.Fatalf("backend dispatch evidence is not distinct: standard=%q fast=%q", standard, fast)
+	}
+	if fixedSigmaChainDispatchEvidence("unknown") != "" {
+		t.Fatal("unknown backend received dispatch evidence")
+	}
+}
+
 func TestPublicOperationResidualEvidenceBindsDecodedInputsAndOutput(t *testing.T) {
 	standard, standardVectors := makePublicPairArtifactFixture(t, "standard")
 	fast, fastVectors := makePublicPairArtifactFixture(t, "fast")

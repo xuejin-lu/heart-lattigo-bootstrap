@@ -647,7 +647,7 @@ func validatePublicFixedSigmaChainArtifact(doc publicNativeDocument, vectors pub
 			operation.Residual.PKStatus != "UNSUPPORTED_FAST_ZERO_SECRET_MULRELIN_REQUIRES_C1_ZERO" ||
 			operation.Residual.SchemaVersion != "fixed-sigma-mul-relin-rescale-residual.v1" ||
 			operation.Residual.Classification != "DIAGNOSTIC_ONLY" ||
-			operation.Residual.DispatchEvidence != publicMulRelinRescaleDispatchEvidence() {
+			operation.Residual.DispatchEvidence != fixedSigmaChainDispatchEvidence(backend) {
 			return fmt.Errorf("%s operation metadata or phase timing is incomplete", stageName)
 		}
 		productState := byName[productName].State
@@ -725,6 +725,17 @@ func validatePublicFixedSigmaChainArtifact(doc publicNativeDocument, vectors pub
 func fixedSigmaChainScaleText(value *big.Int) string {
 	scale := rlwe.NewScale(value)
 	return scale.Value.Text('e', 80)
+}
+
+func fixedSigmaChainDispatchEvidence(backend string) string {
+	switch backend {
+	case "standard":
+		return "ordinary ckks.Evaluator.MulRelinNew and Rescale on the isolated genuine Standard source"
+	case "fast":
+		return "ordinary ckks.Evaluator.MulRelinNew -> Fast zero-secret MulCore.ApplyRows; ordinary ckks.Evaluator.Rescale -> shared Q-prefix RescaleCore.ApplyRows; no Standard fallback"
+	default:
+		return ""
+	}
 }
 
 func productOracleForStage(stage string, add, c []complex128) []complex128 {
