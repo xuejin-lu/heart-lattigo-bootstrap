@@ -1,0 +1,469 @@
+{
+  "schema_version": "fast-standard-public-native-pair.v1",
+  "generated_at": "2026-10-21T16:52:27.929134Z",
+  "status": "PASS",
+  "profile": "logn13",
+  "max_complex_gate": 0.000001,
+  "fast_backend_commit": "9ef0315feaf59dbee03bf0852b72c76fdeb6b800",
+  "standard_backend_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+  "primary_commit": "a47e402a31e9181ac94dfb430e1cc337fbd8b3a0",
+  "primary_measurement_source_sha256": "79b13e0978030f575458230d7068f572976ae29b3ebeed13f3a9fbc66fa8d8e5",
+  "input_sha256": "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285",
+  "workload_sha256": "00b70a2e77887c7d6a41db1859246f6513f2c984915de648734e5dd8c584cf74",
+  "config_sha256": "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98",
+  "qp_sha256": "1f045e603a856968779d62e045a037274bba08cbfce8b1dd3dec2828f1f6a46b",
+  "profile_kind": "frozen-historical-fixture-v1",
+  "input_slots": 4096,
+  "effective_parameters": {
+    "ephemeral_secret_weight": 32,
+    "log_n": 13,
+    "log_slots": 12,
+    "input_slots": 4096,
+    "ring_n": 8192,
+    "residual_ring_n": 8192,
+    "q0_config_target_bits": 55,
+    "q0_bits": 55,
+    "q_chain_bits": [
+      55,
+      39,
+      40,
+      39,
+      40,
+      60,
+      60,
+      61,
+      60,
+      60,
+      60,
+      61,
+      61,
+      56,
+      57,
+      56,
+      56
+    ],
+    "p_bits": [
+      61,
+      61,
+      62,
+      61,
+      62
+    ],
+    "q_primes": [
+      "36028797018652673",
+      "549755731969",
+      "549756026881",
+      "549755486209",
+      "549756174337",
+      "1152921504606830593",
+      "1152921504606748673",
+      "1152921504606994433",
+      "1152921504606683137",
+      "1152921504606601217",
+      "1152921504606584833",
+      "1152921504607191041",
+      "1152921504607223809",
+      "72057594037616641",
+      "72057594038321153",
+      "72057594037370881",
+      "72057594037338113"
+    ],
+    "p_primes": [
+      "2305843009213317121",
+      "2305843009213120513",
+      "2305843009214414849",
+      "2305843009212694529",
+      "2305843009214758913"
+    ],
+    "default_scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+    "mod1_log_scale": 60,
+    "mod1_degree": 30,
+    "double_angle": 3,
+    "k": 16,
+    "log_message_ratio": 10,
+    "circuit_order": 0,
+    "q_prefix_rows_at_max_level": 4
+  },
+  "capacity_evidence_version": "public-capacity-evidence.v1",
+  "capacity_policy": "strict-sufficient-bound-v1",
+  "conservative_bound_status": "SUFFICIENT",
+  "observed_native_oracle_status": "PASS_EIGHT_CHECKPOINT_PLAINTEXT_ORACLES",
+  "standard_level4_to_level0_continuity": {
+    "complex_rmse": 0,
+    "max_complex_difference": 0,
+    "max_real_difference": 0,
+    "max_imag_difference": 0,
+    "worst_slot": 0,
+    "real_components_above_threshold": 0,
+    "imag_components_above_threshold": 0,
+    "median_precision_bits": 99.65784284662087
+  },
+  "fast_level4_to_level0_continuity": {
+    "complex_rmse": 0,
+    "max_complex_difference": 0,
+    "max_real_difference": 0,
+    "max_imag_difference": 0,
+    "worst_slot": 0,
+    "real_components_above_threshold": 0,
+    "imag_components_above_threshold": 0,
+    "median_precision_bits": 99.65784284662087
+  },
+  "ephemeral_secret_weight": 32,
+  "actual_bootstrap_calls": 0,
+  "matched_environment": true,
+  "checkpoints": [
+    {
+      "name": "add_level5",
+      "level_scale_degree_matched": true,
+      "fast_state": {
+        "level": 5,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "standard_state": {
+        "level": 5,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "fast_vs_standard": {
+        "complex_rmse": 1.165809871153412e-11,
+        "max_complex_difference": 3.6269097409040584e-11,
+        "max_real_difference": 3.1949484724513866e-11,
+        "max_imag_difference": 3.013966940607071e-11,
+        "worst_slot": 2512,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 36.585304496894246
+      },
+      "pass": true
+    },
+    {
+      "name": "drop_level0",
+      "level_scale_degree_matched": true,
+      "fast_state": {
+        "level": 0,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 1,
+        "prefix_q": "36028797018652673"
+      },
+      "standard_state": {
+        "level": 0,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 1,
+        "prefix_q": "36028797018652673"
+      },
+      "fast_vs_standard": {
+        "complex_rmse": 1.7771274690074385e-11,
+        "max_complex_difference": 6.798352092232404e-11,
+        "max_real_difference": 6.211833239629094e-11,
+        "max_imag_difference": 6.753905545725178e-11,
+        "worst_slot": 434,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 36.071098524235865
+      },
+      "pass": true
+    },
+    {
+      "name": "encrypt_a_level5",
+      "level_scale_degree_matched": true,
+      "fast_state": {
+        "level": 5,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "standard_state": {
+        "level": 5,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "fast_vs_standard": {
+        "complex_rmse": 8.338078965565494e-12,
+        "max_complex_difference": 2.493608639176127e-11,
+        "max_real_difference": 2.474655202977516e-11,
+        "max_imag_difference": 2.193467976696617e-11,
+        "worst_slot": 3194,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 37.07156613865646
+      },
+      "pass": true
+    },
+    {
+      "name": "encrypt_b_level5",
+      "level_scale_degree_matched": true,
+      "fast_state": {
+        "level": 5,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "standard_state": {
+        "level": 5,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "fast_vs_standard": {
+        "complex_rmse": 8.197778879415365e-12,
+        "max_complex_difference": 2.3708043571158687e-11,
+        "max_real_difference": 2.2364250208684044e-11,
+        "max_imag_difference": 2.1091223385838465e-11,
+        "worst_slot": 2309,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 37.117013872764296
+      },
+      "pass": true
+    },
+    {
+      "name": "encrypt_c_q5_level5",
+      "level_scale_degree_matched": true,
+      "fast_state": {
+        "level": 5,
+        "degree": 1,
+        "scale": "1.15292150460683059300000000000000000000000000000000000000000000000000000000000000e+18",
+        "scale_log2": 59.99999999999998,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "standard_state": {
+        "level": 5,
+        "degree": 1,
+        "scale": "1.15292150460683059300000000000000000000000000000000000000000000000000000000000000e+18",
+        "scale_log2": 59.99999999999998,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "fast_vs_standard": {
+        "complex_rmse": 2.5180976171157443e-16,
+        "max_complex_difference": 8.508000761623982e-16,
+        "max_real_difference": 7.28583859910259e-16,
+        "max_imag_difference": 6.730727086790012e-16,
+        "worst_slot": 1462,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 52.07333912988746
+      },
+      "pass": true
+    },
+    {
+      "name": "mulrelin_level5",
+      "level_scale_degree_matched": true,
+      "fast_state": {
+        "level": 5,
+        "degree": 1,
+        "scale": "4.05648192073027644223265712373760000000000000000000000000000000000000000000000000e+31",
+        "scale_log2": 104.99999999999999,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "standard_state": {
+        "level": 5,
+        "degree": 1,
+        "scale": "4.05648192073027644223265712373760000000000000000000000000000000000000000000000000e+31",
+        "scale_log2": 104.99999999999999,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "fast_vs_standard": {
+        "complex_rmse": 2.3786573180932246e-13,
+        "max_complex_difference": 9.71200648616864e-13,
+        "max_real_difference": 8.413545467961248e-13,
+        "max_imag_difference": 9.561760020912469e-13,
+        "worst_slot": 1155,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 42.5201966634965
+      },
+      "pass": true
+    },
+    {
+      "name": "rescale_q5_level4",
+      "level_scale_degree_matched": true,
+      "fast_state": {
+        "level": 4,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "standard_state": {
+        "level": 4,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "fast_vs_standard": {
+        "complex_rmse": 1.458280216148844e-11,
+        "max_complex_difference": 5.135678759226245e-11,
+        "max_real_difference": 4.199381922927181e-11,
+        "max_imag_difference": 5.009175507112579e-11,
+        "worst_slot": 136,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 36.36909505515521
+      },
+      "pass": true
+    },
+    {
+      "name": "rotate_level4",
+      "level_scale_degree_matched": true,
+      "fast_state": {
+        "level": 4,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "standard_state": {
+        "level": 4,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "fast_vs_standard": {
+        "complex_rmse": 1.7771274690074385e-11,
+        "max_complex_difference": 6.798352092232404e-11,
+        "max_real_difference": 6.211833239629094e-11,
+        "max_imag_difference": 6.753905545725178e-11,
+        "worst_slot": 434,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 36.071098524235865
+      },
+      "pass": true
+    }
+  ],
+  "mul_relin_rescale_incremental_residual": {
+    "schema_version": "fixed-sigma-mul-relin-rescale-pair.v1",
+    "standard_incremental_residual": {
+      "count": 4096,
+      "mean_real": 1.439908138673146e-13,
+      "mean_imag": 5.75109126931003e-14,
+      "variance": 1.0544128709677885e-22,
+      "rms": 1.0269631344714181e-11,
+      "max_abs": 4.7013604001091595e-11,
+      "worst_slot": 435,
+      "status": "FINITE"
+    },
+    "fast_incremental_residual": {
+      "count": 4096,
+      "mean_real": 2.844007886992532e-14,
+      "mean_imag": 1.7062148879028756e-13,
+      "variance": 1.0765493729792055e-22,
+      "rms": 1.0377131483625117e-11,
+      "max_abs": 3.3719008023356644e-11,
+      "worst_slot": 2917,
+      "status": "FINITE"
+    },
+    "standard_total_error": {
+      "count": 4096,
+      "mean_real": 1.4210854785987985e-13,
+      "mean_imag": 5.684342282713905e-14,
+      "variance": 1.053959272950401e-22,
+      "rms": 1.0267392722065981e-11,
+      "max_abs": 4.705123106772317e-11,
+      "worst_slot": 435,
+      "status": "FINITE"
+    },
+    "fast_total_error": {
+      "count": 4096,
+      "mean_real": 2.8421708330150395e-14,
+      "mean_imag": 1.705302607907054e-13,
+      "variance": 1.076549193424382e-22,
+      "rms": 1.037712906857132e-11,
+      "max_abs": 3.3707938095747576e-11,
+      "worst_slot": 2917,
+      "status": "FINITE"
+    },
+    "standard_minus_fast_variance": -2.2136502011416965e-24,
+    "variance_delta_status": "UNMODELLED_NEGATIVE_SLOT_VARIANCE_DELTA",
+    "cross_backend_covariance": {
+      "count": 4096,
+      "real": 2.0669304911459422e-25,
+      "imag": -1.5161629642052011e-24,
+      "correlation_magnitude": 0.014362239772828855,
+      "status": "FINITE"
+    },
+    "coefficient_sigma_status": "FROZEN_CP_B_CANDIDATE_APPLIED_DIAGNOSTIC_ONLY",
+    "fast_fixed_sigma_coefficient": 4.004280012097432,
+    "fast_sampling_seed": 20261022,
+    "fast_coefficient_empirical_rms": 4.022504442780331,
+    "fast_coefficient_sha256": "a4ddb60bb3544265cdef1ef59fd01be80db64b51703a2e1aa2f10c55c68adbc8",
+    "fast_decoded_injection_delta": {
+      "count": 4096,
+      "mean_real": 2.842170713621858e-14,
+      "mean_imag": 1.7053025643249756e-13,
+      "variance": 1.070439567086343e-22,
+      "rms": 1.0347649253353618e-11,
+      "max_abs": 3.3736270110616896e-11,
+      "worst_slot": 2917,
+      "status": "FINITE"
+    },
+    "fast_injection_elapsed_ns": 1305000,
+    "interpretation": "The frozen CP-B coefficient sigma was injected once after this isolated Fast MulRelin+Rescale; decoded delta, coefficient moments and seed are recorded. This paired vector does not establish a general independent-noise model."
+  },
+  "limitations": [
+    "Diagnostic-only pre-Bootstrap evidence; no formal Standard-vs-Fast acceptance claim is made by the fixed-sigma task.",
+    "No public Bootstrap acceptance or Bootstrap output metric is claimed."
+  ]
+}
