@@ -1,14 +1,15 @@
-# CURRENT TASK — BTS No-Trace Warm and Numerical Batch 008
+# CURRENT TASK — FIXED-SIGMA-MUL-NOISE-001
 
-Task: `BTS-NOTRACE-WARM-AND-NUMERICAL-008`
-Status: `READY_FOR_WEB_REVIEW`
-Authoritative spec: `specs/BTS-NOTRACE-WARM-AND-NUMERICAL-008.md`
-Primary approved baseline: `f3eb665e35f15b91d5f290626fbb7a3bb360a95c`; the task-spec/pointer commits are authorized additions.
+Task: `FIXED-SIGMA-MUL-NOISE-001`
+Status: `AUTHORIZED_AUTONOMOUS_BATCH`（**尚未執行**；等待使用者對 Codex 發出 `開始`）
+Authoritative spec: `specs/FIXED-SIGMA-MUL-NOISE-001.md`
+Durable journal: `results/FIXED-SIGMA-MUL-NOISE-001/journal.md`
+Planned result summary: `results/FIXED-SIGMA-MUL-NOISE-001/summary.md`
 
-User objective: finish the **teammate's original BTS** (LogN16, 32,768 slots) **No-Trace Cold/Warm performance table**, then use the exact same measured executions' decoded Standard/Fast vectors for numerical comparison. First complete the existing-platform BTS measurement adapter and zero-Bootstrap tests, then run Standard first and Fast second. Resource telemetry (unused RAM, free Swap, `memory_pressure`, and the prior Task007 memorystatus event) must be recorded but is advisory and cannot alone cause `RESOURCE_BLOCKED`. Real process failures still stop the batch and consume their reservations; do not bypass macOS protection or alter parameters. One cold plus five subsequent warm Bootstrap calls per backend, max 6 per backend and one measurement process per backend, no hidden test/warm-up calls. Both series must be environment-comparable to calculate a speedup. The existing public-native Notion baseline is a different workload and cannot be substituted.
+研究目標：對真正的 Standard vs Fast 的單次 `ct×ct → Mul → Relin → Rescale`「新增」數值誤差，建立有主導項理論依據、由實測校準的固定係數 σ 模型；在 Fast-only opt-in 診斷路徑的 `c0` 加入一致的 coefficient-domain Noise，所有乘法共用同一 σ。**不是**把被歸零的 `a` 加回來、不是恢復安全性，也不是把輸出總誤差直接當成一次新誤差。
 
-Read `AGENTS.md`, `docs/MEASUREMENT_PLATFORM.md`, `docs/RESEARCH_ENGINEERING_WORKFLOW.md`, and the spec after mandatory safe fetch/fast-forward. Reuse maintained measurement tools, preserve external/BTS source and pinned pristine Standard and Fast math. The old Secondary five-dirty-files note is historical: the user confirmed those changes were upstreamed and cleared; current `fast-qprefix` is clean at `ee308c9743000b5f281a84a871e7c4bd59b176c4`. All earlier Task007 evidence/call counts remain immutable. Record resource telemetry without treating it as an automatic gate, and do not infer OOM solely from exit 137.
+Codex 啟動必須先遵守 Primary `AGENTS.md` 的 fetch／safe ff-only／本機變更 preflight，讀 `docs/RESEARCH_ENGINEERING_WORKFLOW.md`、`docs/MEASUREMENT_PLATFORM.md`、`docs/BACKEND_TRANSPARENCY_CONTRACT.md` 和上方 spec；涉及 Secondary 時遵守 `fast-qprefix` 的 `AGENTS.md` 與 `docs/FAST_QPREFIX_SPEC.md`。工作環境是**既有** Primary／Secondary，勿 clone 重建、勿清理未知本機變更。
 
-Batch 008 is complete: Standard and Fast each used one process for exactly one cold + five warm calls; see `results/BTS-NOTRACE-WARM-AND-NUMERICAL-008/summary.md` and its run/evidence artifacts. No additional Bootstrap call is authorized by this completed batch.
+本次僅授權 spec 的 CP-A～CP-D 及廉價 LogN13 非 Bootstrap 測試。**Bootstrap 預算 = 0 次**；完整 Bootstrap 注入覆蓋、LogN16、大型 benchmark、組員 BTS 不在此批次。遇到數學／表示法／實際呼叫鏈未決問題，保存 checkpoint 後 `NEEDS_WEB_REVIEW`。本次任務完成前不得指向下一個任務；勿重新執行先前已完成的 BTS Batch008。
 
-Perform the spec's enumerated autonomous checks sequentially; follow mandatory coding self-review and only hand off at completed batch boundary or a genuine STOP escalation. User-facing updates in Traditional Chinese.
+歷史 Batch008 的 spec 與結果仍保存在 GitHub；本次新任務不會修改其來源、統計或預算。GPT Web 將在里程碑結束時獨立審查。
