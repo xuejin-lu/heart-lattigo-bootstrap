@@ -1,7 +1,7 @@
 # FIXED-SIGMA-PROPAGATION-003 journal
 
 Created: 2026-10-22 Asia/Taipei.
-State: `CP-B_READY_TO_CAPTURE`. CP-A passed. Web reviewed and accepted the one incidental LogN16 parameter-construction unit test as `NON_BLOCKING_INCIDENTAL_TEST_SCOPE`; no experiment budget is restored or expanded. No chain capture or Bootstrap call has been made yet.
+Current state: `BATCH_COMPLETE_READY_FOR_WEB_REVIEW`. CP-A passed without repetition; CP-B completed and passed its declared oracle/capacity gates; CP-C left the checker unchanged; CP-D completed as a read-only source map. Web reviewed and accepted the one incidental LogN16 parameter-construction unit test as `NON_BLOCKING_INCIDENTAL_TEST_SCOPE`; no experiment budget is restored or expanded.
 Prior Web accepted milestone: `FIXED-SIGMA-CHAIN-002 = ACCEPTED_SCOPED_RMSE_ONLY`.
 Initial refs: Primary `25de6e43386cc16baf9f81bf455356b2da49ad1b`; Secondary `1e7828293c36f9845e30723ba4e9500d84bb50d2`; genuine Standard `5dbffbdea05394de2ca3a432ed5318aa832e3f40`.
 Frozen coefficient sigma: `4.004280012097432`.
@@ -9,11 +9,11 @@ Frozen coefficient sigma: `4.004280012097432`.
 | Checkpoint | Status | Notes |
 |---|---|---|
 | CP-A source/proof preflight | PASS_SCOPED | completed before the incidental test; no redo required |
-| CP-B propagation ablation | READY_TO_CAPTURE | harness implemented and targeted tests passed; 0 Standard / 0 Fast chain runs so far |
-| CP-C capacity checker optimization | NOT_STARTED | optional, only strict semantic parity |
-| CP-D read-only Bootstrap source map | NOT_STARTED | source inspection only, zero execution |
+| CP-B propagation ablation | PASS | 2 genuine Standard references / 16 Fast chains; all declared checks pass |
+| CP-C capacity checker optimization | NO_CHANGE | no optimization implemented; equivalence proof and post-change profiling would exceed the bounded safe scope |
+| CP-D read-only Bootstrap source map | PASS_READ_ONLY | source inspection only; zero Bootstrap execution |
 
-Budgets: Standard Bootstrap **0 used / 0 authorized**, Fast Bootstrap **0 used / 0 authorized**, LogN16 workload/chain executions **0**, BTS 0; one existing unit test constructed the LogN16 effective parameter object and was accepted by Web as non-blocking incidental test scope. This one-time decision does not authorize future LogN16 testing. No cost-heavy reruns. No chain results or timing claims have been made.
+Budgets: Standard Bootstrap **0 used / 0 authorized**, Fast Bootstrap **0 used / 0 authorized**, LogN16 workload/chain executions **0**, BTS 0; one existing unit test constructed the LogN16 effective parameter object and was accepted by Web as non-blocking incidental test scope. This one-time decision does not authorize future LogN16 testing. No cost-heavy reruns. CP-B numerical results are recorded below; no formal performance claim is made.
 
 ## 2026-10-22 CP-A — source, reuse, and representation preflight
 
@@ -54,3 +54,63 @@ No Standard or Fast chain execution had occurred (`0/2` and `0/16`), no Bootstra
 **Prevention:** Before every future Go test invocation, inspect the selected test names and their call paths for profile construction, Bootstrap, BTS, and prohibited workloads. Run only the explicit CP-B/CP-C targeted test names; do not run package-wide suites in this batch. Keep the hard runtime limits at Fast chains ≤16, genuine Standard chains ≤2, Bootstrap 0, LogN16 workload 0, BTS 0, and no large benchmark. Record each invocation and its scope in this journal before advancing to the next checkpoint.
 
 **Resume state:** At the time of Web approval, Primary was on `main` at `fc62bc68bde4d2d16ef63d19eeb0508c733cd6d1` with only the task-scoped source/journal/summary edits listed in Git status; Secondary was clean on `fast-qprefix` at `1e7828293c36f9845e30723ba4e9500d84bb50d2`. The subsequent safe fetches found no remote commits or divergence. No captures, commits, or pushes had occurred. Current task resumes at the CP-B pre-capture gate.
+
+## 2026-10-22 CP-B — paired four-arm captures and propagation analysis
+
+**Execution and gates:** Reused the maintained `cmd/perfprobe` fixture and `internal/numericalmetrics`; no runner, vector-statistics implementation, warmup, or profile-hashing framework was duplicated. Four Fast arms were captured for each of two predeclared workloads and two seed pairs. Genuine original Standard was run once per workload. Every Fast result passed the strict centered-Q-prefix runtime capacity checks and all eight declared plaintext-oracle checkpoints. The helper reported the actual decoded injection delta exactly equal to the paired ablation delta. Total use: Fast 16/16, genuine Standard 2/2, Bootstrap 0/0, LogN16 workload/chain 0, BTS 0. No chain failed. The fixed coefficient sigma remained exactly `4.004280012097432` in every ON arm.
+
+**Workloads and parameters:** The canonical workload hashes A and C as `d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285` and B as `200fdf50e784980cab99289e9c2bbe1930cc43b2ca84df09ac6cde38745dc20f`; workload SHA-256 is `484b245bf4dd4c91708da27f98f33aabe45988db0b275c0aa12a8f43bf0d61aa`. The stronger workload was fixed before examining captures as C×4 with A/B unchanged; its C hash is `be790fa0502dbb922b9cd29dcbbf54bbca7d3e053a07c388d10f114f04c57261`, workload SHA-256 `e5b73c0f511c2e02f0312c630e25b6a155ee680aab9711339e96b8e0198809ba`. Both used the same public API and effective scale schedule. Effective profile was LogN13, LogSlots12, 4096 slots, RingN8192, E=32, `configs/bootstrap_config.logN13.json`. Config SHA-256 `919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98`; Q/P SHA-256 `1f045e603a856968779d62e045a037274bba08cbfce8b1dd3dec2828f1f6a46b`. The exact integer strict-capacity plans, including the sufficient terminal-q0 conditions, are preserved in the compact analysis artifact.
+
+**Paired seeds:** Canonical seed pairs were (20261037, 20261038) and (20261039, 20261040). C×4 pairs were (20261041, 20261042) and (20261043, 20261044). Each pair uses identical inputs and operation sequence across the four Fast arms; Fast's deterministic zero-secret EncryptNew input is hash-checked across arms. Standard used native independent encryption and is an operation-residual reference, not an ablation arm or shared random stream.
+
+**Propagation results:** The table reports ranges across the two pairs; each statistic is calculated over 4096 decoded slot coordinates, which are correlated observations rather than independent trials. P1 is the observed stage-1 error transmitted into the Stage-2 output. The first-order column is decoded `δ1 × C`; residual is `P1 − δ1×C`, retained without single-source attribution. The ON/ON context check compares `ON/ON − OFF/ON` with P1.
+
+| Workload | P1 RMS | First-order RMS | Residual RMS | ON/ON check difference RMS (max) | P1 correlation with first-order |
+|---|---:|---:|---:|---:|---:|
+| canonical | 6.6046–6.6229e-13 | 2.0977–2.1384e-13 | 6.2146–6.2554e-13 | 7.1354–7.2013e-21 (2.7939–3.0304e-20) | 0.3288–0.3389 |
+| stronger C×4 | 1.3261–1.3270e-12 | 8.5013–8.5416e-13 | 1.0197–1.0224e-12 | 1.2229–1.2477e-19 (4.4124–4.4456e-19) | 0.6375–0.6394 |
+
+The P1 RMS tails (p95/p99/p99.9) were canonical 1.1496–1.1502e-12 / 1.4060–1.4341e-12 / 1.6867–1.7515e-12, and C×4 2.3191–2.3503e-12 / 3.0307–3.0837e-12 / 3.8061–3.8900e-12. Across pairs, the injected Stage-1 decoded-delta RMS was 1.0218–1.0364e-11 for canonical and 1.0293–1.0459e-11 for C×4. The first-order model underpredicts observed P1 in both workloads; the remaining residual is material and includes operation/encoding/rounding differences that these captures do not separate. The almost exact ON/ON context check confirms paired propagation consistency, not the accuracy of the first-order approximation. No Gaussianity or distribution-equivalence claim is made.
+
+**Incremental residual versus total oracle error:** These are different measurements. For canonical, Fast OFF/OFF Stage-2 total-oracle RMS was 7.3940e-13; ON/OFF was 7.6905–7.7172e-13 while its Stage-2 incremental residual remained 7.3821–7.4282e-13; OFF/ON was 1.0407–1.0427e-11; ON/ON was 1.0413–1.0429e-11. For C×4, the corresponding Stage-2 totals were 7.5777e-13, 1.1290–1.1412e-12, 1.0283–1.0366e-11, and 1.0298–1.0398e-11. Genuine Standard Stage-2 total-oracle RMS was 1.0378e-11 canonical and 1.0415e-11 C×4; Standard Stage-2 incremental RMS was 1.0375e-11 and 1.0270e-11 respectively. These are single independent Standard references per workload and should not be read as a distributional or security equivalence result. With two seed pairs and only these two workloads, transferability of the frozen sigma is `INSUFFICIENT_EVIDENCE`; sigma was not adjusted.
+
+**Capacity and timing evidence:** All 16 enabled Fast injection points passed strict runtime Q-prefix capacity validation over all 8192 coefficients, with the recorded active rows, representation, and transactional write checks. The pre-change capacity-check phase attribution across these diagnostic calls was 721125–838916 ns, median 774250 ns, 262624 or 262640 allocated bytes, and 18 allocations per call. These are diagnostic phase measurements, not a formal performance benchmark.
+
+**Failed analysis attempt and repair:** The first comparator run rejected the otherwise complete capture manifest because the producer fingerprint serialized scale as an integer-form string while the verifier recomputed the same effective scale in scientific notation. No arithmetic comparison ran in that attempt; no chain was rerun. The verifier was repaired to canonicalize the workload scale representation, and a regression test now covers both canonical and C×4 fingerprints. Rebuilding from clean Primary commit `3ee10087e9e020aff5c0acad3abe42cf87996fd3` and re-running analysis over the same immutable captures passed. This was a comparator formatting/validation defect, not an experiment or capacity failure.
+
+**Provenance:** Capture binaries were built from clean Primary source commit `2d9ffd4643b590d38da3c892b670a998a39b92c1`, with `vcs.modified=false`. Fast binary SHA-256 `641e87d30d8e4d27f43620444966de10741b2f964b755eda0d51ee6f54881f94` used Secondary commit `1e7828293c36f9845e30723ba4e9500d84bb50d2`; genuine Standard binary SHA-256 `03f641cae31a42087ed0eba5299627f2f20e9e7c52470d232f229b3a23e4fb0b` used clean original Standard commit `5dbffbdea05394de2ca3a432ed5318aa832e3f40`. Measurement source SHA-256 was `1bf7e04b33177803c934acd3356dc4eaa4bdc7712aa81838220d877913dcb48a`. Go `go1.26.4`, darwin/arm64, Apple M4, GOMAXPROCS=10. Captures ran from `2026-10-21T22:27:25.463598Z` through `2026-10-21T22:29:14.739238Z`. The final analyzer binary SHA-256 is `bc269d7de27474532bf1990e538fd542ed41e84f34d280c7b934446c158e286e`; it was built from clean Primary commit `3ee10087e9e020aff5c0acad3abe42cf87996fd3`.
+
+**Durable evidence:** `cp-b-analysis.json` is a 95145-byte compact artifact, SHA-256 `5d59e622ce281e8e59e9d7db58dfdf7250d7eb63b9a672f3dca0d729b93c0ed4`. It records each workload/pair/arm's aggregate metrics, tails, exact run counts, capacity plans, source/binary identity, and SHA-256 of every result and vector capture. Per-slot vectors are intentionally not duplicated into the journal or summary; the bounded analysis artifact is the review evidence. No performance benchmark, Bootstrap, LogN16 operation, or BTS was run.
+
+## 2026-10-22 CP-C — no capacity-checker change
+
+CP-A and CP-B gates passed, so the optional optimization gate was considered. The existing checker is a strict centered-Q-prefix correctness boundary, and the measured diagnostic call allocates about 262.6 KB with 18 allocations. Reducing that cost would require scratch lifetime/reuse semantics plus adversarial parity coverage for valid values, near-half boundaries, overflow, malformed residues, wrong representation, Level 3/4, and sigma zero, followed by a comparable post-change profile. That is library behavior with a broad fail-closed surface; the batch has no need to risk changing it to answer the propagation question, and a fair post-change profile would add a new capture/benchmark path outside the bounded evidence. Per the charter's explicit “if too risky” branch, no Secondary source or tests were changed. Suggested future review: investigate caller-owned scratch for centered CRT/inverse-NTT intermediates, only with exact oracle parity and transactional preservation checks. No capacity rule was weakened.
+
+## 2026-10-22 CP-D — read-only Bootstrap multiplication-boundary map
+
+Inspected bounded source excerpts in the unchanged Secondary `fast-qprefix` checkout; no Bootstrap API or test was called.
+
+| Category | Source path | Observed operation boundary |
+|---|---|---|
+| Public evaluator dispatch | `circuits/ckks/bootstrapping/evaluator.go:53-64,183-210` | `NewEvaluator` uses internal Fast dispatch only when the evaluation key is Fast-compatible; public `Bootstrap`/`BootstrapMany` route into the selected implementation. |
+| Bootstrap stage order | `circuits/ckks/bootstrapping/evaluator.go:497-535`; Fast core `fast_bootstrap.go:191-272,275-395` | ScaleDown → ModUp → CoeffsToSlots → EvalMod(real and optional imag) → SlotsToCoeffs; Fast packing/unpacking/finalization surrounds the core. |
+| ScaleDown / ModUp | `evaluator.go:545-588,598+`; `fast_scaledown.go:77-110` | Scalar/integer multiplication and possibly a separate RescaleTo; basis extension and key switching. Neither is a single ct×ct MulRelin→Rescale event. |
+| DFT transforms | `circuits/ckks/dft/dft.go:226-318`; Fast `dft/fast.go:272-321` | Linear transforms are ct×plaintext; transform factor groups can have a distinct Rescale after each group. |
+| EvalMod polynomial | `circuits/ckks/mod1/mod1_evaluator.go:96-160`; Fast `mod1/fast.go:111-132` | Chebyshev/DoubleAngle has repeated ct×ct MulRelin, additions/scalar operations, and later rescale; the Fast loop calls Q-prefix MulRelin and Rescale on its own schedule. |
+| Polynomial powers | `circuits/common/polynomial/power_basis.go:55-146`, `polynomial_evaluator.go:29-254` | Generic power-basis code calls evaluator-interface MulRelinNew, lazy MulNew, and Rescale, deferring relinearization/rescaling across the power schedule; the selected Fast evaluator supplies the backend implementation. Monomial combination and scaling add further boundaries. |
+
+The current source exposes no single public hook that can inject exactly once after every logically complete ct×ct MulRelin→Rescale sequence: some polynomial products defer one or more steps, DFT uses ct×plaintext linear maps, ScaleDown has scalar multiply plus standalone Rescale, and the public Bootstrap boundary encloses the entire multi-stage circuit. An automatic global Rescale hook would therefore misidentify boundaries and could inject at unrelated operations. A future design needs an explicit operation event/wrapper contract at the logical operation owner, including how deferred relinearization/rescale is closed. No automatic Bootstrap injection was enabled.
+
+## Final checkpoint and validation record
+
+- CP-A: `PASS_SCOPED`, unchanged and not repeated.
+- CP-B: `PASS`; Standard 2/2, Fast 16/16, Bootstrap 0/0, LogN16 workload/chain 0, BTS 0. All four arms and both workloads passed the recorded oracle and capacity gates.
+- CP-C: `NO_CHANGE`; no Secondary changes or push.
+- CP-D: `PASS_READ_ONLY`; source mapping only, no Bootstrap call.
+- Web incident resolution remains the one-time `NON_BLOCKING_INCIDENTAL_TEST_SCOPE` acceptance recorded above; it does not raise any future limit.
+- Targeted tests passed: Fast `go test -tags perf_fast ./cmd/perfprobe -run 'TestFixedSigmaAblation|TestFixedSigmaChain'`; genuine Standard `go test -modfile=/private/tmp/fixed-sigma-propagation-003/standard.mod -tags perf_standard ./cmd/perfprobe -run 'TestFixedSigmaAblation|TestFixedSigmaChain'`; `go test ./internal/numericalmetrics -run 'TestSummarizeComplexMagnitudeTails'`; exact bounded JSON reader and scale fingerprint regression tests were included in the targeted Fast/Standard selections. Do not rerun package-wide Go tests in this batch.
+- Final comparator returned `PASS_VALIDATED_DIAGNOSTIC_ANALYSIS` for the same captured artifacts. Final `git diff --check` passed; the explicit task-path checker returned `TASK_PATHS_ONLY` for CURRENT_TASK, journal, summary, and compact CP-B analysis evidence. Earlier targeted Go tests and policy tests passed; package-wide Go tests were not repeated.
+- Primary implementation commits: `2d9ffd4643b590d38da3c892b670a998a39b92c1` (CP-B harness) and `3ee10087e9e020aff5c0acad3abe42cf87996fd3` (scale fingerprint validation repair). The completion commit contains this final checkpoint, summary, active pointer, and analysis artifact.
+- Secondary remains clean at `1e7828293c36f9845e30723ba4e9500d84bb50d2`; no commit/push was required because CP-C made no code change.
+
+No unresolved Noise arithmetic, Scale, Q-prefix capacity, NTT/RNS representation, or evaluator-dispatch decision remains for this bounded diagnostic. The empirical first-order residual is reported as unresolved attribution, as the charter requires; the data do not support an automatic Bootstrap injection rule or a transferability claim for the frozen sigma.

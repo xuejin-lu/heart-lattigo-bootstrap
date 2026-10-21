@@ -1,6 +1,6 @@
 # CURRENT TASK — FIXED-SIGMA-PROPAGATION-003
 
-**Status:** `AUTHORIZED_AUTONOMOUS_BATCH` — **NOT_RUN**; waiting for Codex user command `開始`.
+**Status:** `BATCH_COMPLETE_READY_FOR_WEB_REVIEW`.
 **Authoritative charter:** `specs/FIXED-SIGMA-PROPAGATION-003.md`.
 **Journal:** `results/FIXED-SIGMA-PROPAGATION-003/journal.md`. **Summary:** `results/FIXED-SIGMA-PROPAGATION-003/summary.md`.
 
