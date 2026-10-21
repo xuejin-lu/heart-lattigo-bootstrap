@@ -1762,3 +1762,29 @@ func TestFixedSigmaAblationBoundedJSONReaderChecksSizeBeforeDecode(t *testing.T)
 		t.Fatalf("bounded JSON decoded count=%d, want 1", decoded.Count)
 	}
 }
+
+func TestFixedSigmaChainWorkloadFingerprintUsesEffectiveIntegerScales(t *testing.T) {
+	a, b, c, err := perfmeasure.PublicMulRescaleWorkload(1 << 12)
+	if err != nil {
+		t.Fatal(err)
+	}
+	q := make([]uint64, 6)
+	q[4], q[5] = 549756174337, 1152921504606830593
+	got, err := fixedSigmaChainWorkloadFingerprint(a, b, c, q)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if want := "484b245bf4dd4c91708da27f98f33aabe45988db0b275c0aa12a8f43bf0d61aa"; got != want {
+		t.Fatalf("canonical fixed-sigma workload fingerprint=%s, want %s", got, want)
+	}
+	for index := range c {
+		c[index] *= 4
+	}
+	got, err = fixedSigmaChainWorkloadFingerprint(a, b, c, q)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if want := "e5b73c0f511c2e02f0312c630e25b6a155ee680aab9711339e96b8e0198809ba"; got != want {
+		t.Fatalf("stronger-c4 fixed-sigma workload fingerprint=%s, want %s", got, want)
+	}
+}

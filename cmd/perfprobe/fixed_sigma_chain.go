@@ -720,9 +720,7 @@ func validatePublicFixedSigmaChainArtifact(doc publicNativeDocument, vectors pub
 		if len(q) <= 5 {
 			return errors.New("ablation effective Q chain does not include q4 and q5")
 		}
-		workloadHash, err := perfmeasure.PublicFixedSigmaChainFingerprint(inputs["A"], inputs["B"], inputs["C"],
-			fixedSigmaChainScaleText(new(big.Int).Lsh(big.NewInt(1), 45)), fixedSigmaChainScaleText(new(big.Int).SetUint64(q[5])),
-			fixedSigmaChainScaleText(new(big.Int).SetUint64(q[4])))
+		workloadHash, err := fixedSigmaChainWorkloadFingerprint(inputs["A"], inputs["B"], inputs["C"], q)
 		if err != nil || workloadHash != doc.WorkloadSHA256 {
 			return errors.New("ablation workload fingerprint does not recompute from the exact messages and scale schedule")
 		}
@@ -957,6 +955,15 @@ func validatePublicFixedSigmaChainArtifact(doc publicNativeDocument, vectors pub
 func fixedSigmaChainScaleText(value *big.Int) string {
 	scale := rlwe.NewScale(value)
 	return scale.Value.Text('e', 80)
+}
+
+func fixedSigmaChainWorkloadFingerprint(a, b, c []complex128, q []uint64) (string, error) {
+	if len(q) <= 5 {
+		return "", errors.New("fixed-sigma workload fingerprint requires q4 and q5")
+	}
+	return perfmeasure.PublicFixedSigmaChainFingerprint(a, b, c,
+		new(big.Int).Lsh(big.NewInt(1), 45).String(),
+		new(big.Int).SetUint64(q[5]).String(), new(big.Int).SetUint64(q[4]).String())
 }
 
 func fixedSigmaChainDispatchEvidence(backend string) string {
