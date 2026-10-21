@@ -1,6 +1,6 @@
 {
   "schema_version": "fixed-sigma-mul-noise-001-artifact-manifest.v1",
-  "status": "CP_B_COMPLETE_CP_C_IN_PROGRESS",
+  "status": "BATCH_COMPLETE_READY_FOR_WEB_REVIEW",
   "task_id": "FIXED-SIGMA-MUL-NOISE-001",
   "primary_commit": "b99f63710718ac4373e704afef3023d62fc17f3d",
   "primary_measurement_source_sha256": "6f8a9237ebf2152c369abc2fe797c4f168793f056954a753d706126fda38d3ad",
@@ -91,6 +91,81 @@
   "fast_vector_sidecar_sha256": "af7de0aeeda4e65f2e1401b68378ebeb5e81d0d239b63e86565183ccf7cd6137",
   "artifacts": [
     {
+      "file": "cp-c-fast-noise-run-01-vectors.json",
+      "bytes": 4530812,
+      "sha256": "822b9ec61c65d7ec770594c24667cca16112dc92611065e627bd425cebb059ec"
+    },
+    {
+      "file": "cp-c-fast-noise-run-01.json",
+      "bytes": 31966,
+      "sha256": "a045b46f566ecf8a53917f4ef3c093c15df31af7e3f8d30cc12fe53059996deb"
+    },
+    {
+      "file": "cp-c-fast-noise-run-02-vectors.json",
+      "bytes": 4531003,
+      "sha256": "ecdcd3231416779803c0f5a770978633f8e3e997f34801ddc3e848656378620d"
+    },
+    {
+      "file": "cp-c-fast-noise-run-02.json",
+      "bytes": 31966,
+      "sha256": "79a74a4f6ee02be9fa6b428ad6b0bccca48e8f2cbc4c490d0a0298abdbe20e87"
+    },
+    {
+      "file": "cp-c-fast-noise-run-03-vectors.json",
+      "bytes": 4531350,
+      "sha256": "84612cd7e6424f8e7ac154c2ccaf9ee3d19d2de104e128e0a9fb516e3aa53e21"
+    },
+    {
+      "file": "cp-c-fast-noise-run-03.json",
+      "bytes": 31958,
+      "sha256": "5bd3e24385ab0a45578b2134c21f29fda497ca4bdda07a81afb8e9e2663dcf3f"
+    },
+    {
+      "file": "cp-c-paired-run-01.json",
+      "bytes": 16147,
+      "sha256": "83f642f8945bf030b869666d148c595e00167117340202a236d5d2c6f385ca47"
+    },
+    {
+      "file": "cp-c-paired-run-02.json",
+      "bytes": 16150,
+      "sha256": "a1dafae5fdb988151ab2728f1e680f5c303b4d5d7bd645f616cfd80fd43bd676"
+    },
+    {
+      "file": "cp-c-paired-run-03.json",
+      "bytes": 16154,
+      "sha256": "f6f3be21b64b5922bed66f7318c5602cf609e24fa47d8b85c72787fbbc734c75"
+    },
+    {
+      "file": "cp-c-standard-run-01-vectors.json",
+      "bytes": 3816810,
+      "sha256": "4a9c1f0ad2c7d772ffd99c982871c9b97e6ec775984255a53aaaf0b8a99e6ac5"
+    },
+    {
+      "file": "cp-c-standard-run-01.json",
+      "bytes": 29164,
+      "sha256": "3cf83a5518af7d3622e3dc2e2b47ac7f8bd31345baf26245a3fdf37955b612f9"
+    },
+    {
+      "file": "cp-c-standard-run-02-vectors.json",
+      "bytes": 3816400,
+      "sha256": "08eea1d567abd185530ec13fdff5f13a6c02f2e5db7aa69b68f7d0010326c357"
+    },
+    {
+      "file": "cp-c-standard-run-02.json",
+      "bytes": 29174,
+      "sha256": "cc82c75f3a7456915c11ff2b4b8633f04c6c8095e48903bce54975ca4dbeea9c"
+    },
+    {
+      "file": "cp-c-standard-run-03-vectors.json",
+      "bytes": 3816397,
+      "sha256": "8bbc824012ed6a50feb3caf69b66755dfb7b811855c30d1373e1243707486671"
+    },
+    {
+      "file": "cp-c-standard-run-03.json",
+      "bytes": 29176,
+      "sha256": "28e46e1a161d02f78211b3e3921df78a05cfc6cac709383fcd402c5fa6010817"
+    },
+    {
       "file": "fast-run-01.json",
       "bytes": 29267,
       "sha256": "8b8f625cf690a29ba169917b2ea8e2a6cd1e1e2644dd66664a0b313b72982579"
@@ -171,5 +246,279 @@
       4.04591114352061
     ],
     "calibration_only": true
+  },
+  "cp_c": {
+    "status": "RMSE_ONLY",
+    "classification_reason": "All three paired incremental RMS values were close, but variance deltas were negative in pairs 01 and 03 and positive only in pair 02; per-pair variance is therefore not consistently aligned. The result is RMSE_ONLY and does not establish a general independent-noise model.",
+    "primary_source_sha256": "79b13e0978030f575458230d7068f572976ae29b3ebeed13f3a9fbc66fa8d8e5",
+    "primary_commits_observed": [
+      "a47e402a31e9181ac94dfb430e1cc337fbd8b3a0",
+      "e543cf8a9aac5199ebc849e044328cbfac835d3d"
+    ],
+    "standard_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+    "standard_binary_sha256": "7521b4e33dfeeb80c266d5526d82845f1cf54c619b61dfe151bcd73af050ea76",
+    "fast_helper_commit": "9ef0315feaf59dbee03bf0852b72c76fdeb6b800",
+    "fast_noise_binary_sha256": "8e6eb3934ed5bb545524344654314cdf7fbff67928fdd5268b18d75ad39153d8",
+    "go_version": "go1.26.4",
+    "os": "darwin",
+    "arch": "arm64",
+    "profile": "logn13",
+    "ephemeral_secret_weight": 32,
+    "ring_degree": 8192,
+    "slots": 4096,
+    "level_in": 5,
+    "level_out": 4,
+    "scale_in": "2^45 * q5",
+    "scale_out": "2^45",
+    "sigma_coefficient_frozen_from_cp_b": 4.004280012097432,
+    "bootstrap_budget": 0,
+    "bootstrap_calls": 0,
+    "calibration_seed": 20261022,
+    "held_out_seeds": [
+      20261023,
+      20261024
+    ],
+    "runs": [
+      {
+        "pair": 1,
+        "role": "calibration-transfer-check",
+        "seed": 20261022,
+        "standard_file": "cp-c-standard-run-01.json",
+        "fast_noise_file": "cp-c-fast-noise-run-01.json",
+        "pair_file": "cp-c-paired-run-01.json",
+        "primary_commit": "a47e402a31e9181ac94dfb430e1cc337fbd8b3a0",
+        "primary_source_sha256": "79b13e0978030f575458230d7068f572976ae29b3ebeed13f3a9fbc66fa8d8e5",
+        "standard_binary_sha256": "7521b4e33dfeeb80c266d5526d82845f1cf54c619b61dfe151bcd73af050ea76",
+        "fast_binary_sha256": "8e6eb3934ed5bb545524344654314cdf7fbff67928fdd5268b18d75ad39153d8",
+        "status": "PASS",
+        "bootstrap_calls": 0,
+        "logical_ct_ct_mul_count": 1,
+        "logical_noise_injections": 1,
+        "sigma_coefficient": 4.004280012097432,
+        "coefficient_mean": -0.03845214843749997,
+        "coefficient_variance": 16.179063424468087,
+        "coefficient_rms": 4.022504442780331,
+        "coefficient_max_abs": 16,
+        "coefficient_sha256": "a4ddb60bb3544265cdef1ef59fd01be80db64b51703a2e1aa2f10c55c68adbc8",
+        "qprefix_rows": 4,
+        "qprefix_capacity_strict_fit": true,
+        "standard_incremental": {
+          "count": 4096,
+          "mean_real": 1.439908138673146e-13,
+          "mean_imag": 5.75109126931003e-14,
+          "variance": 1.0544128709677885e-22,
+          "rms": 1.0269631344714181e-11,
+          "max_abs": 4.7013604001091595e-11,
+          "worst_slot": 435,
+          "status": "FINITE"
+        },
+        "fast_baseline_incremental": {
+          "count": 4096,
+          "mean_real": 1.8371733706743724e-17,
+          "mean_imag": 9.123235779000881e-17,
+          "variance": 5.531307679675344e-25,
+          "rms": 7.43727622606826e-13,
+          "max_abs": 2.2054128106146474e-12,
+          "worst_slot": 96,
+          "status": "FINITE"
+        },
+        "fast_noise_incremental": {
+          "count": 4096,
+          "mean_real": 2.844007886992532e-14,
+          "mean_imag": 1.7062148879028756e-13,
+          "variance": 1.0765493729792055e-22,
+          "rms": 1.0377131483625117e-11,
+          "max_abs": 3.3719008023356644e-11,
+          "worst_slot": 2917,
+          "status": "FINITE"
+        },
+        "fast_total_error": {
+          "count": 4096,
+          "mean_real": 2.8421708330150395e-14,
+          "mean_imag": 1.705302607907054e-13,
+          "variance": 1.076549193424382e-22,
+          "rms": 1.037712906857132e-11,
+          "max_abs": 3.3707938095747576e-11,
+          "worst_slot": 2917,
+          "status": "FINITE"
+        },
+        "decoded_injection_delta": {
+          "count": 4096,
+          "mean_real": 2.842170713621858e-14,
+          "mean_imag": 1.7053025643249756e-13,
+          "variance": 1.070439567086343e-22,
+          "rms": 1.0347649253353618e-11,
+          "max_abs": 3.3736270110616896e-11,
+          "worst_slot": 2917,
+          "status": "FINITE"
+        },
+        "standard_minus_fast_noise_variance": -2.2136502011416965e-24,
+        "variance_delta_status": "UNMODELLED_NEGATIVE_SLOT_VARIANCE_DELTA",
+        "cross_backend_correlation_magnitude": 0.014362239772828855,
+        "injection_elapsed_ns": 1305000,
+        "mul_relin_rescale_elapsed_ns_excluding_injection": 2268875,
+        "dispatch_evidence": "ordinary ckks.Evaluator.MulRelinNew -> Fast zero-secret MulCore.ApplyRows; ordinary ckks.Evaluator.Rescale -> shared Q-prefix RescaleCore.ApplyRows; no Standard fallback"
+      },
+      {
+        "pair": 2,
+        "role": "held-out",
+        "seed": 20261023,
+        "standard_file": "cp-c-standard-run-02.json",
+        "fast_noise_file": "cp-c-fast-noise-run-02.json",
+        "pair_file": "cp-c-paired-run-02.json",
+        "primary_commit": "e543cf8a9aac5199ebc849e044328cbfac835d3d",
+        "primary_source_sha256": "79b13e0978030f575458230d7068f572976ae29b3ebeed13f3a9fbc66fa8d8e5",
+        "standard_binary_sha256": "7521b4e33dfeeb80c266d5526d82845f1cf54c619b61dfe151bcd73af050ea76",
+        "fast_binary_sha256": "8e6eb3934ed5bb545524344654314cdf7fbff67928fdd5268b18d75ad39153d8",
+        "status": "PASS",
+        "bootstrap_calls": 0,
+        "logical_ct_ct_mul_count": 1,
+        "logical_noise_injections": 1,
+        "sigma_coefficient": 4.004280012097432,
+        "coefficient_mean": 0.03186035156250004,
+        "coefficient_variance": 15.909019097685814,
+        "coefficient_rms": 3.9887384195616913,
+        "coefficient_max_abs": 17,
+        "coefficient_sha256": "31af10e98bed007322378968ab0889b31ef22ae84de1d0340ce4b6b9b85881c7",
+        "qprefix_rows": 4,
+        "qprefix_capacity_strict_fit": true,
+        "standard_incremental": {
+          "count": 4096,
+          "mean_real": 2.8908431813626864e-14,
+          "mean_imag": 1.4121965441278153e-13,
+          "variance": 1.0691982418981118e-22,
+          "rms": 1.0341208965978472e-11,
+          "max_abs": 4.539546748717531e-11,
+          "worst_slot": 1622,
+          "status": "FINITE"
+        },
+        "fast_baseline_incremental": {
+          "count": 4096,
+          "mean_real": 1.8371733706743724e-17,
+          "mean_imag": 9.123235779000881e-17,
+          "variance": 5.531307679675344e-25,
+          "rms": 7.43727622606826e-13,
+          "max_abs": 2.2054128106146474e-12,
+          "worst_slot": 96,
+          "status": "FINITE"
+        },
+        "fast_noise_incremental": {
+          "count": 4096,
+          "mean_real": 2.8440081446075934e-14,
+          "mean_imag": 9.123321185399817e-17,
+          "variance": 1.056652987739813e-22,
+          "rms": 1.0279402104234345e-11,
+          "max_abs": 2.971252216269117e-11,
+          "worst_slot": 2447,
+          "status": "FINITE"
+        },
+        "fast_total_error": {
+          "count": 4096,
+          "mean_real": 2.8421710906301015e-14,
+          "mean_imag": 5.212271822227991e-21,
+          "variance": 1.0566157212260835e-22,
+          "rms": 1.0279220783515612e-11,
+          "max_abs": 2.969735583965179e-11,
+          "worst_slot": 2447,
+          "status": "FINITE"
+        },
+        "decoded_injection_delta": {
+          "count": 4096,
+          "mean_real": 2.84217097123692e-14,
+          "mean_imag": 8.540639761501138e-22,
+          "variance": 1.0528296668908848e-22,
+          "rms": 1.0260788199873898e-11,
+          "max_abs": 2.99516759928582e-11,
+          "worst_slot": 2447,
+          "status": "FINITE"
+        },
+        "standard_minus_fast_noise_variance": 1.2545254158298855e-24,
+        "variance_delta_status": "NONNEGATIVE_SLOT_VARIANCE_DELTA_ONLY",
+        "cross_backend_correlation_magnitude": 0.00982745067752748,
+        "injection_elapsed_ns": 2062750,
+        "mul_relin_rescale_elapsed_ns_excluding_injection": 3531750,
+        "dispatch_evidence": "ordinary ckks.Evaluator.MulRelinNew -> Fast zero-secret MulCore.ApplyRows; ordinary ckks.Evaluator.Rescale -> shared Q-prefix RescaleCore.ApplyRows; no Standard fallback"
+      },
+      {
+        "pair": 3,
+        "role": "held-out",
+        "seed": 20261024,
+        "standard_file": "cp-c-standard-run-03.json",
+        "fast_noise_file": "cp-c-fast-noise-run-03.json",
+        "pair_file": "cp-c-paired-run-03.json",
+        "primary_commit": "e543cf8a9aac5199ebc849e044328cbfac835d3d",
+        "primary_source_sha256": "79b13e0978030f575458230d7068f572976ae29b3ebeed13f3a9fbc66fa8d8e5",
+        "standard_binary_sha256": "7521b4e33dfeeb80c266d5526d82845f1cf54c619b61dfe151bcd73af050ea76",
+        "fast_binary_sha256": "8e6eb3934ed5bb545524344654314cdf7fbff67928fdd5268b18d75ad39153d8",
+        "status": "PASS",
+        "bootstrap_calls": 0,
+        "logical_ct_ct_mul_count": 1,
+        "logical_noise_injections": 1,
+        "sigma_coefficient": 4.004280012097432,
+        "coefficient_mean": 0.10217285156250003,
+        "coefficient_variance": 16.321714028716105,
+        "coefficient_rms": 4.041305892940115,
+        "coefficient_max_abs": 16,
+        "coefficient_sha256": "1fbaad5ec8abdaf1ba34b5bfca4bbe1162a2e31939270d347bd8bb39c5384a91",
+        "qprefix_rows": 4,
+        "qprefix_capacity_strict_fit": true,
+        "standard_incremental": {
+          "count": 4096,
+          "mean_real": -1.3986603069588769e-13,
+          "mean_imag": 8.79038288020922e-14,
+          "variance": 1.0580619520652395e-22,
+          "rms": 1.0287540269480581e-11,
+          "max_abs": 5.542996155069135e-11,
+          "worst_slot": 112,
+          "status": "FINITE"
+        },
+        "fast_baseline_incremental": {
+          "count": 4096,
+          "mean_real": 1.8371733706743724e-17,
+          "mean_imag": 9.123235779000881e-17,
+          "variance": 5.531307679675344e-25,
+          "rms": 7.43727622606826e-13,
+          "max_abs": 2.2054128106146474e-12,
+          "worst_slot": 96,
+          "status": "FINITE"
+        },
+        "fast_noise_incremental": {
+          "count": 4096,
+          "mean_real": -1.989335938716832e-13,
+          "mean_imag": -1.1359560554332419e-13,
+          "variance": 1.0881509341962705e-22,
+          "rms": 1.043396242833934e-11,
+          "max_abs": 3.070904251411103e-11,
+          "worst_slot": 71,
+          "status": "FINITE"
+        },
+        "fast_total_error": {
+          "count": 4096,
+          "mean_real": -1.9895196441145808e-13,
+          "mean_imag": -1.1368683354290637e-13,
+          "variance": 1.0882674041427018e-22,
+          "rms": 1.043452188624543e-11,
+          "max_abs": 3.071152265106805e-11,
+          "worst_slot": 71,
+          "status": "FINITE"
+        },
+        "decoded_injection_delta": {
+          "count": 4096,
+          "mean_real": -1.989519656053899e-13,
+          "mean_imag": -1.1368683790111422e-13,
+          "variance": 1.0802461808166663e-22,
+          "rms": 1.039601484528552e-11,
+          "max_abs": 3.0271549328458963e-11,
+          "worst_slot": 71,
+          "status": "FINITE"
+        },
+        "standard_minus_fast_noise_variance": -3.0088982131030966e-24,
+        "variance_delta_status": "UNMODELLED_NEGATIVE_SLOT_VARIANCE_DELTA",
+        "cross_backend_correlation_magnitude": 0.015864716775047527,
+        "injection_elapsed_ns": 2716083,
+        "mul_relin_rescale_elapsed_ns_excluding_injection": 5364833,
+        "dispatch_evidence": "ordinary ckks.Evaluator.MulRelinNew -> Fast zero-secret MulCore.ApplyRows; ordinary ckks.Evaluator.Rescale -> shared Q-prefix RescaleCore.ApplyRows; no Standard fallback"
+      }
+    ]
   }
 }

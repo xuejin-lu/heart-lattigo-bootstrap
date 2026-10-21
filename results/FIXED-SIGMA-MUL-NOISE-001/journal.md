@@ -1,7 +1,7 @@
 # FIXED-SIGMA-MUL-NOISE-001 — Durable Experiment Journal
 
 **建立日：** 2026-10-21 (Asia/Taipei)
-**狀態：** `PLANNED_NOT_RUN`
+**狀態：** `BATCH_COMPLETE_READY_FOR_WEB_REVIEW`（CP-C 分類為 `RMSE_ONLY`）
 **授權來源：** 使用者確認「每次完整 ct×ct＋Relin＋Rescale 新增誤差」，全體乘法共用一個固定 σ，要求 GitHub 版本管理；本 GitHub 提交僅為**規格與任務建置**。
 
 ## 版本控制及不可變歷史
@@ -9,7 +9,10 @@
 - Primary 初始規格基底：`4476da0fad330205d7333d25b23e3ebccebfe2bb` (`main`)。
 - Secondary 初始參考：`ee308c9743000b5f281a84a871e7c4bd59b176c4` (`fast-qprefix`)。
 - 原始 Standard 參考：`5dbffbdea05394de2ca3a432ed5318aa832e3f40`（只讀、不可修改）。
-- 最新實際 Git commit、原始碼 SHAs、binary SHA 與 dirty/clean 狀態：**執行後填寫**。
+- CP-A/CP-B Primary commits：`b99f63710718ac4373e704afef3023d62fc17f3d` 與 `8cf9f4c693d67d54ca246ec53c3478828bf42f4f`；CP-C harness commit：`a47e402a31e9181ac94dfb430e1cc337fbd8b3a0`。
+- CP-C 證據 checkpoint：`e543cf8a9aac5199ebc849e044328cbfac835d3d`；CP-C 執行期間 Primary source hash 固定為 `79b13e0978030f575458230d7068f572976ae29b3ebeed13f3a9fbc66fa8d8e5`。
+- Genuine Standard：`5dbffbdea05394de2ca3a432ed5318aa832e3f40`；CP-C helper Fast：`9ef0315feaf59dbee03bf0852b72c76fdeb6b800`，位於 `fast-qprefix`。
+- CP-C Standard/Fast+Noise binary SHA-256：`7521b4e33dfeeb80c266d5526d82845f1cf54c619b61dfe151bcd73af050ea76` / `8e6eb3934ed5bb545524344654314cdf7fbff67928fdd5268b18d75ad39153d8`。
 - 歷史 BTS Batch008 結果不可修改，不能重算或借用其 Bootstrap 配額。
 
 ## 研究決策
@@ -25,9 +28,9 @@
 | Checkpoint | 狀態 | 備註 |
 |---|---|---|
 | CP-A Source/maths audit | COMPLETE (isolated operation only) | source map／theory／Q-prefix and Scale limits recorded below; no Bootstrap-wide boundary claim |
-| CP-B Standard/Fast single-op | IN_PROGRESS | Bootstrap 0 calls; E=32, LogN13 |
-| CP-C Opt-in Fast helper | NOT_STARTED | 只有 A/B 成功且無未決數學問題才能實作 |
-| CP-D Summary & review handoff | NOT_STARTED | 記錄 commits、證據與結果 |
+| CP-B Standard/Fast single-op | COMPLETE | genuine Standard 與原始 Fast；Bootstrap 0 calls；候選 σ 僅由 Pair 01 校準 |
+| CP-C Opt-in Fast helper | COMPLETE — `RMSE_ONLY` | 單一孤立 MulRelin+Rescale 邊界；固定 σ；三組 matched、每組恰注入一次；未建立一般 Noise 分布模型 |
+| CP-D Summary & review handoff | READY_FOR_WEB_REVIEW | journal、summary、manifest、source/test/JSON/vector 證據及 commits 已整理；等待 Web 獨立審查 |
 
 ## Expensive call budget
 
@@ -36,7 +39,7 @@
 | Standard Bootstrap | 0 | 0 | 0 |
 | Fast Bootstrap | 0 | 0 | 0 |
 
-尚未實作、尚未量測、沒有校準出 σ。**不可填造結果。**
+累計 Standard/Fast Bootstrap 呼叫均為 `0`；LogN16、大型 benchmark 與 BTS 均未執行。CP-B 凍結候選 `σ=4.004280012097432`；CP-C 不曾調整此值。
 
 ## 中斷／續跑原則
 
@@ -94,3 +97,27 @@ All three existing `compare-public` pairs passed the shared 1e-6 public checkpoi
 **CP-B outcome:** `PASS_SCOPED_CANDIDATE_IDENTIFIED`. It is reasonable to perform the already-authorized, isolated CP-C injection trial at this one LogN13/E32/Scale profile. No claim is made that Standard's whole `r_op` is key-switch noise; its contributors also include rescale rounding and encoding/decode effects. PK remains unsupported because the Fast zero-secret MulRelin contract requires `c1=0`; no SK result is relabeled PK.
 
 **CP-B artifacts:** `standard-run-01..03.json`, their three `*-vectors.json` sidecars, `fast-run-01..03.json`, `fast-vectors-shared.json`, and `paired-run-01..03.json`; all exact sizes and SHA-256 values are in `manifest.json`. No Bootstrap, LogN16, or BTS calls were made.
+
+## 2026-10-22 CP-C completed — one post-Rescale fixed-σ injection
+
+**Source and build provenance:** Primary source was `a47e402a31e9181ac94dfb430e1cc337fbd8b3a0` for pair 01 and `e543cf8a9aac5199ebc849e044328cbfac835d3d` for pairs 02/03. The latter checkpoint adds pair-01 evidence only; all three binaries report the identical measurement source SHA-256 `79b13e0978030f575458230d7068f572976ae29b3ebeed13f3a9fbc66fa8d8e5`. Genuine Standard stayed at pristine `5dbffbdea05394de2ca3a432ed5318aa832e3f40`; Fast helper source is `fast-qprefix@9ef0315feaf59dbee03bf0852b72c76fdeb6b800`. Standard and Fast+Noise binary SHA-256 are respectively `7521b4e33dfeeb80c266d5526d82845f1cf54c619b61dfe151bcd73af050ea76` and `8e6eb3934ed5bb545524344654314cdf7fbff67928fdd5268b18d75ad39153d8`. Environment was Go `go1.26.4`, `darwin/arm64`; E=32, LogN13, 4096 slots, N=8192, input Level5 / Scale `2^45×q5`, output Level4 / Scale `2^45`, SK cohort, one ct×ct MulRelin and one Rescale. All three pairs passed `compare-public`; each run reported zero Bootstrap calls and exactly one Fast injection. Same public workload, config, Q/P, and decoded-operation definition were used; Standard arithmetic and source were untouched.
+
+The first attempt to start pairs 02/03 while pair-01 files were uncommitted was rejected by the runner's clean-Primary provenance guard before measurement. The six outputs were then generated under `/private/tmp` while Primary remained clean and copied unchanged into the task result directory. The rejected attempts consumed no Bootstrap budget and produced no measurement artifacts.
+
+The frozen value remained `sigma=4.004280012097432` for all three seeds. Pair 01 is the calibration-transfer check (seed `20261022`); pairs 02/03 are held out (seeds `20261023`, `20261024`). No pair was used to change σ. Summary statistics are per single 4096-slot vector; slots are not independent experimental repetitions.
+
+| Pair / role | Standard `r_op` variance / RMS / Max | Fast before injection: variance / RMS / Max | Fast + fixed σ: variance / RMS / Max | Standard − Fast+Noise variance | Correlation magnitude |
+|---|---:|---:|---:|---:|---:|
+| 01 / transfer check | `1.054413e-22` / `1.026963e-11` / `4.701360e-11` | `5.531308e-25` / `7.437276e-13` / `2.205413e-12` | `1.076549e-22` / `1.037713e-11` / `3.371901e-11` | `-2.213650e-24` (`UNMODELLED_NEGATIVE_SLOT_VARIANCE_DELTA`) | `0.01436` |
+| 02 / held out | `1.069198e-22` / `1.034121e-11` / `4.539547e-11` | `5.531308e-25` / `7.437276e-13` / `2.205413e-12` | `1.056653e-22` / `1.027940e-11` / `2.971252e-11` | `+1.254525e-24` (`NONNEGATIVE_SLOT_VARIANCE_DELTA_ONLY`) | `0.00983` |
+| 03 / held out | `1.058062e-22` / `1.028754e-11` / `5.542996e-11` | `5.531308e-25` / `7.437276e-13` / `2.205413e-12` | `1.088151e-22` / `1.043396e-11` / `3.070904e-11` | `-3.008898e-24` (`UNMODELLED_NEGATIVE_SLOT_VARIANCE_DELTA`) | `0.01586` |
+
+The Fast+Noise incremental RMS was respectively `+1.047%`, `−0.598%`, and `+1.423%` relative to its paired Standard result. Across the three descriptive vectors, mean RMS was `1.036350e-11` versus Standard `1.029946e-11` (about `0.62%` higher); mean variance was `1.073784e-22` versus `1.060558e-22` (about `1.25%` higher). Two of three paired variance deltas were negative, so the variance model is not consistently confirmed. Max errors were lower in all three Fast+Noise pairs than their paired Standard observations. Cross-backend correlation magnitudes were below `0.016`; this small per-vector result does not prove independent sampling.
+
+**Coefficient-to-slot check:** For seeds 20261022/23/24, coefficient empirical variance was `16.179063` / `15.909019` / `16.321714`, empirical RMS `4.022504` / `3.988738` / `4.041306`, and sample count 8192 each. Observed decoded injection-delta variance was `1.070440e-22` / `1.052830e-22` / `1.080246e-22`; `N·Var(eta)/2^90` predicts `1.070641e-22` / `1.052771e-22` / `1.080080e-22`, within `0.019%` in each sample. This confirms the isolated coefficient-to-slot mapping at the tested Scale; it does not explain the Standard residual distribution or turn the variance subtraction into a general model. Q-prefix capacity was strict-fit for all 8192 coefficients across q0..q3 on all three calls; the sampler hash, capacity evidence, exact delta vectors, fingerprints and full provenance are in each run JSON and vector sidecar, inventoried in `manifest.json`.
+
+Injection elapsed times were `1.305`, `2.063`, and `2.716 ms`; the measured MulRelin+Rescale operation phases excluding injection were `2.269`, `3.532`, and `5.365 ms`. These single-run timings imply diagnostic overhead of roughly `50.6%–58.4%` of the operation phase and are descriptive, not a performance campaign. Post-injection total oracle-error RMS was `1.037713e-11`, `1.027922e-11`, `1.043452e-11`; maximum total errors were `3.370794e-11`, `2.969736e-11`, `3.071152e-11`.
+
+**CP-C outcome:** `RMSE_ONLY`. One unchanged σ brought the Fast incremental RMS close to the three genuine Standard observations and the decoded injection delta followed the coefficient-domain mapping. However, paired variance deltas were negative twice and positive once; CP-C does not establish distribution equivalence, a universal Gaussian model, or Bootstrap behavior. The fixed σ was not tuned. Results remain `DIAGNOSTIC_ONLY`; no security claim is made.
+
+**Verification:** Both the full Fast `cmd/perfprobe` package and task-focused Standard/Fast tests passed; the focused tests include exact Fast-pin scoping, opt-in fail-closed rules, residual evidence recomputation and injected-delta tamper rejection. Secondary fixed-sigma/fastcore tests passed. Full Standard `cmd/perfprobe` tests reproduce the already-recorded unrelated historical A=0 failures and the build-info-relative-path test under the isolated Standard modfile. The task path policy accepted the exact generated artifact paths and its two unit tests passed. The helper is committed and pushed as Secondary `9ef0315feaf59dbee03bf0852b72c76fdeb6b800`; the CP-C harness and evidence checkpoints are Primary `a47e402...` and `e543cf8...`, with the final summary/manifest commit to follow. Bootstrap budget remains 0; LogN16, large benchmarks and BTS were not run.
