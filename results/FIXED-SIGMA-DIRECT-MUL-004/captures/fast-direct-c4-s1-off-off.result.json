@@ -1,0 +1,1103 @@
+{
+  "schema_version": "fast-standard-fixed-sigma-direct-ctct.v1",
+  "mode": "fixed-sigma-direct-ctct",
+  "status": "PASS_ZERO_BOOTSTRAP_DIRECT_CTCT_CHAIN",
+  "timestamp": "2026-10-22T00:37:11.337539Z",
+  "profile": "logn13",
+  "profile_kind": "frozen-historical-fixture-v1",
+  "backend": "fast",
+  "backend_commit": "1e7828293c36f9845e30723ba4e9500d84bb50d2",
+  "backend_ref": "fast-qprefix",
+  "backend_checkout_ref": "fast-qprefix",
+  "backend_path": "/Users/xuejinlu/Developer/xuejin-lu/lattigo",
+  "backend_clean": true,
+  "built_binary_sha256": "a7083bc12aa1d3da062c0b094b99f5c4fbcf3ceb8d86ea92f981ad73ab9db2ff",
+  "primary_path": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap",
+  "primary_commit": "977d853541cf59b37e42cdfc1e635bc0cab7862d",
+  "primary_clean": true,
+  "primary_measurement_source_sha256": "544356df4747d51d9bc5d4acbfdaca02888ba9f417d2130629a3573f96ca236c",
+  "build_tag": "perf_fast",
+  "go_version": "go1.26.4",
+  "os": "darwin",
+  "arch": "arm64",
+  "cpu": "Apple M4",
+  "num_cpu": 10,
+  "gomaxprocs": 10,
+  "gogc": "runtime-default",
+  "gomemlimit": "runtime-default",
+  "godebug": "runtime-default",
+  "config_path": "configs/bootstrap_config.logN13.json",
+  "config_sha256": "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98",
+  "qp_sha256": "1f045e603a856968779d62e045a037274bba08cbfce8b1dd3dec2828f1f6a46b",
+  "canonical_input_sha256": "cce5d432ca1cefcc6ca2d70f37f9e50c463783b5895560fff8b13728fc1a109e",
+  "workload_sha256": "6ed6318094e75d3e8481611d9ede971aebad8deeae5763496d1365274f345786",
+  "effective_parameters": {
+    "ephemeral_secret_weight": 32,
+    "log_n": 13,
+    "log_slots": 12,
+    "input_slots": 4096,
+    "ring_n": 8192,
+    "residual_ring_n": 8192,
+    "q0_config_target_bits": 55,
+    "q0_bits": 55,
+    "q_chain_bits": [
+      55,
+      39,
+      40,
+      39,
+      40,
+      60,
+      60,
+      61,
+      60,
+      60,
+      60,
+      61,
+      61,
+      56,
+      57,
+      56,
+      56
+    ],
+    "p_bits": [
+      61,
+      61,
+      62,
+      61,
+      62
+    ],
+    "q_primes": [
+      "36028797018652673",
+      "549755731969",
+      "549756026881",
+      "549755486209",
+      "549756174337",
+      "1152921504606830593",
+      "1152921504606748673",
+      "1152921504606994433",
+      "1152921504606683137",
+      "1152921504606601217",
+      "1152921504606584833",
+      "1152921504607191041",
+      "1152921504607223809",
+      "72057594037616641",
+      "72057594038321153",
+      "72057594037370881",
+      "72057594037338113"
+    ],
+    "p_primes": [
+      "2305843009213317121",
+      "2305843009213120513",
+      "2305843009214414849",
+      "2305843009212694529",
+      "2305843009214758913"
+    ],
+    "default_scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+    "mod1_log_scale": 60,
+    "mod1_degree": 30,
+    "double_angle": 3,
+    "k": 16,
+    "log_message_ratio": 10,
+    "circuit_order": 0,
+    "q_prefix_rows_at_max_level": 4
+  },
+  "ephemeral_secret_weight": 32,
+  "input_slots": 4096,
+  "input_kind": "fast_zero_secret_public_encrypt_v1",
+  "input_constructor": "rlwe.NewEncryptor(full, extended bootstrap secret).EncryptNew; pinned Fast CKKS zero-secret capability yields observed c1=0",
+  "input_c1_nonzero": false,
+  "public_evaluator_dispatch": "bootstrapping.NewEvaluator public wrapper; Fast dispatch selected by pinned zero-secret capability",
+  "capacity_evidence_version": "public-direct-mul-qprefix-capacity.v1",
+  "capacity_policy": "strict-sufficient-bound-v1",
+  "conservative_bound_status": "STRICT_QPREFIX_FIT",
+  "observed_native_oracle_status": "PASS_SEVEN_DIRECT_CTCT_CHECKPOINT_PLAINTEXT_ORACLES",
+  "level4_to_level0_continuity": {
+    "complex_rmse": 0,
+    "max_complex_difference": 0,
+    "max_real_difference": 0,
+    "max_imag_difference": 0,
+    "worst_slot": 0,
+    "real_components_above_threshold": 0,
+    "imag_components_above_threshold": 0,
+    "median_precision_bits": 0
+  },
+  "capacity_plan": {
+    "input_a_bound": "",
+    "input_b_bound": "",
+    "input_c_bound": "",
+    "add_bound": "",
+    "mulrelin_bound": "",
+    "rescale_bound": "",
+    "q0123_product": "",
+    "q0": "",
+    "mul_divisor_q5": "",
+    "terminal_q0_sufficient_condition": ""
+  },
+  "direct_mul_capacity_plan": {
+    "schema_version": "public-direct-mul-qprefix-capacity.v1",
+    "workload_id": "direct-ctct-v1",
+    "ring_n": 8192,
+    "q4": "549756174337",
+    "q5": "1152921504606830593",
+    "q0123_product": "5986308565615587353347023386369277282933624144412673",
+    "stage1": {
+      "input_x_bound": "2348557866436",
+      "input_y_bound": "59140416434924413",
+      "mulrelin_bound": "1137825302466909215393461879341056",
+      "rescale_divisor": "1152921504606830593",
+      "rescale_bound": "986906131874893",
+      "input_level": 5,
+      "output_level": 4,
+      "active_q_prefix_rows": 4,
+      "q_prefix_capacity": "5986308565615587353347023386369277282933624144412673"
+    },
+    "stage2": {
+      "input_x_bound": "986906131874893",
+      "input_y_bound": "111999117939",
+      "mulrelin_bound": "905483192390274484633645277184",
+      "rescale_divisor": "549756174337",
+      "rescale_bound": "1647063252144966668",
+      "input_level": 4,
+      "output_level": 3,
+      "active_q_prefix_rows": 4,
+      "q_prefix_capacity": "5986308565615587353347023386369277282933624144412673"
+    },
+    "checks": [
+      {
+        "operation": "EncryptNew(A)",
+        "level": 5,
+        "active_q_prefix_rows": 4,
+        "centered_bound": "2348557866436",
+        "q_prefix_capacity": "5986308565615587353347023386369277282933624144412673",
+        "strict_2b_lt_capacity": true
+      },
+      {
+        "operation": "EncryptNew(B,q5)",
+        "level": 5,
+        "active_q_prefix_rows": 4,
+        "centered_bound": "59140416434924413",
+        "q_prefix_capacity": "5986308565615587353347023386369277282933624144412673",
+        "strict_2b_lt_capacity": true
+      },
+      {
+        "operation": "stage1.MulRelinNew",
+        "level": 5,
+        "active_q_prefix_rows": 4,
+        "centered_bound": "1137825302466909215393461879341056",
+        "q_prefix_capacity": "5986308565615587353347023386369277282933624144412673",
+        "strict_2b_lt_capacity": true
+      },
+      {
+        "operation": "stage1.Rescale(q5)",
+        "level": 4,
+        "active_q_prefix_rows": 4,
+        "centered_bound": "986906131874893",
+        "q_prefix_capacity": "5986308565615587353347023386369277282933624144412673",
+        "strict_2b_lt_capacity": true
+      },
+      {
+        "operation": "EncryptNew(C,q4)",
+        "level": 4,
+        "active_q_prefix_rows": 4,
+        "centered_bound": "111999117939",
+        "q_prefix_capacity": "5986308565615587353347023386369277282933624144412673",
+        "strict_2b_lt_capacity": true
+      },
+      {
+        "operation": "stage2.input_X",
+        "level": 4,
+        "active_q_prefix_rows": 4,
+        "centered_bound": "986906131874893",
+        "q_prefix_capacity": "5986308565615587353347023386369277282933624144412673",
+        "strict_2b_lt_capacity": true
+      },
+      {
+        "operation": "stage2.MulRelinNew",
+        "level": 4,
+        "active_q_prefix_rows": 4,
+        "centered_bound": "905483192390274484633645277184",
+        "q_prefix_capacity": "5986308565615587353347023386369277282933624144412673",
+        "strict_2b_lt_capacity": true
+      },
+      {
+        "operation": "stage2.Rescale(q4)",
+        "level": 3,
+        "active_q_prefix_rows": 4,
+        "centered_bound": "1647063252144966668",
+        "q_prefix_capacity": "5986308565615587353347023386369277282933624144412673",
+        "strict_2b_lt_capacity": true
+      }
+    ],
+    "status": "STRICT_QPREFIX_FIT"
+  },
+  "max_complex_numerical_gate": 0.000001,
+  "bootstrap_budget": 0,
+  "actual_bootstrap_calls": 0,
+  "execution_phases": [
+    {
+      "phase": "secret_key_generation",
+      "elapsed_ns": 171000,
+      "allocated_bytes": 198448,
+      "allocations": 209,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "public_GenEvaluationKeys",
+      "elapsed_ns": 907951083,
+      "allocated_bytes": 894155816,
+      "allocations": 428362,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "public_ckks_evaluator_construction",
+      "elapsed_ns": 996750,
+      "allocated_bytes": 6195696,
+      "allocations": 16682,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "public_bootstrapping_evaluator_construction",
+      "elapsed_ns": 2508250,
+      "allocated_bytes": 9640608,
+      "allocations": 32102,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "chain_encrypt_a_level5",
+      "elapsed_ns": 1160917,
+      "allocated_bytes": 5223152,
+      "allocations": 21554,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "chain_encrypt_b_q5_level5",
+      "elapsed_ns": 1199000,
+      "allocated_bytes": 5223152,
+      "allocations": 21554,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "checkpoint_decode_encrypt_a_level5",
+      "elapsed_ns": 2742166,
+      "allocated_bytes": 4768120,
+      "allocations": 139398,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "checkpoint_decode_encrypt_b_q5_level5",
+      "elapsed_ns": 2725958,
+      "allocated_bytes": 4768376,
+      "allocations": 139399,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "chain_encrypt_c_q4_level4",
+      "elapsed_ns": 1120250,
+      "allocated_bytes": 5026496,
+      "allocations": 21551,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "checkpoint_decode_encrypt_c_q4_level4",
+      "elapsed_ns": 2819584,
+      "allocated_bytes": 4767880,
+      "allocations": 139398,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "stage1_MulRelinNew",
+      "elapsed_ns": 288541,
+      "allocated_bytes": 525504,
+      "allocations": 19,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "checkpoint_decode_chain_stage1_mulrelin_level5",
+      "elapsed_ns": 3005083,
+      "allocated_bytes": 5423480,
+      "allocations": 139398,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "stage1_Rescale",
+      "elapsed_ns": 1691125,
+      "allocated_bytes": 656896,
+      "allocations": 38,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "stage1_decode_pre_injection",
+      "elapsed_ns": 2923833,
+      "allocated_bytes": 4767608,
+      "allocations": 139398,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "checkpoint_decode_chain_stage1_output_level4",
+      "elapsed_ns": 2791375,
+      "allocated_bytes": 4767608,
+      "allocations": 139398,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "stage2_MulRelinNew",
+      "elapsed_ns": 265167,
+      "allocated_bytes": 525472,
+      "allocations": 19,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "checkpoint_decode_chain_stage2_mulrelin_level4",
+      "elapsed_ns": 2790958,
+      "allocated_bytes": 4768632,
+      "allocations": 139399,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "stage2_Rescale",
+      "elapsed_ns": 1665500,
+      "allocated_bytes": 525760,
+      "allocations": 36,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "stage2_decode_pre_injection",
+      "elapsed_ns": 3078166,
+      "allocated_bytes": 4761848,
+      "allocations": 139398,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "checkpoint_decode_chain_stage2_output_level3",
+      "elapsed_ns": 2928792,
+      "allocated_bytes": 4761848,
+      "allocations": 139398,
+      "samples": 1,
+      "available": true
+    }
+  ],
+  "checkpoints": [
+    {
+      "name": "encrypt_a_level5",
+      "state": {
+        "level": 5,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "ciphertext_domain": "NTT_NON_MONTGOMERY",
+      "decode_path": "Fast c0 projection to the authoritative Q-prefix plaintext (zero-secret measurement adapter)",
+      "physical_row_lengths_by_component": [
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          8192,
+          8192
+        ],
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          8192,
+          8192
+        ]
+      ],
+      "active_row_sha256_by_component": [
+        [
+          "d28e82688ffdbd2cc5a067f0c0919952063278a6fb23c64d8ae2ebcda096cd30",
+          "724917793423a820e00ab221be62d612d194964691521bc5e1f526c3314e8f51",
+          "0e159a22e2eaeb65682f26ab01052c4a2bb9aba79a6fa6ea5b71ca9200396801",
+          "f0f6204c281d8a49465540dfa1062b705f9b070b40fdb741e0f30f8c937d219f"
+        ],
+        [
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        ]
+      ],
+      "fast_compact_prefix_layout": false,
+      "c1_nonzero": false,
+      "decoded_sha256": "d107a20b1606f9d73a65b21299ead4d24f177adf74edcecb65dc7648aa4bdc5f",
+      "oracle_metrics": {
+        "complex_rmse": 7.449975091875706e-13,
+        "max_complex_difference": 2.101955261562136e-12,
+        "max_real_difference": 1.842290209275177e-12,
+        "max_imag_difference": 1.982903424790905e-12,
+        "worst_slot": 2334,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 40.52421353622066
+      },
+      "oracle_snr": {
+        "signal_power": 0.00041948817670345306,
+        "signal_rms": 0.020481410515476053,
+        "noise_power": 5.550212886956844e-25,
+        "noise_rmse": 7.449975091875706e-13,
+        "snr_db": 208.78410083248798,
+        "status": "FINITE"
+      },
+      "oracle_pass": true
+    },
+    {
+      "name": "encrypt_b_q5_level5",
+      "state": {
+        "level": 5,
+        "degree": 1,
+        "scale": "1.15292150460683059300000000000000000000000000000000000000000000000000000000000000e+18",
+        "scale_log2": 59.99999999999998,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "ciphertext_domain": "NTT_NON_MONTGOMERY",
+      "decode_path": "Fast c0 projection to the authoritative Q-prefix plaintext (zero-secret measurement adapter)",
+      "physical_row_lengths_by_component": [
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          8192,
+          8192
+        ],
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          8192,
+          8192
+        ]
+      ],
+      "active_row_sha256_by_component": [
+        [
+          "797da37656dcd64a560a6439c73f7ca49ccbdf630c49d7c92182440702548e9c",
+          "8c056ed7b1fb82a5e165c38e89f4f7ee47639da716489f7e7266d80334c01897",
+          "89defdf4db599b3b12a8961eb5f9d6f6d19d93a54f293a04ce17f8805ced4cbc",
+          "0a90492a86617be1f23bdb206c1646b44ad572f30cd88ecb1f1b717b8bc1535b"
+        ],
+        [
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        ]
+      ],
+      "fast_compact_prefix_layout": false,
+      "c1_nonzero": false,
+      "decoded_sha256": "2733a41b86b3ed40c25e3687dc4c27f64ce905a4891b013a725e4f1ac2f875ac",
+      "oracle_metrics": {
+        "complex_rmse": 2.4657639287703733e-17,
+        "max_complex_difference": 7.078437059792875e-17,
+        "max_real_difference": 6.245004513516506e-17,
+        "max_imag_difference": 6.765421556309548e-17,
+        "worst_slot": 833,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 55.43826325304417
+      },
+      "oracle_snr": {
+        "signal_power": 0.00024407108624776205,
+        "signal_rms": 0.015622774601451627,
+        "noise_power": 6.079991752425107e-34,
+        "noise_rmse": 2.4657639287703733e-17,
+        "snr_db": 296.03613343850134,
+        "status": "FINITE"
+      },
+      "oracle_pass": true
+    },
+    {
+      "name": "encrypt_c_q4_level4",
+      "state": {
+        "level": 4,
+        "degree": 1,
+        "scale": "5.49756174337000000000000000000000000000000000000000000000000000000000000000000000e+11",
+        "scale_log2": 39.00000094590689,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "ciphertext_domain": "NTT_NON_MONTGOMERY",
+      "decode_path": "Fast c0 projection to the authoritative Q-prefix plaintext (zero-secret measurement adapter)",
+      "physical_row_lengths_by_component": [
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          8192
+        ],
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          8192
+        ]
+      ],
+      "active_row_sha256_by_component": [
+        [
+          "e6cc11182e3036a251400ec59fb1377d2bffb38dab537df15ec11bffccd356df",
+          "6c3cec4d94682e65ad1d57e725d91c1fce209d651fd0f54dc8a1458686f80071",
+          "dbbdb67070dd9d3720cc38fe9e4a32de224230a8f5148018cb392ad5d218e737",
+          "f82963758e30f3455a56065bc7d071a40230d20e00f32d3000d9fd6355b2fe18"
+        ],
+        [
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        ]
+      ],
+      "fast_compact_prefix_layout": false,
+      "c1_nonzero": false,
+      "decoded_sha256": "aabe0f20fffc0a8829d7901ccc8fad96d6e04e78ddfc8568736fd7ce8474f452",
+      "oracle_metrics": {
+        "complex_rmse": 4.749901283074345e-11,
+        "max_complex_difference": 1.4588363726719225e-10,
+        "max_real_difference": 1.4470632331287092e-10,
+        "max_imag_difference": 1.2817692740529907e-10,
+        "worst_slot": 2862,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 34.58293425077031
+      },
+      "oracle_snr": {
+        "signal_power": 0.0037532076239585876,
+        "signal_rms": 0.06126342811138296,
+        "noise_power": 2.2561562198951307e-21,
+        "noise_rmse": 4.749901283074345e-11,
+        "snr_db": 182.21033422242098,
+        "status": "FINITE"
+      },
+      "oracle_pass": true
+    },
+    {
+      "name": "chain_stage1_mulrelin_level5",
+      "state": {
+        "level": 5,
+        "degree": 1,
+        "scale": "4.05648192073027644223265712373760000000000000000000000000000000000000000000000000e+31",
+        "scale_log2": 104.99999999999999,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "ciphertext_domain": "NTT_NON_MONTGOMERY",
+      "decode_path": "Fast c0 projection to the authoritative Q-prefix plaintext (zero-secret measurement adapter)",
+      "physical_row_lengths_by_component": [
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          0,
+          0
+        ],
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          0,
+          0
+        ]
+      ],
+      "active_row_sha256_by_component": [
+        [
+          "74964eef13d24c404af639e213f4d681d40f278f8dcc03f8150877c1212780ed",
+          "b251c90ba1e2ef3619a5c31a457a6c20fca0fbe35da5397205e26604ae80b2c2",
+          "5faa7b52481ec12a3ce528b7c506ac1a687fde523330be6ca93bc378b753f8df",
+          "89d41b5c70dd7c31aeefb2f3e8a22072921d8dffdd7a14aa946eba1081816a48"
+        ],
+        [
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        ]
+      ],
+      "fast_compact_prefix_layout": true,
+      "c1_nonzero": false,
+      "decoded_sha256": "c2b2688625bebf049897b2783105a0c29fbf4e21d472df89e9d505cc9e0ff43e",
+      "oracle_metrics": {
+        "complex_rmse": 1.1608041627159342e-14,
+        "max_complex_difference": 4.11573154718892e-14,
+        "max_real_difference": 4.101406714251965e-14,
+        "max_imag_difference": 3.977772430018012e-14,
+        "worst_slot": 3039,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 46.84395666415475
+      },
+      "oracle_snr": {
+        "signal_power": 1.032054244534365e-7,
+        "signal_rms": 0.0003212560107662369,
+        "noise_power": 1.3474663041786411e-28,
+        "noise_rmse": 1.1608041627159342e-14,
+        "snr_db": 208.84184610630442,
+        "status": "FINITE"
+      },
+      "oracle_pass": true
+    },
+    {
+      "name": "chain_stage1_output_level4",
+      "state": {
+        "level": 4,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "ciphertext_domain": "NTT_NON_MONTGOMERY",
+      "decode_path": "Fast c0 projection to the authoritative Q-prefix plaintext (zero-secret measurement adapter)",
+      "physical_row_lengths_by_component": [
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          0
+        ],
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          0
+        ]
+      ],
+      "active_row_sha256_by_component": [
+        [
+          "e65acd6375b86a8ef4e92cf4bbcb79f30154df4e9a18bedd0d3d9b819b2a953c",
+          "fb8937230c5902b4dcc39c209a58eca0f52177c6aaafe2fbb9d3e80e34c86c02",
+          "f307e5ec672e90431353fc9210c3db750fd24a553319a38f0b66c381cd0623fb",
+          "52f4fda02173cd1efae3ac8bb520fd77e79606cb9c6f21ea0f51755465863363"
+        ],
+        [
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        ]
+      ],
+      "fast_compact_prefix_layout": true,
+      "c1_nonzero": false,
+      "decoded_sha256": "c34487e85df8ddb1ee623fc2017fe1e401786bd517b3ce241c8cba67f1039445",
+      "oracle_metrics": {
+        "complex_rmse": 7.384007226613933e-13,
+        "max_complex_difference": 2.032528297624777e-12,
+        "max_real_difference": 1.9417602291696423e-12,
+        "max_imag_difference": 2.0022356846506953e-12,
+        "worst_slot": 1834,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 40.57381325209455
+      },
+      "oracle_snr": {
+        "signal_power": 1.032054244534365e-7,
+        "signal_rms": 0.0003212560107662369,
+        "noise_power": 5.452356272268678e-25,
+        "noise_rmse": 7.384007226613933e-13,
+        "snr_db": 172.77118298198698,
+        "status": "FINITE"
+      },
+      "oracle_pass": true
+    },
+    {
+      "name": "chain_stage2_mulrelin_level4",
+      "state": {
+        "level": 4,
+        "degree": 1,
+        "scale": "1.93428257960058018427043840000000000000000000000000000000000000000000000000000000e+25",
+        "scale_log2": 84.00000094590689,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "ciphertext_domain": "NTT_NON_MONTGOMERY",
+      "decode_path": "Fast c0 projection to the authoritative Q-prefix plaintext (zero-secret measurement adapter)",
+      "physical_row_lengths_by_component": [
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          0
+        ],
+        [
+          8192,
+          8192,
+          8192,
+          8192,
+          0
+        ]
+      ],
+      "active_row_sha256_by_component": [
+        [
+          "2390351562d4ec36b52f1b7cd0237e0705d2e76b19d0282a172b4e1a57aba9fc",
+          "5cf93b37426bb39341e92f015432d4ccdac08982b837cf18a1077ce2e0596063",
+          "fbbd148033860f2e8d9c047dea030a3c12756d62bdc923dccba31b305e12a063",
+          "c35734f39e8f8b62f66bd523d72dc7ff1741b4d8d99b8d995b31d2cb71cdf893"
+        ],
+        [
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        ]
+      ],
+      "fast_compact_prefix_layout": true,
+      "c1_nonzero": false,
+      "decoded_sha256": "3bac873f5a7c6cbf7ab41ace29bf9fce924c0a45abed1f5eed5d9cb90d6971a2",
+      "oracle_metrics": {
+        "complex_rmse": 4.799586701384594e-14,
+        "max_complex_difference": 1.951462282543609e-13,
+        "max_real_difference": 1.6644127618032148e-13,
+        "max_imag_difference": 1.7367786320167302e-13,
+        "worst_slot": 2533,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 44.708921014828206
+      },
+      "oracle_snr": {
+        "signal_power": 3.8728324297039363e-10,
+        "signal_rms": 0.000019679513280830744,
+        "noise_power": 2.3036032504107845e-27,
+        "noise_rmse": 4.799586701384594e-14,
+        "snr_db": 172.25621023620806,
+        "status": "FINITE"
+      },
+      "oracle_pass": true
+    },
+    {
+      "name": "chain_stage2_output_level3",
+      "state": {
+        "level": 3,
+        "degree": 1,
+        "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+        "scale_log2": 45,
+        "log_rows": 0,
+        "log_cols": 12,
+        "q_prefix_rows": 4,
+        "prefix_q": "5986308565615587353347023386369277282933624144412673"
+      },
+      "ciphertext_domain": "NTT_NON_MONTGOMERY",
+      "decode_path": "Fast c0 projection to the authoritative Q-prefix plaintext (zero-secret measurement adapter)",
+      "physical_row_lengths_by_component": [
+        [
+          8192,
+          8192,
+          8192,
+          8192
+        ],
+        [
+          8192,
+          8192,
+          8192,
+          8192
+        ]
+      ],
+      "active_row_sha256_by_component": [
+        [
+          "5d5bbc66b7a21131f1d4d4755dae91b373e6d3fe40ef3356a4cf78bf79fd2633",
+          "4585c2bd2782f0a5f9ca9c9e5f10414148df072328de0866fe31aa92e0e03595",
+          "5381fb0d5f834bb50e50cf247d9325b1b69a6207ea71d1868c6cd3fc167a2b12",
+          "ee4cb3bd8d5a3e88aa66fb71e0177afee04b8c79997b975fd15e147040034737"
+        ],
+        [
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+          "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+        ]
+      ],
+      "fast_compact_prefix_layout": true,
+      "c1_nonzero": false,
+      "decoded_sha256": "cd077543e93b45818bf3de8d6e3ef226a1905ccffdca0031ef2128219595f844",
+      "oracle_metrics": {
+        "complex_rmse": 7.454403052900353e-13,
+        "max_complex_difference": 2.143309630539596e-12,
+        "max_real_difference": 2.0313533197386952e-12,
+        "max_imag_difference": 1.905474139002436e-12,
+        "worst_slot": 2831,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 40.54876289014058
+      },
+      "oracle_snr": {
+        "signal_power": 3.8728324297039363e-10,
+        "signal_rms": 0.000019679513280830744,
+        "noise_power": 5.556812487509009e-25,
+        "noise_rmse": 7.454403052900353e-13,
+        "snr_db": 148.43202964340537,
+        "status": "FINITE"
+      },
+      "oracle_pass": true
+    }
+  ],
+  "mul_relin_rescale_total_error": {
+    "count": 0,
+    "mean_real": 0,
+    "mean_imag": 0,
+    "variance": 0,
+    "rms": 0,
+    "max_abs": 0,
+    "worst_slot": 0,
+    "status": ""
+  },
+  "fixed_sigma_two_step_chain": {
+    "schema_version": "fixed-sigma-direct-ctct-chain.v1",
+    "workload_id": "direct-ctct-v1",
+    "classification": "DIAGNOSTIC_ONLY",
+    "primary_build_commit": "977d853541cf59b37e42cdfc1e635bc0cab7862d",
+    "primary_build_clean": true,
+    "ablation_arm": "OFF/OFF",
+    "c_input_variant": "direct-c4",
+    "stage_seed_pair": [
+      20261105,
+      20261106
+    ],
+    "fast_input_active_row_sha256": {
+      "A.c0.q0": "d28e82688ffdbd2cc5a067f0c0919952063278a6fb23c64d8ae2ebcda096cd30",
+      "A.c0.q1": "724917793423a820e00ab221be62d612d194964691521bc5e1f526c3314e8f51",
+      "A.c0.q2": "0e159a22e2eaeb65682f26ab01052c4a2bb9aba79a6fa6ea5b71ca9200396801",
+      "A.c0.q3": "f0f6204c281d8a49465540dfa1062b705f9b070b40fdb741e0f30f8c937d219f",
+      "A.c1.q0": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+      "A.c1.q1": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+      "A.c1.q2": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+      "A.c1.q3": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+      "B.c0.q0": "797da37656dcd64a560a6439c73f7ca49ccbdf630c49d7c92182440702548e9c",
+      "B.c0.q1": "8c056ed7b1fb82a5e165c38e89f4f7ee47639da716489f7e7266d80334c01897",
+      "B.c0.q2": "89defdf4db599b3b12a8961eb5f9d6f6d19d93a54f293a04ce17f8805ced4cbc",
+      "B.c0.q3": "0a90492a86617be1f23bdb206c1646b44ad572f30cd88ecb1f1b717b8bc1535b",
+      "B.c1.q0": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+      "B.c1.q1": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+      "B.c1.q2": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+      "B.c1.q3": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+      "C_q4.c0.q0": "e6cc11182e3036a251400ec59fb1377d2bffb38dab537df15ec11bffccd356df",
+      "C_q4.c0.q1": "6c3cec4d94682e65ad1d57e725d91c1fce209d651fd0f54dc8a1458686f80071",
+      "C_q4.c0.q2": "dbbdb67070dd9d3720cc38fe9e4a32de224230a8f5148018cb392ad5d218e737",
+      "C_q4.c0.q3": "f82963758e30f3455a56065bc7d071a40230d20e00f32d3000d9fd6355b2fe18",
+      "C_q4.c1.q0": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+      "C_q4.c1.q1": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+      "C_q4.c1.q2": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31",
+      "C_q4.c1.q3": "de2f256064a0af797747c2b97505dc0b9f3df0de4f489eac731c23ae9ca9cc31"
+    },
+    "fast_c1_invariant": "PASS: Fast EncryptNew inputs and all captured checkpoints have c1=0; each enabled injection hashes c1 q0..q3 before and after commit.",
+    "fast_dormant_row_policy": "Arithmetic, direct input-row hashes, and the noise injector operate on authoritative q0..q3 only; the existing injector's candidate and commit write set is c0 q0..q3. Dormant rows are not copied into the candidate or written; checkpoint metadata records physical row lengths, and the separate c1-zero invariant scans stored c1 values as validation.",
+    "fast_metadata_invariant": "PASS: each enabled injection compares ciphertext state, metadata, IsNTT and IsMontgomery before and after; all run checkpoints preserve the expected Level/Scale/domain.",
+    "input_randomness_status": "Fast zero-secret EncryptNew copies the deterministic encoded plaintext into c0 and clears c1 without sampling ciphertext randomness; only enabled noise stages use the recorded deterministic seeds.",
+    "logical_ct_ct_operations": 2,
+    "logical_noise_injections": 0,
+    "stage2_seed_derivation": "stage2 seed is stage1 seed + 1; OFF stages do not invoke the sampler",
+    "input_message_sha256": {
+      "A": "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285",
+      "B": "200fdf50e784980cab99289e9c2bbe1930cc43b2ca84df09ac6cde38745dc20f",
+      "C": "766d36b04d9240867b28f034e2ded7f57e2af8439f90eb1eb7604fa7efba1165"
+    },
+    "operations": [
+      {
+        "name": "stage1",
+        "input_x_checkpoint": "encrypt_a_level5",
+        "input_y_checkpoint": "encrypt_b_q5_level5",
+        "output_checkpoint": "chain_stage1_output_level4",
+        "input_x_state": {
+          "level": 5,
+          "degree": 1,
+          "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+          "scale_log2": 45,
+          "log_rows": 0,
+          "log_cols": 12,
+          "q_prefix_rows": 4,
+          "prefix_q": "5986308565615587353347023386369277282933624144412673"
+        },
+        "input_y_state": {
+          "level": 5,
+          "degree": 1,
+          "scale": "1.15292150460683059300000000000000000000000000000000000000000000000000000000000000e+18",
+          "scale_log2": 59.99999999999998,
+          "log_rows": 0,
+          "log_cols": 12,
+          "q_prefix_rows": 4,
+          "prefix_q": "5986308565615587353347023386369277282933624144412673"
+        },
+        "multiplication_scale": "4.05648192073027644223265712373760000000000000000000000000000000000000000000000000e+31",
+        "rescale_divisor": "1152921504606830593",
+        "mul_relin_checkpoint": "chain_stage1_mulrelin_level5",
+        "output_state": {
+          "level": 4,
+          "degree": 1,
+          "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+          "scale_log2": 45,
+          "log_rows": 0,
+          "log_cols": 12,
+          "q_prefix_rows": 4,
+          "prefix_q": "5986308565615587353347023386369277282933624144412673"
+        },
+        "mul_relin_elapsed_ns": 288541,
+        "rescale_elapsed_ns": 1691125,
+        "incremental_residual": {
+          "schema_version": "fixed-sigma-mul-relin-rescale-residual.v1",
+          "classification": "DIAGNOSTIC_ONLY",
+          "definition": "Decode(Rescale(Relin(Mul(ct_x,ct_y)))) - Decode(ct_x) * Decode(ct_y), elementwise in slot domain",
+          "encryption_mode": "sk",
+          "pk_comparison_status": "UNSUPPORTED_FAST_ZERO_SECRET_MULRELIN_REQUIRES_C1_ZERO",
+          "logical_ct_ct_mul_count": 1,
+          "logical_noise_injections": 0,
+          "sigma_coefficient_status": "NOT_ESTIMATED_CP_B_BASELINE",
+          "sampling_seed_status": "NOT_APPLICABLE_BASELINE_NO_INJECTION",
+          "mul_relin_rescale_elapsed_ns": 1979666,
+          "decoded_input_x_sha256": "d107a20b1606f9d73a65b21299ead4d24f177adf74edcecb65dc7648aa4bdc5f",
+          "decoded_input_y_sha256": "2733a41b86b3ed40c25e3687dc4c27f64ce905a4891b013a725e4f1ac2f875ac",
+          "decoded_output_sha256": "c34487e85df8ddb1ee623fc2017fe1e401786bd517b3ce241c8cba67f1039445",
+          "statistics": {
+            "count": 4096,
+            "mean_real": 8.600717952502178e-18,
+            "mean_imag": 4.3415244776333964e-17,
+            "variance": 5.449278102107478e-25,
+            "rms": 7.381922596245538e-13,
+            "max_abs": 2.033109937082661e-12,
+            "worst_slot": 1834,
+            "status": "FINITE"
+          },
+          "dispatch_evidence": "ordinary ckks.Evaluator.MulRelinNew -\u003e Fast zero-secret MulCore.ApplyRows; ordinary ckks.Evaluator.Rescale -\u003e shared Q-prefix RescaleCore.ApplyRows; no Standard fallback"
+        },
+        "total_oracle_error": {
+          "count": 4096,
+          "mean_real": 2.529104722880882e-22,
+          "mean_imag": 2.061437484058714e-21,
+          "variance": 5.452356272268686e-25,
+          "rms": 7.384007226613933e-13,
+          "max_abs": 2.032528297624777e-12,
+          "worst_slot": 1834,
+          "status": "FINITE"
+        }
+      },
+      {
+        "name": "stage2",
+        "input_x_checkpoint": "chain_stage1_output_level4",
+        "input_y_checkpoint": "encrypt_c_q4_level4",
+        "output_checkpoint": "chain_stage2_output_level3",
+        "input_x_state": {
+          "level": 4,
+          "degree": 1,
+          "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+          "scale_log2": 45,
+          "log_rows": 0,
+          "log_cols": 12,
+          "q_prefix_rows": 4,
+          "prefix_q": "5986308565615587353347023386369277282933624144412673"
+        },
+        "input_y_state": {
+          "level": 4,
+          "degree": 1,
+          "scale": "5.49756174337000000000000000000000000000000000000000000000000000000000000000000000e+11",
+          "scale_log2": 39.00000094590689,
+          "log_rows": 0,
+          "log_cols": 12,
+          "q_prefix_rows": 4,
+          "prefix_q": "5986308565615587353347023386369277282933624144412673"
+        },
+        "multiplication_scale": "1.93428257960058018427043840000000000000000000000000000000000000000000000000000000e+25",
+        "rescale_divisor": "549756174337",
+        "mul_relin_checkpoint": "chain_stage2_mulrelin_level4",
+        "output_state": {
+          "level": 3,
+          "degree": 1,
+          "scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+          "scale_log2": 45,
+          "log_rows": 0,
+          "log_cols": 12,
+          "q_prefix_rows": 4,
+          "prefix_q": "5986308565615587353347023386369277282933624144412673"
+        },
+        "mul_relin_elapsed_ns": 265167,
+        "rescale_elapsed_ns": 1665500,
+        "incremental_residual": {
+          "schema_version": "fixed-sigma-mul-relin-rescale-residual.v1",
+          "classification": "DIAGNOSTIC_ONLY",
+          "definition": "Decode(Rescale(Relin(Mul(ct_x,ct_y)))) - Decode(ct_x) * Decode(ct_y), elementwise in slot domain",
+          "encryption_mode": "sk",
+          "pk_comparison_status": "UNSUPPORTED_FAST_ZERO_SECRET_MULRELIN_REQUIRES_C1_ZERO",
+          "logical_ct_ct_mul_count": 1,
+          "logical_noise_injections": 0,
+          "sigma_coefficient_status": "NOT_ESTIMATED_CP_B_BASELINE",
+          "sampling_seed_status": "NOT_APPLICABLE_BASELINE_NO_INJECTION",
+          "mul_relin_rescale_elapsed_ns": 1930667,
+          "decoded_input_x_sha256": "c34487e85df8ddb1ee623fc2017fe1e401786bd517b3ce241c8cba67f1039445",
+          "decoded_input_y_sha256": "aabe0f20fffc0a8829d7901ccc8fad96d6e04e78ddfc8568736fd7ce8474f452",
+          "decoded_output_sha256": "cd077543e93b45818bf3de8d6e3ef226a1905ccffdca0031ef2128219595f844",
+          "statistics": {
+            "count": 4096,
+            "mean_real": 9.703551986742516e-15,
+            "mean_imag": 3.8850135812039853e-16,
+            "variance": 5.539554205618127e-25,
+            "rms": 7.443451688674254e-13,
+            "max_abs": 2.104384642605549e-12,
+            "worst_slot": 2831,
+            "status": "FINITE"
+          },
+          "dispatch_evidence": "ordinary ckks.Evaluator.MulRelinNew -\u003e Fast zero-secret MulCore.ApplyRows; ordinary ckks.Evaluator.Rescale -\u003e shared Q-prefix RescaleCore.ApplyRows; no Standard fallback"
+        },
+        "total_oracle_error": {
+          "count": 4096,
+          "mean_real": 9.473903210806751e-15,
+          "mean_imag": 2.2183626935479732e-23,
+          "variance": 5.555914939088535e-25,
+          "rms": 7.454403052900353e-13,
+          "max_abs": 2.143309630539596e-12,
+          "worst_slot": 2831,
+          "status": "FINITE"
+        }
+      }
+    ],
+    "limitations": [
+      "Two explicit public ct×ct MulRelinNew→Rescale operations only; no Bootstrap, lazy/deferred Bootstrap chain, or generic Rescale interception was run.",
+      "Stage 2 re-encodes the same original C message at the effective q4 Scale so the ordinary q4 Rescale returns to Scale2^45; this is a diagnostic CKKS schedule, not a general application workload claim.",
+      "Standard uses genuine native SK encryption; Fast uses the pinned intentionally insecure zero-secret c1=0 mode. PK comparison remains unsupported."
+    ]
+  },
+  "limitations": [
+    "Diagnostic-only two-step MulRelin+Rescale evidence; no Bootstrap call, output, or performance claim is included.",
+    "Same canonical messages and public CKKS call sequence are built against isolated genuine Standard and current Fast sources; keys and ciphertext coefficients are backend-native.",
+    "Fixed-sigma ablation arm OFF/OFF explicitly controls only the two demonstrated post-Rescale boundaries; no Bootstrap or arbitrary-operation interception is claimed.",
+    "C variant direct-c4 changes slot-message values only; effective CKKS parameters and q5/q4 encoding scales are unchanged.",
+    "Versioned direct-ctct-v1 schedule contains two independently encrypted ct×ct MulRelinNew→Rescale operations and no AddNew.",
+    "The direct fixture's q5 and q4 Scale schedule and strict two-stage Q-prefix capacity plan are separate from the historical Add-containing fixture."
+  ]
+}

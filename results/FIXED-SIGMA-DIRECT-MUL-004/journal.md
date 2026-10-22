@@ -1,6 +1,6 @@
 # FIXED-SIGMA-DIRECT-MUL-004 — durable experiment journal
 
-**Status:** `BATCH_IN_PROGRESS`. Established 2026-10-22 Asia/Taipei from the approved direct-multiplication redesign. CP-A is complete; no ciphertext-chain captures have been made.
+**Status:** `BATCH_BLOCKED_NEEDS_WEB_REVIEW`. CP-A and CP-B are complete. CP-C stopped after the F5 runner invocation failed during flag parsing before any multiplication chain ran. No retry or replacement sample was launched.
 **Prior:** `FIXED-SIGMA-PROPAGATION-003` results remain unchanged; Web review in `../FIXED-SIGMA-PROPAGATION-003/web-review.md`.
 **Authoritative spec:** `../../specs/FIXED-SIGMA-DIRECT-MUL-004.md`.
 
@@ -16,8 +16,9 @@
 
 | Metric | Used | Maximum |
 |---|---:|---:|
-| Fast two-stage chain runs | 0 | 16 |
-| Genuine Standard two-stage chains | 0 | 2 |
+| Fast two-stage chains completed | 5 | 16 |
+| Fast launch slots consumed, including failed pre-chain F5 invocation | 6 | 16 |
+| Genuine Standard two-stage chains completed | 2 | 2 |
 | Standard Bootstrap calls | 0 | 0 |
 | Fast Bootstrap calls | 0 | 0 |
 | LogN16 workload runs | 0 | 0 |
@@ -26,11 +27,11 @@
 | Checkpoint | Status |
 |---|---|
 | CP-A new-workload source/math/capacity gates | COMPLETE |
-| CP-B direct A×B→×C baseline | IN_PROGRESS |
-| CP-C fixed σ four-arm experiment | NOT_STARTED |
-| CP-D full analysis/provenance/commit | NOT_STARTED |
+| CP-B direct A×B→×C baseline | COMPLETE |
+| CP-C fixed σ four-arm experiment | BLOCKED after F5 invocation failure; no retry |
+| CP-D full analysis/provenance/commit | NOT_RUN; CP-C stop condition applies |
 
-All numerical metrics and capture binaries/SHAs remain **NOT_RUN**. Codex must record them instead of guessing. Avoid broad `go test` selecting unrelated LogN16 parameter construction; test exact focused Go patterns. No Bootstrap calls are authorized.
+The paired numerical analysis and aggregate stage/tail metrics are **NOT_RUN** because the frozen CP-C matrix is incomplete. The seven validated captures and their SHA-256 index are preserved under `captures/`; binary and ledger hashes are recorded in the CP-C incident section below. Avoid broad `go test` selecting unrelated LogN16 parameter construction. No Bootstrap calls are authorized.
 
 ## CP-A — completed source, scale and capacity preflight
 
@@ -91,21 +92,21 @@ All eight tested `2B < q0q1q2q3` predicates pass for each variant. Neither workl
 
 The first Fast `OFF/OFF` capture for each workload and seed pair 1 is also that workload's CP-B Fast baseline. It is counted once and reused as the matching CP-C arm; **no additional Fast baseline chain** will be launched. This is how the CP-B gate fits inside the fixed CP-C ceiling of 16 Fast chain invocations. Standard references are separate: one native Standard `OFF/OFF` chain per workload (2 total). Together the full planned matrix is exactly 2 Standard + 16 Fast calls, with no warmup, retry, replacement sample, or hidden chain invocation. Every launch below consumes its budget slot even if the process exits with an error. A failed launch stops the batch; it is not retried.
 
-Before each launch, this ledger entry will be changed from `NOT_LAUNCHED` to `LAUNCH_COMMITTED` and both exclusive output paths will be recorded. Once launched, it will be marked `PASS` or `FAILED_CONSUMED`; a failed chain will not be replaced. In the table, `captures/...` resolves during execution to `tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/...`; after all launches, the evidence is copied to the result directory's `captures/` and hashes are reconciled here. The runner requires a clean committed Primary source and embeds its Git revision, so active attempt state and exclusive output files will live under the repository's pre-existing ignored `tmp/FIXED-SIGMA-DIRECT-MUL-004/` scratch directory. That local ledger is reconciled into this journal and the checked-in evidence directory before any future-session attempt or final delivery. No chain command is issued until the Primary source, this frozen ledger, and the focused tests are committed and both build binaries pass provenance inspection.
+Before each launch, this ledger entry will be changed from `NOT_LAUNCHED` to `LAUNCH_COMMITTED` and both exclusive output paths will be recorded. Once launched, it will be marked `PASS` or `FAILED_CONSUMED`; a failed chain will not be replaced. In the table, `captures/...` resolves during execution to `tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/...`; validated evidence is copied to the result directory's `captures/` and hashes are reconciled here. The runner requires a clean committed Primary source and embeds its Git revision, so active attempt state and exclusive output files live under the repository's pre-existing ignored `tmp/FIXED-SIGMA-DIRECT-MUL-004/` scratch directory. The local ledger is reconciled into this journal and the checked-in evidence directory before handoff.
 
 | Slot | Workload | Backend / arm | Stage1 / Stage2 seed | Budget state | Result / vectors |
 |---:|---|---|---|---|---|
-| S1 | direct-base | genuine Standard / OFF/OFF | 20261101 / 20261102 | NOT_LAUNCHED | `captures/standard-direct-base-s1.result.json` / `captures/standard-direct-base-s1.vectors.json` |
-| S2 | direct-c4 | genuine Standard / OFF/OFF | 20261105 / 20261106 | NOT_LAUNCHED | `captures/standard-direct-c4-s1.result.json` / `captures/standard-direct-c4-s1.vectors.json` |
-| F1 | direct-base | Fast / OFF/OFF | 20261101 / 20261102 | NOT_LAUNCHED (CP-B gate) | `captures/fast-direct-base-s1-off-off.result.json` / `captures/fast-direct-base-s1-off-off.vectors.json` |
-| F2 | direct-base | Fast / ON/OFF | 20261101 / 20261102 | NOT_LAUNCHED | `captures/fast-direct-base-s1-on-off.result.json` / `captures/fast-direct-base-s1-on-off.vectors.json` |
-| F3 | direct-base | Fast / OFF/ON | 20261101 / 20261102 | NOT_LAUNCHED | `captures/fast-direct-base-s1-off-on.result.json` / `captures/fast-direct-base-s1-off-on.vectors.json` |
-| F4 | direct-base | Fast / ON/ON | 20261101 / 20261102 | NOT_LAUNCHED | `captures/fast-direct-base-s1-on-on.result.json` / `captures/fast-direct-base-s1-on-on.vectors.json` |
-| F5 | direct-base | Fast / OFF/OFF | 20261103 / 20261104 | NOT_LAUNCHED | `captures/fast-direct-base-s2-off-off.result.json` / `captures/fast-direct-base-s2-off-off.vectors.json` |
+| S1 | direct-base | genuine Standard / OFF/OFF | 20261101 / 20261102 | PASS_VALIDATED | `captures/standard-direct-base-s1.result.json` / `captures/standard-direct-base-s1.vectors.json` |
+| S2 | direct-c4 | genuine Standard / OFF/OFF | 20261105 / 20261106 | PASS_VALIDATED | `captures/standard-direct-c4-s1.result.json` / `captures/standard-direct-c4-s1.vectors.json` |
+| F1 | direct-base | Fast / OFF/OFF | 20261101 / 20261102 | PASS_VALIDATED (CP-B gate) | `captures/fast-direct-base-s1-off-off.result.json` / `captures/fast-direct-base-s1-off-off.vectors.json` |
+| F2 | direct-base | Fast / ON/OFF | 20261101 / 20261102 | PASS_VALIDATED | `captures/fast-direct-base-s1-on-off.result.json` / `captures/fast-direct-base-s1-on-off.vectors.json` |
+| F3 | direct-base | Fast / OFF/ON | 20261101 / 20261102 | PASS_VALIDATED | `captures/fast-direct-base-s1-off-on.result.json` / `captures/fast-direct-base-s1-off-on.vectors.json` |
+| F4 | direct-base | Fast / ON/ON | 20261101 / 20261102 | PASS_VALIDATED | `captures/fast-direct-base-s1-on-on.result.json` / `captures/fast-direct-base-s1-on-on.vectors.json` |
+| F5 | direct-base | Fast / OFF/OFF | 20261103 / 20261104 | FAILED_CONSUMED; CLI rejected before chain | no result or vectors created |
 | F6 | direct-base | Fast / ON/OFF | 20261103 / 20261104 | NOT_LAUNCHED | `captures/fast-direct-base-s2-on-off.result.json` / `captures/fast-direct-base-s2-on-off.vectors.json` |
 | F7 | direct-base | Fast / OFF/ON | 20261103 / 20261104 | NOT_LAUNCHED | `captures/fast-direct-base-s2-off-on.result.json` / `captures/fast-direct-base-s2-off-on.vectors.json` |
 | F8 | direct-base | Fast / ON/ON | 20261103 / 20261104 | NOT_LAUNCHED | `captures/fast-direct-base-s2-on-on.result.json` / `captures/fast-direct-base-s2-on-on.vectors.json` |
-| F9 | direct-c4 | Fast / OFF/OFF | 20261105 / 20261106 | NOT_LAUNCHED (CP-B gate) | `captures/fast-direct-c4-s1-off-off.result.json` / `captures/fast-direct-c4-s1-off-off.vectors.json` |
+| F9 | direct-c4 | Fast / OFF/OFF | 20261105 / 20261106 | PASS_VALIDATED (CP-B gate) | `captures/fast-direct-c4-s1-off-off.result.json` / `captures/fast-direct-c4-s1-off-off.vectors.json` |
 | F10 | direct-c4 | Fast / ON/OFF | 20261105 / 20261106 | NOT_LAUNCHED | `captures/fast-direct-c4-s1-on-off.result.json` / `captures/fast-direct-c4-s1-on-off.vectors.json` |
 | F11 | direct-c4 | Fast / OFF/ON | 20261105 / 20261106 | NOT_LAUNCHED | `captures/fast-direct-c4-s1-off-on.result.json` / `captures/fast-direct-c4-s1-off-on.vectors.json` |
 | F12 | direct-c4 | Fast / ON/ON | 20261105 / 20261106 | NOT_LAUNCHED | `captures/fast-direct-c4-s1-on-on.result.json` / `captures/fast-direct-c4-s1-on-on.vectors.json` |
@@ -122,4 +123,14 @@ At ledger freeze: Standard `0/2`, Fast `0/16`, Bootstrap `0/0`, LogN16 `0`, BTS 
 - The comparator now dispatches direct artifacts through the direct schema validator and direct Standard/Fast pair validator. It reports the direct strict capacity plan and preserves the Add fixture's existing validation route. Artifact validation recomputes inputs, workload hash, seven plaintext oracles, residual and total-error vectors, scales, dispatch, seeds, injection and capacity evidence. Direct inputs and operation schedule cannot silently fall back to the old Add fixture.
 - Coding self-review found that the first comparator draft still routed direct artifacts through the legacy Add-specific validator and would have omitted the direct capacity plan from the analysis output. Both defects were corrected before any chain invocation. A representation assertion was also added for every direct checkpoint; runtime rejects MulRelin/Rescale results outside degree-1 NTT non-Montgomery state.
 - After those changes, the focused perfprobe test selection passed under each isolated build tag: `GOCACHE=/tmp/fixed-sigma-direct-mul-004-gocache go test -tags=perf_standard ./cmd/perfprobe -run '^TestFixedSigmaDirectMul|TestFixedSigmaChain' -count=1` and the corresponding `-tags=perf_fast` command. `git diff --check` passed. A transient test compile failure caught a duplicated row-evidence block while wiring the direct validator; the duplicate was removed, and both tagged test commands then passed. This was a coding-only failure and consumed no experiment chain budget.
-- At this checkpoint no Standard or Fast ciphertext chain has been launched. The worktree contains only the reviewed CP-B implementation and this pre-capture ledger; capture slots remain unchanged at Standard `0/2`, Fast `0/16`, Bootstrap `0/0`.
+- The above records were frozen before captures. Capture outcomes and the stop incident are documented below; the initial `0/2` Standard and `0/16` Fast table entry was the pre-capture state only.
+
+## CP-B/CP-C capture checkpoint and stop incident
+
+- CP-B passed using the two native Standard `OFF/OFF` references (S1/S2) and the original Fast `OFF/OFF` references (F1/F9). The paired artifacts matched the frozen public workload/configuration identities, effective parameters, levels/scales, plaintext-oracle checks, strict Q-prefix capacity evidence and expected Standard/Fast dispatch invariants. The full recomputed ablation analysis was not run.
+- The first `direct-base` seed pair completed all four Fast arms: F1–F4, seeds 20261101/20261102. For `direct-c4`, only its first-pair Fast `OFF/OFF` reference F9 completed. This is not a complete two-pair CP-C matrix.
+- Before finalizing the baseline validators, the scratch pre-next-call checker initially used three stale schema assumptions: it matched evaluator-construction text containing “bootstrap” as if it were a Bootstrap call, expected `canonical_input_sha256` instead of `input_sha256`, and expected `q0123` instead of `q0123_product`. These checker-only assertions were corrected against the maintained artifact schema before continuing. No multiplication chain was relaunched to repair a result, and Bootstrap count remained zero.
+- F5 was marked `LAUNCH_COMMITTED` and the process exited 1 before entering the chain. The invocation mistakenly included the positional word `mul-rescale-chain`; this binary accepts global flags and the boolean `--mul-rescale-chain` flag. Go's `flag.Parse` stopped at that positional argument, so the required flags were not parsed and `run()` returned `perfprobe: --config, --out, --backend-commit, --backend-ref, and --secondary-root are required`. The source parser/required-flag check is in `cmd/perfprobe/main.go` around lines 210–255. Neither F5 output file exists; no MulRelin, Rescale, noise injection, or Bootstrap call occurred in F5.
+- The frozen ledger policy counts every launched slot, including a process-level failure, as consumed and forbids retry/replacement. Therefore F5 remains `FAILED_CONSUMED`; no subsequent Fast slot was launched. CP-C stopped with 5 successful Fast chains and 6 consumed Fast launch slots. S1/S2 are the 2/2 Standard chains. Bootstrap 0/0, LogN16 0, BTS 0.
+- Seven validated capture pairs (2 Standard + 5 Fast; 55,915,277 bytes total) are preserved in `captures/`. `captures/SHA256SUMS` indexes each result/vector file; the durable copy of the attempt ledger is `attempt-ledger.json`. Ledger SHA-256 is `70fc601b82497ef19a9c4678c9b02d053f9bfa0ea4374af824ed61699ccf7401`; checksum-index SHA-256 is `8245793a1162c756659bddc2193a6d0e251a5f5da634b6a36788986847873545`. Binary SHA-256: Standard `2a44e3f89d055d4a70b294d70b9b265edee3e9f5451c5877a3491f1f2ae2a83c`; Fast `a7083bc12aa1d3da062c0b094b99f5c4fbcf3ceb8d86ea92f981ad73ab9db2ff`. Both binaries were built from Primary source commit `977d853541cf59b37e42cdfc1e635bc0cab7862d` with the intended isolated backend module sources recorded in the pre-capture review.
+- No aggregate stagewise RMSE, propagation decomposition, tail statistic or frozen ±10% screen is reported because the required matched matrix is incomplete. CP-D was not started after the CP-C stop condition. Resumption requires independent Web review of the consumed pre-chain F5 launch and explicit direction on any further attempt budget; the fixed σ and original seeds remain unchanged.

@@ -1,0 +1,14 @@
+cc3d7e4148f58b7e8bae45071687729efd5d0d2da2dbf81cdaf40bd082a4f3fa  captures/fast-direct-base-s1-off-off.result.json
+5ac88c166efd623406d35b68b7502d6edccdb51d7510475da14fb9f53ccef51b  captures/fast-direct-base-s1-off-off.vectors.json
+61e7376415cd06592cb3ffd50d941b6537383d77b4eaa67277dcde4b7d24531f  captures/fast-direct-base-s1-off-on.result.json
+4fd57b0b34fe6b433ffa7fc6a8885f350c23c663c4c38e2efd7dc210976a5d6d  captures/fast-direct-base-s1-off-on.vectors.json
+4810f912e6bef56975d042ba63707d3c31508f275e810140e1a2dbe0c63b8ee2  captures/fast-direct-base-s1-on-off.result.json
+195aca6e4c81902ebb5c4df05f4d523572e438f486e44b1308a548aa18d0897b  captures/fast-direct-base-s1-on-off.vectors.json
+c696e24fd9addead377fed87ba018fa9b0382694c0df575a75e5d669f7515df6  captures/fast-direct-base-s1-on-on.result.json
+8c25f74d99010f1550dde622c8e4dd6d161017481ec182ba17b8abced98f4e60  captures/fast-direct-base-s1-on-on.vectors.json
+c3e5172c44688f62d4087149e485f0f2f4f597747dc1c748f0bac2d8e28be94a  captures/fast-direct-c4-s1-off-off.result.json
+b1abc549359dbb3c3b293c9e5de56b1e76c7888fd35e9c973357f62de3d61f4e  captures/fast-direct-c4-s1-off-off.vectors.json
+c10d0d54720ac37cc738c7b3258661a75114a6e5ec344518e361a53f3eef6521  captures/standard-direct-base-s1.result.json
+20dcbb2957b32ad3aa747440d6cbd953c863dd8d1ac916b04ab440e5ac512f53  captures/standard-direct-base-s1.vectors.json
+6fc283b4312dac92308027abfa5a943e8279d8ef4b6e2613a316fcd149e1a3f0  captures/standard-direct-c4-s1.result.json
+dd5f3054238d1db9bd21c14e9a51e9dd0497c65678727e446cf3c22d43d06f8c  captures/standard-direct-c4-s1.vectors.json
