@@ -1,7 +1,7 @@
 # CURRENT TASK — FIXED-SIGMA-DIRECT-MUL-004
 
 Task: `FIXED-SIGMA-DIRECT-MUL-004`
-Status: `BATCH_BLOCKED_NEEDS_WEB_REVIEW` — the authorized 16/16 Fast and 2/2 Standard chains are captured and validated. Comparator RMS screening passes, but its propagation-decomposition roundoff gate fails for every pair (4,059/4,096 slots outside the unchanged `gamma_64` tolerance). No further computation is authorized pending Web review. See the task summary, analysis, and journal.
+Status: `RMS_SCREEN_PASS_DECOMPOSITION_ROUNDOFF_REVIEW_REQUIRED` — the authorized 16/16 Fast and 2/2 Standard chains remain captured and validated. The original comparator and its fail-closed `gamma_64` result are preserved. An authorized offline high-precision review finds the exact identity closes for all slots and an operation-derived binary64 roundoff envelope covers all observed closures; final Web acceptance is pending. No new CKKS computation is authorized. See the task summary, original analysis, roundoff review, and journal.
 **Spec:** `specs/FIXED-SIGMA-DIRECT-MUL-004.md`
 **Journal:** `results/FIXED-SIGMA-DIRECT-MUL-004/journal.md`
 **Results:** `results/FIXED-SIGMA-DIRECT-MUL-004/summary.md`

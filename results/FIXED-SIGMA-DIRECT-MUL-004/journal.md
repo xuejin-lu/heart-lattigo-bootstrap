@@ -1,6 +1,6 @@
 # FIXED-SIGMA-DIRECT-MUL-004 — durable experiment journal
 
-**Status:** `BATCH_BLOCKED_NEEDS_WEB_REVIEW`. CP-A and CP-B remain complete; CP-C captured all authorized arms and CP-D completed the comparator, but the unchanged propagation-decomposition `gamma_64` gate fails in every seed pair. Counters are final: 18/18 Fast launch attempts (including the two preserved pre-chain failures), 16/16 actual Fast chains, and 2/2 Standard chains. No Bootstrap, LogN16, BTS, or multiparty work ran. Do not launch more computation pending Web review.
+**Status:** `RMS_SCREEN_PASS_DECOMPOSITION_ROUNDOFF_REVIEW_REQUIRED`. The original comparator and its fail-closed `gamma_64` result remain unchanged; an authorized offline high-precision review supports that its error model omitted material `r2a`/`r2b` construction roundoff. Exact rational recomputation closes the identity in all 16,384 pair-slots, and a derived per-operation binary64 envelope covers every complex128 closure. Final Web acceptance is pending. Counters remain final: 18/18 Fast launches, 16/16 actual Fast chains, 2/2 Standard chains; Bootstrap, LogN16, BTS, and multiparty remain zero.
 **Prior:** `FIXED-SIGMA-PROPAGATION-003` results remain unchanged; Web review in `../FIXED-SIGMA-PROPAGATION-003/web-review.md`.
 **Authoritative spec:** `../../specs/FIXED-SIGMA-DIRECT-MUL-004.md`.
 
@@ -316,3 +316,74 @@ The user relayed independent approval `AUTHORIZED_DETERMINISTIC_OFF_OFF_BASELINE
 - Final comparator status is `FAIL_PROPAGATION_DECOMPOSITION_ROUNDOFF_CHECK` / `BATCH_BLOCKED_NEEDS_WEB_REVIEW`; its unchanged per-slot `gamma_64` gate reports 4,059/4,096 slots outside tolerance in each pair. All four ON/ON ±10% RMS screens pass. No tolerance, σ, workload, seed, capture, or acceptance condition was changed.
 - The final attempt ledger SHA-256 is `6e155374b8a70995dfb2c12e1b58680e414ca1d934a1815540418b9e379e79df`; `analysis.json` is SHA-256 `dc45035b37a50ec35d97cbe9a4d747b75ed85012a663dba7f28022e47e027243`; all 36 capture files verify against the preserved checksum index (`b267019d0af79ac7d19c3e888814d97f08eebc88b0ed020fdd1da7e5d1bd2102`).
 - Focused reuse/comparator tests pass, the task worktree policy reports only explicitly authorized task paths, its regression suite passes 2/2, and `git diff --check` passes. Secondary remains unchanged. The scientific interpretation of the propagation residual is the sole Web-review question.
+
+## Web ruling and offline propagation-roundoff review — 2026-10-22
+
+The user relayed the Web classification `RMS_SCREEN_PASS_DECOMPOSITION_ROUNDOFF_REVIEW_REQUIRED`. The four ON/ON ±10% RMS screens remain passed, but the original full propagation decomposition is not treated as accepted merely because of that RMS screen. The Web-approved scope was offline analysis of the existing captures only. This review made no CKKS calls, generated no new captures, did not invoke Bootstrap/LogN16/BTS, did not retune σ, did not change Secondary, and did not alter the original comparator or `analysis.json`.
+
+### Inputs and preservation
+
+- The new review uses the task's 16 Fast / 2 genuine Standard captured workload through `roundoff-review-manifest.json`; the F9/F13 OFF/OFF reuse remains the previously authorized, strictly witnessed analysis reference. There are no new experiment attempts.
+- The review re-runs the existing capture loader and paired comparator on the referenced artifacts, then checks the recomputed old `Propagation` values and artifact SHA map against the original analysis. It refuses to emit a report if they differ. The old `analysis.json` remains status `FAIL_PROPAGATION_DECOMPOSITION_ROUNDOFF_CHECK`, SHA-256 `dc45035b37a50ec35d97cbe9a4d747b75ed85012a663dba7f28022e47e027243`.
+- New independent evidence is in `roundoff-review.json` and its input witness `roundoff-review-manifest.json`; this does not replace the capture checksum index or any earlier result.
+
+### Arithmetic check and bound
+
+The old tolerance used `gamma_64` on the final small terms `P1`, `d1*C`, `r2a`, and `r2b`. Its decomposition first forms `r2a=fl(Y_on-fl(X_on*C))` and `r2b=fl(Y_off-fl(X_off*C))`. These are subtractions of large, nearly equal values: the `Y` and `X*C` operands reach about `2.60075e-5` for `direct-base` and `1.04030e-4` for `direct-c4`, while the resulting `r2` values are only around `3e-12`. The old term-only scale omitted product rounding and the subsequent subtraction rounding at those large operand magnitudes. This explains why its tolerance (about `0.7e-25` to `1.2e-25`) is much smaller than observed closure residuals (up to `1.3e-20`).
+
+For each captured JSON binary64 value, the independent review treats that exact IEEE-754 bit pattern as a rational and evaluates the algebra with `math/big.Rat`. For all 4,096 slots in each of the four pairs, the exact first-order relation `U=P1-d1*C=r2a-r2b` holds and the full identity `P1-(d1*C+(r2a-r2b))` is exactly zero. Thus the nonzero `U` is the first-order propagation remainder; it is not the floating-point closure residual and is not attributed to a particular CKKS primitive.
+
+The separate complex128 recomputation follows the existing operation order. With `L(z)=|Re(z)|+|Im(z)|`, round-to-nearest unit roundoff `u=2^-53`, and `gamma_2=2u/(1-2u)`, the operation bounds used are:
+
+```text
+add/sub:   |fl(a±b)-(a±b)|_L1 <= u*(L(a)+L(b))
+multiply:  |fl(a*b)-a*b|_L1 <= gamma_2*L(a)*L(b)
+```
+
+The full per-slot bound propagates those terms through the actual chain:
+
+```text
+eP     = u*(L(Yon)+L(Yoff))
+eD     = u*(L(Xon)+L(Xoff))
+ePred  = L(C)*eD + gamma_2*L(Dfl)*L(C)
+eA     = gamma_2*L(Xon)*L(C) + u*(L(Yon)+L((Xon*C)fl))
+eB     = gamma_2*L(Xoff)*L(C) + u*(L(Yoff)+L((Xoff*C)fl))
+eDiff  = u*(L(rAfl)+L(rBfl))
+eRhs   = ePred+eA+eB+eDiff + u*(L(predfl)+L(diffFl))
+Ebound = eP+eRhs + u*(L(P1fl)+L(rhsfl))
+```
+
+Every right-hand term is computed as an exact rational envelope over the actual captured operands/intermediates. It is compared with the L1 magnitude of the observed complex128 closure; no tuned slack multiplier is used. Inputs and intermediates are checked finite and normal-or-zero, so the relative-error model's overflow/underflow exclusions hold for these captures. This is a candidate review bound; the original gate is still unchanged pending Web acceptance.
+
+### Results and slot pattern
+
+| Workload / seeds | Old gate failures | Min failure / tolerance | Max pass / tolerance | Max pass `|X*C|` | Min failed `|X*C|` | Derived max bound | Max closure / bound |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| direct-base 20261101/02 | 4059/4096 | 8.229× | 0.00498× | 3.92e-13 | 6.52e-8 | 3.96e-20 | 0.161× |
+| direct-base 20261103/04 | 4059/4096 | 24.44× | 0.00750× | 4.08e-13 | 6.52e-8 | 3.96e-20 | 0.263× |
+| direct-c4 20261105/06 | 4059/4096 | 18.04× | 0.00536× | 1.32e-12 | 2.61e-7 | 1.584e-19 | 0.170× |
+| direct-c4 20261107/08 | 4059/4096 | 46.12× | 0.00435× | 1.29e-12 | 2.61e-7 | 1.584e-19 | 0.219× |
+
+All four old failure masks are identical (SHA-256 `05338aaf9c07e4b5f596395a435b3483eac6c60e4b4cd44d693251298ddd90a5`): intersection and union are both 4,059 slots, with no differing indices. The same 37 slots pass in every pair: `93, 294, 314, 333, 535, 617, 756, 940, 977, 1000, 1198, 1263, 1419, 1586, 1640, 1667, 1861, 1909, 2082, 2232, 2303, 2334, 2524, 2555, 2745, 2878, 2966, 3001, 3187, 3201, 3408, 3524, 3629, 3668, 3847, 3850, 4071`.
+
+The decoded `|X*C|` magnitudes sharply separate those same slots in every pair: the largest product magnitude among both on/off stage-one inputs at any old-pass slot is `4.08e-13` for direct-base and `1.32e-12` for direct-c4; the smallest product magnitude at any old-failure slot is `6.52e-8` and `2.61e-7`, respectively. This supports that the repeated mask tracks stable near-zero product slots in the frozen workload, not an exact-zero C value (none of the 4,096 decoded C slots is exactly zero). The review records the repeated mask and magnitude gap; it makes no stronger claim about the origin of those workload slots.
+
+### Separate model remainder from closure
+
+| Workload / seeds | Exact/high-precision first-order `U` RMS / max | Complex128 full-closure RMS / max | Max float-vs-exact `U` L1 |
+|---|---:|---:|---:|
+| direct-base 20261101/02 | 5.391e-13 / 1.689e-12 | 4.276e-22 / 3.857e-21 | 1.332e-28 |
+| direct-base 20261103/04 | 5.462e-13 / 1.753e-12 | 4.296e-22 / 4.933e-21 | 1.407e-28 |
+| direct-c4 20261105/06 | 9.664e-13 / 2.650e-12 | 1.667e-21 / 1.120e-20 | 2.887e-28 |
+| direct-c4 20261107/08 | 9.517e-13 / 3.135e-12 | 1.701e-21 / 1.257e-20 | 3.646e-28 |
+
+The four exact identity mismatch counts are zero across all 16,384 slot-pairs. The proposed bound violations are also zero; the largest observed closure/bound ratio is `0.2631`. The first-order remainder is roughly nine orders of magnitude larger than full floating-point closure and remains a real propagation quantity; it must not be reported as roundoff. Conversely, the closure residual is roundoff in the complex128 bookkeeping identity and is covered by the operation-derived envelope.
+
+### Validation and evidence
+
+- Added the standalone `perfprobe review-fixed-sigma-roundoff` path. It reads existing captures only, independently revalidates the unchanged old comparator result, computes exact rational identities and per-operation error envelopes, and writes to a new exclusive output path. The original comparator, thresholds, `analysis.json`, capture files, attempt ledger, σ and Secondary helper were not edited.
+- The report retains the true baseline and ON/OFF Primary commit, Primary measurement-source SHA, backend commit, binary SHA, source seeds and result/vector SHA for each pair. Direct-base pair 1 uses `a7083bc1…`; direct-base pair 2 and both direct-c4 pairs use the F13-qualified `bde01f61…` binary. The two genuine Standard references and their pinned source are still those recorded in the unchanged original analysis.
+- Offline analyzer build provenance: Go `1.26.4`, `-tags=perf_fast`, Primary base `a70978d5933592e41ed712574e7e47ba160e1188` with `vcs.modified=true`, and local module replacement `../lattigo` at clean `fast-qprefix@1e7828293c36f9845e30723ba4e9500d84bb50d2`. The temporary analyzer executable SHA-256 is `3f055eed4e707f75c00a8170a5a935c787ab432790a50db7b69d665e3b2b6472`; it generated a byte-identical report to the archived `roundoff-review.json`. `go build` exited successfully and printed a nonfatal Go module stat-cache write denial; the executable's VCS/module metadata and output SHA were verified. Its source file SHA-256 values are `main.go` `ce7ae8e75ae07665b380acb9f2d0b836aa76fcfc3ca3ae85b7a582bf745cbf59`, `fixed_sigma_roundoff_review.go` `225b88a4da1fabbc5be42cacc4bf07da0fcbc8ce04211ccbef3e5c6553caa0b8`, and `fixed_sigma_roundoff_review_test.go` `99dd11bd2fc39cb9caf8fefc48fbaa505af91a88337f0cb0cdabfc74b432af11`. This is an offline analysis executable, not a CKKS experiment binary.
+- Focused tests: `GOCACHE=/private/tmp/fixed-sigma-roundoff-gocache go test -tags=perf_fast ./cmd/perfprobe -run '^TestFixedSigma(RoundoffOperationBoundsCoverComplex128|PropagationRoundoffReviewUsesOnlyArchivedCaptures)$' -count=1` passed. The integration test asserts the preserved original analysis SHA, all four 4,059/4,096 masks, common 37 pass indices, exact per-slot identity, bound coverage, and separation of first-order remainder from closure. Synthetic tests exercise complex multiply and add/sub error bounds.
+- No broad Go package test ran, so this review did not touch parameter-construction tests or consume any experiment budget. `analysis.json` SHA-256 remains `dc45035b37a50ec35d97cbe9a4d747b75ed85012a663dba7f28022e47e027243`.
+- The detailed machine-readable evidence is `roundoff-review.json` (29,188 bytes; SHA-256 `c7cf25bccfeaf7178bc69696b8954cc59e3541a2f49369e5bdc92a9975dadaa3`); its exact capture references are in `roundoff-review-manifest.json` (5,755 bytes; SHA-256 `b7fc615ed8825ce2ec96a6fc0371301b1ee1964ee69e3bb31878cb2a59ac950e`). No research acceptance is claimed pending the independent Web decision.

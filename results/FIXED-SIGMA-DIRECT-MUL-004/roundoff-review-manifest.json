@@ -1,0 +1,119 @@
+{
+  "schema_version": "fixed-sigma-direct-ctct-ablation-manifest.v1",
+  "workloads": [
+    {
+      "name": "direct-base",
+      "c_input_variant": "direct-base",
+      "standard_off_off": {
+        "result": "results/FIXED-SIGMA-DIRECT-MUL-004/captures/standard-direct-base-s1.result.json",
+        "vectors": "results/FIXED-SIGMA-DIRECT-MUL-004/captures/standard-direct-base-s1.vectors.json"
+      },
+      "seed_pairs": [
+        {
+          "stage1_seed": 20261101,
+          "arms": {
+            "OFF/OFF": {
+              "result": "results/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-base-s1-off-off.result.json",
+              "vectors": "results/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-base-s1-off-off.vectors.json"
+            },
+            "ON/OFF": {
+              "result": "results/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-base-s1-on-off.result.json",
+              "vectors": "results/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-base-s1-on-off.vectors.json"
+            },
+            "OFF/ON": {
+              "result": "results/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-base-s1-off-on.result.json",
+              "vectors": "results/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-base-s1-off-on.vectors.json"
+            },
+            "ON/ON": {
+              "result": "results/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-base-s1-on-on.result.json",
+              "vectors": "results/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-base-s1-on-on.vectors.json"
+            }
+          }
+        },
+        {
+          "stage1_seed": 20261103,
+          "arms": {
+            "OFF/OFF": {
+              "result": "results/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-base-s2-off-off-f5-r2.result.json",
+              "vectors": "results/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-base-s2-off-off-f5-r2.vectors.json"
+            },
+            "ON/OFF": {
+              "result": "results/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-base-s2-on-off.result.json",
+              "vectors": "results/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-base-s2-on-off.vectors.json"
+            },
+            "OFF/ON": {
+              "result": "results/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-base-s2-off-on.result.json",
+              "vectors": "results/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-base-s2-off-on.vectors.json"
+            },
+            "ON/ON": {
+              "result": "results/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-base-s2-on-on.result.json",
+              "vectors": "results/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-base-s2-on-on.vectors.json"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "direct-c4",
+      "c_input_variant": "direct-c4",
+      "standard_off_off": {
+        "result": "results/FIXED-SIGMA-DIRECT-MUL-004/captures/standard-direct-c4-s1.result.json",
+        "vectors": "results/FIXED-SIGMA-DIRECT-MUL-004/captures/standard-direct-c4-s1.vectors.json"
+      },
+      "seed_pairs": [
+        {
+          "stage1_seed": 20261105,
+          "arms": {
+            "OFF/OFF": {
+              "result": "results/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-c4-s2-off-off.result.json",
+              "vectors": "results/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-c4-s2-off-off.vectors.json"
+            },
+            "ON/OFF": {
+              "result": "results/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-c4-s1-on-off.result.json",
+              "vectors": "results/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-c4-s1-on-off.vectors.json"
+            },
+            "OFF/ON": {
+              "result": "results/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-c4-s1-off-on.result.json",
+              "vectors": "results/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-c4-s1-off-on.vectors.json"
+            },
+            "ON/ON": {
+              "result": "results/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-c4-s1-on-on.result.json",
+              "vectors": "results/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-c4-s1-on-on.vectors.json"
+            }
+          },
+          "baseline_reuse": {
+            "origin_slot": "F13",
+            "origin_stage1_seed": 20261107,
+            "origin_stage2_seed": 20261108,
+            "equivalence_witness_slot": "F9",
+            "equivalence_witness": {
+              "result": "results/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-c4-s1-off-off.result.json",
+              "vectors": "results/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-c4-s1-off-off.vectors.json"
+            }
+          }
+        },
+        {
+          "stage1_seed": 20261107,
+          "arms": {
+            "OFF/OFF": {
+              "result": "results/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-c4-s2-off-off.result.json",
+              "vectors": "results/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-c4-s2-off-off.vectors.json"
+            },
+            "ON/OFF": {
+              "result": "results/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-c4-s2-on-off.result.json",
+              "vectors": "results/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-c4-s2-on-off.vectors.json"
+            },
+            "OFF/ON": {
+              "result": "results/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-c4-s2-off-on.result.json",
+              "vectors": "results/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-c4-s2-off-on.vectors.json"
+            },
+            "ON/ON": {
+              "result": "results/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-c4-s2-on-on.result.json",
+              "vectors": "results/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-c4-s2-on-on.vectors.json"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

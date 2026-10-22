@@ -189,6 +189,13 @@ func main() {
 		}
 		return
 	}
+	if len(os.Args) > 1 && os.Args[1] == "review-fixed-sigma-roundoff" {
+		if err := runFixedSigmaPropagationRoundoffReview(os.Args[2:]); err != nil {
+			fmt.Fprintln(os.Stderr, "perfprobe review-fixed-sigma-roundoff:", err)
+			os.Exit(1)
+		}
+		return
+	}
 	if len(os.Args) > 1 && os.Args[1] == "bts-build" {
 		if err := runBTSBuild(os.Args[2:]); err != nil {
 			fmt.Fprintln(os.Stderr, "perfprobe bts-build:", err)

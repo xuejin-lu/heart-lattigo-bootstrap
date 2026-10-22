@@ -1,6 +1,6 @@
 # FIXED-SIGMA-DIRECT-MUL-004 — Direct ct×ct multiplication and frozen-σ transfer test
 
-**Status:** `BATCH_BLOCKED_NEEDS_WEB_REVIEW` after completing the authorized capture matrix and comparator on 2026-10-22. All 16 Fast and 2 Standard chains are accounted for; the unchanged propagation-decomposition `gamma_64` gate fails for every seed pair. The approved analysis-only F9/F13 baseline reuse passed its strict equivalence and regression gates. No additional computation is authorized pending Web review.
+**Status:** `RMS_SCREEN_PASS_DECOMPOSITION_ROUNDOFF_REVIEW_REQUIRED` after completing the authorized capture matrix, comparator, and a separately reported offline high-precision roundoff review on 2026-10-22. All 16 Fast and 2 Standard chains are accounted for; the original propagation-decomposition `gamma_64` gate remains fail-closed and unchanged. Exact rational recomputation closes the identity on every slot, and a per-operation binary64 bound covers every observed complex128 closure. Final Web acceptance is pending. No new CKKS computation is authorized.
 **Primary:** `xuejin-lu/heart-lattigo-bootstrap/main`.
 **Secondary:** `xuejin-lu/lattigo/fast-qprefix`; initial pin `1e7828293c36f9845e30723ba4e9500d84bb50d2`.
 **Genuine Standard:** original clean `xuejin-lu/lattigo@5dbffbdea05394de2ca3a432ed5318aa832e3f40` (isolated checkout, read-only).
@@ -127,3 +127,11 @@ Save durable `results/FIXED-SIGMA-DIRECT-MUL-004/journal.md`, `summary.md` and c
 ## Hard constraints
 
 **No Bootstrap calls (0), LogN16 workload/chain runs (0), BTS (0), multiparty changes, large benchmarks, Standard source edits, zero-a historical A=0 comparator, silent drop of capacity checking, general automatic Rescale hook or Bootstrap-wide injection.** Results are `DIAGNOSTIC_ONLY` and intentionally insecure Fast; accepting numeric accuracy is not accepting RLWE security or equal statistical tails. Historical 003 budget 16/2 is *already spent* and is not available to rerun; 004 has its own bounded accounting.
+
+## Web ruling addendum — offline gamma64 roundoff review (2026-10-22)
+
+The user relayed the Web classification `RMS_SCREEN_PASS_DECOMPOSITION_ROUNDOFF_REVIEW_REQUIRED`. All four ON/ON ±10% RMS screens pass, but that does not complete scientific acceptance because the original propagation-decomposition gate reports 4,059/4,096 slots outside its `gamma_64` tolerance. The authorized next work is **offline analysis of the already captured 16 Fast and 2 genuine Standard results only**. Do not execute another CKKS chain, Bootstrap, LogN16 workload, or BTS; do not recalibrate σ or modify the Secondary noise helper.
+
+- Inspect whether the old tolerance omitted rounding while constructing `r2a=fl(Y_on-fl(X_on*C))` and `r2b=fl(Y_off-fl(X_off*C))`. Recompute each of the four paired decompositions per slot using exact rational arithmetic over the captured binary64 inputs, compare with the original complex128 operation order, and distinguish the first-order remainder from full-identity closure.
+- Derive any proposed replacement envelope from the actual binary64 operation graph and operand magnitudes. Preserve `analysis.json`, its original status, and the comparator's fail-closed behavior. A separately named review report, focused tests, derivation and evidence are required; do not silently replace the original gate or its output.
+- Check whether the four old failure masks share identical slot positions and report the evidence. Preserve the archived capture set and all provenance. Update `CURRENT_TASK.md`, this spec, journal and summary, then commit and normally push the offline analysis for final Web review. This ruling authorizes no broader batch work.
