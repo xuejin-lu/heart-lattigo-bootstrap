@@ -344,6 +344,48 @@
       "workload": "direct-c4"
     }
   ],
+  "binary_pairing_status": {
+    "experiment_launches_during_search": 0,
+    "f9_binary_recovery": "NOT_FOUND",
+    "f9_required_binary_sha256": "a7083bc12aa1d3da062c0b094b99f5c4fbcf3ceb8d86ea92f981ad73ab9db2ff",
+    "f9_source_fast_commit": "1e7828293c36f9845e30723ba4e9500d84bb50d2",
+    "f9_source_primary_commit": "977d853541cf59b37e42cdfc1e635bc0cab7862d",
+    "same_pair_policy": {
+      "F10-F12": "HOLD_UNTIL_EXACT_F9_BINARY_RECOVERED",
+      "F13-F16": "establish F13 OFF/OFF then keep binary bde01f61... for all four arms",
+      "F6-F8": "use F5-R2 baseline binary bde01f61..."
+    },
+    "search_scope": [
+      "task build/capture paths",
+      "/private/tmp",
+      "previously checked Developer and Codex build locations",
+      "Go build cache executable-sized Mach-O files",
+      "macOS filename index"
+    ],
+    "valid_vcs_rebuild_candidates": [
+      {
+        "build": "ordinary go.mod",
+        "sha256": "bde01f61c36f70dc70939eb12d72f3a42ce07a925942904939b54e516cafae17",
+        "used_for_f5_r2": true,
+        "vcs_modified": false,
+        "vcs_revision": "977d853541cf59b37e42cdfc1e635bc0cab7862d"
+      },
+      {
+        "build": "task fast.mod replacement",
+        "sha256": "a96633cebd14accfeab1e795a44c68a6528b3753b93f48109f918f072fda399e",
+        "used_for_experiment": false,
+        "vcs_modified": false,
+        "vcs_revision": "977d853541cf59b37e42cdfc1e635bc0cab7862d"
+      },
+      {
+        "build": "task fast.mod replacement with -trimpath",
+        "sha256": "ca52e3a18acfc6f78c9e63c19285d6fb252b0e0a6e60dacf1c13e4863661f3a4",
+        "used_for_experiment": false,
+        "vcs_modified": false,
+        "vcs_revision": "977d853541cf59b37e42cdfc1e635bc0cab7862d"
+      }
+    ]
+  },
   "ceilings": {
     "bootstrap": 0,
     "bts": 0,
