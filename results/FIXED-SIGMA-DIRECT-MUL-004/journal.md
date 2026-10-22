@@ -1,6 +1,6 @@
 # FIXED-SIGMA-DIRECT-MUL-004 — durable experiment journal
 
-**Status:** `BATCH_IN_PROGRESS`. CP-A and CP-B remain complete. Web has authorized exactly one linked pre-chain replacement, F5-R1; it has not yet been launched. CP-C resumes with all original successful captures preserved.
+**Status:** `BATCH_BLOCKED_NEEDS_WEB_REVIEW`. CP-A and CP-B remain complete. The authorized F5-R1 launch was consumed by a Primary binary provenance failure before encryption or any ciphertext-chain operation. No further experiment launch is authorized; all seven earlier validated captures remain preserved.
 **Prior:** `FIXED-SIGMA-PROPAGATION-003` results remain unchanged; Web review in `../FIXED-SIGMA-PROPAGATION-003/web-review.md`.
 **Authoritative spec:** `../../specs/FIXED-SIGMA-DIRECT-MUL-004.md`.
 
@@ -17,9 +17,10 @@
 | Metric | Used | Maximum |
 |---|---:|---:|
 | Fast actual two-stage chain executions completed | 5 | 16 |
-| Fast launch attempts recorded, including original F5 parser failure | 6 | 17 |
-| Known pre-chain CLI failures / authorized maximum | 1 | 1 |
-| Authorized replacement F5-R1 | NOT_LAUNCHED | 1 |
+| Fast launch attempts recorded, including F5 and F5-R1 failures | 7 | 17 |
+| Original authorized F5 pre-chain CLI failure | 1 | 1 |
+| Unexpected F5-R1 pre-chain binary provenance failure | 1 | 0 retries |
+| Authorized replacement F5-R1 | FAILED_CONSUMED | 1 |
 | Genuine Standard two-stage chains completed | 2 | 2 |
 | Standard Bootstrap calls | 0 | 0 |
 | Fast Bootstrap calls | 0 | 0 |
@@ -30,10 +31,10 @@
 |---|---|
 | CP-A new-workload source/math/capacity gates | COMPLETE |
 | CP-B direct A×B→×C baseline | COMPLETE |
-| CP-C fixed σ four-arm experiment | IN_PROGRESS under one authorized F5-R1 replacement |
-| CP-D full analysis/provenance/commit | NOT_STARTED |
+| CP-C fixed σ four-arm experiment | BLOCKED after F5-R1 binary provenance failure |
+| CP-D full analysis/provenance/commit | NOT_STARTED; CP-C stop condition applies |
 
-The paired numerical analysis and aggregate stage/tail metrics remain **NOT_RUN** until CP-C completes. The seven validated captures and their SHA-256 index remain preserved under `captures/`; the original F5 failure remains in the ledger and is not counted as an actual chain. No Bootstrap calls are authorized.
+The paired numerical analysis and aggregate stage/tail metrics remain **NOT_RUN** because CP-C stopped before F5-R1 entered the ciphertext chain. The seven validated captures and their SHA-256 index remain preserved under `captures/`; both F5 and F5-R1 are recorded as launch attempts and zero actual chains. Bootstrap remains 0/0.
 
 ## CP-A — completed source, scale and capacity preflight
 
@@ -144,7 +145,15 @@ At ledger freeze: Standard `0/2`, Fast `0/16`, Bootstrap `0/0`, LogN16 `0`, BTS 
 - Effective accounting is 5/16 actual Fast chains completed, 6/17 Fast launch attempts recorded, and 1/1 known pre-chain parse failure (the original F5). F5-R1 plus the 10 remaining original Fast slots can add at most 11 actual Fast chains. Any additional failure stops immediately; no second replacement is authorized.
 - Recovery preflight: Primary began clean on `main@8f203f8beba7fcc06a988c712272bce73c8b51e3`, fetched `origin`, verified `origin/main` was the ancestor, and verified the three ahead commits were task-owned. The three commits were pushed normally; after push local `HEAD` and `origin/main` both equaled `8f203f8beba7fcc06a988c712272bce73c8b51e3`. Normal push first failed DNS resolution for `github.com`; one formal network-permission retry succeeded with fast-forward `5f9174a..8f203f8`.
 - Secondary was checked on `fast-qprefix`, clean at `1e7828293c36f9845e30723ba4e9500d84bb50d2`; `git fetch origin` succeeded through the formal metadata-permission retry, and `origin/fast-qprefix` matched exactly. Secondary source remains unchanged.
-- The existing `cmd/perfprobe` direct-chain source is unchanged since Primary commit `977d853541cf59b37e42cdfc1e635bc0cab7862d`. Rebuild the Fast binary from the committed current Primary HEAD before use because `fixedSigmaChainBinaryProvenance` requires the binary build revision to equal Primary HEAD; verify the source fingerprint and Fast module path/commit remain the frozen implementation. Keep the original 7 validated captures and SHA index unchanged.
+- The capture matrix and pair validator are pinned to Primary source commit `977d853541cf59b37e42cdfc1e635bc0cab7862d`; the Web ruling commit changes only task documents. Fast capture runs must build and execute from a clean checkout at the pinned Primary revision, with valid Go VCS metadata, and the pinned Secondary source. Keep the original 7 validated captures and SHA index unchanged.
 - Before F5-R1, run the no-operation CLI validation with the correct global flag layout and an intentionally invalid C variant. The expected direct-mul variant validation error must occur before config loading/parameter construction; confirm no output files or chain counters change. Only then launch the corrected exact F5-R1 command, with `--mul-rescale-chain` among flags and no positional command word.
 - The authorization checkpoint attempt ledger SHA-256 is `dc050c051d6f5ffa57cdbcf456c730bc415bd30b99b228f3138a9c0016af8072`; its accounting is 6/17 Fast launches and 5/16 actual Fast chains, with one authorized replacement slot unused. The seven-pair capture checksum index SHA-256 remains `8245793a1162c756659bddc2193a6d0e251a5f5da634b6a36788986847873545`; all 14 indexed files verify.
-- In an isolated temporary copy of the operational ledger, `start F5-R1` was exercised without touching the durable ledger. It recorded launch 7/17 while retaining 5/16 completed chains; the durable ledger remains `NOT_LAUNCHED` for F5-R1.
+- In an isolated temporary copy of the operational ledger, `start F5-R1` was exercised without touching the durable ledger. At that prelaunch checkpoint it recorded launch 7/17 while retaining 5/16 completed chains; the durable ledger was then `NOT_LAUNCHED` for F5-R1.
+
+## F5-R1 consumed failure and stop — 2026-10-22
+
+- The required CLI preflight used the corrected global flag layout and an intentionally invalid C variant. It exited with the expected validation message `direct-ctct-v1 requires --fixed-sigma-c-variant=direct-base or direct-c4` before config loading or parameter construction. No result/vector files were created and the durable ledger hash did not change. The preflight binary was built from Primary `5d1688a27cb57bd5582b8b4e48efa3a6d9446f03`, SHA-256 `0e5a5c22e49565b7af39e4f6a32d5ae08d83662515fbe55e9ff4011c3c1aced4`.
+- To retain the captured pair's Primary source pin, the F5-R1 runner was built from a clean detached Primary checkout at `977d853541cf59b37e42cdfc1e635bc0cab7862d` using the same `perf_fast` tag and pinned Secondary `1e7828293c36f9845e30723ba4e9500d84bb50d2`. Its binary SHA-256 was `3e6ab7cfb1d55d75641c7792cd0c4bb845fdc5fc8356b152fa37648f2c008056`; `go version -m` showed no VCS metadata settings. The direct-chain measurement-source fingerprint in the existing captures is `544356df4747d51d9bc5d4acbfdaca02888ba9f417d2130629a3573f96ca236c`; the committed measurement source at the pinned revision was left unchanged.
+- F5-R1 used the frozen `direct-base`, `OFF/OFF`, stage seeds `20261103`/`20261104`, E32 LogN13 configuration, and corrected flags with no positional `mul-rescale-chain`. It exited 1 with `perfprobe: Primary binary provenance: binary vcs.revision="" does not match Primary HEAD="977d853541cf59b37e42cdfc1e635bc0cab7862d"`. The failure occurred at `debug.ReadBuildInfo` provenance validation before encryption, MulRelin, Rescale, or noise injection. Neither F5-R1 result nor vector output exists.
+- The attempt ledger preserves original F5 as a failed launch, marks F5-R1 `FAILED_CONSUMED`, and records `actual_chain_executed=false`. Counts are now Fast launches 7/17, actual chains 5/16, two pre-chain failures (one authorized F5 CLI parse failure and one unexpected F5-R1 provenance failure), one of one replacement launch consumed, Standard 2/2, Bootstrap 0/0, LogN16 0, and BTS 0. No additional Fast, Standard, Bootstrap, LogN16, or BTS run was made.
+- The new failure is outside the one-time Web authorization. CP-C and CP-D stop here; no comparator or aggregate statistics were produced. The original seven capture pairs remain intact: all 14 files pass `captures/SHA256SUMS` (index SHA-256 `8245793a1162c756659bddc2193a6d0e251a5f5da634b6a36788986847873545`). Failure-checkpoint ledger SHA-256 is `d4fce29902cc009fb4b497abf7199c20961dd6ec8c0ed14c184d5c1817ae8e30`. The detached Primary `977d853` checkout and Secondary worktree remain clean and unchanged.

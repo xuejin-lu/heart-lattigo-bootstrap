@@ -6,14 +6,14 @@
     },
     "authorized_replacement_slots": 1,
     "known_prechain_failures": {
-      "fast": 1,
+      "fast": 2,
       "standard": 0
     },
     "launch_attempts": {
-      "fast": 6,
+      "fast": 7,
       "standard": 2
     },
-    "replacement_launches": 0
+    "replacement_launches": 1
   },
   "accounting_semantics": {
     "actual_chain_executed": "true only after entering and completing the two-stage chain; false for verified pre-chain F5; null while not launched",
@@ -142,17 +142,23 @@
       "workload": "direct-base"
     },
     {
-      "actual_chain_executed": null,
+      "actual_chain_executed": false,
       "arm": "OFF/OFF",
       "authorization": "AUTHORIZED_ONE_PRECHAIN_REPLACEMENT",
       "backend": "fast",
-      "launch_attempted": false,
+      "binary_sha256": "3e6ab7cfb1d55d75641c7792cd0c4bb845fdc5fc8356b152fa37648f2c008056",
+      "exit_code": 1,
+      "failure_classification": "PRECHAIN_PRIMARY_BINARY_VCS_PROVENANCE_FAILURE",
+      "failure_reason": "The runner rejected the rebuilt binary because debug.ReadBuildInfo contained no vcs.revision, while Primary HEAD was 977d853541cf59b37e42cdfc1e635bc0cab7862d; it exited before encryption or the first MulRelin+Rescale chain.",
+      "finished_at_utc": "2026-10-22T01:14:52.631889+00:00",
+      "launch_attempted": true,
+      "launched_at_utc": "2026-10-22T01:14:46.337583+00:00",
       "replaces_slot": "F5",
       "result": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-base-s2-off-off-f5-r1.result.json",
       "slot": "F5-R1",
       "stage1_seed": 20261103,
       "stage2_seed": 20261104,
-      "state": "NOT_LAUNCHED",
+      "state": "FAILED_CONSUMED",
       "vectors": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-base-s2-off-off-f5-r1.vectors.json",
       "workload": "direct-base"
     },
