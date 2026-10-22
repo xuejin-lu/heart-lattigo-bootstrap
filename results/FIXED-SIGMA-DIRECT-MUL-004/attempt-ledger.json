@@ -20,6 +20,7 @@
     "ceilings.fast": "actual_chain_executions",
     "launch_attempt_ceilings.fast": "all started Fast processes including the preserved original F5 failure"
   },
+  "analysis_status": "BLOCKED_INCOMPLETE_MATCHED_MATRIX_NO_AGGREGATE_COMPARATOR_OUTPUT",
   "attempts": [
     {
       "actual_chain_executed": true,
@@ -346,6 +347,7 @@
       "actual_chain_executed": null,
       "arm": "ON/OFF",
       "backend": "fast",
+      "hold_reason": "Requires F9 Fast binary SHA-256 a7083bc12aa1d3da062c0b094b99f5c4fbcf3ceb8d86ea92f981ad73ab9db2ff for same-seed-pair identity; exact binary not recovered. No launch or chain execution occurred.",
       "launch_attempted": false,
       "result": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-c4-s1-on-off.result.json",
       "slot": "F10",
@@ -359,6 +361,7 @@
       "actual_chain_executed": null,
       "arm": "OFF/ON",
       "backend": "fast",
+      "hold_reason": "Requires F9 Fast binary SHA-256 a7083bc12aa1d3da062c0b094b99f5c4fbcf3ceb8d86ea92f981ad73ab9db2ff for same-seed-pair identity; exact binary not recovered. No launch or chain execution occurred.",
       "launch_attempted": false,
       "result": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-c4-s1-off-on.result.json",
       "slot": "F11",
@@ -372,6 +375,7 @@
       "actual_chain_executed": null,
       "arm": "ON/ON",
       "backend": "fast",
+      "hold_reason": "Requires F9 Fast binary SHA-256 a7083bc12aa1d3da062c0b094b99f5c4fbcf3ceb8d86ea92f981ad73ab9db2ff for same-seed-pair identity; exact binary not recovered. No launch or chain execution occurred.",
       "launch_attempted": false,
       "result": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-c4-s1-on-on.result.json",
       "slot": "F12",
@@ -555,12 +559,29 @@
       "workload": "direct-c4"
     }
   ],
+  "batch_status": "BATCH_BLOCKED_NEEDS_WEB_REVIEW",
   "binary_pairing_status": {
+    "comparator_gate": "Primary cmd/perfprobe/fixed_sigma_ablation.go requires two direct workload variants, two frozen seed pairs each, and exactly four arms per pair; F10-F12 are unavailable, so no full CP-D result can be emitted without weakening the contract.",
+    "comparator_status": "NOT_RUN_FULL_MATRIX_INCOMPLETE",
+    "complete_fast_pairs": [
+      "direct-base-seed-pair-1",
+      "direct-base-seed-pair-2",
+      "direct-c4-seed-pair-2"
+    ],
     "experiment_launches_during_search": 0,
     "f9_binary_recovery": "NOT_FOUND",
     "f9_required_binary_sha256": "a7083bc12aa1d3da062c0b094b99f5c4fbcf3ceb8d86ea92f981ad73ab9db2ff",
     "f9_source_fast_commit": "1e7828293c36f9845e30723ba4e9500d84bb50d2",
     "f9_source_primary_commit": "977d853541cf59b37e42cdfc1e635bc0cab7862d",
+    "held_actual_chain_budget": 3,
+    "held_slots": [
+      "F10",
+      "F11",
+      "F12"
+    ],
+    "incomplete_fast_pair": "direct-c4-seed-pair-1 (F9 OFF/OFF only)",
+    "next_gate": "Recover the exact F9 binary; any rebuild/rebaseline that consumes additional chains or changes pairing requires Web budget authorization.",
+    "required_binary_sha256": "a7083bc12aa1d3da062c0b094b99f5c4fbcf3ceb8d86ea92f981ad73ab9db2ff",
     "same_pair_policy": {
       "F10-F12": "HOLD_UNTIL_EXACT_F9_BINARY_RECOVERED",
       "F13-F16": "establish F13 OFF/OFF then keep binary bde01f61... for all four arms",
@@ -573,6 +594,7 @@
       "Go build cache executable-sized Mach-O files",
       "macOS filename index"
     ],
+    "status": "BLOCKED_NEEDS_WEB_REVIEW",
     "valid_vcs_rebuild_candidates": [
       {
         "build": "ordinary go.mod",

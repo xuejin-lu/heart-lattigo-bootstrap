@@ -1,7 +1,7 @@
 # CURRENT TASK — FIXED-SIGMA-DIRECT-MUL-004
 
 Task: `FIXED-SIGMA-DIRECT-MUL-004`
-Status: `AUTHORIZED_AUTONOMOUS_BATCH` — **NOT_RUN**; execute on user's next `開始`.
+Status: `BATCH_BLOCKED_NEEDS_WEB_REVIEW` — CP-A/CP-B passed; CP-C/CP-D are blocked by unrecoverable F9 Binary SHA pairing for F10–F12. See the task summary and journal for the exact evidence and budget status.
 **Spec:** `specs/FIXED-SIGMA-DIRECT-MUL-004.md`
 **Journal:** `results/FIXED-SIGMA-DIRECT-MUL-004/journal.md`
 **Results:** `results/FIXED-SIGMA-DIRECT-MUL-004/summary.md`
