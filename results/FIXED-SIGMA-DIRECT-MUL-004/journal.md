@@ -1,6 +1,6 @@
 # FIXED-SIGMA-DIRECT-MUL-004 — durable experiment journal
 
-**Status:** `BATCH_IN_PROGRESS`. CP-A and CP-B remain complete. F5 and F5-R1 remain preserved as pre-chain launch failures. Web has authorized exactly one additional F5-R2 launch; its binary provenance and corrected command have now passed prelaunch checks, but F5-R2 has not been launched.
+**Status:** `BATCH_IN_PROGRESS`. CP-A and CP-B remain complete. F5 and F5-R1 remain preserved as pre-chain launch failures. Web authorized exactly one additional F5-R2 launch; its binary provenance and corrected command passed prelaunch checks, and the durable ledger now has its one-time launch reservation (`8/18` Fast launches, `5/16` actual chains). The process result is pending.
 **Prior:** `FIXED-SIGMA-PROPAGATION-003` results remain unchanged; Web review in `../FIXED-SIGMA-PROPAGATION-003/web-review.md`.
 **Authoritative spec:** `../../specs/FIXED-SIGMA-DIRECT-MUL-004.md`.
 
@@ -17,11 +17,11 @@
 | Metric | Used | Maximum |
 |---|---:|---:|
 | Fast actual two-stage chain executions completed | 5 | 16 |
-| Fast launch attempts recorded, including F5 and F5-R1 failures | 7 | 18 |
+| Fast launch attempts recorded, including F5 and F5-R1 failures | 8 | 18 |
 | Original authorized F5 pre-chain CLI failure | 1 | 1 |
 | F5-R1 pre-chain binary provenance failure | 1 | permanently recorded |
-| F5 recovery launches authorized / launched | 2 / 1 | 2 |
-| Authorized replacement F5-R2 | NOT_LAUNCHED; provenance and CLI preflight passed | 1 |
+| F5 recovery launches authorized / launch-reserved | 2 / 2 | 2 |
+| Replacement F5-R2 | LAUNCH_COMMITTED; actual chain result pending | 1 |
 | Genuine Standard two-stage chains completed | 2 | 2 |
 | Standard Bootstrap calls | 0 | 0 |
 | Fast Bootstrap calls | 0 | 0 |
@@ -35,7 +35,7 @@
 | CP-C fixed σ four-arm experiment | IN_PROGRESS; F5-R2 authorized and preflighted, not launched |
 | CP-D full analysis/provenance/commit | NOT_STARTED |
 
-The paired numerical analysis and aggregate stage/tail metrics remain **NOT_RUN** because neither F5 nor F5-R1 entered the ciphertext chain and F5-R2 is not yet launched. The seven validated captures and their SHA-256 index remain preserved under `captures/`; F5 and F5-R1 are separate launch attempts and zero actual chains. Bootstrap remains 0/0.
+The paired numerical analysis and aggregate stage/tail metrics remain **NOT_RUN** because neither F5 nor F5-R1 entered the ciphertext chain; F5-R2's reserved process has not yet returned. The seven validated captures and their SHA-256 index remain preserved under `captures/`; F5 and F5-R1 are separate launch attempts and zero actual chains. Bootstrap remains 0/0.
 
 ## CP-A — completed source, scale and capacity preflight
 
@@ -169,3 +169,9 @@ At ledger freeze: Standard `0/2`, Fast `0/16`, Bootstrap `0/0`, LogN16 `0`, BTS 
 - F5-R2 is recorded as authorized but `NOT_LAUNCHED`, with the original `direct-base`, `OFF/OFF`, seeds `20261103`/`20261104`, σ and source pins. The ledger also records binary SHA, VCS metadata, measurement-source fingerprint, Fast source, and the CLI-only preflight outcome. A scratch-copy exercise of the existing task ledger helper accepted F5-R2 at 8/18 launches and 5/16 chains while preserving F5/F5-R1 and leaving the durable ledger unlaunched; the helper now targets the authoritative result ledger through `FIXED_SIGMA_LEDGER_PATH` and gates F5-R2 on the new authorization plus linked pre-chain history. Helper SHA-256: `99af06be672021432ac904871218c480d4a10500f629dc244c941bfa3f2181a5`.
 - This authorization checkpoint ledger SHA-256 is `094950169062f78071ccbefaab79a3b4cc02bd801dd6f77526eeb3877d1e2957`. Reuse binary SHA `bde01f61...` unchanged for the remaining Fast arms so every capture in a seed pair has matching binary/source provenance. F5-R2 may launch only after this checkpoint is committed and pushed. If F5-R2 or any later arm fails unexpectedly, stop with no further retry.
 - The mandatory Primary task-path checker reported `TASK_PATHS_ONLY`; its two regression tests passed. `git diff --check` passed. Only the four authorized task files are modified.
+
+## F5-R2 launch reservation — 2026-10-22
+
+- After the authorization checkpoint `d0e849ceda72d55079c098cb8edf01b748ae7a33` was pushed and verified equal to `origin/main`, the final prelaunch gate passed: Primary clone `977d853...` clean, Secondary `1e782829...` clean, candidate binary SHA and Go VCS metadata matched, and both output paths were absent.
+- The existing ledger helper's `start F5-R2` action wrote `LAUNCH_COMMITTED`, preserving `actual_chain_executed=null` until the result is classified. It reports Fast launch attempts `8/18` and actual chains before execution `5/16`. This is the sole F5-R2 launch reservation; no process result or ciphertext chain has yet been recorded at this checkpoint.
+- The frozen invocation uses the candidate binary in the clean Primary clone, `--mode=public-native --profile=logn13 --ephemeral-secret-weight=32`, the pinned LogN13 config, Fast commit/ref/root `1e782829...` / `fast-qprefix` / the clean Secondary path, `--bootstrap-budget=0 --mul-rescale-chain`, workload `direct-ctct-v1`, arm `OFF/OFF`, C variant `direct-base`, and seed `20261103`. No positional `mul-rescale-chain` argument is present.

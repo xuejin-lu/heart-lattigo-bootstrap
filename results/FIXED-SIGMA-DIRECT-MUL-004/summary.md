@@ -1,6 +1,6 @@
 # FIXED-SIGMA-DIRECT-MUL-004 — direct-mul experiment result summary
 
-**BATCH_IN_PROGRESS.** CP-A and CP-B passed. Web authorized one additional same-seed launch, F5-R2, after F5-R1 stopped before ciphertext work. The rebuilt Fast binary now passes the pinned-source/VCS metadata checks and the corrected CLI parse preflight; F5-R2 has not launched.
+**BATCH_IN_PROGRESS.** CP-A and CP-B passed. Web authorized one additional same-seed launch, F5-R2, after F5-R1 stopped before ciphertext work. The rebuilt Fast binary passed the pinned-source/VCS metadata checks and the corrected CLI parse preflight. F5-R2's single launch is reserved in the ledger; its result is pending.
 
 **Research question:** Does σ calibrated on the historical `(A+B)×C` fixture transfer to direct `A×B`, followed by `(A×B)×C`, with no Add?
 
@@ -9,7 +9,7 @@ Frozen σ: `4.004280012097432`. Genuine Standard: `5dbffbdea05394de2ca3a432ed531
 | Captured evidence | Standard | Fast OFF/OFF | Fast ON/OFF | Fast OFF/ON | Fast ON/ON |
 |---|---|---|---|---|---|
 | Direct-base first seed pair (S1, F1–F4) | Captured | Captured | Captured | Captured | Captured |
-| Direct-base second seed pair (F5-R2, F6–F8) | — | Authorized, not launched | Not launched | Not launched | Not launched |
+| Direct-base second seed pair (F5-R2, F6–F8) | — | Launch committed; result pending | Not launched | Not launched | Not launched |
 | Direct-c4 first seed pair (S2, F9–F12) | Captured | Captured | Not launched | Not launched | Not launched |
 | Direct-c4 second seed pair (F13–F16) | — | Not launched | Not launched | Not launched | Not launched |
 | Stagewise incremental RMS, variance, bias, max | Not analyzed | Not analyzed | Not analyzed | Not analyzed | Not analyzed |
@@ -27,11 +27,11 @@ Frozen σ: `4.004280012097432`. Genuine Standard: `5dbffbdea05394de2ca3a432ed531
 ## Durable attempt counters
 
 - Fast actual two-stage chain executions completed: **5/16**
-- Fast launch attempts recorded, including original F5 and F5-R1 failures: **7/18**
+- Fast launch attempts recorded, including original F5 and F5-R1 failures: **8/18**
 - Original authorized F5 pre-chain CLI parse failure: **1/1**
 - F5-R1 pre-chain binary provenance failure: **1**, permanently recorded
-- F5 recovery launches authorized / launched: **2 / 1**
-- F5-R2 replacement slot: **authorized, not launched**
+- F5 recovery launches authorized / launch-reserved: **2 / 2**
+- F5-R2 replacement slot: **LAUNCH_COMMITTED; actual chain result pending**
 - Genuine Standard completed two-stage chains: **2/2**
 - Bootstrap: **0/0**
 - LogN16 workload: **0**
