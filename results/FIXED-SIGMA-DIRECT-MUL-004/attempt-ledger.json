@@ -4,7 +4,7 @@
       "fast": 5,
       "standard": 2
     },
-    "authorized_replacement_slots": 1,
+    "authorized_replacement_slots": 2,
     "known_prechain_failures": {
       "fast": 2,
       "standard": 0
@@ -164,6 +164,36 @@
     },
     {
       "actual_chain_executed": null,
+      "arm": "OFF/OFF",
+      "authorization": "AUTHORIZED_F5_R2_PRECHAIN_RECOVERY",
+      "backend": "fast",
+      "binary_path": "/private/tmp/fixed-sigma-direct-mul-004-fast-build-20261022/perfprobe-fast-clone",
+      "binary_sha256": "bde01f61c36f70dc70939eb12d72f3a42ce07a925942904939b54e516cafae17",
+      "launch_attempted": false,
+      "replaces_slot": "F5",
+      "result": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-base-s2-off-off-f5-r2.result.json",
+      "slot": "F5-R2",
+      "stage1_seed": 20261103,
+      "stage2_seed": 20261104,
+      "state": "NOT_LAUNCHED",
+      "vectors": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-base-s2-off-off-f5-r2.vectors.json",
+      "workload": "direct-base",
+      "prelaunch_provenance": {
+        "primary_commit": "977d853541cf59b37e42cdfc1e635bc0cab7862d",
+        "primary_vcs_revision": "977d853541cf59b37e42cdfc1e635bc0cab7862d",
+        "primary_vcs_modified": false,
+        "primary_measurement_source_sha256": "544356df4747d51d9bc5d4acbfdaca02888ba9f417d2130629a3573f96ca236c",
+        "fast_source_commit": "1e7828293c36f9845e30723ba4e9500d84bb50d2",
+        "fast_source_ref": "fast-qprefix",
+        "fast_source_clean": true,
+        "build_tag": "perf_fast",
+        "cli_preflight_exit_code": 1,
+        "cli_preflight_expected_variant_rejection": true,
+        "cli_preflight_created_outputs": false
+      }
+    },
+    {
+      "actual_chain_executed": null,
       "arm": "ON/OFF",
       "backend": "fast",
       "launch_attempted": false,
@@ -319,7 +349,7 @@
   },
   "fast_commit": "1e7828293c36f9845e30723ba4e9500d84bb50d2",
   "launch_attempt_ceilings": {
-    "fast": 17,
+    "fast": 18,
     "standard": 2
   },
   "primary_commit": "977d853541cf59b37e42cdfc1e635bc0cab7862d",
@@ -330,11 +360,32 @@
     "constraints": "Same workload, arm, seeds, sigma, parameters and implementation; no further replacement is authorized.",
     "fast_actual_chain_execution_ceiling": 16,
     "fast_actual_chain_executions_before_resume": 5,
-    "fast_launch_attempt_ceiling": 17,
+    "fast_launch_attempt_ceiling": 18,
     "fast_launch_attempts_before_resume": 6,
     "original_failed_slot": "F5",
-    "replacement_launches_max": 1,
-    "replacement_slot": "F5-R1"
+    "replacement_launches_max": 2,
+    "replacement_slot": "F5-R1",
+    "initial_ruling_replacement_launches_max": 1,
+    "initial_ruling_fast_launch_attempt_ceiling": 17,
+    "authorized_replacement_slots": [
+      "F5-R1",
+      "F5-R2"
+    ],
+    "additional_authorization": {
+      "authority": "User-relayed completed independent Web review",
+      "authorized_date": "2026-10-22",
+      "classification": "AUTHORIZED_F5_R2_PRECHAIN_RECOVERY",
+      "replacement_slot": "F5-R2",
+      "replaces_slot": "F5",
+      "prior_replacement_slot": "F5-R1",
+      "prior_replacement_state": "FAILED_CONSUMED",
+      "fast_launch_attempt_ceiling": 18,
+      "fast_actual_chain_execution_ceiling": 16,
+      "fast_launch_attempts_at_authorization": 7,
+      "fast_actual_chain_executions_at_authorization": 5,
+      "max_additional_actual_chain_executions": 11,
+      "constraints": "Same direct-base OFF/OFF workload, seeds 20261103/20261104, sigma, E32 LogN13 parameters, Primary measurement source commit 977d853541cf59b37e42cdfc1e635bc0cab7862d and Fast commit 1e7828293c36f9845e30723ba4e9500d84bb50d2. No successful chains may be rerun; this grants one launch only and no further retry."
+    }
   },
   "sigma": 4.004280012097432,
   "standard_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",

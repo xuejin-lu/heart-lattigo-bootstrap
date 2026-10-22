@@ -1,12 +1,12 @@
 # FIXED-SIGMA-DIRECT-MUL-004 — Direct ct×ct multiplication and frozen-σ transfer test
 
-**Status:** `AUTHORIZED_AUTONOMOUS_BATCH`, resumed 2026-10-22 after the user's Web-review ruling below.
+**Status:** `AUTHORIZED_AUTONOMOUS_BATCH`, resumed 2026-10-22 after the user's F5-R1 and F5-R2 Web-review rulings below.
 **Primary:** `xuejin-lu/heart-lattigo-bootstrap/main`.
 **Secondary:** `xuejin-lu/lattigo/fast-qprefix`; initial pin `1e7828293c36f9845e30723ba4e9500d84bb50d2`.
 **Genuine Standard:** original clean `xuejin-lu/lattigo@5dbffbdea05394de2ca3a432ed5318aa832e3f40` (isolated checkout, read-only).
 **Scientific handoff baseline:** Primary `574a1aee5ce5b0e329096095de3eda1b2df7bd1b`. Reviewed prior interpretation: `results/FIXED-SIGMA-PROPAGATION-003/web-review.md`.
 **Frozen coefficient noise σ:** EXACTLY `4.004280012097432`. The numeric value is an empirical fit to the prior **Add-containing** fixture and is *not* universal or re-fit here.
-**Effective compute budget:** at most **2 genuine Standard two-stage chains** and **16 actual Fast two-stage chain executions**; at most **17 Fast launch attempts** only under the single F5-R1 exception below. Standard/Fast Bootstrap, LogN16 workload/chain, BTS/multiparty, broad benchmarks and implicit Bootstrap tests remain at zero. Counters persist across interrupted sessions. Existing completed batch budgets/results cannot be reused or overwritten.
+**Effective compute budget:** at most **2 genuine Standard two-stage chains** and **16 actual Fast two-stage chain executions**; at most **18 Fast launch attempts** under the two narrowly linked F5 pre-chain recovery authorizations below. This is a launch-only allowance: the actual Fast chain ceiling remains 16, with 5 completed and at most 11 still possible at the F5-R2 ruling. Standard/Fast Bootstrap, LogN16 workload/chain, BTS/multiparty, broad benchmarks and implicit Bootstrap tests remain at zero. Counters persist across interrupted sessions. Existing completed batch budgets/results cannot be reused or overwritten.
 
 ## Web ruling addendum — one pre-chain replacement only (2026-10-22)
 
@@ -17,6 +17,17 @@ The user relayed the completed independent Web review decision `AUTHORIZED_ONE_P
 - At authorization, 5 Fast chains have completed and 6 Fast launches are recorded. F5-R1 plus the 10 remaining original Fast slots may produce at most 11 additional actual Fast chains. Genuine Standard remains spent at 2/2. Bootstrap, LogN16 workload, BTS and multiparty remain 0.
 - F5-R1 must be the only replacement record. Any new unexpected failure, including another pre-chain error, stops the task immediately; this ruling authorizes no further retry or replacement and does not relax any capacity, oracle, dispatch, provenance or representation gate.
 - Before F5-R1, run a CLI parse/validation check with an intentionally invalid direct-mul C-variant so the binary rejects before loading CKKS parameters or running any homomorphic operation. Then run the exact corrected flags with no positional `mul-rescale-chain` argument.
+
+## Web ruling addendum — one F5-R2 pre-chain recovery (2026-10-22)
+
+The user relayed independent Web approval to resume after both F5 and F5-R1 stopped before any ciphertext chain. This addendum supersedes the earlier ruling **only** for the number of authorized F5 recovery launches and the Fast launch-attempt ceiling; it does not change the actual-chain budget, workload, seeds, σ, source pins, or any acceptance gate.
+
+- Preserve the original F5 CLI parse failure and consumed F5-R1 provenance failure as separate immutable launch records. Both remain zero actual chain executions. Do not rerun any of the five successful Fast chains or either successful Standard chain.
+- Authorize exactly one further launch, `F5-R2`, linked to F5: `direct-base`, `OFF/OFF`, stage seeds `20261103`/`20261104`, frozen σ `4.004280012097432`, E32 LogN13 parameters, Primary measurement source at `977d853541cf59b37e42cdfc1e635bc0cab7862d`, and Fast source `1e7828293c36f9845e30723ba4e9500d84bb50d2`. It restores the missing F5 sample; it does not authorize another chain beyond the original 16-slot matrix.
+- The cumulative Fast launch-attempt ceiling is 18 (the 16 preregistered slots plus the two specifically authorized F5 recovery launches). At this ruling there are 7 launch attempts and 5 actual Fast chains; no more than 11 additional actual chains can run. Genuine Standard stays 2/2. Bootstrap, LogN16, BTS, multiparty, and broad benchmarks stay at zero. Any later unexpected failure has no retry authorization and stops the matrix.
+- Before F5-R2, verify a clean source checkout at Primary `977d853...`, Fast source/ref/clean state, Go `vcs.revision` and `vcs.modified`, linked module source, binary SHA, and the exact CLI flags. Never bypass provenance checks. The new binary must be reused unchanged for all remaining Fast captures in the same frozen seed pairs; if pairwise source/binary consistency cannot be maintained, stop.
+- The previously captured successful Fast binary SHA `a7083bc12aa1d3da062c0b094b99f5c4fbcf3ceb8d86ea92f981ad73ab9db2ff` was not present in the searched task build and temporary build locations. A clean independent Primary clone at `977d853...`, using the repository's ordinary `go.mod` replacement and `-buildvcs=true`, produced candidate Fast binary SHA `bde01f61c36f70dc70939eb12d72f3a42ce07a925942904939b54e516cafae17`; `go version -m` reports `vcs.revision=977d853541cf59b37e42cdfc1e635bc0cab7862d`, `vcs.modified=false`, and `-tags=perf_fast`. Its `../lattigo` module replacement resolves to the clean Secondary checkout at the pinned Fast commit. The candidate has not run an experiment chain.
+- Before the authorized F5-R2 launch, run the no-compute CLI validation with an intentionally invalid `--fixed-sigma-c-variant`, using the corrected flag layout and no positional `mul-rescale-chain` token. Require the expected variant-validation error and no result/vector files. Then launch F5-R2 once with the exact frozen valid arguments. A failed or provenance-rejected F5-R2 is consumed; do not retry.
 
 ## 1. Why this new experiment exists
 

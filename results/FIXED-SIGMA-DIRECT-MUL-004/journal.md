@@ -1,6 +1,6 @@
 # FIXED-SIGMA-DIRECT-MUL-004 — durable experiment journal
 
-**Status:** `BATCH_BLOCKED_NEEDS_WEB_REVIEW`. CP-A and CP-B remain complete. The authorized F5-R1 launch was consumed by a Primary binary provenance failure before encryption or any ciphertext-chain operation. No further experiment launch is authorized; all seven earlier validated captures remain preserved.
+**Status:** `BATCH_IN_PROGRESS`. CP-A and CP-B remain complete. F5 and F5-R1 remain preserved as pre-chain launch failures. Web has authorized exactly one additional F5-R2 launch; its binary provenance and corrected command have now passed prelaunch checks, but F5-R2 has not been launched.
 **Prior:** `FIXED-SIGMA-PROPAGATION-003` results remain unchanged; Web review in `../FIXED-SIGMA-PROPAGATION-003/web-review.md`.
 **Authoritative spec:** `../../specs/FIXED-SIGMA-DIRECT-MUL-004.md`.
 
@@ -17,10 +17,11 @@
 | Metric | Used | Maximum |
 |---|---:|---:|
 | Fast actual two-stage chain executions completed | 5 | 16 |
-| Fast launch attempts recorded, including F5 and F5-R1 failures | 7 | 17 |
+| Fast launch attempts recorded, including F5 and F5-R1 failures | 7 | 18 |
 | Original authorized F5 pre-chain CLI failure | 1 | 1 |
-| Unexpected F5-R1 pre-chain binary provenance failure | 1 | 0 retries |
-| Authorized replacement F5-R1 | FAILED_CONSUMED | 1 |
+| F5-R1 pre-chain binary provenance failure | 1 | permanently recorded |
+| F5 recovery launches authorized / launched | 2 / 1 | 2 |
+| Authorized replacement F5-R2 | NOT_LAUNCHED; provenance and CLI preflight passed | 1 |
 | Genuine Standard two-stage chains completed | 2 | 2 |
 | Standard Bootstrap calls | 0 | 0 |
 | Fast Bootstrap calls | 0 | 0 |
@@ -31,10 +32,10 @@
 |---|---|
 | CP-A new-workload source/math/capacity gates | COMPLETE |
 | CP-B direct A×B→×C baseline | COMPLETE |
-| CP-C fixed σ four-arm experiment | BLOCKED after F5-R1 binary provenance failure |
-| CP-D full analysis/provenance/commit | NOT_STARTED; CP-C stop condition applies |
+| CP-C fixed σ four-arm experiment | IN_PROGRESS; F5-R2 authorized and preflighted, not launched |
+| CP-D full analysis/provenance/commit | NOT_STARTED |
 
-The paired numerical analysis and aggregate stage/tail metrics remain **NOT_RUN** because CP-C stopped before F5-R1 entered the ciphertext chain. The seven validated captures and their SHA-256 index remain preserved under `captures/`; both F5 and F5-R1 are recorded as launch attempts and zero actual chains. Bootstrap remains 0/0.
+The paired numerical analysis and aggregate stage/tail metrics remain **NOT_RUN** because neither F5 nor F5-R1 entered the ciphertext chain and F5-R2 is not yet launched. The seven validated captures and their SHA-256 index remain preserved under `captures/`; F5 and F5-R1 are separate launch attempts and zero actual chains. Bootstrap remains 0/0.
 
 ## CP-A — completed source, scale and capacity preflight
 
@@ -157,3 +158,14 @@ At ledger freeze: Standard `0/2`, Fast `0/16`, Bootstrap `0/0`, LogN16 `0`, BTS 
 - F5-R1 used the frozen `direct-base`, `OFF/OFF`, stage seeds `20261103`/`20261104`, E32 LogN13 configuration, and corrected flags with no positional `mul-rescale-chain`. It exited 1 with `perfprobe: Primary binary provenance: binary vcs.revision="" does not match Primary HEAD="977d853541cf59b37e42cdfc1e635bc0cab7862d"`. The failure occurred at `debug.ReadBuildInfo` provenance validation before encryption, MulRelin, Rescale, or noise injection. Neither F5-R1 result nor vector output exists.
 - The attempt ledger preserves original F5 as a failed launch, marks F5-R1 `FAILED_CONSUMED`, and records `actual_chain_executed=false`. Counts are now Fast launches 7/17, actual chains 5/16, two pre-chain failures (one authorized F5 CLI parse failure and one unexpected F5-R1 provenance failure), one of one replacement launch consumed, Standard 2/2, Bootstrap 0/0, LogN16 0, and BTS 0. No additional Fast, Standard, Bootstrap, LogN16, or BTS run was made.
 - The new failure is outside the one-time Web authorization. CP-C and CP-D stop here; no comparator or aggregate statistics were produced. The original seven capture pairs remain intact: all 14 files pass `captures/SHA256SUMS` (index SHA-256 `8245793a1162c756659bddc2193a6d0e251a5f5da634b6a36788986847873545`). Failure-checkpoint ledger SHA-256 is `d4fce29902cc009fb4b497abf7199c20961dd6ec8c0ed14c184d5c1817ae8e30`. The detached Primary `977d853` checkout and Secondary worktree remain clean and unchanged.
+
+## F5-R2 Web approval and provenance recovery — 2026-10-22
+
+- Web approved exactly one additional F5 recovery launch, `F5-R2`, after classifying F5 and F5-R1 as pre-chain CLI/build-provenance stops. F5 and F5-R1 remain unchanged in the ledger and both remain `actual_chain_executed=false`. This authorization changes only the Fast launch ceiling from 17 to 18; actual Fast chains remain capped at 16. At resume, 7 Fast launches and 5 actual chains were recorded, so at most 11 additional chains remain. No successful Fast/Standard sample is rerun; Standard remains 2/2; Bootstrap, LogN16, BTS and multiparty remain 0.
+- Before this work, Primary `main@13eb7948165813d5a679714466b21bd88fe18250` was clean and one local checkpoint ahead of `origin/main`; its diff contained only this task's attempt ledger, journal and summary. It was pushed normally, and a follow-up fetch verified both local `HEAD` and `origin/main` equal `13eb7948165813d5a679714466b21bd88fe18250`. Secondary `fast-qprefix` was clean and equal to `origin/fast-qprefix` at `1e7828293c36f9845e30723ba4e9500d84bb50d2` after fetch. No Secondary source was edited.
+- The valid historical Fast binary `a7083bc12aa1d3da062c0b094b99f5c4fbcf3ceb8d86ea92f981ad73ab9db2ff` was not present in the searched Primary task build directory or `/private/tmp`. The existing `3e6ab7cf...` and `ffb4355e...` candidate builds lacked Go VCS settings and were not used for any new chain.
+- A clean independent Primary clone was created at `/private/tmp/fixed-sigma-direct-mul-004-build-source`, detached at `977d853541cf59b37e42cdfc1e635bc0cab7862d`. Its ordinary `go.mod` replacement `../lattigo` resolves through `/private/tmp/lattigo` to `/Users/xuejinlu/Developer/xuejin-lu/lattigo`, whose branch, clean state and HEAD were verified as `fast-qprefix`, clean, and `1e7828293c36f9845e30723ba4e9500d84bb50d2`. Built the `perf_fast` binary with `GOWORK=off`, the task-local `GOCACHE`, and `-buildvcs=true`, without `-modfile`. `go version -m` confirms `vcs.revision=977d853541cf59b37e42cdfc1e635bc0cab7862d`, `vcs.modified=false`, and `-tags=perf_fast`; the candidate SHA-256 is `bde01f61c36f70dc70939eb12d72f3a42ce07a925942904939b54e516cafae17`. The clone remains clean. The binary has not run a chain.
+- Using that binary, the correctly positioned frozen F5-R2 flags plus an intentionally invalid `--fixed-sigma-c-variant=invalid` returned exit 1 with `direct-ctct-v1 requires --fixed-sigma-c-variant=direct-base or direct-c4`. The check created no result or vector files. It was a CLI-only preflight and did not change the durable attempt ledger or consume an experiment launch.
+- F5-R2 is recorded as authorized but `NOT_LAUNCHED`, with the original `direct-base`, `OFF/OFF`, seeds `20261103`/`20261104`, σ and source pins. The ledger also records binary SHA, VCS metadata, measurement-source fingerprint, Fast source, and the CLI-only preflight outcome. A scratch-copy exercise of the existing task ledger helper accepted F5-R2 at 8/18 launches and 5/16 chains while preserving F5/F5-R1 and leaving the durable ledger unlaunched; the helper now targets the authoritative result ledger through `FIXED_SIGMA_LEDGER_PATH` and gates F5-R2 on the new authorization plus linked pre-chain history. Helper SHA-256: `99af06be672021432ac904871218c480d4a10500f629dc244c941bfa3f2181a5`.
+- This authorization checkpoint ledger SHA-256 is `094950169062f78071ccbefaab79a3b4cc02bd801dd6f77526eeb3877d1e2957`. Reuse binary SHA `bde01f61...` unchanged for the remaining Fast arms so every capture in a seed pair has matching binary/source provenance. F5-R2 may launch only after this checkpoint is committed and pushed. If F5-R2 or any later arm fails unexpectedly, stop with no further retry.
+- The mandatory Primary task-path checker reported `TASK_PATHS_ONLY`; its two regression tests passed. `git diff --check` passed. Only the four authorized task files are modified.
