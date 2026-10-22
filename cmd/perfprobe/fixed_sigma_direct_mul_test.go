@@ -1,6 +1,7 @@
 package main
 
 import (
+	"path/filepath"
 	"testing"
 
 	"github.com/xuejin-lu/heart-lattigo-bootstrap/internal/numericalmetrics"
@@ -103,5 +104,125 @@ func TestFixedSigmaDirectMulTransferScreenAppliesFrozenTenPercentBand(t *testing
 	workload.SeedPairs[1].Arms["ON/ON"] = fixedSigmaAblationArmAnalysis{Stage1Incremental: metric(1.11), Stage2Incremental: metric(2)}
 	if screen = computeFixedSigmaDirectMulTransferScreen(workload); screen.AllOnOnWithinBand {
 		t.Fatalf("an ON/ON stage outside the frozen ±10%% screen was accepted: %+v", screen)
+	}
+}
+
+func TestFixedSigmaDirectMulAuthorizedF9F13BaselineReuseEvidence(t *testing.T) {
+	captures := filepath.Join("..", "..", "results", "FIXED-SIGMA-DIRECT-MUL-004", "captures")
+	load := func(stem string) loadedFixedSigmaAblationArtifact {
+		t.Helper()
+		artifact, err := loadFixedSigmaAblationArtifact(fixedSigmaAblationArtifactRef{
+			Result: filepath.Join(captures, stem+".result.json"), Vectors: filepath.Join(captures, stem+".vectors.json"),
+		})
+		if err != nil {
+			t.Fatalf("load %s evidence: %v", stem, err)
+		}
+		return artifact
+	}
+	f9 := load("fast-direct-c4-s1-off-off")
+	f13 := load("fast-direct-c4-s2-off-off")
+	reuse := fixedSigmaAblationBaselineReuse{
+		OriginSlot: "F13", OriginStage1Seed: 20261107, OriginStage2Seed: 20261108,
+		WitnessSlot: "F9",
+	}
+	evidence, err := validateFixedSigmaDirectMulF9F13BaselineReuse(f13, f9, "direct-c4", 20261105, reuse)
+	if err != nil {
+		t.Fatalf("reviewed F9/F13 OFF/OFF baseline equivalence was rejected: %v", err)
+	}
+	if evidence.OriginSlot != "F13" || evidence.OriginStageSeeds != [2]int64{20261107, 20261108} ||
+		evidence.RequestedStageSeeds != [2]int64{20261105, 20261106} ||
+		evidence.OriginBinarySHA256 != fixedSigmaDirectMulF13BinarySHA256 ||
+		evidence.WitnessSlot != "F9" || evidence.WitnessStageSeeds != [2]int64{20261105, 20261106} ||
+		evidence.WitnessBinarySHA256 != fixedSigmaDirectMulF9BinarySHA256 || evidence.NoiseInjectionCount != 0 ||
+		!evidence.DecodedVectorDocumentsMatch || !evidence.CheckpointStatesMatch || !evidence.FastInputRowsMatch {
+		t.Fatalf("baseline reuse output omits true origin or equality evidence: %+v", evidence)
+	}
+}
+
+func TestFixedSigmaDirectMulBaselineReuseFailsClosed(t *testing.T) {
+	captures := filepath.Join("..", "..", "results", "FIXED-SIGMA-DIRECT-MUL-004", "captures")
+	load := func(stem string) loadedFixedSigmaAblationArtifact {
+		t.Helper()
+		artifact, err := loadFixedSigmaAblationArtifact(fixedSigmaAblationArtifactRef{
+			Result: filepath.Join(captures, stem+".result.json"), Vectors: filepath.Join(captures, stem+".vectors.json"),
+		})
+		if err != nil {
+			t.Fatalf("load %s evidence: %v", stem, err)
+		}
+		return artifact
+	}
+	base := load("fast-direct-c4-s2-off-off")
+	witness := load("fast-direct-c4-s1-off-off")
+	validReuse := fixedSigmaAblationBaselineReuse{
+		OriginSlot: "F13", OriginStage1Seed: 20261107, OriginStage2Seed: 20261108,
+		WitnessSlot: "F9",
+	}
+	check := func(name string, candidateBase, candidateWitness loadedFixedSigmaAblationArtifact, variant string, seed int64, reuse fixedSigmaAblationBaselineReuse) {
+		t.Helper()
+		if _, err := validateFixedSigmaDirectMulF9F13BaselineReuse(candidateBase, candidateWitness, variant, seed, reuse); err == nil {
+			t.Errorf("baseline reuse accepted %s mismatch", name)
+		}
+	}
+
+	wrongSeed := validReuse
+	check("target seed", base, witness, "direct-c4", 20261103, wrongSeed)
+	wrongOrigin := validReuse
+	wrongOrigin.OriginSlot = "F9"
+	check("origin slot", base, witness, "direct-c4", 20261105, wrongOrigin)
+	check("workload variant", base, witness, "direct-base", 20261105, validReuse)
+
+	noiseWitness := witness
+	noiseChain := *witness.doc.FixedSigmaChain
+	noiseChain.LogicalNoiseInjections = 1
+	noiseWitness.doc.FixedSigmaChain = &noiseChain
+	check("nonzero injection count", base, noiseWitness, "direct-c4", 20261105, validReuse)
+
+	rowWitness := witness
+	rowChain := *witness.doc.FixedSigmaChain
+	rowChain.FastInputRowsSHA256 = make(map[string]string, len(witness.doc.FixedSigmaChain.FastInputRowsSHA256))
+	for key, value := range witness.doc.FixedSigmaChain.FastInputRowsSHA256 {
+		rowChain.FastInputRowsSHA256[key] = value
+	}
+	rowChain.FastInputRowsSHA256["A.c0.q0"] = "mismatch"
+	rowWitness.doc.FixedSigmaChain = &rowChain
+	check("input active-row hash", base, rowWitness, "direct-c4", 20261105, validReuse)
+
+	checkpointWitness := witness
+	checkpointWitness.doc.Checkpoints = append([]publicCheckpoint(nil), witness.doc.Checkpoints...)
+	checkpointWitness.doc.Checkpoints[0].State.Level++
+	check("checkpoint state", base, checkpointWitness, "direct-c4", 20261105, validReuse)
+
+	vectorWitness := witness
+	vectorWitness.vectors.Checkpoints = map[string][]complexValue{}
+	check("decoded vectors", base, vectorWitness, "direct-c4", 20261105, validReuse)
+}
+
+func TestFixedSigmaAblationRunCountDeduplicatesReusedBaselineAndCountsWitness(t *testing.T) {
+	ids := make(map[string]struct{})
+	firstPair := fixedSigmaAblationSeedPairResult{
+		ArtifactSHA256: map[string]map[string]string{
+			"standard": {"result": "standard-result", "vectors": "standard-vectors"},
+			"OFF/OFF":  {"result": "f13-result", "vectors": "f13-vectors"},
+			"ON/OFF":   {"result": "f10-result", "vectors": "f10-vectors"},
+			"OFF/ON":   {"result": "f11-result", "vectors": "f11-vectors"},
+			"ON/ON":    {"result": "f12-result", "vectors": "f12-vectors"},
+		},
+		BaselineReuse: &fixedSigmaAblationBaselineReuseEvidence{
+			WitnessResultSHA256: "f9-result", WitnessVectorsSHA256: "f9-vectors",
+		},
+	}
+	secondPair := fixedSigmaAblationSeedPairResult{
+		ArtifactSHA256: map[string]map[string]string{
+			"standard": {"result": "standard-result", "vectors": "standard-vectors"},
+			"OFF/OFF":  {"result": "f13-result", "vectors": "f13-vectors"},
+			"ON/OFF":   {"result": "f14-result", "vectors": "f14-vectors"},
+			"OFF/ON":   {"result": "f15-result", "vectors": "f15-vectors"},
+			"ON/ON":    {"result": "f16-result", "vectors": "f16-vectors"},
+		},
+	}
+	addFixedSigmaAblationFastArtifactIDs(ids, firstPair)
+	addFixedSigmaAblationFastArtifactIDs(ids, secondPair)
+	if len(ids) != 8 {
+		t.Fatalf("expected four F10-F13 arms, the F9 equivalence witness, and four F13-F16 arms deduplicated at F13; got %d unique captures", len(ids))
 	}
 }

@@ -1,7 +1,7 @@
 # CURRENT TASK — FIXED-SIGMA-DIRECT-MUL-004
 
 Task: `FIXED-SIGMA-DIRECT-MUL-004`
-Status: `BATCH_BLOCKED_NEEDS_WEB_REVIEW` — CP-A/CP-B passed; CP-C/CP-D are blocked by unrecoverable F9 Binary SHA pairing for F10–F12. See the task summary and journal for the exact evidence and budget status.
+Status: `BATCH_BLOCKED_NEEDS_WEB_REVIEW` — the authorized 16/16 Fast and 2/2 Standard chains are captured and validated. Comparator RMS screening passes, but its propagation-decomposition roundoff gate fails for every pair (4,059/4,096 slots outside the unchanged `gamma_64` tolerance). No further computation is authorized pending Web review. See the task summary, analysis, and journal.
 **Spec:** `specs/FIXED-SIGMA-DIRECT-MUL-004.md`
 **Journal:** `results/FIXED-SIGMA-DIRECT-MUL-004/journal.md`
 **Results:** `results/FIXED-SIGMA-DIRECT-MUL-004/summary.md`

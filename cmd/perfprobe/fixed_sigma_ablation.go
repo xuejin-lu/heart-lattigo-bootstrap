@@ -31,8 +31,17 @@ type fixedSigmaAblationArtifactRef struct {
 }
 
 type fixedSigmaAblationSeedPair struct {
-	Stage1Seed int64                                    `json:"stage1_seed"`
-	Arms       map[string]fixedSigmaAblationArtifactRef `json:"arms"`
+	Stage1Seed    int64                                    `json:"stage1_seed"`
+	Arms          map[string]fixedSigmaAblationArtifactRef `json:"arms"`
+	BaselineReuse *fixedSigmaAblationBaselineReuse         `json:"baseline_reuse,omitempty"`
+}
+
+type fixedSigmaAblationBaselineReuse struct {
+	OriginSlot       string                        `json:"origin_slot"`
+	OriginStage1Seed int64                         `json:"origin_stage1_seed"`
+	OriginStage2Seed int64                         `json:"origin_stage2_seed"`
+	WitnessSlot      string                        `json:"equivalence_witness_slot"`
+	Witness          fixedSigmaAblationArtifactRef `json:"equivalence_witness"`
 }
 
 type fixedSigmaAblationWorkload struct {
@@ -88,12 +97,41 @@ type fixedSigmaAblationSeedPairResult struct {
 	Stage1Seed     int64                                    `json:"stage1_seed"`
 	Stage2Seed     int64                                    `json:"stage2_seed"`
 	FastBinarySHA  string                                   `json:"fast_binary_sha256"`
+	BaselineOrigin string                                   `json:"baseline_origin,omitempty"`
+	BaselineReuse  *fixedSigmaAblationBaselineReuseEvidence `json:"baseline_reuse_evidence,omitempty"`
 	ArtifactSHA256 map[string]map[string]string             `json:"artifact_sha256"`
 	Arms           map[string]fixedSigmaAblationArmAnalysis `json:"fast_arm_operation_metrics"`
 	Standard       fixedSigmaAblationArmAnalysis            `json:"standard_off_off_operation_metrics"`
 	Propagation    fixedSigmaAblationPropagation            `json:"stage1_to_stage2_propagation"`
 	SecondCheck    fixedSigmaAblationSecondCheck            `json:"on_on_context_check"`
 }
+
+type fixedSigmaAblationBaselineReuseEvidence struct {
+	OriginSlot                  string   `json:"baseline_origin"`
+	OriginStageSeeds            [2]int64 `json:"baseline_source_stage_seeds"`
+	RequestedStageSeeds         [2]int64 `json:"requested_pair_stage_seeds"`
+	OriginBinarySHA256          string   `json:"baseline_binary_sha256"`
+	OriginResultSHA256          string   `json:"baseline_result_sha256"`
+	OriginVectorsSHA256         string   `json:"baseline_vectors_sha256"`
+	WitnessSlot                 string   `json:"equivalence_witness_origin"`
+	WitnessStageSeeds           [2]int64 `json:"equivalence_witness_stage_seeds"`
+	WitnessBinarySHA256         string   `json:"equivalence_witness_binary_sha256"`
+	WitnessResultSHA256         string   `json:"equivalence_witness_result_sha256"`
+	WitnessVectorsSHA256        string   `json:"equivalence_witness_vectors_sha256"`
+	DecodedVectorDocumentsMatch bool     `json:"decoded_vector_documents_match"`
+	CheckpointStatesMatch       bool     `json:"checkpoint_states_match"`
+	FastInputRowsMatch          bool     `json:"fast_input_active_rows_match"`
+	NoiseInjectionCount         int      `json:"baseline_noise_injection_count"`
+}
+
+const (
+	fixedSigmaDirectMulReuseTargetSeed    = int64(20261105)
+	fixedSigmaDirectMulF9BinarySHA256     = "a7083bc12aa1d3da062c0b094b99f5c4fbcf3ceb8d86ea92f981ad73ab9db2ff"
+	fixedSigmaDirectMulF9ResultSHA256     = "c3e5172c44688f62d4087149e485f0f2f4f597747dc1c748f0bac2d8e28be94a"
+	fixedSigmaDirectMulF13BinarySHA256    = "bde01f61c36f70dc70939eb12d72f3a42ce07a925942904939b54e516cafae17"
+	fixedSigmaDirectMulF13ResultSHA256    = "27370f575519e061a73584994d1a30e52acd65d9e85be19c6b87731a3a930f69"
+	fixedSigmaDirectMulSharedVectorSHA256 = "b1abc549359dbb3c3b293c9e5de56b1e76c7888fd35e9c973357f62de3d61f4e"
+)
 
 type fixedSigmaAblationWorkloadResult struct {
 	Name              string                                   `json:"name"`
@@ -193,7 +231,8 @@ func runPublicFixedSigmaAblationCompare(args []string) error {
 			"The ±10% RMS screen is descriptive and applies to Stage1 and Stage2 of every ON/ON seed arm for both declared direct workloads; it is not statistical or tail equivalence.",
 			"Propagation decomposition residual is checked against a float64 roundoff envelope derived from gamma_64; no CKKS primitive is inferred from the residual difference.")
 	}
-	fastCount, standardCount := 0, 0
+	fastArtifactIDs := make(map[string]struct{})
+	standardCount := 0
 	decompositionFailed := false
 	seenNames, seenVariants := map[string]bool{}, map[string]bool{}
 	for _, workload := range manifest.Workloads {
@@ -249,7 +288,7 @@ func runPublicFixedSigmaAblationCompare(args []string) error {
 			}
 			workResult.SeedPairs = append(workResult.SeedPairs, pairResult)
 			decompositionFailed = decompositionFailed || pairResult.Propagation.DecompositionToleranceFails != 0
-			fastCount += len(seedPair.Arms)
+			addFixedSigmaAblationFastArtifactIDs(fastArtifactIDs, pairResult)
 		}
 		if directMul {
 			workResult.TransferScreen = computeFixedSigmaDirectMulTransferScreen(workResult)
@@ -274,6 +313,7 @@ func runPublicFixedSigmaAblationCompare(args []string) error {
 			result.Classification = "BATCH_BLOCKED_NEEDS_WEB_REVIEW"
 		}
 	}
+	fastCount := len(fastArtifactIDs)
 	if standardCount > 2 || fastCount > 16 {
 		return fmt.Errorf("manifest exceeds charter execution ceilings: Standard=%d Fast=%d", standardCount, fastCount)
 	}
@@ -283,6 +323,18 @@ func runPublicFixedSigmaAblationCompare(args []string) error {
 	}
 	fmt.Printf("fixed-sigma ablation workloads=%d standard_chains=%d fast_chains=%d bootstrap_calls=0 result=%s\n", len(result.Workloads), standardCount, fastCount, *outPath)
 	return nil
+}
+
+func addFixedSigmaAblationFastArtifactIDs(ids map[string]struct{}, pair fixedSigmaAblationSeedPairResult) {
+	for arm, hashes := range pair.ArtifactSHA256 {
+		if arm == "standard" || hashes["result"] == "" || hashes["vectors"] == "" {
+			continue
+		}
+		ids[hashes["result"]+":"+hashes["vectors"]] = struct{}{}
+	}
+	if reuse := pair.BaselineReuse; reuse != nil && reuse.WitnessResultSHA256 != "" && reuse.WitnessVectorsSHA256 != "" {
+		ids[reuse.WitnessResultSHA256+":"+reuse.WitnessVectorsSHA256] = struct{}{}
+	}
 }
 
 func computeFixedSigmaDirectMulTransferScreen(workload fixedSigmaAblationWorkloadResult) *fixedSigmaAblationTransferScreen {
@@ -408,17 +460,52 @@ func analyzeFixedSigmaAblationSeedPair(standard loadedFixedSigmaAblationArtifact
 		Standard:       summarizeFixedSigmaAblationArtifact(standard),
 	}
 	result.ArtifactSHA256["standard"] = map[string]string{"result": standard.resultSHA, "vectors": standard.vectorsSHA}
+	var reusedBaseline *loadedFixedSigmaAblationArtifact
+	if seedPair.BaselineReuse != nil {
+		if !directMulWorkloadIDFromDocument(standard.doc) || cVariant != "direct-c4" || seedPair.Stage1Seed != fixedSigmaDirectMulReuseTargetSeed {
+			return result, errors.New("OFF/OFF baseline reuse is authorized only for the direct-c4 first frozen seed pair")
+		}
+		baselineRef, ok := seedPair.Arms["OFF/OFF"]
+		if !ok {
+			return result, errors.New("reusable OFF/OFF baseline artifact is missing")
+		}
+		baseline, err := loadFixedSigmaAblationArtifact(baselineRef)
+		if err != nil {
+			return result, fmt.Errorf("reusable OFF/OFF baseline: %w", err)
+		}
+		witness, err := loadFixedSigmaAblationArtifact(seedPair.BaselineReuse.Witness)
+		if err != nil {
+			return result, fmt.Errorf("baseline equivalence witness: %w", err)
+		}
+		reuseEvidence, err := validateFixedSigmaDirectMulF9F13BaselineReuse(
+			baseline, witness, cVariant, seedPair.Stage1Seed, *seedPair.BaselineReuse,
+		)
+		if err != nil {
+			return result, err
+		}
+		reusedBaseline = &baseline
+		result.BaselineOrigin = reuseEvidence.OriginSlot
+		result.BaselineReuse = &reuseEvidence
+	}
 	for _, arm := range wantedArms {
 		ref, ok := seedPair.Arms[arm]
 		if !ok {
 			return result, fmt.Errorf("missing arm %s (wanted %s)", arm, arms)
 		}
-		loaded, err := loadFixedSigmaAblationArtifact(ref)
-		if err != nil {
-			return result, fmt.Errorf("arm %s: %w", arm, err)
+		var loaded loadedFixedSigmaAblationArtifact
+		var err error
+		if arm == "OFF/OFF" && reusedBaseline != nil {
+			loaded = *reusedBaseline
+		} else {
+			loaded, err = loadFixedSigmaAblationArtifact(ref)
+			if err != nil {
+				return result, fmt.Errorf("arm %s: %w", arm, err)
+			}
 		}
+		wantSeeds := [2]int64{seedPair.Stage1Seed, seedPair.Stage1Seed + 1}
 		if loaded.doc.Backend != "fast" || loaded.doc.FixedSigmaChain.AblationArm != arm || loaded.doc.FixedSigmaChain.CVariant != cVariant ||
-			loaded.doc.FixedSigmaChain.StageSeeds != [2]int64{seedPair.Stage1Seed, seedPair.Stage1Seed + 1} {
+			(arm == "OFF/OFF" && reusedBaseline == nil && loaded.doc.FixedSigmaChain.StageSeeds != wantSeeds) ||
+			(arm != "OFF/OFF" && loaded.doc.FixedSigmaChain.StageSeeds != wantSeeds) {
 			return result, fmt.Errorf("arm %s does not match Fast, C variant, and declared seed pair", arm)
 		}
 		var pairErr error
@@ -468,6 +555,72 @@ func analyzeFixedSigmaAblationSeedPair(standard loadedFixedSigmaAblationArtifact
 	}
 	result.SecondCheck = second
 	return result, nil
+}
+
+func validateFixedSigmaDirectMulF9F13BaselineReuse(
+	baseline, witness loadedFixedSigmaAblationArtifact,
+	cVariant string,
+	targetStage1Seed int64,
+	reuse fixedSigmaAblationBaselineReuse,
+) (fixedSigmaAblationBaselineReuseEvidence, error) {
+	const (
+		f9Stage1Seed  = int64(20261105)
+		f9Stage2Seed  = int64(20261106)
+		f13Stage1Seed = int64(20261107)
+		f13Stage2Seed = int64(20261108)
+	)
+	if cVariant != "direct-c4" || targetStage1Seed != fixedSigmaDirectMulReuseTargetSeed ||
+		reuse.OriginSlot != "F13" || reuse.WitnessSlot != "F9" ||
+		reuse.OriginStage1Seed != f13Stage1Seed || reuse.OriginStage2Seed != f13Stage2Seed {
+		return fixedSigmaAblationBaselineReuseEvidence{}, errors.New("baseline reuse metadata is outside the single authorized F9/F13 direct-c4 seed pair")
+	}
+	if baseline.doc.Backend != "fast" || witness.doc.Backend != "fast" ||
+		baseline.doc.FixedSigmaChain.AblationArm != "OFF/OFF" || witness.doc.FixedSigmaChain.AblationArm != "OFF/OFF" ||
+		baseline.doc.FixedSigmaChain.CVariant != cVariant || witness.doc.FixedSigmaChain.CVariant != cVariant ||
+		baseline.doc.FixedSigmaChain.StageSeeds != [2]int64{f13Stage1Seed, f13Stage2Seed} ||
+		witness.doc.FixedSigmaChain.StageSeeds != [2]int64{f9Stage1Seed, f9Stage2Seed} ||
+		baseline.doc.FixedSigmaChain.LogicalNoiseInjections != 0 || witness.doc.FixedSigmaChain.LogicalNoiseInjections != 0 {
+		return fixedSigmaAblationBaselineReuseEvidence{}, errors.New("F9/F13 reusable baselines must be OFF/OFF, zero-injection captures with their original source seeds")
+	}
+	if baseline.doc.BinarySHA256 != fixedSigmaDirectMulF13BinarySHA256 || witness.doc.BinarySHA256 != fixedSigmaDirectMulF9BinarySHA256 ||
+		baseline.resultSHA != fixedSigmaDirectMulF13ResultSHA256 || witness.resultSHA != fixedSigmaDirectMulF9ResultSHA256 ||
+		baseline.vectorsSHA != fixedSigmaDirectMulSharedVectorSHA256 || witness.vectorsSHA != fixedSigmaDirectMulSharedVectorSHA256 {
+		return fixedSigmaAblationBaselineReuseEvidence{}, errors.New("F9/F13 artifact or binary SHA-256 differs from the reviewed deterministic reuse evidence")
+	}
+	if baseline.doc.Mode != witness.doc.Mode || baseline.doc.SchemaVersion != witness.doc.SchemaVersion ||
+		baseline.doc.Status != witness.doc.Status || baseline.doc.PrimaryCommit != witness.doc.PrimaryCommit ||
+		baseline.doc.PrimarySourceSHA256 != witness.doc.PrimarySourceSHA256 || baseline.doc.BackendCommit != witness.doc.BackendCommit ||
+		baseline.doc.BackendRef != witness.doc.BackendRef || baseline.doc.BackendCheckoutRef != witness.doc.BackendCheckoutRef ||
+		!baseline.doc.PrimaryClean || !witness.doc.PrimaryClean || !baseline.doc.BackendClean || !witness.doc.BackendClean ||
+		baseline.doc.ConfigSHA256 != witness.doc.ConfigSHA256 || baseline.doc.QPSHA256 != witness.doc.QPSHA256 ||
+		baseline.doc.InputSHA256 != witness.doc.InputSHA256 || baseline.doc.WorkloadSHA256 != witness.doc.WorkloadSHA256 ||
+		!reflect.DeepEqual(baseline.doc.Parameters, witness.doc.Parameters) ||
+		!reflect.DeepEqual(baseline.doc.DirectMulCapacity, witness.doc.DirectMulCapacity) ||
+		!reflect.DeepEqual(baseline.doc.FixedSigmaChain.InputMessageSHA256, witness.doc.FixedSigmaChain.InputMessageSHA256) ||
+		!publicEnvironmentsMatch(baseline.doc, witness.doc) {
+		return fixedSigmaAblationBaselineReuseEvidence{}, errors.New("F9/F13 baseline source, inputs, parameters, environment or capacity evidence differs")
+	}
+	if len(baseline.doc.FixedSigmaChain.FastInputRowsSHA256) != 24 ||
+		!reflect.DeepEqual(baseline.doc.FixedSigmaChain.FastInputRowsSHA256, witness.doc.FixedSigmaChain.FastInputRowsSHA256) {
+		return fixedSigmaAblationBaselineReuseEvidence{}, errors.New("F9/F13 baseline input active-row hashes are missing or differ")
+	}
+	if !reflect.DeepEqual(baseline.doc.Checkpoints, witness.doc.Checkpoints) {
+		return fixedSigmaAblationBaselineReuseEvidence{}, errors.New("F9/F13 checkpoint Level/Scale/domain/status/active-row evidence differs")
+	}
+	if !reflect.DeepEqual(baseline.vectors, witness.vectors) || baseline.vectorsSHA != witness.vectorsSHA {
+		return fixedSigmaAblationBaselineReuseEvidence{}, errors.New("F9/F13 complete decoded vector documents or their SHA-256 differ")
+	}
+	return fixedSigmaAblationBaselineReuseEvidence{
+		OriginSlot: "F13", OriginStageSeeds: baseline.doc.FixedSigmaChain.StageSeeds,
+		RequestedStageSeeds: [2]int64{targetStage1Seed, targetStage1Seed + 1},
+		OriginBinarySHA256:  baseline.doc.BinarySHA256,
+		OriginResultSHA256:  baseline.resultSHA, OriginVectorsSHA256: baseline.vectorsSHA,
+		WitnessSlot: "F9", WitnessStageSeeds: witness.doc.FixedSigmaChain.StageSeeds,
+		WitnessBinarySHA256: witness.doc.BinarySHA256,
+		WitnessResultSHA256: witness.resultSHA, WitnessVectorsSHA256: witness.vectorsSHA,
+		DecodedVectorDocumentsMatch: true, CheckpointStatesMatch: true,
+		FastInputRowsMatch: true, NoiseInjectionCount: 0,
+	}, nil
 }
 
 func summarizeFixedSigmaAblationArtifact(artifact loadedFixedSigmaAblationArtifact) fixedSigmaAblationArmAnalysis {

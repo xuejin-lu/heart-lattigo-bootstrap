@@ -1,7 +1,7 @@
 {
   "accounting": {
     "actual_chain_executions": {
-      "fast": 13,
+      "fast": 16,
       "standard": 2
     },
     "authorized_replacement_slots": 2,
@@ -10,7 +10,7 @@
       "standard": 0
     },
     "launch_attempts": {
-      "fast": 15,
+      "fast": 18,
       "standard": 2
     },
     "replacement_launches": 2
@@ -20,7 +20,7 @@
     "ceilings.fast": "actual_chain_executions",
     "launch_attempt_ceilings.fast": "all started Fast processes including the preserved original F5 failure"
   },
-  "analysis_status": "BLOCKED_INCOMPLETE_MATCHED_MATRIX_NO_AGGREGATE_COMPARATOR_OUTPUT",
+  "analysis_status": "FAIL_PROPAGATION_DECOMPOSITION_ROUNDOFF_CHECK",
   "attempts": [
     {
       "actual_chain_executed": true,
@@ -344,44 +344,206 @@
       "workload": "direct-c4"
     },
     {
-      "actual_chain_executed": null,
+      "actual_chain_executed": true,
       "arm": "ON/OFF",
+      "artifact_validation": {
+        "archive_result": "captures/fast-direct-c4-s1-on-off.result.json",
+        "archive_result_sha256": "96186cdd8a240612a156f993b8d9be53bec3326cb3f123a57b4e79466ec6c34e",
+        "archive_vectors": "captures/fast-direct-c4-s1-on-off.vectors.json",
+        "archive_vectors_sha256": "8cd8218ea7bee1e324fa3f79a4a6c701768267a04feb9f978372b53360f5f405",
+        "baseline_origin": "F13",
+        "baseline_source_seeds": [
+          20261107,
+          20261108
+        ],
+        "binary_sha256": "bde01f61c36f70dc70939eb12d72f3a42ce07a925942904939b54e516cafae17",
+        "bootstrap_calls": 0,
+        "capacity": "STRICT_QPREFIX_FIT",
+        "injections": 1,
+        "operations": 2,
+        "oracles_passed": 7,
+        "status": "PASS_ZERO_BOOTSTRAP_DIRECT_CTCT_CHAIN",
+        "target_stage_seeds": [
+          20261105,
+          20261106
+        ]
+      },
       "backend": "fast",
+      "binary_path": "/private/tmp/fixed-sigma-direct-mul-004-fast-build-20261022/perfprobe-fast-clone",
+      "binary_sha256": "bde01f61c36f70dc70939eb12d72f3a42ce07a925942904939b54e516cafae17",
+      "exit_code": 0,
+      "finished_at_utc": "2026-10-22T03:09:54.422424+00:00",
       "hold_reason": "Requires F9 Fast binary SHA-256 a7083bc12aa1d3da062c0b094b99f5c4fbcf3ceb8d86ea92f981ad73ab9db2ff for same-seed-pair identity; exact binary not recovered. No launch or chain execution occurred.",
-      "launch_attempted": false,
+      "launch_attempted": true,
+      "launched_at_utc": "2026-10-22T03:09:36.478923+00:00",
+      "prelaunch_provenance": {
+        "baseline_binary_sha256": "bde01f61c36f70dc70939eb12d72f3a42ce07a925942904939b54e516cafae17",
+        "baseline_origin": "F13",
+        "baseline_reuse_offline_comparator_regression": "PASS",
+        "baseline_source_seeds": [
+          20261107,
+          20261108
+        ],
+        "build_tag": "perf_fast",
+        "candidate_result_path_absent": true,
+        "candidate_vectors_path_absent": true,
+        "config_sha256": "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98",
+        "fast_source_clean": true,
+        "fast_source_commit": "1e7828293c36f9845e30723ba4e9500d84bb50d2",
+        "fast_source_ref": "fast-qprefix",
+        "matches_pair_baseline_slot": "F13",
+        "primary_measurement_source_sha256": "544356df4747d51d9bc5d4acbfdaca02888ba9f417d2130629a3573f96ca236c",
+        "primary_vcs_modified": false,
+        "primary_vcs_revision": "977d853541cf59b37e42cdfc1e635bc0cab7862d",
+        "qp_sha256": "1f045e603a856968779d62e045a037274bba08cbfce8b1dd3dec2828f1f6a46b",
+        "target_stage_seeds": [
+          20261105,
+          20261106
+        ],
+        "workload_sha256": "6ed6318094e75d3e8481611d9ede971aebad8deeae5763496d1365274f345786"
+      },
       "result": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-c4-s1-on-off.result.json",
       "slot": "F10",
       "stage1_seed": 20261105,
       "stage2_seed": 20261106,
-      "state": "NOT_LAUNCHED",
+      "state": "PASS_VALIDATED",
+      "validated_at_utc": "2026-10-22T03:10:24.138512+00:00",
       "vectors": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-c4-s1-on-off.vectors.json",
       "workload": "direct-c4"
     },
     {
-      "actual_chain_executed": null,
+      "actual_chain_executed": true,
       "arm": "OFF/ON",
+      "artifact_validation": {
+        "archive_result": "captures/fast-direct-c4-s1-off-on.result.json",
+        "archive_result_sha256": "1ad1f55b137033be46dfa5cb9be2559d2ab9907decd186cb3364b52e95b6510d",
+        "archive_vectors": "captures/fast-direct-c4-s1-off-on.vectors.json",
+        "archive_vectors_sha256": "d509b055c02c0a79e3de4ca5b08f9e51f3d3425162e1493bbd685f1b73f6eb2e",
+        "baseline_origin": "F13",
+        "baseline_source_seeds": [
+          20261107,
+          20261108
+        ],
+        "binary_sha256": "bde01f61c36f70dc70939eb12d72f3a42ce07a925942904939b54e516cafae17",
+        "bootstrap_calls": 0,
+        "capacity": "STRICT_QPREFIX_FIT",
+        "injections": 1,
+        "operations": 2,
+        "oracles_passed": 7,
+        "status": "PASS_ZERO_BOOTSTRAP_DIRECT_CTCT_CHAIN",
+        "target_stage_seeds": [
+          20261105,
+          20261106
+        ]
+      },
       "backend": "fast",
+      "binary_path": "/private/tmp/fixed-sigma-direct-mul-004-fast-build-20261022/perfprobe-fast-clone",
+      "binary_sha256": "bde01f61c36f70dc70939eb12d72f3a42ce07a925942904939b54e516cafae17",
+      "exit_code": 0,
+      "finished_at_utc": "2026-10-22T03:11:05.814787+00:00",
       "hold_reason": "Requires F9 Fast binary SHA-256 a7083bc12aa1d3da062c0b094b99f5c4fbcf3ceb8d86ea92f981ad73ab9db2ff for same-seed-pair identity; exact binary not recovered. No launch or chain execution occurred.",
-      "launch_attempted": false,
+      "launch_attempted": true,
+      "launched_at_utc": "2026-10-22T03:10:52.198983+00:00",
+      "prelaunch_provenance": {
+        "baseline_binary_sha256": "bde01f61c36f70dc70939eb12d72f3a42ce07a925942904939b54e516cafae17",
+        "baseline_origin": "F13",
+        "baseline_reuse_offline_comparator_regression": "PASS",
+        "baseline_source_seeds": [
+          20261107,
+          20261108
+        ],
+        "build_tag": "perf_fast",
+        "candidate_result_path_absent": true,
+        "candidate_vectors_path_absent": true,
+        "config_sha256": "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98",
+        "fast_source_clean": true,
+        "fast_source_commit": "1e7828293c36f9845e30723ba4e9500d84bb50d2",
+        "fast_source_ref": "fast-qprefix",
+        "matches_pair_baseline_slot": "F13",
+        "primary_measurement_source_sha256": "544356df4747d51d9bc5d4acbfdaca02888ba9f417d2130629a3573f96ca236c",
+        "primary_vcs_modified": false,
+        "primary_vcs_revision": "977d853541cf59b37e42cdfc1e635bc0cab7862d",
+        "qp_sha256": "1f045e603a856968779d62e045a037274bba08cbfce8b1dd3dec2828f1f6a46b",
+        "target_stage_seeds": [
+          20261105,
+          20261106
+        ],
+        "workload_sha256": "6ed6318094e75d3e8481611d9ede971aebad8deeae5763496d1365274f345786"
+      },
       "result": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-c4-s1-off-on.result.json",
       "slot": "F11",
       "stage1_seed": 20261105,
       "stage2_seed": 20261106,
-      "state": "NOT_LAUNCHED",
+      "state": "PASS_VALIDATED",
+      "validated_at_utc": "2026-10-22T03:11:15.163539+00:00",
       "vectors": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-c4-s1-off-on.vectors.json",
       "workload": "direct-c4"
     },
     {
-      "actual_chain_executed": null,
+      "actual_chain_executed": true,
       "arm": "ON/ON",
+      "artifact_validation": {
+        "archive_result": "captures/fast-direct-c4-s1-on-on.result.json",
+        "archive_result_sha256": "320608ecfeb06b671572c15f6c280a67d1df7b930a0f8bf0bb3e380f8e643333",
+        "archive_vectors": "captures/fast-direct-c4-s1-on-on.vectors.json",
+        "archive_vectors_sha256": "49ea2e0a6023277d119b0ff7a45299ff7ff8e11346d7d55de471295526d1bae5",
+        "baseline_origin": "F13",
+        "baseline_source_seeds": [
+          20261107,
+          20261108
+        ],
+        "binary_sha256": "bde01f61c36f70dc70939eb12d72f3a42ce07a925942904939b54e516cafae17",
+        "bootstrap_calls": 0,
+        "capacity": "STRICT_QPREFIX_FIT",
+        "injections": 2,
+        "operations": 2,
+        "oracles_passed": 7,
+        "status": "PASS_ZERO_BOOTSTRAP_DIRECT_CTCT_CHAIN",
+        "target_stage_seeds": [
+          20261105,
+          20261106
+        ]
+      },
       "backend": "fast",
+      "binary_path": "/private/tmp/fixed-sigma-direct-mul-004-fast-build-20261022/perfprobe-fast-clone",
+      "binary_sha256": "bde01f61c36f70dc70939eb12d72f3a42ce07a925942904939b54e516cafae17",
+      "exit_code": 0,
+      "finished_at_utc": "2026-10-22T03:11:46.081155+00:00",
       "hold_reason": "Requires F9 Fast binary SHA-256 a7083bc12aa1d3da062c0b094b99f5c4fbcf3ceb8d86ea92f981ad73ab9db2ff for same-seed-pair identity; exact binary not recovered. No launch or chain execution occurred.",
-      "launch_attempted": false,
+      "launch_attempted": true,
+      "launched_at_utc": "2026-10-22T03:11:31.244389+00:00",
+      "prelaunch_provenance": {
+        "baseline_binary_sha256": "bde01f61c36f70dc70939eb12d72f3a42ce07a925942904939b54e516cafae17",
+        "baseline_origin": "F13",
+        "baseline_reuse_offline_comparator_regression": "PASS",
+        "baseline_source_seeds": [
+          20261107,
+          20261108
+        ],
+        "build_tag": "perf_fast",
+        "candidate_result_path_absent": true,
+        "candidate_vectors_path_absent": true,
+        "config_sha256": "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98",
+        "fast_source_clean": true,
+        "fast_source_commit": "1e7828293c36f9845e30723ba4e9500d84bb50d2",
+        "fast_source_ref": "fast-qprefix",
+        "matches_pair_baseline_slot": "F13",
+        "primary_measurement_source_sha256": "544356df4747d51d9bc5d4acbfdaca02888ba9f417d2130629a3573f96ca236c",
+        "primary_vcs_modified": false,
+        "primary_vcs_revision": "977d853541cf59b37e42cdfc1e635bc0cab7862d",
+        "qp_sha256": "1f045e603a856968779d62e045a037274bba08cbfce8b1dd3dec2828f1f6a46b",
+        "target_stage_seeds": [
+          20261105,
+          20261106
+        ],
+        "workload_sha256": "6ed6318094e75d3e8481611d9ede971aebad8deeae5763496d1365274f345786"
+      },
       "result": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-c4-s1-on-on.result.json",
       "slot": "F12",
       "stage1_seed": 20261105,
       "stage2_seed": 20261106,
-      "state": "NOT_LAUNCHED",
+      "state": "PASS_VALIDATED",
+      "validated_at_utc": "2026-10-22T03:11:55.087596+00:00",
       "vectors": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-c4-s1-on-on.vectors.json",
       "workload": "direct-c4"
     },
@@ -559,31 +721,123 @@
       "workload": "direct-c4"
     }
   ],
+  "baseline_reuse_authorization": {
+    "authorized_remaining_actual_fast_chains": 0,
+    "authorized_remaining_fast_launches": [
+      "F10",
+      "F11",
+      "F12"
+    ],
+    "authorized_remaining_launches": 0,
+    "baseline_binary_sha256": "bde01f61c36f70dc70939eb12d72f3a42ce07a925942904939b54e516cafae17",
+    "baseline_origin": "F13",
+    "baseline_origin_seeds": [
+      20261107,
+      20261108
+    ],
+    "baseline_result_sha256": "27370f575519e061a73584994d1a30e52acd65d9e85be19c6b87731a3a930f69",
+    "baseline_vectors_sha256": "b1abc549359dbb3c3b293c9e5de56b1e76c7888fd35e9c973357f62de3d61f4e",
+    "classification": "AUTHORIZED_DETERMINISTIC_OFF_OFF_BASELINE_REUSE",
+    "complete_decoded_vector_documents_byte_identical": true,
+    "equivalence_witness_origin": "F9",
+    "equivalence_witness_seeds": [
+      20261105,
+      20261106
+    ],
+    "execution_slots_completed": [
+      "F10",
+      "F11",
+      "F12"
+    ],
+    "fast_binary_sha256_for_F10_F12": "bde01f61c36f70dc70939eb12d72f3a42ce07a925942904939b54e516cafae17",
+    "matched_checkpoint_count": 7,
+    "matched_fast_input_active_row_hash_count": 24,
+    "no_standard_bootstrap_logn16_bts_or_multiparty_authorized": true,
+    "offline_comparator_regression": "PASS",
+    "scope": "analysis-only reuse of direct-c4 pair-1 OFF/OFF baseline",
+    "target_pair_seeds": [
+      20261105,
+      20261106
+    ],
+    "vectors_git_blob_sha1": "db809ceeb183112fa35ae5305006ff2533d41814",
+    "witness_binary_sha256": "a7083bc12aa1d3da062c0b094b99f5c4fbcf3ceb8d86ea92f981ad73ab9db2ff",
+    "witness_result_sha256": "c3e5172c44688f62d4087149e485f0f2f4f597747dc1c748f0bac2d8e28be94a",
+    "witness_vectors_sha256": "b1abc549359dbb3c3b293c9e5de56b1e76c7888fd35e9c973357f62de3d61f4e",
+    "zero_noise_injections": true
+  },
   "batch_status": "BATCH_BLOCKED_NEEDS_WEB_REVIEW",
   "binary_pairing_status": {
-    "comparator_gate": "Primary cmd/perfprobe/fixed_sigma_ablation.go requires two direct workload variants, two frozen seed pairs each, and exactly four arms per pair; F10-F12 are unavailable, so no full CP-D result can be emitted without weakening the contract.",
-    "comparator_status": "NOT_RUN_FULL_MATRIX_INCOMPLETE",
+    "analysis_output": {
+      "bootstrap_calls": 0,
+      "classification": "BATCH_BLOCKED_NEEDS_WEB_REVIEW",
+      "decomposition_failures_by_pair": {
+        "direct-base-20261101": 4059,
+        "direct-base-20261103": 4059,
+        "direct-c4-20261105": 4059,
+        "direct-c4-20261107": 4059
+      },
+      "fast_chain_runs_unique_captures": 16,
+      "path": "results/FIXED-SIGMA-DIRECT-MUL-004/analysis.json",
+      "rms_transfer_screen_all_on_on_pass": true,
+      "sha256": "dc45035b37a50ec35d97cbe9a4d747b75ed85012a663dba7f28022e47e027243",
+      "standard_chain_runs": 2,
+      "status": "FAIL_PROPAGATION_DECOMPOSITION_ROUNDOFF_CHECK"
+    },
+    "authorized_slots": [
+      "F10",
+      "F11",
+      "F12"
+    ],
+    "comparator_gate": "COMPLETE: the existing comparator analyzed all four seed pairs and both Standard references. All ON/ON ±10% RMS screens passed; the unchanged gamma_64 propagation-decomposition gate failed in every pair. Full output is archived at results/FIXED-SIGMA-DIRECT-MUL-004/analysis.json; no threshold was changed.",
+    "comparator_status": "FAIL_PROPAGATION_DECOMPOSITION_ROUNDOFF_CHECK",
     "complete_fast_pairs": [
       "direct-base-seed-pair-1",
       "direct-base-seed-pair-2",
+      "direct-c4-seed-pair-1 (F13 OFF/OFF referenced under approved F9/F13 equivalence; F9 preserved as witness)",
       "direct-c4-seed-pair-2"
+    ],
+    "completed_slots": [
+      "F10",
+      "F11",
+      "F12"
     ],
     "experiment_launches_during_search": 0,
     "f9_binary_recovery": "NOT_FOUND",
     "f9_required_binary_sha256": "a7083bc12aa1d3da062c0b094b99f5c4fbcf3ceb8d86ea92f981ad73ab9db2ff",
     "f9_source_fast_commit": "1e7828293c36f9845e30723ba4e9500d84bb50d2",
     "f9_source_primary_commit": "977d853541cf59b37e42cdfc1e635bc0cab7862d",
-    "held_actual_chain_budget": 3,
-    "held_slots": [
-      "F10",
-      "F11",
-      "F12"
-    ],
-    "incomplete_fast_pair": "direct-c4-seed-pair-1 (F9 OFF/OFF only)",
-    "next_gate": "Recover the exact F9 binary; any rebuild/rebaseline that consumes additional chains or changes pairing requires Web budget authorization.",
+    "held_actual_chain_budget": 0,
+    "held_slots": [],
+    "next_gate": "Web review of the shared comparator gamma_64 propagation residual gate; do not change tolerance or rerun captures before review.",
+    "offline_equivalence": {
+      "baseline_origin": "F13",
+      "baseline_source_seeds": [
+        20261107,
+        20261108
+      ],
+      "checkpoint_states_match": true,
+      "decoded_vector_sha256_match": true,
+      "fast_input_active_rows_match": true,
+      "fast_source_commit": "1e7828293c36f9845e30723ba4e9500d84bb50d2",
+      "git_blob_sha1_match": true,
+      "noise_injections": 0,
+      "primary_source_sha256": "544356df4747d51d9bc5d4acbfdaca02888ba9f417d2130629a3573f96ca236c",
+      "qp_sha256": "1f045e603a856968779d62e045a037274bba08cbfce8b1dd3dec2828f1f6a46b",
+      "status": "PASS",
+      "target_pair_seeds": [
+        20261105,
+        20261106
+      ],
+      "witness_origin": "F9",
+      "witness_source_seeds": [
+        20261105,
+        20261106
+      ],
+      "workload_sha256": "6ed6318094e75d3e8481611d9ede971aebad8deeae5763496d1365274f345786"
+    },
     "required_binary_sha256": "a7083bc12aa1d3da062c0b094b99f5c4fbcf3ceb8d86ea92f981ad73ab9db2ff",
     "same_pair_policy": {
-      "F10-F12": "HOLD_UNTIL_EXACT_F9_BINARY_RECOVERED",
+      "F10-F12": "Use F13 OFF/OFF only through the explicit deterministic-reuse gate; ON/OFF, OFF/ON, ON/ON must match F13 source, Binary SHA, workload, input, parameters, environment, capacity and exact frozen seeds.",
       "F13-F16": "establish F13 OFF/OFF then keep binary bde01f61... for all four arms",
       "F6-F8": "use F5-R2 baseline binary bde01f61..."
     },
@@ -594,7 +848,7 @@
       "Go build cache executable-sized Mach-O files",
       "macOS filename index"
     ],
-    "status": "BLOCKED_NEEDS_WEB_REVIEW",
+    "status": "BATCH_BLOCKED_NEEDS_WEB_REVIEW",
     "valid_vcs_rebuild_candidates": [
       {
         "build": "ordinary go.mod",
@@ -617,7 +871,11 @@
         "vcs_modified": false,
         "vcs_revision": "977d853541cf59b37e42cdfc1e635bc0cab7862d"
       }
-    ]
+    ],
+    "historical_incomplete_fast_pair_before_deterministic_reuse": "direct-c4-seed-pair-1 (F9 OFF/OFF only)",
+    "incomplete_fast_pair": null,
+    "resolved_pair_with_authorized_reuse": "direct-c4-seed-pair-1: F13 OFF/OFF baseline referenced for analysis; F9 remains the immutable equivalence witness",
+    "f9_binary_recovery_resolution": "Original F9 binary remains unavailable; the approved F9/F13 deterministic OFF/OFF equivalence permits analysis-only F13 baseline reuse. No capture was relabeled or rerun."
   },
   "ceilings": {
     "bootstrap": 0,
