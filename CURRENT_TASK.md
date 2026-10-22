@@ -1,13 +1,17 @@
-# CURRENT TASK — FIXED-SIGMA-PROPAGATION-003
+# CURRENT TASK — FIXED-SIGMA-DIRECT-MUL-004
 
-**Status:** `BATCH_COMPLETE_READY_FOR_WEB_REVIEW`.
-**Authoritative charter:** `specs/FIXED-SIGMA-PROPAGATION-003.md`.
-**Journal:** `results/FIXED-SIGMA-PROPAGATION-003/journal.md`. **Summary:** `results/FIXED-SIGMA-PROPAGATION-003/summary.md`.
+Task: `FIXED-SIGMA-DIRECT-MUL-004`
+Status: `AUTHORIZED_AUTONOMOUS_BATCH` — **NOT_RUN**; execute on user's next `開始`.
+**Spec:** `specs/FIXED-SIGMA-DIRECT-MUL-004.md`
+**Journal:** `results/FIXED-SIGMA-DIRECT-MUL-004/journal.md`
+**Results:** `results/FIXED-SIGMA-DIRECT-MUL-004/summary.md`
 
-Prior `FIXED-SIGMA-CHAIN-002` accepted by GPT Web as `ACCEPTED_SCOPED_RMSE_ONLY`; see `results/FIXED-SIGMA-CHAIN-002/web-review.md`. Do not rerun completed 001/002 expensive work, change historical artifacts, or recalibrate sigma.
+Prior 003 Web review: `results/FIXED-SIGMA-PROPAGATION-003/web-review.md`. Accepted as `ACCEPTED_SCOPED_PROPAGATION_ABLATION`, with `INSUFFICIENT_EVIDENCE` for general frozen-sigma transferability. Preserve all 001–003 historical results, accepted source SHA and budgets.
 
-New goal: frozen `σ_coefficient=4.004280012097432` ablation `OFF/OFF`, `ON/OFF`, `OFF/ON`, `ON/ON` to isolate propagation of prior artificial Noise in two dependent ct×ct multiplications; compare original and one predeclared stronger C input. If mathematically safe, improve diagnostic Q-prefix capacity-check overhead **without weakening correctness**; produce read-only Bootstrap multiplication-boundary coverage map. Same Primary `heart-lattigo-bootstrap/main` and Secondary `lattigo/fast-qprefix`, genuine Standard pin `5dbffbdea05394de2ca3a432ed5318aa832e3f40`.
+**New goal:** User approved replacing the historical Add-containing `(A+B)×C×C` test circuit with a **separate versioned** pure ciphertext×ciphertext direct-mul `A×B×C` circuit. The frontend must perform exactly two ordered `MulRelinNew→Rescale` operations, no `AddNew`. Stage1 encrypt A at `Δ=2^45`, B at effective `q5`, output Level4/Δ. Stage2 encrypt independent deterministic C at effective `q4`, output Level3/Δ. Introduce own workload hash and capacity plan; don't mutate legacy fixture.
 
-**Budget:** at most 16 Fast two-step chain executions, at most 2 genuine Standard reference chains; **0 Bootstrap / 0 LogN16 / 0 BTS / 0 large benchmark**. No global Rescale interception, no automatic Bootstrap injection, no runtime backend selection in production frontend.
+**Fixed coefficient sigma:** `4.004280012097432`, unchanged and unretuned; manual Fast-only opt-in c0 after each completed operation; retain `OFF/OFF`, `ON/OFF`, `OFF/ON`, `ON/ON` ablation on two preregistered variants `direct-base` and `direct-c4`. Stagewise incremental errors, total oracle errors, and propagated first-stage injection have separate metrics. Do not mistake RMS match for distribution equivalence.
 
-Follow existing Primary/Secondary `AGENTS.md`, current backend transparency contract, safe fetch/ff-only and code/measurement reuse rules. Stop for Web review at math/Scale/Q-prefix/dispatch uncertainty. Journal exact provenance, gate status and results; safe normal commit+push only in task scope.
+**Budget:** genuine Standard at most 2 **two-stage chains**; Fast at most 16 **two-stage chains**, including failed attempts; Bootstrap **0** Standard/Fast, no LogN16 workload, no BTS, no large benchmark. Strict centered Q-prefix capacity, source/binary provenance, honest STOP gates. Two repos: Primary `heart-lattigo-bootstrap/main`, Secondary `lattigo/fast-qprefix`; genuine Standard original `5dbffbdea05394de2ca3a432ed5318aa832e3f40`. Secondary initially `1e7828293c36f9845e30723ba4e9500d84bb50d2`.
+
+Codex: mandatory safe branch/status/fetch/path check and conditional ff-only, read `AGENTS.md`, `docs/MEASUREMENT_PLATFORM.md`, scientific workflow, task spec; preserve existing local work, reuse mature platform, read file sizes before large logs. Follow CP-A→CP-D, journal every checkpoint; no task diversion to old A=0 or obsolete standard fixture. Complete and normal push with `BATCH_COMPLETE_READY_FOR_WEB_REVIEW`, or stop `BATCH_BLOCKED_NEEDS_WEB_REVIEW` for a new math/representation decision.
