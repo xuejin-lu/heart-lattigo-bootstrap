@@ -18,3 +18,5 @@ cf038c517ee9f0804497867aa7a542cc21c17bcb7553174f718ed75b8defc4b5  captures/fast-
 eb9da919f2ffee2ced0ce166b349f838ed53324a0c0710c2367c674e6a806712  captures/fast-direct-base-s2-on-off.vectors.json
 c618a00c2a9737683de833c8e02ab42783b86a1f1f593e368405789fd219506d  captures/fast-direct-base-s2-off-on.result.json
 6bd61ce50658ad9e239265b3014283405b887c31ea3c591e3834a4c66683c95c  captures/fast-direct-base-s2-off-on.vectors.json
+b7a6dda53e0f46b3b968c296845884a61dc91c823c284732a9bd6d37305cb401  captures/fast-direct-base-s2-on-on.result.json
+75296145cdabac3b2d8b17434bc43d093574bae371056111af523e643f64ed9f  captures/fast-direct-base-s2-on-on.vectors.json
