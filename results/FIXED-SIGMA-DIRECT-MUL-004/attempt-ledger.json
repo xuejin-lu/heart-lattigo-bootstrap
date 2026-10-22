@@ -1,7 +1,7 @@
 {
   "accounting": {
     "actual_chain_executions": {
-      "fast": 5,
+      "fast": 6,
       "standard": 2
     },
     "authorized_replacement_slots": 2,
@@ -163,12 +163,14 @@
       "workload": "direct-base"
     },
     {
-      "actual_chain_executed": null,
+      "actual_chain_executed": true,
       "arm": "OFF/OFF",
       "authorization": "AUTHORIZED_F5_R2_PRECHAIN_RECOVERY",
       "backend": "fast",
       "binary_path": "/private/tmp/fixed-sigma-direct-mul-004-fast-build-20261022/perfprobe-fast-clone",
       "binary_sha256": "bde01f61c36f70dc70939eb12d72f3a42ce07a925942904939b54e516cafae17",
+      "exit_code": 0,
+      "finished_at_utc": "2026-10-22T02:33:28.697076+00:00",
       "launch_attempted": true,
       "launched_at_utc": "2026-10-22T02:32:04.950622+00:00",
       "prelaunch_provenance": {
@@ -189,7 +191,8 @@
       "slot": "F5-R2",
       "stage1_seed": 20261103,
       "stage2_seed": 20261104,
-      "state": "LAUNCH_COMMITTED",
+      "state": "PASS_VALIDATED",
+      "validated_at_utc": "2026-10-22T02:33:49.306006+00:00",
       "vectors": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-base-s2-off-off-f5-r2.vectors.json",
       "workload": "direct-base"
     },

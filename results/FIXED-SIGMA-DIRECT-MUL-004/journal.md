@@ -1,6 +1,6 @@
 # FIXED-SIGMA-DIRECT-MUL-004 — durable experiment journal
 
-**Status:** `BATCH_IN_PROGRESS`. CP-A and CP-B remain complete. F5 and F5-R1 remain preserved as pre-chain launch failures. Web authorized exactly one additional F5-R2 launch; its binary provenance and corrected command passed prelaunch checks, and the durable ledger now has its one-time launch reservation (`8/18` Fast launches, `5/16` actual chains). The process result is pending.
+**Status:** `BATCH_IN_PROGRESS`. CP-A and CP-B remain complete. F5 and F5-R1 remain preserved as pre-chain launch failures. The authorized F5-R2 `direct-base` OFF/OFF chain passed capture validation. Current use is 8/18 Fast launch attempts and 6/16 actual chains; ten original Fast slots remain.
 **Prior:** `FIXED-SIGMA-PROPAGATION-003` results remain unchanged; Web review in `../FIXED-SIGMA-PROPAGATION-003/web-review.md`.
 **Authoritative spec:** `../../specs/FIXED-SIGMA-DIRECT-MUL-004.md`.
 
@@ -16,12 +16,12 @@
 
 | Metric | Used | Maximum |
 |---|---:|---:|
-| Fast actual two-stage chain executions completed | 5 | 16 |
+| Fast actual two-stage chain executions completed | 6 | 16 |
 | Fast launch attempts recorded, including F5 and F5-R1 failures | 8 | 18 |
 | Original authorized F5 pre-chain CLI failure | 1 | 1 |
 | F5-R1 pre-chain binary provenance failure | 1 | permanently recorded |
 | F5 recovery launches authorized / launch-reserved | 2 / 2 | 2 |
-| Replacement F5-R2 | LAUNCH_COMMITTED; actual chain result pending | 1 |
+| Replacement F5-R2 | PASS_VALIDATED | 1 |
 | Genuine Standard two-stage chains completed | 2 | 2 |
 | Standard Bootstrap calls | 0 | 0 |
 | Fast Bootstrap calls | 0 | 0 |
@@ -32,10 +32,10 @@
 |---|---|
 | CP-A new-workload source/math/capacity gates | COMPLETE |
 | CP-B direct A×B→×C baseline | COMPLETE |
-| CP-C fixed σ four-arm experiment | IN_PROGRESS; F5-R2 authorized and preflighted, not launched |
+| CP-C fixed σ four-arm experiment | IN_PROGRESS; F5-R2 passed, ten original Fast slots remain |
 | CP-D full analysis/provenance/commit | NOT_STARTED |
 
-The paired numerical analysis and aggregate stage/tail metrics remain **NOT_RUN** because neither F5 nor F5-R1 entered the ciphertext chain; F5-R2's reserved process has not yet returned. The seven validated captures and their SHA-256 index remain preserved under `captures/`; F5 and F5-R1 are separate launch attempts and zero actual chains. Bootstrap remains 0/0.
+The paired numerical analysis and aggregate stage/tail metrics remain **NOT_RUN** because the frozen four-arm/two-pair matrix is incomplete. The original seven capture pairs remain preserved, and F5-R2 adds one validated Fast capture pair. F5 and F5-R1 remain separate zero-chain launch failures. Bootstrap remains 0/0.
 
 ## CP-A — completed source, scale and capacity preflight
 
@@ -175,3 +175,11 @@ At ledger freeze: Standard `0/2`, Fast `0/16`, Bootstrap `0/0`, LogN16 `0`, BTS 
 - After the authorization checkpoint `d0e849ceda72d55079c098cb8edf01b748ae7a33` was pushed and verified equal to `origin/main`, the final prelaunch gate passed: Primary clone `977d853...` clean, Secondary `1e782829...` clean, candidate binary SHA and Go VCS metadata matched, and both output paths were absent.
 - The existing ledger helper's `start F5-R2` action wrote `LAUNCH_COMMITTED`, preserving `actual_chain_executed=null` until the result is classified. It reports Fast launch attempts `8/18` and actual chains before execution `5/16`. This is the sole F5-R2 launch reservation; no process result or ciphertext chain has yet been recorded at this checkpoint.
 - The frozen invocation uses the candidate binary in the clean Primary clone, `--mode=public-native --profile=logn13 --ephemeral-secret-weight=32`, the pinned LogN13 config, Fast commit/ref/root `1e782829...` / `fast-qprefix` / the clean Secondary path, `--bootstrap-budget=0 --mul-rescale-chain`, workload `direct-ctct-v1`, arm `OFF/OFF`, C variant `direct-base`, and seed `20261103`. No positional `mul-rescale-chain` argument is present.
+
+## F5-R2 completed and validated — 2026-10-22
+
+- The single reserved F5-R2 invocation exited 0 and reported two operations, zero injections, and zero Bootstrap calls. Its result is `PASS_ZERO_BOOTSTRAP_DIRECT_CTCT_CHAIN`; the existing fixed-sigma capture validator passed all seven plaintext-oracle checkpoints, `STRICT_QPREFIX_FIT`, unchanged input active rows, expected Fast dispatch, and the pair's source/binary/workload checks. The archived capture was revalidated after copying.
+- Seeds remain `20261103`/`20261104`; workload `direct-base`; arm `OFF/OFF`; σ remains `4.004280012097432` (not injected in this arm). Incremental residual statistics: Stage1 RMS `7.381922596245538e-13`, variance `5.449278102107478e-25`, mean `(8.600717952502178e-18, 4.3415244776333964e-17)`, max `2.033109937082661e-12`; Stage2 RMS `7.466034270050545e-13`, variance `5.573265270069246e-25`, mean `(9.479061795056734e-15, 5.455238314370671e-16)`, max `2.3079708010302514e-12`. Worst checkpoint plaintext-oracle difference is `1.3376847125191824e-10`.
+- Result SHA-256 `d93953b8e0dc58a34ae8622936a8d290db13db0bf3119e86e40c07d32db9385b` (41,722 bytes); vector SHA-256 `5ac88c166efd623406d35b68b7502d6edccdb51d7510475da14fb9f53ccef51b` (7,419,795 bytes). Both are preserved under `captures/`; all 16 indexed result/vector files verify. The updated `captures/SHA256SUMS` SHA-256 is `d27276ec4803d4646fc4b3b5eaa7b645bdc1824eeb5061ad40eacaa2f840ab43`; ledger SHA-256 is `2a091d262d41034127426ad9a9d1ed93c1474c4146e878ec55e38970b33ab44f`.
+- F5-R2 is `PASS_VALIDATED`; counters are 8/18 Fast launches and 6/16 actual chains, with 10 remaining preregistered Fast slots. F5 and F5-R1 remain failed pre-chain records. No other sample was rerun. Standard remains 2/2; Bootstrap, LogN16, BTS and multiparty remain 0.
+- The setup check had caught the accidental untracked self-referential symlink `lattigo/lattigo` created while arranging the temporary module replacement. That exact symlink was removed before F5-R2; Secondary was rechecked clean at `fast-qprefix@1e7828293c36f9845e30723ba4e9500d84bb50d2`. No tracked Secondary file changed and no experiment ran while that link existed.
