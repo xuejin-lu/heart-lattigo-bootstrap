@@ -1,12 +1,22 @@
 # FIXED-SIGMA-DIRECT-MUL-004 — Direct ct×ct multiplication and frozen-σ transfer test
 
-**Status:** `AUTHORIZED_AUTONOMOUS_BATCH`, **PLANNED_NOT_RUN**. Codex executes only on the user's next `開始` after the required Git safe startup.
+**Status:** `AUTHORIZED_AUTONOMOUS_BATCH`, resumed 2026-10-22 after the user's Web-review ruling below.
 **Primary:** `xuejin-lu/heart-lattigo-bootstrap/main`.
 **Secondary:** `xuejin-lu/lattigo/fast-qprefix`; initial pin `1e7828293c36f9845e30723ba4e9500d84bb50d2`.
 **Genuine Standard:** original clean `xuejin-lu/lattigo@5dbffbdea05394de2ca3a432ed5318aa832e3f40` (isolated checkout, read-only).
 **Scientific handoff baseline:** Primary `574a1aee5ce5b0e329096095de3eda1b2df7bd1b`. Reviewed prior interpretation: `results/FIXED-SIGMA-PROPAGATION-003/web-review.md`.
 **Frozen coefficient noise σ:** EXACTLY `4.004280012097432`. The numeric value is an empirical fit to the prior **Add-containing** fixture and is *not* universal or re-fit here.
-**Explicit compute budget:** at most **2 genuine Standard two-stage chains**, at most **16 Fast two-stage chains total**, **zero Standard/Fast Bootstrap**, zero LogN16 workload/chain, zero BTS/multiparty, no broad benchmark or implicit Bootstrap tests. Counters persist across interrupted sessions. Existing completed batch budgets/results cannot be reused or overwritten.
+**Effective compute budget:** at most **2 genuine Standard two-stage chains** and **16 actual Fast two-stage chain executions**; at most **17 Fast launch attempts** only under the single F5-R1 exception below. Standard/Fast Bootstrap, LogN16 workload/chain, BTS/multiparty, broad benchmarks and implicit Bootstrap tests remain at zero. Counters persist across interrupted sessions. Existing completed batch budgets/results cannot be reused or overwritten.
+
+## Web ruling addendum — one pre-chain replacement only (2026-10-22)
+
+The user relayed the completed independent Web review decision `AUTHORIZED_ONE_PRECHAIN_REPLACEMENT`. The original F5 launch remains permanently recorded as a CLI flag-parse failure; it is excluded from **actual chain executions** because the runner returned before any ciphertext operation. This one-time ruling supersedes only the original attempt-accounting treatment of that known F5 pre-chain failure.
+
+- Preserve F5 and authorize exactly one linked launch slot `F5-R1`, using `direct-base`, `OFF/OFF`, stage seeds `20261103` and `20261104`, frozen σ `4.004280012097432`, original parameters, Fast commit `1e7828293c36f9845e30723ba4e9500d84bb50d2`, and the unchanged direct-mul implementation source. F5-R1 is the same deterministic sample; it does not select new seeds or tune the experiment.
+- The total Fast launch-attempt ceiling is 17, with exactly one known pre-chain CLI failure allowed (the original F5). The actual Fast chain-execution ceiling remains 16. The ledger must separately count launch attempts and actual chain executions; it must not rewrite the original F5 as unlaunched or erase it from launch history.
+- At authorization, 5 Fast chains have completed and 6 Fast launches are recorded. F5-R1 plus the 10 remaining original Fast slots may produce at most 11 additional actual Fast chains. Genuine Standard remains spent at 2/2. Bootstrap, LogN16 workload, BTS and multiparty remain 0.
+- F5-R1 must be the only replacement record. Any new unexpected failure, including another pre-chain error, stops the task immediately; this ruling authorizes no further retry or replacement and does not relax any capacity, oracle, dispatch, provenance or representation gate.
+- Before F5-R1, run a CLI parse/validation check with an intentionally invalid direct-mul C-variant so the binary rejects before loading CKKS parameters or running any homomorphic operation. Then run the exact corrected flags with no positional `mul-rescale-chain` argument.
 
 ## 1. Why this new experiment exists
 

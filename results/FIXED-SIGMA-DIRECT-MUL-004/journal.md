@@ -1,6 +1,6 @@
 # FIXED-SIGMA-DIRECT-MUL-004 — durable experiment journal
 
-**Status:** `BATCH_BLOCKED_NEEDS_WEB_REVIEW`. CP-A and CP-B are complete. CP-C stopped after the F5 runner invocation failed during flag parsing before any multiplication chain ran. No retry or replacement sample was launched.
+**Status:** `BATCH_IN_PROGRESS`. CP-A and CP-B remain complete. Web has authorized exactly one linked pre-chain replacement, F5-R1; it has not yet been launched. CP-C resumes with all original successful captures preserved.
 **Prior:** `FIXED-SIGMA-PROPAGATION-003` results remain unchanged; Web review in `../FIXED-SIGMA-PROPAGATION-003/web-review.md`.
 **Authoritative spec:** `../../specs/FIXED-SIGMA-DIRECT-MUL-004.md`.
 
@@ -16,8 +16,10 @@
 
 | Metric | Used | Maximum |
 |---|---:|---:|
-| Fast two-stage chains completed | 5 | 16 |
-| Fast launch slots consumed, including failed pre-chain F5 invocation | 6 | 16 |
+| Fast actual two-stage chain executions completed | 5 | 16 |
+| Fast launch attempts recorded, including original F5 parser failure | 6 | 17 |
+| Known pre-chain CLI failures / authorized maximum | 1 | 1 |
+| Authorized replacement F5-R1 | NOT_LAUNCHED | 1 |
 | Genuine Standard two-stage chains completed | 2 | 2 |
 | Standard Bootstrap calls | 0 | 0 |
 | Fast Bootstrap calls | 0 | 0 |
@@ -28,10 +30,10 @@
 |---|---|
 | CP-A new-workload source/math/capacity gates | COMPLETE |
 | CP-B direct A×B→×C baseline | COMPLETE |
-| CP-C fixed σ four-arm experiment | BLOCKED after F5 invocation failure; no retry |
-| CP-D full analysis/provenance/commit | NOT_RUN; CP-C stop condition applies |
+| CP-C fixed σ four-arm experiment | IN_PROGRESS under one authorized F5-R1 replacement |
+| CP-D full analysis/provenance/commit | NOT_STARTED |
 
-The paired numerical analysis and aggregate stage/tail metrics are **NOT_RUN** because the frozen CP-C matrix is incomplete. The seven validated captures and their SHA-256 index are preserved under `captures/`; binary and ledger hashes are recorded in the CP-C incident section below. Avoid broad `go test` selecting unrelated LogN16 parameter construction. No Bootstrap calls are authorized.
+The paired numerical analysis and aggregate stage/tail metrics remain **NOT_RUN** until CP-C completes. The seven validated captures and their SHA-256 index remain preserved under `captures/`; the original F5 failure remains in the ledger and is not counted as an actual chain. No Bootstrap calls are authorized.
 
 ## CP-A — completed source, scale and capacity preflight
 
@@ -131,6 +133,18 @@ At ledger freeze: Standard `0/2`, Fast `0/16`, Bootstrap `0/0`, LogN16 `0`, BTS 
 - The first `direct-base` seed pair completed all four Fast arms: F1–F4, seeds 20261101/20261102. For `direct-c4`, only its first-pair Fast `OFF/OFF` reference F9 completed. This is not a complete two-pair CP-C matrix.
 - Before finalizing the baseline validators, the scratch pre-next-call checker initially used three stale schema assumptions: it matched evaluator-construction text containing “bootstrap” as if it were a Bootstrap call, expected `canonical_input_sha256` instead of `input_sha256`, and expected `q0123` instead of `q0123_product`. These checker-only assertions were corrected against the maintained artifact schema before continuing. No multiplication chain was relaunched to repair a result, and Bootstrap count remained zero.
 - F5 was marked `LAUNCH_COMMITTED` and the process exited 1 before entering the chain. The invocation mistakenly included the positional word `mul-rescale-chain`; this binary accepts global flags and the boolean `--mul-rescale-chain` flag. Go's `flag.Parse` stopped at that positional argument, so the required flags were not parsed and `run()` returned `perfprobe: --config, --out, --backend-commit, --backend-ref, and --secondary-root are required`. The source parser/required-flag check is in `cmd/perfprobe/main.go` around lines 210–255. Neither F5 output file exists; no MulRelin, Rescale, noise injection, or Bootstrap call occurred in F5.
-- The frozen ledger policy counts every launched slot, including a process-level failure, as consumed and forbids retry/replacement. Therefore F5 remains `FAILED_CONSUMED`; no subsequent Fast slot was launched. CP-C stopped with 5 successful Fast chains and 6 consumed Fast launch slots. S1/S2 are the 2/2 Standard chains. Bootstrap 0/0, LogN16 0, BTS 0.
+- At the time of the incident, the pre-ruling ledger policy counted every launched slot as consumed and stopped the batch. F5 remains `FAILED_CONSUMED`; it is not changed into a successful or unlaunched record. The incident checkpoint had 5 actual Fast chains, 6 launch attempts and 2/2 Standard chains. Bootstrap 0/0, LogN16 0, BTS 0.
 - Seven validated capture pairs (2 Standard + 5 Fast; 55,915,277 bytes total) are preserved in `captures/`. `captures/SHA256SUMS` indexes each result/vector file; the durable copy of the attempt ledger is `attempt-ledger.json`. Ledger SHA-256 is `70fc601b82497ef19a9c4678c9b02d053f9bfa0ea4374af824ed61699ccf7401`; checksum-index SHA-256 is `8245793a1162c756659bddc2193a6d0e251a5f5da634b6a36788986847873545`. Binary SHA-256: Standard `2a44e3f89d055d4a70b294d70b9b265edee3e9f5451c5877a3491f1f2ae2a83c`; Fast `a7083bc12aa1d3da062c0b094b99f5c4fbcf3ceb8d86ea92f981ad73ab9db2ff`. Both binaries were built from Primary source commit `977d853541cf59b37e42cdfc1e635bc0cab7862d` with the intended isolated backend module sources recorded in the pre-capture review.
-- No aggregate stagewise RMSE, propagation decomposition, tail statistic or frozen ±10% screen is reported because the required matched matrix is incomplete. CP-D was not started after the CP-C stop condition. Resumption requires independent Web review of the consumed pre-chain F5 launch and explicit direction on any further attempt budget; the fixed σ and original seeds remain unchanged.
+- No aggregate stagewise RMSE, propagation decomposition, tail statistic or frozen ±10% screen was reported at the blocked checkpoint because the matched matrix was incomplete. The fixed σ and original seeds remained unchanged.
+
+## Web ruling and authorized resumption — 2026-10-22
+
+- The user relayed independent Web approval classified `AUTHORIZED_ONE_PRECHAIN_REPLACEMENT`. The ruling confirms F5 failed at CLI parsing before ciphertext work and is not an actual chain execution. The original F5 attempt remains permanently in the attempt history.
+- Exactly one additional linked launch record, `F5-R1`, is authorized: same `direct-base` workload, `OFF/OFF` arm, stage seeds `20261103`/`20261104`, frozen σ, E32 LogN13 parameters, Fast source commit and direct-mul source implementation. No new Standard call is authorized.
+- Effective accounting is 5/16 actual Fast chains completed, 6/17 Fast launch attempts recorded, and 1/1 known pre-chain parse failure (the original F5). F5-R1 plus the 10 remaining original Fast slots can add at most 11 actual Fast chains. Any additional failure stops immediately; no second replacement is authorized.
+- Recovery preflight: Primary began clean on `main@8f203f8beba7fcc06a988c712272bce73c8b51e3`, fetched `origin`, verified `origin/main` was the ancestor, and verified the three ahead commits were task-owned. The three commits were pushed normally; after push local `HEAD` and `origin/main` both equaled `8f203f8beba7fcc06a988c712272bce73c8b51e3`. Normal push first failed DNS resolution for `github.com`; one formal network-permission retry succeeded with fast-forward `5f9174a..8f203f8`.
+- Secondary was checked on `fast-qprefix`, clean at `1e7828293c36f9845e30723ba4e9500d84bb50d2`; `git fetch origin` succeeded through the formal metadata-permission retry, and `origin/fast-qprefix` matched exactly. Secondary source remains unchanged.
+- The existing `cmd/perfprobe` direct-chain source is unchanged since Primary commit `977d853541cf59b37e42cdfc1e635bc0cab7862d`. Rebuild the Fast binary from the committed current Primary HEAD before use because `fixedSigmaChainBinaryProvenance` requires the binary build revision to equal Primary HEAD; verify the source fingerprint and Fast module path/commit remain the frozen implementation. Keep the original 7 validated captures and SHA index unchanged.
+- Before F5-R1, run the no-operation CLI validation with the correct global flag layout and an intentionally invalid C variant. The expected direct-mul variant validation error must occur before config loading/parameter construction; confirm no output files or chain counters change. Only then launch the corrected exact F5-R1 command, with `--mul-rescale-chain` among flags and no positional command word.
+- The authorization checkpoint attempt ledger SHA-256 is `dc050c051d6f5ffa57cdbcf456c730bc415bd30b99b228f3138a9c0016af8072`; its accounting is 6/17 Fast launches and 5/16 actual Fast chains, with one authorized replacement slot unused. The seven-pair capture checksum index SHA-256 remains `8245793a1162c756659bddc2193a6d0e251a5f5da634b6a36788986847873545`; all 14 indexed files verify.
+- In an isolated temporary copy of the operational ledger, `start F5-R1` was exercised without touching the durable ledger. It recorded launch 7/17 while retaining 5/16 completed chains; the durable ledger remains `NOT_LAUNCHED` for F5-R1.

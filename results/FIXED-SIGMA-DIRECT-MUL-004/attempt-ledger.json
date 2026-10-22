@@ -1,10 +1,33 @@
 {
+  "accounting": {
+    "actual_chain_executions": {
+      "fast": 5,
+      "standard": 2
+    },
+    "authorized_replacement_slots": 1,
+    "known_prechain_failures": {
+      "fast": 1,
+      "standard": 0
+    },
+    "launch_attempts": {
+      "fast": 6,
+      "standard": 2
+    },
+    "replacement_launches": 0
+  },
+  "accounting_semantics": {
+    "actual_chain_executed": "true only after entering and completing the two-stage chain; false for verified pre-chain F5; null while not launched",
+    "ceilings.fast": "actual_chain_executions",
+    "launch_attempt_ceilings.fast": "all started Fast processes including the preserved original F5 failure"
+  },
   "attempts": [
     {
+      "actual_chain_executed": true,
       "arm": "OFF/OFF",
       "backend": "standard",
       "exit_code": 0,
       "finished_at_utc": "2026-10-22T00:36:07.709568+00:00",
+      "launch_attempted": true,
       "launched_at_utc": "2026-10-22T00:35:51.674757+00:00",
       "result": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/standard-direct-base-s1.result.json",
       "slot": "S1",
@@ -16,10 +39,12 @@
       "workload": "direct-base"
     },
     {
+      "actual_chain_executed": true,
       "arm": "OFF/OFF",
       "backend": "standard",
       "exit_code": 0,
       "finished_at_utc": "2026-10-22T00:36:25.719110+00:00",
+      "launch_attempted": true,
       "launched_at_utc": "2026-10-22T00:36:12.111956+00:00",
       "result": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/standard-direct-c4-s1.result.json",
       "slot": "S2",
@@ -31,10 +56,12 @@
       "workload": "direct-c4"
     },
     {
+      "actual_chain_executed": true,
       "arm": "OFF/OFF",
       "backend": "fast",
       "exit_code": 0,
       "finished_at_utc": "2026-10-22T00:36:46.946386+00:00",
+      "launch_attempted": true,
       "launched_at_utc": "2026-10-22T00:36:29.247201+00:00",
       "result": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-base-s1-off-off.result.json",
       "slot": "F1",
@@ -46,10 +73,12 @@
       "workload": "direct-base"
     },
     {
+      "actual_chain_executed": true,
       "arm": "ON/OFF",
       "backend": "fast",
       "exit_code": 0,
       "finished_at_utc": "2026-10-22T00:39:16.221699+00:00",
+      "launch_attempted": true,
       "launched_at_utc": "2026-10-22T00:39:05.901589+00:00",
       "result": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-base-s1-on-off.result.json",
       "slot": "F2",
@@ -61,10 +90,12 @@
       "workload": "direct-base"
     },
     {
+      "actual_chain_executed": true,
       "arm": "OFF/ON",
       "backend": "fast",
       "exit_code": 0,
       "finished_at_utc": "2026-10-22T00:39:38.597497+00:00",
+      "launch_attempted": true,
       "launched_at_utc": "2026-10-22T00:39:37.311397+00:00",
       "result": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-base-s1-off-on.result.json",
       "slot": "F3",
@@ -76,10 +107,12 @@
       "workload": "direct-base"
     },
     {
+      "actual_chain_executed": true,
       "arm": "ON/ON",
       "backend": "fast",
       "exit_code": 0,
       "finished_at_utc": "2026-10-22T00:39:48.267585+00:00",
+      "launch_attempted": true,
       "launched_at_utc": "2026-10-22T00:39:46.917647+00:00",
       "result": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-base-s1-on-on.result.json",
       "slot": "F4",
@@ -91,10 +124,14 @@
       "workload": "direct-base"
     },
     {
+      "actual_chain_executed": false,
       "arm": "OFF/OFF",
       "backend": "fast",
       "exit_code": 1,
+      "failure_classification": "PRECHAIN_CLI_FLAG_PARSE_FAILURE",
+      "failure_reason": "The positional token mul-rescale-chain stopped flag.Parse before required flags; process exited before config loading or any ciphertext operation.",
       "finished_at_utc": "2026-10-22T00:40:48.295968+00:00",
+      "launch_attempted": true,
       "launched_at_utc": "2026-10-22T00:40:48.189552+00:00",
       "result": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-base-s2-off-off.result.json",
       "slot": "F5",
@@ -105,8 +142,25 @@
       "workload": "direct-base"
     },
     {
+      "actual_chain_executed": null,
+      "arm": "OFF/OFF",
+      "authorization": "AUTHORIZED_ONE_PRECHAIN_REPLACEMENT",
+      "backend": "fast",
+      "launch_attempted": false,
+      "replaces_slot": "F5",
+      "result": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-base-s2-off-off-f5-r1.result.json",
+      "slot": "F5-R1",
+      "stage1_seed": 20261103,
+      "stage2_seed": 20261104,
+      "state": "NOT_LAUNCHED",
+      "vectors": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-base-s2-off-off-f5-r1.vectors.json",
+      "workload": "direct-base"
+    },
+    {
+      "actual_chain_executed": null,
       "arm": "ON/OFF",
       "backend": "fast",
+      "launch_attempted": false,
       "result": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-base-s2-on-off.result.json",
       "slot": "F6",
       "stage1_seed": 20261103,
@@ -116,8 +170,10 @@
       "workload": "direct-base"
     },
     {
+      "actual_chain_executed": null,
       "arm": "OFF/ON",
       "backend": "fast",
+      "launch_attempted": false,
       "result": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-base-s2-off-on.result.json",
       "slot": "F7",
       "stage1_seed": 20261103,
@@ -127,8 +183,10 @@
       "workload": "direct-base"
     },
     {
+      "actual_chain_executed": null,
       "arm": "ON/ON",
       "backend": "fast",
+      "launch_attempted": false,
       "result": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-base-s2-on-on.result.json",
       "slot": "F8",
       "stage1_seed": 20261103,
@@ -138,10 +196,12 @@
       "workload": "direct-base"
     },
     {
+      "actual_chain_executed": true,
       "arm": "OFF/OFF",
       "backend": "fast",
       "exit_code": 0,
       "finished_at_utc": "2026-10-22T00:37:29.695982+00:00",
+      "launch_attempted": true,
       "launched_at_utc": "2026-10-22T00:37:07.143447+00:00",
       "result": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-c4-s1-off-off.result.json",
       "slot": "F9",
@@ -153,8 +213,10 @@
       "workload": "direct-c4"
     },
     {
+      "actual_chain_executed": null,
       "arm": "ON/OFF",
       "backend": "fast",
+      "launch_attempted": false,
       "result": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-c4-s1-on-off.result.json",
       "slot": "F10",
       "stage1_seed": 20261105,
@@ -164,8 +226,10 @@
       "workload": "direct-c4"
     },
     {
+      "actual_chain_executed": null,
       "arm": "OFF/ON",
       "backend": "fast",
+      "launch_attempted": false,
       "result": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-c4-s1-off-on.result.json",
       "slot": "F11",
       "stage1_seed": 20261105,
@@ -175,8 +239,10 @@
       "workload": "direct-c4"
     },
     {
+      "actual_chain_executed": null,
       "arm": "ON/ON",
       "backend": "fast",
+      "launch_attempted": false,
       "result": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-c4-s1-on-on.result.json",
       "slot": "F12",
       "stage1_seed": 20261105,
@@ -186,8 +252,10 @@
       "workload": "direct-c4"
     },
     {
+      "actual_chain_executed": null,
       "arm": "OFF/OFF",
       "backend": "fast",
+      "launch_attempted": false,
       "result": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-c4-s2-off-off.result.json",
       "slot": "F13",
       "stage1_seed": 20261107,
@@ -197,8 +265,10 @@
       "workload": "direct-c4"
     },
     {
+      "actual_chain_executed": null,
       "arm": "ON/OFF",
       "backend": "fast",
+      "launch_attempted": false,
       "result": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-c4-s2-on-off.result.json",
       "slot": "F14",
       "stage1_seed": 20261107,
@@ -208,8 +278,10 @@
       "workload": "direct-c4"
     },
     {
+      "actual_chain_executed": null,
       "arm": "OFF/ON",
       "backend": "fast",
+      "launch_attempted": false,
       "result": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-c4-s2-off-on.result.json",
       "slot": "F15",
       "stage1_seed": 20261107,
@@ -219,8 +291,10 @@
       "workload": "direct-c4"
     },
     {
+      "actual_chain_executed": null,
       "arm": "ON/ON",
       "backend": "fast",
+      "launch_attempted": false,
       "result": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-c4-s2-on-on.result.json",
       "slot": "F16",
       "stage1_seed": 20261107,
@@ -238,7 +312,24 @@
     "standard": 2
   },
   "fast_commit": "1e7828293c36f9845e30723ba4e9500d84bb50d2",
+  "launch_attempt_ceilings": {
+    "fast": 17,
+    "standard": 2
+  },
   "primary_commit": "977d853541cf59b37e42cdfc1e635bc0cab7862d",
+  "replacement_authorization": {
+    "authority": "User-relayed completed independent Web review",
+    "authorized_date": "2026-10-22",
+    "classification": "AUTHORIZED_ONE_PRECHAIN_REPLACEMENT",
+    "constraints": "Same workload, arm, seeds, sigma, parameters and implementation; no further replacement is authorized.",
+    "fast_actual_chain_execution_ceiling": 16,
+    "fast_actual_chain_executions_before_resume": 5,
+    "fast_launch_attempt_ceiling": 17,
+    "fast_launch_attempts_before_resume": 6,
+    "original_failed_slot": "F5",
+    "replacement_launches_max": 1,
+    "replacement_slot": "F5-R1"
+  },
   "sigma": 4.004280012097432,
   "standard_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
   "task": "FIXED-SIGMA-DIRECT-MUL-004"
