@@ -1,6 +1,6 @@
 # FIXED-SIGMA-DIRECT-MUL-004 — direct-mul experiment result summary
 
-**PLANNED_NOT_RUN** — no numerical results yet. This is a durable reporting template and must never be presented as a completed experiment.
+**BATCH_IN_PROGRESS** — CP-A passed; no ciphertext-chain numerical results have been collected yet.
 
 **Question:** Does the σ calibrated on the historical `(A+B)×C` fixture transfer to genuinely direct `A×B` and `(A×B)×C` with no Add?
 
@@ -14,6 +14,21 @@ Frozen σ: `4.004280012097432`; genuine Standard `5dbffbdea05394de2ca3a432ed5318
 | Direct-c4 Stage1 and Stage2 metrics | NOT_RUN | NOT_RUN | NOT_RUN | NOT_RUN | NOT_RUN |
 | Propagated `P1`, exact residual decomposition and tails | NOT_RUN | NOT_RUN | NOT_RUN | NOT_RUN | NOT_RUN |
 | Actual Level/Scale, strict capacity and built source | NOT_RUN | NOT_RUN | NOT_RUN | NOT_RUN | NOT_RUN |
+
+## CP-A preflight
+
+Effective profile: LogN13/E32, 4096 slots, Δ=`2^45`, RingN=8192, Q=`q0…q16`; the experiment touches Levels 5→4→3 and four active Q-prefix rows `q0..q3`. Effective `q4=549756174337`, `q5=1152921504606830593`, Q/P SHA-256 `1f045e603a856968779d62e045a037274bba08cbfce8b1dd3dec2828f1f6a46b`.
+
+Both direct-base and direct-c4 passed all eight strict `2B < q0q1q2q3` checks. Their exact input hashes, workload hashes, bounds and CP-A source/test evidence are in [journal.md](journal.md). The shared `perfmeasure` focused test passed. No ciphertext chain, Bootstrap, LogN16 workload or BTS has run.
+
+## Durable attempt counters
+
+- Fast two-stage chains: `0/16`
+- Genuine Standard two-stage chains: `0/2`
+- Bootstrap: `0/0`
+- LogN16 workload / BTS: `0/0`
+
+CP-B remains in progress. Frozen σ, seed schedule, workload identities and ±10% descriptive screen are fixed before numerical capture. See the journal for the current checkpoint table and safe synchronization evidence.
 
 `SCOPED_RMS_TRANSFER_SCREEN_PASS` only if two stagewise relative RMS discrepancies to genuine Standard are within predeclared ±10% for **both workloads** and all tested ON/ON seed arms; this is a descriptive screen, not statistical equivalence. Always separately report variance, signed bias, p95/p99/p99.9 and maximum mismatch, and any failure to meet the band. No tuning σ after viewing results.
 
