@@ -1,7 +1,7 @@
 {
   "accounting": {
     "actual_chain_executions": {
-      "fast": 6,
+      "fast": 7,
       "standard": 2
     },
     "authorized_replacement_slots": 2,
@@ -197,11 +197,27 @@
       "workload": "direct-base"
     },
     {
-      "actual_chain_executed": null,
+      "actual_chain_executed": true,
       "arm": "ON/OFF",
+      "artifact_validation": {
+        "archive_result": "captures/fast-direct-base-s2-on-off.result.json",
+        "archive_result_sha256": "cf038c517ee9f0804497867aa7a542cc21c17bcb7553174f718ed75b8defc4b5",
+        "archive_vectors": "captures/fast-direct-base-s2-on-off.vectors.json",
+        "archive_vectors_sha256": "eb9da919f2ffee2ced0ce166b349f838ed53324a0c0710c2367c674e6a806712",
+        "bootstrap_calls": 0,
+        "capacity": "STRICT_QPREFIX_FIT",
+        "injections": 1,
+        "operations": 2,
+        "oracles_passed": 7,
+        "status": "PASS_ZERO_BOOTSTRAP_DIRECT_CTCT_CHAIN",
+        "validator": "tmp/FIXED-SIGMA-DIRECT-MUL-004/validate_fast_capture.py",
+        "validator_sha256": "cf62e9342b13cd6881d5f4196d1ecb3061efba774e694957b636838b2564dd8a"
+      },
       "backend": "fast",
       "binary_path": "/private/tmp/fixed-sigma-direct-mul-004-fast-build-20261022/perfprobe-fast-clone",
       "binary_sha256": "bde01f61c36f70dc70939eb12d72f3a42ce07a925942904939b54e516cafae17",
+      "exit_code": 0,
+      "finished_at_utc": "2026-10-22T02:43:51.613325+00:00",
       "launch_attempted": true,
       "launched_at_utc": "2026-10-22T02:43:15.805360+00:00",
       "prelaunch_provenance": {
@@ -218,7 +234,8 @@
       "slot": "F6",
       "stage1_seed": 20261103,
       "stage2_seed": 20261104,
-      "state": "LAUNCH_COMMITTED",
+      "state": "PASS_VALIDATED",
+      "validated_at_utc": "2026-10-22T02:43:56.161346+00:00",
       "vectors": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-base-s2-on-off.vectors.json",
       "workload": "direct-base"
     },
