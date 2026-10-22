@@ -155,6 +155,7 @@ type cliOptions struct {
 	fixedSigmaSigmaProvided bool
 	fixedSigmaSeedProvided  bool
 	mulRescaleChain         bool
+	fixedSigmaWorkload      string
 	fixedSigmaAblationArm   string
 	fixedSigmaCVariant      string
 }
@@ -234,6 +235,7 @@ func run() error {
 	flag.Float64Var(&opts.fixedSigmaNoiseSigma, "fixed-sigma-noise-sigma", 0, "fixed-sigma diagnostic coefficient-domain standard deviation; requires --fixed-sigma-noise")
 	flag.Int64Var(&opts.fixedSigmaNoiseSeed, "fixed-sigma-noise-seed", 0, "deterministic fixed-sigma sampler seed; required by --fixed-sigma-noise or --fixed-sigma-ablation-arm")
 	flag.BoolVar(&opts.mulRescaleChain, "mul-rescale-chain", false, "public-native zero-Bootstrap two-step ct×ct MulRelin+Rescale diagnostic chain")
+	flag.StringVar(&opts.fixedSigmaWorkload, "fixed-sigma-workload", "", "explicit versioned workload fixture: direct-ctct-v1")
 	flag.StringVar(&opts.fixedSigmaAblationArm, "fixed-sigma-ablation-arm", "", "research-only chain arm: OFF/OFF, ON/OFF, OFF/ON, or ON/ON; uses the frozen task sigma")
 	flag.StringVar(&opts.fixedSigmaCVariant, "fixed-sigma-c-variant", "", "research-only chain C input: canonical or stronger-c4")
 	flag.Parse()
@@ -514,6 +516,12 @@ func run() error {
 }
 
 func validateFixedSigmaNoiseOptions(opts cliOptions) error {
+	if opts.fixedSigmaWorkload != "" && opts.fixedSigmaWorkload != perfmeasure.PublicDirectMulWorkloadID {
+		return fmt.Errorf("unsupported fixed-sigma workload fixture %q", opts.fixedSigmaWorkload)
+	}
+	if opts.fixedSigmaWorkload != "" && (!opts.mulRescaleChain || opts.fixedSigmaAblationArm == "" || opts.mode != "public-native") {
+		return errors.New("direct-ctct-v1 requires an explicit zero-Bootstrap public-native MulRelin+Rescale ablation run")
+	}
 	if opts.fixedSigmaCVariant != "" && opts.fixedSigmaAblationArm == "" {
 		return errors.New("--fixed-sigma-c-variant requires --fixed-sigma-ablation-arm")
 	}
@@ -529,7 +537,11 @@ func validateFixedSigmaNoiseOptions(opts cliOptions) error {
 			opts.profile != "logn13" || !opts.fixedSigmaSeedProvided {
 			return errors.New("--fixed-sigma-ablation-arm requires a seeded zero-Bootstrap LogN13 public-native --mul-rescale-chain run")
 		}
-		if opts.fixedSigmaCVariant != "canonical" && opts.fixedSigmaCVariant != "stronger-c4" {
+		if opts.fixedSigmaWorkload == perfmeasure.PublicDirectMulWorkloadID {
+			if opts.fixedSigmaCVariant != "direct-base" && opts.fixedSigmaCVariant != "direct-c4" {
+				return errors.New("direct-ctct-v1 requires --fixed-sigma-c-variant=direct-base or direct-c4")
+			}
+		} else if opts.fixedSigmaCVariant != "canonical" && opts.fixedSigmaCVariant != "stronger-c4" {
 			return errors.New("--fixed-sigma-ablation-arm requires --fixed-sigma-c-variant=canonical or stronger-c4")
 		}
 		if opts.fixedSigmaNoiseSeed == int64(^uint64(0)>>1) {

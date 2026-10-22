@@ -172,6 +172,7 @@ type publicBackend struct {
 type publicCheckpoint struct {
 	Name               string               `json:"name"`
 	State              ciphertextState      `json:"state"`
+	CiphertextDomain   string               `json:"ciphertext_domain,omitempty"`
 	DecodePath         string               `json:"decode_path"`
 	PhysicalRowLengths [][]int              `json:"physical_row_lengths_by_component"`
 	RowSHA256          [][]string           `json:"active_row_sha256_by_component"`
@@ -184,62 +185,63 @@ type publicCheckpoint struct {
 }
 
 type publicNativeDocument struct {
-	SchemaVersion              string                              `json:"schema_version"`
-	Mode                       string                              `json:"mode"`
-	Status                     string                              `json:"status"`
-	Timestamp                  time.Time                           `json:"timestamp"`
-	Profile                    string                              `json:"profile"`
-	ProfileKind                string                              `json:"profile_kind,omitempty"`
-	Backend                    string                              `json:"backend"`
-	BackendCommit              string                              `json:"backend_commit"`
-	BackendRef                 string                              `json:"backend_ref"`
-	BackendCheckoutRef         string                              `json:"backend_checkout_ref"`
-	BackendPath                string                              `json:"backend_path"`
-	BackendClean               bool                                `json:"backend_clean"`
-	BinarySHA256               string                              `json:"built_binary_sha256"`
-	PrimaryPath                string                              `json:"primary_path"`
-	PrimaryCommit              string                              `json:"primary_commit"`
-	PrimaryClean               bool                                `json:"primary_clean"`
-	PrimarySourceSHA256        string                              `json:"primary_measurement_source_sha256"`
-	BuildTag                   string                              `json:"build_tag"`
-	GoVersion                  string                              `json:"go_version"`
-	OS                         string                              `json:"os"`
-	Arch                       string                              `json:"arch"`
-	CPU                        string                              `json:"cpu"`
-	NumCPU                     int                                 `json:"num_cpu"`
-	GOMAXPROCS                 int                                 `json:"gomaxprocs"`
-	GOGC                       string                              `json:"gogc"`
-	GOMEMLIMIT                 string                              `json:"gomemlimit"`
-	GODEBUG                    string                              `json:"godebug"`
-	ConfigPath                 string                              `json:"config_path"`
-	ConfigSHA256               string                              `json:"config_sha256"`
-	QPSHA256                   string                              `json:"qp_sha256"`
-	InputSHA256                string                              `json:"canonical_input_sha256"`
-	WorkloadSHA256             string                              `json:"workload_sha256"`
-	Parameters                 perfmeasure.EffectiveParameters     `json:"effective_parameters"`
-	EphemeralSecretWeight      int                                 `json:"ephemeral_secret_weight"`
-	InputSlots                 int                                 `json:"input_slots"`
-	InputKind                  string                              `json:"input_kind"`
-	InputConstructor           string                              `json:"input_constructor"`
-	InputC1Nonzero             bool                                `json:"input_c1_nonzero"`
-	PublicEvaluatorDispatch    string                              `json:"public_evaluator_dispatch"`
-	PreflightPairSHA256        string                              `json:"preflight_pair_sha256,omitempty"`
-	CapacityEvidenceVersion    string                              `json:"capacity_evidence_version"`
-	CapacityPolicy             string                              `json:"capacity_policy"`
-	ConservativeBoundStatus    string                              `json:"conservative_bound_status"`
-	ObservedNativeOracleStatus string                              `json:"observed_native_oracle_status"`
-	Level0Continuity           vectorMetrics                       `json:"level4_to_level0_continuity"`
-	Capacity                   perfmeasure.PublicCapacityPlan      `json:"capacity_plan"`
-	NumericalGate              float64                             `json:"max_complex_numerical_gate"`
-	BootstrapBudget            int                                 `json:"bootstrap_budget"`
-	BootstrapCalls             int                                 `json:"actual_bootstrap_calls"`
-	ExecutionPhases            []phaseTiming                       `json:"execution_phases"`
-	Checkpoints                []publicCheckpoint                  `json:"checkpoints"`
-	MulRelinRescaleResidual    *publicOperationResidual            `json:"mul_relin_rescale_incremental_residual,omitempty"`
-	MulRelinRescaleTotalError  numericalmetrics.ComplexVectorStats `json:"mul_relin_rescale_total_error,omitempty"`
-	FixedSigmaChain            *fixedSigmaChainEvidence            `json:"fixed_sigma_two_step_chain,omitempty"`
-	BootstrapResults           []publicBootstrapResult             `json:"bootstrap_results,omitempty"`
-	Limitations                []string                            `json:"limitations"`
+	SchemaVersion              string                                   `json:"schema_version"`
+	Mode                       string                                   `json:"mode"`
+	Status                     string                                   `json:"status"`
+	Timestamp                  time.Time                                `json:"timestamp"`
+	Profile                    string                                   `json:"profile"`
+	ProfileKind                string                                   `json:"profile_kind,omitempty"`
+	Backend                    string                                   `json:"backend"`
+	BackendCommit              string                                   `json:"backend_commit"`
+	BackendRef                 string                                   `json:"backend_ref"`
+	BackendCheckoutRef         string                                   `json:"backend_checkout_ref"`
+	BackendPath                string                                   `json:"backend_path"`
+	BackendClean               bool                                     `json:"backend_clean"`
+	BinarySHA256               string                                   `json:"built_binary_sha256"`
+	PrimaryPath                string                                   `json:"primary_path"`
+	PrimaryCommit              string                                   `json:"primary_commit"`
+	PrimaryClean               bool                                     `json:"primary_clean"`
+	PrimarySourceSHA256        string                                   `json:"primary_measurement_source_sha256"`
+	BuildTag                   string                                   `json:"build_tag"`
+	GoVersion                  string                                   `json:"go_version"`
+	OS                         string                                   `json:"os"`
+	Arch                       string                                   `json:"arch"`
+	CPU                        string                                   `json:"cpu"`
+	NumCPU                     int                                      `json:"num_cpu"`
+	GOMAXPROCS                 int                                      `json:"gomaxprocs"`
+	GOGC                       string                                   `json:"gogc"`
+	GOMEMLIMIT                 string                                   `json:"gomemlimit"`
+	GODEBUG                    string                                   `json:"godebug"`
+	ConfigPath                 string                                   `json:"config_path"`
+	ConfigSHA256               string                                   `json:"config_sha256"`
+	QPSHA256                   string                                   `json:"qp_sha256"`
+	InputSHA256                string                                   `json:"canonical_input_sha256"`
+	WorkloadSHA256             string                                   `json:"workload_sha256"`
+	Parameters                 perfmeasure.EffectiveParameters          `json:"effective_parameters"`
+	EphemeralSecretWeight      int                                      `json:"ephemeral_secret_weight"`
+	InputSlots                 int                                      `json:"input_slots"`
+	InputKind                  string                                   `json:"input_kind"`
+	InputConstructor           string                                   `json:"input_constructor"`
+	InputC1Nonzero             bool                                     `json:"input_c1_nonzero"`
+	PublicEvaluatorDispatch    string                                   `json:"public_evaluator_dispatch"`
+	PreflightPairSHA256        string                                   `json:"preflight_pair_sha256,omitempty"`
+	CapacityEvidenceVersion    string                                   `json:"capacity_evidence_version"`
+	CapacityPolicy             string                                   `json:"capacity_policy"`
+	ConservativeBoundStatus    string                                   `json:"conservative_bound_status"`
+	ObservedNativeOracleStatus string                                   `json:"observed_native_oracle_status"`
+	Level0Continuity           vectorMetrics                            `json:"level4_to_level0_continuity"`
+	Capacity                   perfmeasure.PublicCapacityPlan           `json:"capacity_plan"`
+	DirectMulCapacity          *perfmeasure.PublicDirectMulCapacityPlan `json:"direct_mul_capacity_plan,omitempty"`
+	NumericalGate              float64                                  `json:"max_complex_numerical_gate"`
+	BootstrapBudget            int                                      `json:"bootstrap_budget"`
+	BootstrapCalls             int                                      `json:"actual_bootstrap_calls"`
+	ExecutionPhases            []phaseTiming                            `json:"execution_phases"`
+	Checkpoints                []publicCheckpoint                       `json:"checkpoints"`
+	MulRelinRescaleResidual    *publicOperationResidual                 `json:"mul_relin_rescale_incremental_residual,omitempty"`
+	MulRelinRescaleTotalError  numericalmetrics.ComplexVectorStats      `json:"mul_relin_rescale_total_error,omitempty"`
+	FixedSigmaChain            *fixedSigmaChainEvidence                 `json:"fixed_sigma_two_step_chain,omitempty"`
+	BootstrapResults           []publicBootstrapResult                  `json:"bootstrap_results,omitempty"`
+	Limitations                []string                                 `json:"limitations"`
 }
 
 type publicVectorDocument struct {
@@ -316,6 +318,7 @@ type publicOperationResidual struct {
 
 type fixedSigmaChainEvidence struct {
 	SchemaVersion          string                     `json:"schema_version"`
+	WorkloadID             string                     `json:"workload_id,omitempty"`
 	Classification         string                     `json:"classification"`
 	PrimaryBuildCommit     string                     `json:"primary_build_commit,omitempty"`
 	PrimaryBuildClean      bool                       `json:"primary_build_clean,omitempty"`
@@ -323,6 +326,9 @@ type fixedSigmaChainEvidence struct {
 	CVariant               string                     `json:"c_input_variant,omitempty"`
 	StageSeeds             [2]int64                   `json:"stage_seed_pair,omitempty"`
 	FastInputRowsSHA256    map[string]string          `json:"fast_input_active_row_sha256,omitempty"`
+	FastC1Invariant        string                     `json:"fast_c1_invariant,omitempty"`
+	FastDormantRowPolicy   string                     `json:"fast_dormant_row_policy,omitempty"`
+	FastMetadataInvariant  string                     `json:"fast_metadata_invariant,omitempty"`
 	InputRandomnessStatus  string                     `json:"input_randomness_status,omitempty"`
 	LogicalCtCtOperations  int                        `json:"logical_ct_ct_operations"`
 	LogicalNoiseInjections int                        `json:"logical_noise_injections"`

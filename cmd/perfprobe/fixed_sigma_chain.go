@@ -27,6 +27,10 @@ func runPublicFixedSigmaChain(
 	effective perfmeasure.EffectiveParameters,
 	profile publicProfileContract,
 ) error {
+	directMul := opts.fixedSigmaWorkload == perfmeasure.PublicDirectMulWorkloadID
+	if opts.fixedSigmaWorkload != "" && !directMul {
+		return fmt.Errorf("unsupported fixed-sigma workload fixture %q", opts.fixedSigmaWorkload)
+	}
 	if opts.bootstrapBudget != 0 || opts.publicBootstrap || opts.publicRepeatability || opts.preflightPair != "" || opts.traceFixtureOut != "" {
 		return errors.New("fixed-sigma two-step chain requires an explicit zero-Bootstrap public-native run")
 	}
@@ -67,17 +71,28 @@ func runPublicFixedSigmaChain(
 	if err != nil {
 		return err
 	}
-	valuesA, valuesB, valuesC, err := perfmeasure.PublicMulRescaleWorkload(effective.InputSlots)
+	var valuesA, valuesB, valuesC []complex128
+	if directMul {
+		valuesA, valuesB, valuesC, err = perfmeasure.PublicDirectMulWorkload(effective.InputSlots, opts.fixedSigmaCVariant)
+	} else {
+		valuesA, valuesB, valuesC, err = perfmeasure.PublicMulRescaleWorkload(effective.InputSlots)
+	}
 	if err != nil {
 		return err
 	}
-	if opts.fixedSigmaAblationArm != "" && opts.fixedSigmaCVariant == "stronger-c4" {
+	if !directMul && opts.fixedSigmaAblationArm != "" && opts.fixedSigmaCVariant == "stronger-c4" {
 		for index := range valuesC {
 			valuesC[index] *= 4
 		}
 	}
 	inputHash := perfmeasure.Fingerprint(valuesA)
-	if profile.InputSHA256 != "" && inputHash != profile.InputSHA256 {
+	if directMul {
+		inputHash, err = perfmeasure.PublicDirectMulInputsFingerprint(valuesA, valuesB, valuesC)
+		if err != nil {
+			return err
+		}
+	}
+	if !directMul && profile.InputSHA256 != "" && inputHash != profile.InputSHA256 {
 		return fmt.Errorf("canonical fixed-sigma chain %s input fingerprint mismatch: %s", profile.Name, inputHash)
 	}
 	full := params.BootstrappingParameters
@@ -91,16 +106,34 @@ func runPublicFixedSigmaChain(
 	}
 	defaultScale := residual.DefaultScale()
 	q5Scale, q4Scale := rlwe.NewScale(q[5]), rlwe.NewScale(q[4])
-	workloadHash, err := perfmeasure.PublicFixedSigmaChainFingerprint(
-		valuesA, valuesB, valuesC,
-		defaultScale.BigInt().String(), q5Scale.BigInt().String(), q4Scale.BigInt().String(),
-	)
+	var workloadHash string
+	if directMul {
+		workloadHash, err = perfmeasure.PublicDirectMulWorkloadFingerprint(
+			valuesA, valuesB, valuesC, opts.fixedSigmaCVariant,
+			defaultScale.BigInt().String(), q5Scale.BigInt().String(), q4Scale.BigInt().String(), qpHash,
+		)
+	} else {
+		workloadHash, err = perfmeasure.PublicFixedSigmaChainFingerprint(
+			valuesA, valuesB, valuesC,
+			defaultScale.BigInt().String(), q5Scale.BigInt().String(), q4Scale.BigInt().String(),
+		)
+	}
 	if err != nil {
 		return err
 	}
-	capacity, err := assessPublicCapacityForProfile(profile, valuesA, valuesB, valuesC, q, full.N())
-	if err != nil {
-		return fmt.Errorf("original public fixture capacity preflight: %w", err)
+	var capacity perfmeasure.PublicCapacityPlan
+	var directCapacity *perfmeasure.PublicDirectMulCapacityPlan
+	if directMul {
+		plan, capacityErr := perfmeasure.BoundPublicDirectMulChain(valuesA, valuesB, valuesC, q, full.N())
+		if capacityErr != nil {
+			return fmt.Errorf("direct A×B→×C strict Q-prefix capacity preflight: %w", capacityErr)
+		}
+		directCapacity = &plan
+	} else {
+		capacity, err = assessPublicCapacityForProfile(profile, valuesA, valuesB, valuesC, q, full.N())
+		if err != nil {
+			return fmt.Errorf("original public fixture capacity preflight: %w", err)
+		}
 	}
 	if full.LogN() != 13 || full.N() != 1<<13 || effective.LogSlots != 12 || effective.InputSlots != 1<<effective.LogSlots {
 		return errors.New("constructed fixed-sigma chain parameters do not match the accepted LogN13/4096-slot profile")
@@ -131,6 +164,12 @@ func runPublicFixedSigmaChain(
 		if err != nil {
 			return nil, err
 		}
+		if directMul {
+			cp.CiphertextDomain = fixedSigmaCiphertextDomain(ct)
+			if cp.CiphertextDomain != "NTT_NON_MONTGOMERY" {
+				return nil, fmt.Errorf("direct-ctct checkpoint %s is %s; want NTT non-Montgomery representation", name, cp.CiphertextDomain)
+			}
+		}
 		cp.DecodePath = decodePath
 		if !cp.OraclePass {
 			return nil, fmt.Errorf("%s cleartext oracle max %.12g exceeds %.12g", name, cp.Oracle.MaxComplexDifference, publicNumericalGate)
@@ -146,21 +185,42 @@ func runPublicFixedSigmaChain(
 	if err != nil {
 		return fmt.Errorf("EncryptNew(A): %w", err)
 	}
-	ctB, phase, err := backend.encryptAtLevel(valuesB, defaultScale, 5, effective.LogSlots)
-	phases = append(phases, setPhaseName(phase, "chain_encrypt_b_level5"))
+	stage1BScale := defaultScale
+	stage1BName := "encrypt_b_level5"
+	if directMul {
+		stage1BScale = q5Scale
+		stage1BName = "encrypt_b_q5_level5"
+	}
+	ctB, phase, err := backend.encryptAtLevel(valuesB, stage1BScale, 5, effective.LogSlots)
+	phaseNameB := "chain_encrypt_b_level5"
+	if directMul {
+		phaseNameB = "chain_encrypt_b_q5_level5"
+	}
+	phases = append(phases, setPhaseName(phase, phaseNameB))
 	if err != nil {
 		return fmt.Errorf("EncryptNew(B): %w", err)
 	}
-	ctCq5, phase, err := backend.encryptAtLevel(valuesC, q5Scale, 5, effective.LogSlots)
-	phases = append(phases, setPhaseName(phase, "chain_encrypt_c_q5_level5"))
-	if err != nil {
-		return fmt.Errorf("EncryptNew(C,q5 scale): %w", err)
+	var ctCq5 *rlwe.Ciphertext
+	if !directMul {
+		ctCq5, phase, err = backend.encryptAtLevel(valuesC, q5Scale, 5, effective.LogSlots)
+		phases = append(phases, setPhaseName(phase, "chain_encrypt_c_q5_level5"))
+		if err != nil {
+			return fmt.Errorf("EncryptNew(C,q5 scale): %w", err)
+		}
 	}
-	for _, input := range []struct {
+	inputChecks := []struct {
 		name  string
 		ct    *rlwe.Ciphertext
 		scale rlwe.Scale
-	}{{"A", ctA, defaultScale}, {"B", ctB, defaultScale}, {"C/q5", ctCq5, q5Scale}} {
+	}{{"A", ctA, defaultScale}, {"B", ctB, stage1BScale}}
+	if !directMul {
+		inputChecks = append(inputChecks, struct {
+			name  string
+			ct    *rlwe.Ciphertext
+			scale rlwe.Scale
+		}{"C/q5", ctCq5, q5Scale})
+	}
+	for _, input := range inputChecks {
 		if input.ct == nil || input.ct.Level() != 5 || input.ct.Degree() != 1 || !input.ct.IsNTT || input.ct.IsMontgomery || !input.ct.Scale.Equal(input.scale) || input.ct.LogDimensions.Cols != effective.LogSlots {
 			return fmt.Errorf("EncryptNew(%s) violates the Level5/Scale/domain/dimension contract", input.name)
 		}
@@ -175,31 +235,48 @@ func runPublicFixedSigmaChain(
 			return fmt.Errorf("genuine Standard EncryptNew(%s) produced zero c1", input.name)
 		}
 	}
-	if _, err := addCheckpoint("encrypt_a_level5", ctA, valuesA, false); err != nil {
-		return err
-	}
-	if _, err := addCheckpoint("encrypt_b_level5", ctB, valuesB, false); err != nil {
-		return err
-	}
-	if _, err := addCheckpoint("encrypt_c_q5_level5", ctCq5, valuesC, false); err != nil {
-		return err
-	}
-	ctX, phase, err := measurePublicPhase("chain_add_ab_level5", func() (*rlwe.Ciphertext, error) {
-		return backend.evaluator.AddNew(ctA, ctB)
-	})
-	phases = append(phases, phase)
-	if err != nil {
-		return fmt.Errorf("AddNew(A,B): %w", err)
-	}
-	valuesX := publicAdd(valuesA, valuesB)
-	if ctX.Level() != 5 || !ctX.Scale.Equal(defaultScale) {
-		return errors.New("AddNew(A,B) changed the expected Level5/Scale2^45 state")
-	}
-	decodedX, err := addCheckpoint("add_ab_level5", ctX, valuesX, true)
+	decodedA, err := addCheckpoint("encrypt_a_level5", ctA, valuesA, false)
 	if err != nil {
 		return err
 	}
-	decodedCq5 := decoded["encrypt_c_q5_level5"]
+	decodedB, err := addCheckpoint(stage1BName, ctB, valuesB, false)
+	if err != nil {
+		return err
+	}
+	var ctX *rlwe.Ciphertext
+	var decodedX []complex128
+	var stage1InputXName, stage1InputYName string
+	var stage1InputX, stage1InputY []complex128
+	var stage1Y *rlwe.Ciphertext
+	if directMul {
+		ctX, decodedX = ctA, decodedA
+		stage1InputXName, stage1InputYName = "encrypt_a_level5", stage1BName
+		stage1InputX, stage1InputY = decodedA, decodedB
+		stage1Y = ctB
+	} else {
+		if _, err := addCheckpoint("encrypt_c_q5_level5", ctCq5, valuesC, false); err != nil {
+			return err
+		}
+		var addPhase phaseTiming
+		ctX, addPhase, err = measurePublicPhase("chain_add_ab_level5", func() (*rlwe.Ciphertext, error) {
+			return backend.evaluator.AddNew(ctA, ctB)
+		})
+		phases = append(phases, addPhase)
+		if err != nil {
+			return fmt.Errorf("AddNew(A,B): %w", err)
+		}
+		valuesX := publicAdd(valuesA, valuesB)
+		if ctX.Level() != 5 || !ctX.Scale.Equal(defaultScale) {
+			return errors.New("AddNew(A,B) changed the expected Level5/Scale2^45 state")
+		}
+		decodedX, err = addCheckpoint("add_ab_level5", ctX, valuesX, true)
+		if err != nil {
+			return err
+		}
+		stage1InputXName, stage1InputYName = "add_ab_level5", "encrypt_c_q5_level5"
+		stage1InputX, stage1InputY = decodedX, decoded["encrypt_c_q5_level5"]
+		stage1Y = ctCq5
+	}
 	ctCq4, phase, err := backend.encryptAtLevel(valuesC, q4Scale, 4, effective.LogSlots)
 	phases = append(phases, setPhaseName(phase, "chain_encrypt_c_q4_level4"))
 	if err != nil {
@@ -221,11 +298,24 @@ func runPublicFixedSigmaChain(
 	var fastInputRows map[string]string
 	if opts.fixedSigmaAblationArm != "" && backend.name == "fast" {
 		fastInputRows = make(map[string]string)
-		for _, input := range []struct {
+		inputs := []struct {
 			name string
 			ct   *rlwe.Ciphertext
-		}{{"A", ctA}, {"B", ctB}, {"C_q5", ctCq5}, {"C_q4", ctCq4}} {
-			rows, err := fixedSigmaCiphertextActiveRowHashes(input.ct)
+		}{{"A", ctA}, {"B", ctB}, {"C_q4", ctCq4}}
+		if !directMul {
+			inputs = append(inputs, struct {
+				name string
+				ct   *rlwe.Ciphertext
+			}{"C_q5", ctCq5})
+		}
+		for _, input := range inputs {
+			var rows map[string]string
+			var err error
+			if directMul {
+				rows, err = fixedSigmaCiphertextMaintainedRowHashes(input.ct)
+			} else {
+				rows, err = fixedSigmaCiphertextActiveRowHashes(input.ct)
+			}
 			if err != nil {
 				return fmt.Errorf("hash Fast %s input rows: %w", input.name, err)
 			}
@@ -271,6 +361,9 @@ func runPublicFixedSigmaChain(
 		if product.Level() != ctInputX.Level() || !product.Scale.Equal(mulScale) {
 			return nil, nil, fmt.Errorf("%s MulRelinNew state mismatch: Level=%d Scale=%s, want Level=%d Scale=%s", name, product.Level(), product.Scale.Value.Text('e', 80), ctInputX.Level(), mulScale.Value.Text('e', 80))
 		}
+		if directMul && (product.Degree() != 1 || !product.IsNTT || product.IsMontgomery) {
+			return nil, nil, fmt.Errorf("%s MulRelinNew violated the direct-ctct degree-1 NTT non-Montgomery representation", name)
+		}
 		productOracle := append([]complex128(nil), outputOracle...)
 		if _, err := addCheckpoint(productName, product, productOracle, true); err != nil {
 			return nil, nil, err
@@ -288,6 +381,9 @@ func runPublicFixedSigmaChain(
 		}
 		if rescaled.Level() != outputLevel || !rescaled.Scale.Equal(defaultScale) {
 			return nil, nil, fmt.Errorf("%s Rescale did not produce Level%d/Scale2^45", name, outputLevel)
+		}
+		if directMul && (rescaled.Degree() != 1 || !rescaled.IsNTT || rescaled.IsMontgomery) {
+			return nil, nil, fmt.Errorf("%s Rescale violated the direct-ctct degree-1 NTT non-Montgomery representation", name)
 		}
 		preNoise, decodePhase, err := measurePublicPhase(name+"_decode_pre_injection", func() ([]complex128, error) {
 			values, _, decodeErr := backend.decode(rescaled)
@@ -399,9 +495,12 @@ func runPublicFixedSigmaChain(
 		return rescaled, outputDecoded, nil
 	}
 
-	stage1Oracle := publicMul(valuesX, valuesC)
-	stage1, decodedStage1, err := runStage("stage1", "add_ab_level5", "encrypt_c_q5_level5", "chain_stage1_mulrelin_level5", "chain_stage1_output_level4",
-		ctX, ctCq5, decodedX, decodedCq5, stage1Oracle, q[5], 4, opts.fixedSigmaNoiseSeed)
+	stage1Oracle := publicMul(valuesA, valuesB)
+	if !directMul {
+		stage1Oracle = publicMul(publicAdd(valuesA, valuesB), valuesC)
+	}
+	stage1, decodedStage1, err := runStage("stage1", stage1InputXName, stage1InputYName, "chain_stage1_mulrelin_level5", "chain_stage1_output_level4",
+		ctX, stage1Y, stage1InputX, stage1InputY, stage1Oracle, q[5], 4, opts.fixedSigmaNoiseSeed)
 	if err != nil {
 		return err
 	}
@@ -429,6 +528,12 @@ func runPublicFixedSigmaChain(
 	}
 	chain := &fixedSigmaChainEvidence{
 		SchemaVersion: "fixed-sigma-two-step-chain.v3", Classification: "DIAGNOSTIC_ONLY",
+		WorkloadID: func() string {
+			if directMul {
+				return perfmeasure.PublicDirectMulWorkloadID
+			}
+			return "public-add-mulrescale-v1"
+		}(),
 		PrimaryBuildCommit: primaryBuildCommit, PrimaryBuildClean: primaryBuildClean,
 		LogicalCtCtOperations: 2, LogicalNoiseInjections: 0,
 		InputMessageSHA256: inputMessageHashes, Operations: stageOperations,
@@ -467,12 +572,28 @@ func runPublicFixedSigmaChain(
 			chain.InputRandomnessStatus = "Genuine Standard native RLWE EncryptNew uses fresh randomness; this independent reference is not a cross-arm random-state match."
 		}
 	}
+	if directMul && backend.name == "fast" {
+		chain.FastC1Invariant = "PASS: Fast EncryptNew inputs and all captured checkpoints have c1=0; each enabled injection hashes c1 q0..q3 before and after commit."
+		chain.FastDormantRowPolicy = "Arithmetic, direct input-row hashes, and the noise injector operate on authoritative q0..q3 only; the existing injector's candidate and commit write set is c0 q0..q3. Dormant rows are not copied into the candidate or written; checkpoint metadata records physical row lengths, and the separate c1-zero invariant scans stored c1 values as validation."
+		chain.FastMetadataInvariant = "PASS: each enabled injection compares ciphertext state, metadata, IsNTT and IsMontgomery before and after; all run checkpoints preserve the expected Level/Scale/domain."
+	}
 	mode, schema, vectorSchema := "fixed-sigma-two-step-chain", "fast-standard-fixed-sigma-two-step-chain.v3", "fast-standard-fixed-sigma-two-step-chain-vectors.v3"
+	status := "PASS_ZERO_BOOTSTRAP_TWO_STEP_CHAIN"
+	capacityStatus := capacity.TerminalQ0Status
+	capacityEvidenceVersion := publicCapacityEvidenceVersion
+	observedOracleStatus := publicStrictOraclePassed
 	if opts.fixedSigmaAblationArm != "" {
 		schema, vectorSchema = "fast-standard-fixed-sigma-two-step-chain.v4", "fast-standard-fixed-sigma-two-step-chain-vectors.v4"
 		chain.SchemaVersion = "fixed-sigma-two-step-chain.v4"
 	}
-	status := "PASS_ZERO_BOOTSTRAP_TWO_STEP_CHAIN"
+	if directMul {
+		mode, schema, vectorSchema = "fixed-sigma-direct-ctct", "fast-standard-fixed-sigma-direct-ctct.v1", "fast-standard-fixed-sigma-direct-ctct-vectors.v1"
+		chain.SchemaVersion = "fixed-sigma-direct-ctct-chain.v1"
+		capacityStatus = directCapacity.Status
+		capacityEvidenceVersion = directCapacity.SchemaVersion
+		observedOracleStatus = "PASS_SEVEN_DIRECT_CTCT_CHECKPOINT_PLAINTEXT_ORACLES"
+		status = "PASS_ZERO_BOOTSTRAP_DIRECT_CTCT_CHAIN"
+	}
 	limitations := []string{
 		"Diagnostic-only two-step MulRelin+Rescale evidence; no Bootstrap call, output, or performance claim is included.",
 		"Same canonical messages and public CKKS call sequence are built against isolated genuine Standard and current Fast sources; keys and ciphertext coefficients are backend-native.",
@@ -485,7 +606,11 @@ func runPublicFixedSigmaChain(
 			"Fixed-sigma ablation arm "+opts.fixedSigmaAblationArm+" explicitly controls only the two demonstrated post-Rescale boundaries; no Bootstrap or arbitrary-operation interception is claimed.",
 			"C variant "+opts.fixedSigmaCVariant+" changes slot-message values only; effective CKKS parameters and q5/q4 encoding scales are unchanged.")
 	}
-	observedOracleStatus := publicStrictOraclePassed
+	if directMul {
+		limitations = append(limitations,
+			"Versioned direct-ctct-v1 schedule contains two independently encrypted ct×ct MulRelinNew→Rescale operations and no AddNew.",
+			"The direct fixture's q5 and q4 Scale schedule and strict two-stage Q-prefix capacity plan are separate from the historical Add-containing fixture.")
+	}
 	doc := publicNativeDocument{
 		SchemaVersion: schema, Mode: mode, Status: status, Timestamp: time.Now().UTC(),
 		Profile: profile.Name, ProfileKind: profile.Kind, Backend: backend.name, BackendCommit: secondaryCommit,
@@ -498,9 +623,9 @@ func runPublicFixedSigmaChain(
 		ConfigPath: opts.config, ConfigSHA256: configHash, QPSHA256: qpHash, InputSHA256: inputHash, WorkloadSHA256: workloadHash,
 		Parameters: effective, EphemeralSecretWeight: params.EphemeralSecretWeight, InputSlots: effective.InputSlots,
 		InputKind: inputKind, InputConstructor: constructor, InputC1Nonzero: inputC1Nonzero,
-		PublicEvaluatorDispatch: backend.dispatch, CapacityEvidenceVersion: publicCapacityEvidenceVersion,
-		CapacityPolicy: profile.CapacityPolicy, ConservativeBoundStatus: capacity.TerminalQ0Status,
-		ObservedNativeOracleStatus: observedOracleStatus, Capacity: capacity, NumericalGate: publicNumericalGate,
+		PublicEvaluatorDispatch: backend.dispatch, CapacityEvidenceVersion: capacityEvidenceVersion,
+		CapacityPolicy: profile.CapacityPolicy, ConservativeBoundStatus: capacityStatus,
+		ObservedNativeOracleStatus: observedOracleStatus, Capacity: capacity, DirectMulCapacity: directCapacity, NumericalGate: publicNumericalGate,
 		BootstrapBudget: 0, BootstrapCalls: 0, ExecutionPhases: phases, Checkpoints: checkpoints, FixedSigmaChain: chain,
 		Limitations: limitations,
 	}
@@ -538,6 +663,9 @@ var fixedSigmaChainCheckpointNames = []string{
 }
 
 func validatePublicFixedSigmaChainPairArtifacts(standard, fast publicNativeDocument, standardVectors, fastVectors publicVectorDocument) error {
+	if standard.SchemaVersion == "fast-standard-fixed-sigma-direct-ctct.v1" || fast.SchemaVersion == "fast-standard-fixed-sigma-direct-ctct.v1" {
+		return validatePublicDirectMulPairArtifacts(standard, fast, standardVectors, fastVectors)
+	}
 	if standard.Mode != "fixed-sigma-two-step-chain" || fast.Mode != standard.Mode ||
 		!validFixedSigmaChainSchema(standard.SchemaVersion) || fast.SchemaVersion != standard.SchemaVersion ||
 		standard.Status != "PASS_ZERO_BOOTSTRAP_TWO_STEP_CHAIN" || fast.Status != standard.Status {
@@ -612,6 +740,9 @@ func validatePublicFixedSigmaChainPairArtifacts(standard, fast publicNativeDocum
 }
 
 func validatePublicFixedSigmaChainArtifact(doc publicNativeDocument, vectors publicVectorDocument, backend string) error {
+	if doc.SchemaVersion == "fast-standard-fixed-sigma-direct-ctct.v1" {
+		return validatePublicFixedSigmaDirectMulArtifact(doc, vectors, backend)
+	}
 	if doc.Backend != backend || doc.BuildTag != "perf_"+backend || doc.BootstrapBudget != 0 || doc.BootstrapCalls != 0 ||
 		doc.EphemeralSecretWeight != 32 || doc.InputSlots != 1<<12 || doc.CapacityPolicy != publicCapacityPolicyStrict ||
 		doc.FixedSigmaChain == nil || !validFixedSigmaChainEvidenceSchema(doc.FixedSigmaChain.SchemaVersion) ||
@@ -1031,6 +1162,39 @@ func fixedSigmaCiphertextActiveRowHashes(ct *rlwe.Ciphertext) (map[string]string
 		}
 	}
 	return rows, nil
+}
+
+func fixedSigmaCiphertextMaintainedRowHashes(ct *rlwe.Ciphertext) (map[string]string, error) {
+	if ct == nil || ct.Level() < 0 || len(ct.Value) != 2 {
+		return nil, errors.New("ciphertext must be non-nil, have a non-negative level, and contain c0/c1")
+	}
+	rows := min(ct.Level()+1, 4)
+	out := make(map[string]string, len(ct.Value)*rows)
+	for component := range ct.Value {
+		if len(ct.Value[component].Coeffs) < rows {
+			return nil, fmt.Errorf("c%d has %d physical Q rows, fewer than %d authoritative maintained rows", component, len(ct.Value[component].Coeffs), rows)
+		}
+		for q := 0; q < rows; q++ {
+			out[fmt.Sprintf("c%d.q%d", component, q)] = hashUint64Row(ct.Value[component].Coeffs[q])
+		}
+	}
+	return out, nil
+}
+
+func fixedSigmaCiphertextDomain(ct *rlwe.Ciphertext) string {
+	if ct == nil {
+		return "INVALID_NIL"
+	}
+	switch {
+	case ct.IsNTT && !ct.IsMontgomery:
+		return "NTT_NON_MONTGOMERY"
+	case ct.IsNTT && ct.IsMontgomery:
+		return "NTT_MONTGOMERY"
+	case !ct.IsNTT && ct.IsMontgomery:
+		return "COEFFICIENT_MONTGOMERY"
+	default:
+		return "COEFFICIENT_NON_MONTGOMERY"
+	}
 }
 
 func validFixedSigmaNoisePhaseMeasurements(phases []fixedSigmaNoisePhaseEvidence) bool {
