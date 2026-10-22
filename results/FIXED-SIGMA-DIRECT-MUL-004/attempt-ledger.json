@@ -1,7 +1,7 @@
 {
   "accounting": {
     "actual_chain_executions": {
-      "fast": 11,
+      "fast": 12,
       "standard": 2
     },
     "authorized_replacement_slots": 2,
@@ -10,7 +10,7 @@
       "standard": 0
     },
     "launch_attempts": {
-      "fast": 14,
+      "fast": 15,
       "standard": 2
     },
     "replacement_launches": 2
@@ -469,11 +469,27 @@
       "workload": "direct-c4"
     },
     {
-      "actual_chain_executed": null,
+      "actual_chain_executed": true,
       "arm": "OFF/ON",
+      "artifact_validation": {
+        "archive_result": "captures/fast-direct-c4-s2-off-on.result.json",
+        "archive_result_sha256": "017b1b7fe5f5a986509397e7ae8ee2b3ec660d4903febbb1ecde58a6aea6e816",
+        "archive_vectors": "captures/fast-direct-c4-s2-off-on.vectors.json",
+        "archive_vectors_sha256": "aa0d10cb7204c4448ee7293500cd43eafc0b004aba2ebf5153bcd087baaf0162",
+        "bootstrap_calls": 0,
+        "capacity": "STRICT_QPREFIX_FIT",
+        "injections": 1,
+        "operations": 2,
+        "oracles_passed": 7,
+        "status": "PASS_ZERO_BOOTSTRAP_DIRECT_CTCT_CHAIN",
+        "validator": "tmp/FIXED-SIGMA-DIRECT-MUL-004/validate_fast_capture.py",
+        "validator_sha256": "cf62e9342b13cd6881d5f4196d1ecb3061efba774e694957b636838b2564dd8a"
+      },
       "backend": "fast",
       "binary_path": "/private/tmp/fixed-sigma-direct-mul-004-fast-build-20261022/perfprobe-fast-clone",
       "binary_sha256": "bde01f61c36f70dc70939eb12d72f3a42ce07a925942904939b54e516cafae17",
+      "exit_code": 0,
+      "finished_at_utc": "2026-10-22T02:50:15.512259+00:00",
       "launch_attempted": true,
       "launched_at_utc": "2026-10-22T02:49:47.175455+00:00",
       "prelaunch_provenance": {
@@ -490,7 +506,8 @@
       "slot": "F15",
       "stage1_seed": 20261107,
       "stage2_seed": 20261108,
-      "state": "LAUNCH_COMMITTED",
+      "state": "PASS_VALIDATED",
+      "validated_at_utc": "2026-10-22T02:50:19.409269+00:00",
       "vectors": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-c4-s2-off-on.vectors.json",
       "workload": "direct-c4"
     },
@@ -498,12 +515,25 @@
       "actual_chain_executed": null,
       "arm": "ON/ON",
       "backend": "fast",
-      "launch_attempted": false,
+      "binary_path": "/private/tmp/fixed-sigma-direct-mul-004-fast-build-20261022/perfprobe-fast-clone",
+      "binary_sha256": "bde01f61c36f70dc70939eb12d72f3a42ce07a925942904939b54e516cafae17",
+      "launch_attempted": true,
+      "launched_at_utc": "2026-10-22T02:50:46.920093+00:00",
+      "prelaunch_provenance": {
+        "build_tag": "perf_fast",
+        "fast_source_clean": true,
+        "fast_source_commit": "1e7828293c36f9845e30723ba4e9500d84bb50d2",
+        "fast_source_ref": "fast-qprefix",
+        "matches_pair_baseline_slot": "F13",
+        "primary_commit": "977d853541cf59b37e42cdfc1e635bc0cab7862d",
+        "primary_vcs_modified": false,
+        "primary_vcs_revision": "977d853541cf59b37e42cdfc1e635bc0cab7862d"
+      },
       "result": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-c4-s2-on-on.result.json",
       "slot": "F16",
       "stage1_seed": 20261107,
       "stage2_seed": 20261108,
-      "state": "NOT_LAUNCHED",
+      "state": "LAUNCH_COMMITTED",
       "vectors": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap/tmp/FIXED-SIGMA-DIRECT-MUL-004/captures/fast-direct-c4-s2-on-on.vectors.json",
       "workload": "direct-c4"
     }
