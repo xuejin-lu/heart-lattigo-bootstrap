@@ -6,30 +6,36 @@
       "attempts_used": 0,
       "backend": "genuine-standard",
       "binary_sha256": "f34bac107e00534fe0acbeedf252936a1fa7f9351a2aafcc5cf040f3af37410b",
+      "bootstrap_calls_consumed": 0,
       "injection": "OFF",
       "max_actual_calls": 1,
+      "precompute_attempts": 1,
       "preflight_pair_sha256": "3c4f66a0f9aeff869ff86fec39ef4efc37f76a6a166fae0b5bfe6b11cee16445",
-      "status": "RESERVED_NOT_STARTED"
+      "status": "PRECOMPUTE_FAILED_NO_CALL"
     },
     {
       "arm": "F",
       "attempts_used": 0,
       "backend": "fast",
       "binary_sha256": "85ca5a75b217616b2fd068c5006dc56327499d3b5c826a5deea912ce33a5e289",
+      "bootstrap_calls_consumed": 0,
       "injection": "OFF",
       "max_actual_calls": 1,
+      "precompute_attempts": 0,
       "preflight_pair_sha256": "3c4f66a0f9aeff869ff86fec39ef4efc37f76a6a166fae0b5bfe6b11cee16445",
-      "status": "RESERVED_NOT_STARTED"
+      "status": "NOT_STARTED_AFTER_CP_C_STOP"
     },
     {
       "arm": "FN",
       "attempts_used": 0,
       "backend": "fast",
       "binary_sha256": "85ca5a75b217616b2fd068c5006dc56327499d3b5c826a5deea912ce33a5e289",
+      "bootstrap_calls_consumed": 0,
       "injection": "ON",
       "max_actual_calls": 1,
+      "precompute_attempts": 0,
       "preflight_pair_sha256": "3c4f66a0f9aeff869ff86fec39ef4efc37f76a6a166fae0b5bfe6b11cee16445",
-      "status": "RESERVED_NOT_STARTED"
+      "status": "NOT_STARTED_AFTER_CP_C_STOP"
     }
   ],
   "authorization": {
@@ -58,11 +64,36 @@
       "preflight_pair_sha256": "3c4f66a0f9aeff869ff86fec39ef4efc37f76a6a166fae0b5bfe6b11cee16445",
       "primary_source_commit": "37ae2faa5c30ad6f9be35d47acb17a57d5358670",
       "time_utc": "2026-10-26T23:42:07.669728+00:00"
+    },
+    {
+      "actual_bootstrap_calls": 0,
+      "arm": "S",
+      "bootstrap_budget_reservations": 0,
+      "event": "CP_C_STOPPED_PRECOMPUTE_PIN_MISMATCH",
+      "evidence_path": "preflight/cp-c-stop.json",
+      "fast_and_fast_noise_started": false,
+      "retry_budget_remaining": 0,
+      "time_utc": "2026-10-26T23:47:12.520874+00:00"
     }
   ],
   "fast_noise_root_seed": 20261027,
   "fixed_sigma": 4.004280012097432,
   "max_actual_bootstrap_calls": 3,
+  "precompute_attempt_count": 1,
+  "precompute_failures": [
+    {
+      "arm": "S",
+      "bootstrap_attempt_reserved": false,
+      "bootstrap_calls_consumed": 0,
+      "error": "preflight pair provenance does not match the current Primary source, pins, config, Q/P, input, and workload",
+      "evidence_path": "preflight/cp-c-stop.json",
+      "expected_fast_commit": "2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f",
+      "observed_task_fast_commit": "b81f54c2e0f98dc2b4a7474fb333fbae79be8c63",
+      "phase": "public-bootstrap-preflight-contract-before-budget-reservation",
+      "preflight_pair_sha256": "3c4f66a0f9aeff869ff86fec39ef4efc37f76a6a166fae0b5bfe6b11cee16445",
+      "retry_authorized": false
+    }
+  ],
   "preflight_evidence_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-001/preflight-evidence.json",
   "preflight_evidence_sha256": "eb5f3d284d2fb45d802227761933b7e430a59afdb4ec1f2a070fb41c6c357d07",
   "preflight_pair_sha256": "3c4f66a0f9aeff869ff86fec39ef4efc37f76a6a166fae0b5bfe6b11cee16445",
@@ -87,11 +118,12 @@
     "primary_source_sha256": "6c02139892f94b5af67f8cf8046be6438cd106a6b5b2be59622d6c78211bd195",
     "standard_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40"
   },
-  "status": "PREFLIGHT_PASS_RESERVED_NOT_STARTED",
+  "status": "STOPPED_NEEDS_WEB_REVIEW",
   "stop_conditions": [
     "Do not execute any Bootstrap until post-ledger clean-source builds, go version -m metadata, binary SHA, and zero-call Standard/Fast preflight pair all pass.",
     "If any actual call fails, or provenance, parameters, capacity, input, or output validation fails, stop immediately; do not retry or consume another slot.",
     "No LogN16 workload, BTS, large benchmark, CP-D, or CP-E execution is authorized."
   ],
+  "stop_reason": "STANDARD_BOOTSTRAP_PREFLIGHT_FAST_PIN_MISMATCH",
   "task": "FAST-BOOTSTRAP-NOISE-FIDELITY-001"
 }

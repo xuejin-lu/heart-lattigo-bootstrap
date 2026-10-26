@@ -1,0 +1,23 @@
+{
+  "schema_version": "fast-bootstrap-noise-fidelity-precompute-stop.v1",
+  "task": "FAST-BOOTSTRAP-NOISE-FIDELITY-001",
+  "checkpoint": "CP-C",
+  "arm": "S",
+  "phase": "public-bootstrap-preflight-contract-before-budget-reservation",
+  "status": "STOPPED_NEEDS_WEB_REVIEW",
+  "command": "/private/tmp/perfprobe-fast-bootstrap-noise-fidelity-standard-37ae2fa --mode=public-native --public-bootstrap-once --preflight-pair=/private/tmp/fbn001-preflight-pair-37ae.json --profile=logn13 --config=configs/bootstrap_config.logn13.json --out=/private/tmp/fbn001-standard-bootstrap-37ae.json --vectors-out=/private/tmp/fbn001-standard-bootstrap-37ae-vectors.json --backend-commit=5dbffbdea05394de2ca3a432ed5318aa832e3f40 --backend-ref=5dbffbdea05394de2ca3a432ed5318aa832e3f40 --secondary-root=/private/tmp/lattigo-fast-bootstrap-noise-fidelity-standard-5dbffbdea053 --ephemeral-secret-weight=32 --bootstrap-budget=1 --warmup=0 --repetitions=0 --standard-trials=0",
+  "error": "preflight pair provenance does not match the current Primary source, pins, config, Q/P, input, and workload",
+  "primary_source_commit": "37ae2faa5c30ad6f9be35d47acb17a57d5358670",
+  "preflight_pair_sha256": "3c4f66a0f9aeff869ff86fec39ef4efc37f76a6a166fae0b5bfe6b11cee16445",
+  "pair_status": "PASS",
+  "pair_standard_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+  "pair_fast_commit": "b81f54c2e0f98dc2b4a7474fb333fbae79be8c63",
+  "expected_fast_commit_in_standard_side_gate": "2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f",
+  "task_approved_fast_commit": "b81f54c2e0f98dc2b4a7474fb333fbae79be8c63",
+  "source": "cmd/perfprobe/public_native.go:1477-1487",
+  "bootstrap_attempt_reserved": false,
+  "actual_bootstrap_calls_consumed": 0,
+  "retry_authorized": false,
+  "fast_arm_started": false,
+  "fast_noise_arm_started": false
+}
