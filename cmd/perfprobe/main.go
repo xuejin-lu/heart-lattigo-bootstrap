@@ -133,6 +133,7 @@ type cliOptions struct {
 	ephemeralSecretWeight   int
 	bootstrapBudget         int
 	publicBootstrap         bool
+	publicBootstrapPilot    bool
 	publicRepeatability     bool
 	preflightPair           string
 	traceFixtureOut         string
@@ -154,6 +155,9 @@ type cliOptions struct {
 	fixedSigmaNoiseSeed     int64
 	fixedSigmaSigmaProvided bool
 	fixedSigmaSeedProvided  bool
+	bootstrapNoiseEnabled   bool
+	bootstrapNoiseRootSeed  int64
+	bootstrapNoiseSeedGiven bool
 	mulRescaleChain         bool
 	fixedSigmaWorkload      string
 	fixedSigmaAblationArm   string
@@ -178,6 +182,13 @@ func main() {
 	if len(os.Args) > 1 && os.Args[1] == "compare-public" {
 		if err := runPublicCompare(os.Args[2:]); err != nil {
 			fmt.Fprintln(os.Stderr, "perfprobe compare-public:", err)
+			os.Exit(1)
+		}
+		return
+	}
+	if len(os.Args) > 1 && os.Args[1] == "compare-public-triplet" {
+		if err := runPublicTripletCompare(os.Args[2:]); err != nil {
+			fmt.Fprintln(os.Stderr, "perfprobe compare-public-triplet:", err)
 			os.Exit(1)
 		}
 		return
@@ -222,6 +233,7 @@ func run() error {
 	flag.IntVar(&opts.ephemeralSecretWeight, "ephemeral-secret-weight", -1, "explicit E for public-native mode; legacy mode remains E=0")
 	flag.IntVar(&opts.bootstrapBudget, "bootstrap-budget", -1, "hard maximum actual Bootstrap attempts for this process; required when mode can invoke Bootstrap")
 	flag.BoolVar(&opts.publicBootstrap, "public-bootstrap", false, "public-native mode: run exactly one cold and one warm Bootstrap after validating --preflight-pair")
+	flag.BoolVar(&opts.publicBootstrapPilot, "public-bootstrap-once", false, "bounded public-native pilot: run exactly one full Bootstrap after validating --preflight-pair")
 	flag.BoolVar(&opts.publicRepeatability, "public-repeatability", false, "public-native mode: run exactly one cold and five warm Bootstrap calls after validating --preflight-pair")
 	flag.StringVar(&opts.preflightPair, "preflight-pair", "", "passing zero-call compare-public pair required for --public-bootstrap")
 	flag.StringVar(&opts.traceFixtureOut, "trace-fixture-out", "", "public-native Fast zero-call preflight: export held ciphertext/parameter manifest for the test-only E32 tracer")
@@ -239,6 +251,8 @@ func run() error {
 	flag.IntVar(&opts.repetitions, "repetitions", 7, "timed full Bootstrap repetitions")
 	flag.IntVar(&opts.standardTrials, "standard-trials", 3, "independent Standard secret/evaluation-key numerical trials")
 	flag.BoolVar(&opts.fixedSigmaNoise, "fixed-sigma-noise", false, "public-native Fast-only diagnostic: explicitly inject fixed-sigma noise after each complete MulRelin+Rescale stage")
+	flag.BoolVar(&opts.bootstrapNoiseEnabled, "bootstrap-fixed-sigma-noise", false, "public-native Fast-only pilot: inject the frozen coefficient sigma before each degree-one ct×ct Bootstrap multiplication")
+	flag.Int64Var(&opts.bootstrapNoiseRootSeed, "bootstrap-noise-root-seed", 0, "explicit deterministic root seed for --bootstrap-fixed-sigma-noise")
 	flag.Float64Var(&opts.fixedSigmaNoiseSigma, "fixed-sigma-noise-sigma", 0, "fixed-sigma diagnostic coefficient-domain standard deviation; requires --fixed-sigma-noise")
 	flag.Int64Var(&opts.fixedSigmaNoiseSeed, "fixed-sigma-noise-seed", 0, "deterministic fixed-sigma sampler seed; required by --fixed-sigma-noise or --fixed-sigma-ablation-arm")
 	flag.BoolVar(&opts.mulRescaleChain, "mul-rescale-chain", false, "public-native zero-Bootstrap two-step ct×ct MulRelin+Rescale diagnostic chain")
@@ -252,6 +266,8 @@ func run() error {
 			opts.fixedSigmaSigmaProvided = true
 		case "fixed-sigma-noise-seed":
 			opts.fixedSigmaSeedProvided = true
+		case "bootstrap-noise-root-seed":
+			opts.bootstrapNoiseSeedGiven = true
 		}
 	})
 	if opts.config == "" || opts.out == "" || opts.backendCommit == "" || opts.secondaryRoot == "" || opts.backendRef == "" {
@@ -262,6 +278,14 @@ func run() error {
 	}
 	if err := validateFixedSigmaNoiseOptions(opts); err != nil {
 		return err
+	}
+	if opts.bootstrapNoiseEnabled {
+		if !opts.publicBootstrapPilot || opts.mode != "public-native" || publicBackendName() != "fast" || !opts.bootstrapNoiseSeedGiven ||
+			opts.fixedSigmaNoise || opts.mulRescaleChain || opts.publicBootstrap || opts.publicRepeatability {
+			return errors.New("--bootstrap-fixed-sigma-noise requires the Fast public-native --public-bootstrap-once pilot and an explicit --bootstrap-noise-root-seed")
+		}
+	} else if opts.bootstrapNoiseSeedGiven {
+		return errors.New("--bootstrap-noise-root-seed requires --bootstrap-fixed-sigma-noise")
 	}
 	if !opts.inputSmoke && !opts.outputSmoke && opts.vectorsOut == "" {
 		return errors.New("measurement requires --vectors-out")
@@ -282,11 +306,20 @@ func run() error {
 			return errors.New("public-native mode requires an explicit non-negative --ephemeral-secret-weight")
 		}
 		wantBudget := 0
-		if opts.publicBootstrap || opts.publicRepeatability {
-			if opts.publicBootstrap && opts.publicRepeatability {
-				return errors.New("--public-bootstrap and --public-repeatability are mutually exclusive")
+		bootstrapModes := 0
+		for _, selected := range []bool{opts.publicBootstrap, opts.publicBootstrapPilot, opts.publicRepeatability} {
+			if selected {
+				bootstrapModes++
+			}
+		}
+		if bootstrapModes > 0 {
+			if bootstrapModes != 1 {
+				return errors.New("select exactly one public Bootstrap mode")
 			}
 			wantBudget = 2
+			if opts.publicBootstrapPilot {
+				wantBudget = 1
+			}
 			if opts.publicRepeatability {
 				wantBudget = 6
 			}
@@ -298,6 +331,9 @@ func run() error {
 		}
 		if opts.bootstrapBudget != wantBudget {
 			return fmt.Errorf("public-native mode requires --bootstrap-budget=%d", wantBudget)
+		}
+		if opts.bootstrapNoiseEnabled && opts.profile != "logn13" {
+			return errors.New("--bootstrap-fixed-sigma-noise requires the explicit LogN13 profile")
 		}
 		if opts.inputSmoke || opts.outputSmoke || opts.fastBootstrapAcceptance || opts.vectorsOut == "" {
 			return errors.New("public-native mode requires --vectors-out and does not accept legacy smoke/Bootstrap flags")
@@ -533,13 +569,13 @@ func validateFixedSigmaNoiseOptions(opts cliOptions) error {
 		return errors.New("--fixed-sigma-c-variant requires --fixed-sigma-ablation-arm")
 	}
 	if opts.fixedSigmaAblationArm != "" {
-		if opts.fixedSigmaNoise || opts.fixedSigmaSigmaProvided {
+		if opts.fixedSigmaNoise || opts.fixedSigmaSigmaProvided || opts.bootstrapNoiseEnabled {
 			return errors.New("fixed-sigma ablation arms use the charter-frozen sigma and cannot be combined with --fixed-sigma-noise options")
 		}
 		if _, _, err := fixedSigmaAblationInjectionStages(opts.fixedSigmaAblationArm); err != nil {
 			return err
 		}
-		if !opts.mulRescaleChain || opts.mode != "public-native" || opts.publicBootstrap || opts.publicRepeatability ||
+		if !opts.mulRescaleChain || opts.mode != "public-native" || opts.publicBootstrap || opts.publicBootstrapPilot || opts.publicRepeatability ||
 			opts.bootstrapBudget != 0 || opts.preflightPair != "" || opts.traceFixtureOut != "" ||
 			opts.profile != "logn13" || !opts.fixedSigmaSeedProvided {
 			return errors.New("--fixed-sigma-ablation-arm requires a seeded zero-Bootstrap LogN13 public-native --mul-rescale-chain run")
@@ -567,7 +603,7 @@ func validateFixedSigmaNoiseOptions(opts cliOptions) error {
 		if opts.mulRescaleChain {
 			fastCommit = publicFixedSigmaChainFastSHA
 		}
-		if opts.mode != "public-native" || publicBackendName() != "fast" || opts.publicBootstrap || opts.publicRepeatability ||
+		if opts.mode != "public-native" || publicBackendName() != "fast" || opts.publicBootstrap || opts.publicBootstrapPilot || opts.publicRepeatability ||
 			opts.bootstrapBudget != 0 || opts.profile != "logn13" || opts.backendCommit != fastCommit || opts.traceFixtureOut != "" {
 			return errors.New("--fixed-sigma-noise requires zero-Bootstrap public-native LogN13 Fast with its mode-specific approved helper pin")
 		}
@@ -586,7 +622,7 @@ func validateFixedSigmaNoiseOptions(opts cliOptions) error {
 func validateTraceFixtureRequest(opts cliOptions) error {
 	contract, err := publicTraceFixtureContractFor(opts.profile)
 	if err != nil || opts.mode != "public-native" || opts.backendCommit != contract.BackendCommit || opts.ephemeralSecretWeight != 32 || opts.bootstrapBudget != 0 ||
-		opts.publicBootstrap || opts.publicRepeatability {
+		opts.publicBootstrap || opts.publicBootstrapPilot || opts.publicRepeatability {
 		return errors.New("--trace-fixture-out requires the profile-pinned Fast E32 zero-Bootstrap public-native preflight")
 	}
 	return nil
@@ -594,7 +630,7 @@ func validateTraceFixtureRequest(opts cliOptions) error {
 
 func validateExecutionLimits(opts cliOptions) error {
 	if opts.mode == "standard-a-zero-diagnostic" {
-		if !opts.outputSmoke || opts.inputSmoke || opts.fastBootstrapAcceptance || opts.publicBootstrap || opts.publicRepeatability || opts.preflightPair != "" || opts.traceFixtureOut != "" || opts.vectorsOut != "" {
+		if !opts.outputSmoke || opts.inputSmoke || opts.fastBootstrapAcceptance || opts.publicBootstrap || opts.publicBootstrapPilot || opts.publicRepeatability || opts.preflightPair != "" || opts.traceFixtureOut != "" || opts.vectorsOut != "" {
 			return errors.New("standard-a-zero-diagnostic requires the bounded output-smoke path only")
 		}
 		if opts.ephemeralSecretWeight != 32 {
@@ -607,14 +643,23 @@ func validateExecutionLimits(opts cliOptions) error {
 	}
 	if opts.mode == "public-native" {
 		wantBudget := 0
-		if opts.mulRescaleChain && (opts.publicBootstrap || opts.publicRepeatability || opts.preflightPair != "" || opts.traceFixtureOut != "") {
+		if opts.mulRescaleChain && (opts.publicBootstrap || opts.publicBootstrapPilot || opts.publicRepeatability || opts.preflightPair != "" || opts.traceFixtureOut != "") {
 			return errors.New("--mul-rescale-chain is a zero-Bootstrap path and does not accept Bootstrap or trace flags")
 		}
-		if opts.publicBootstrap || opts.publicRepeatability {
-			if opts.publicBootstrap && opts.publicRepeatability {
-				return errors.New("--public-bootstrap and --public-repeatability are mutually exclusive")
+		if opts.publicBootstrap || opts.publicBootstrapPilot || opts.publicRepeatability {
+			selected := 0
+			for _, mode := range []bool{opts.publicBootstrap, opts.publicBootstrapPilot, opts.publicRepeatability} {
+				if mode {
+					selected++
+				}
+			}
+			if selected != 1 {
+				return errors.New("--public-bootstrap, --public-bootstrap-once, and --public-repeatability are mutually exclusive")
 			}
 			wantBudget = 2
+			if opts.publicBootstrapPilot {
+				wantBudget = 1
+			}
 			if opts.publicRepeatability {
 				wantBudget = 6
 			}
@@ -624,7 +669,7 @@ func validateExecutionLimits(opts cliOptions) error {
 		} else if opts.preflightPair != "" {
 			return errors.New("--preflight-pair is only accepted with a public Bootstrap mode")
 		}
-		if opts.traceFixtureOut != "" && (opts.bootstrapBudget != 0 || opts.publicBootstrap || opts.publicRepeatability) {
+		if opts.traceFixtureOut != "" && (opts.bootstrapBudget != 0 || opts.publicBootstrap || opts.publicBootstrapPilot || opts.publicRepeatability) {
 			return errors.New("--trace-fixture-out requires a zero-Bootstrap public-native preflight")
 		}
 		if opts.bootstrapBudget != wantBudget {
@@ -632,7 +677,7 @@ func validateExecutionLimits(opts cliOptions) error {
 		}
 		return nil
 	}
-	if opts.publicBootstrap || opts.publicRepeatability || opts.preflightPair != "" || opts.traceFixtureOut != "" {
+	if opts.publicBootstrap || opts.publicBootstrapPilot || opts.publicRepeatability || opts.preflightPair != "" || opts.traceFixtureOut != "" {
 		return errors.New("public-native Bootstrap/trace fixture flags require --mode=public-native")
 	}
 	if opts.inputSmoke || opts.outputSmoke {

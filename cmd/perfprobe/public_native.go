@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"encoding/binary"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
@@ -34,6 +35,8 @@ const (
 	publicFixedSigmaFastSHA            = "ee308c9743000b5f281a84a871e7c4bd59b176c4"
 	publicFixedSigmaNoiseFastSHA       = "9ef0315feaf59dbee03bf0852b72c76fdeb6b800"
 	publicFixedSigmaChainFastSHA       = "1e7828293c36f9845e30723ba4e9500d84bb50d2"
+	publicBootstrapNoiseFastSHA        = "b81f54c2e0f98dc2b4a7474fb333fbae79be8c63"
+	publicBootstrapNoiseSigma          = 4.004280012097432
 	publicConfigSHA                    = "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98"
 	publicInputSHA                     = "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285"
 	publicWorkloadSHA                  = "00b70a2e77887c7d6a41db1859246f6513f2c984915de648734e5dd8c584cf74"
@@ -225,6 +228,7 @@ type publicNativeDocument struct {
 	InputC1Nonzero             bool                                     `json:"input_c1_nonzero"`
 	PublicEvaluatorDispatch    string                                   `json:"public_evaluator_dispatch"`
 	PreflightPairSHA256        string                                   `json:"preflight_pair_sha256,omitempty"`
+	BootstrapInputSHA256       string                                   `json:"bootstrap_plaintext_input_sha256,omitempty"`
 	CapacityEvidenceVersion    string                                   `json:"capacity_evidence_version"`
 	CapacityPolicy             string                                   `json:"capacity_policy"`
 	ConservativeBoundStatus    string                                   `json:"conservative_bound_status"`
@@ -241,6 +245,7 @@ type publicNativeDocument struct {
 	MulRelinRescaleTotalError  numericalmetrics.ComplexVectorStats      `json:"mul_relin_rescale_total_error,omitempty"`
 	FixedSigmaChain            *fixedSigmaChainEvidence                 `json:"fixed_sigma_two_step_chain,omitempty"`
 	BootstrapResults           []publicBootstrapResult                  `json:"bootstrap_results,omitempty"`
+	BootstrapNoiseEvidence     json.RawMessage                          `json:"bootstrap_noise_evidence,omitempty"`
 	Limitations                []string                                 `json:"limitations"`
 }
 
@@ -254,6 +259,8 @@ type publicVectorDocument struct {
 	ConfigSHA256                       string                    `json:"config_sha256"`
 	QPSHA256                           string                    `json:"qp_sha256"`
 	InputSHA256                        string                    `json:"input_sha256"`
+	BootstrapInputSHA256               string                    `json:"bootstrap_plaintext_input_sha256,omitempty"`
+	BootstrapPlaintextInput            []complexValue            `json:"bootstrap_plaintext_input,omitempty"`
 	WorkloadSHA256                     string                    `json:"workload_sha256"`
 	E                                  int                       `json:"ephemeral_secret_weight"`
 	Checkpoints                        map[string][]complexValue `json:"checkpoints"`
@@ -414,23 +421,24 @@ type publicTraceFixtureManifest struct {
 }
 
 type publicBootstrapFailureDocument struct {
-	SchemaVersion       string                  `json:"schema_version"`
-	Status              string                  `json:"status"`
-	Backend             string                  `json:"backend"`
-	BackendCommit       string                  `json:"backend_commit"`
-	PrimaryCommit       string                  `json:"primary_commit"`
-	PrimarySourceSHA256 string                  `json:"primary_measurement_source_sha256"`
-	PreflightPairSHA256 string                  `json:"preflight_pair_sha256"`
-	ConfigSHA256        string                  `json:"config_sha256"`
-	QPSHA256            string                  `json:"qp_sha256"`
-	InputSHA256         string                  `json:"input_sha256"`
-	WorkloadSHA256      string                  `json:"workload_sha256"`
-	BootstrapBudget     int                     `json:"bootstrap_budget"`
-	BootstrapCalls      int                     `json:"reserved_bootstrap_calls"`
-	FailedPhase         string                  `json:"failed_phase,omitempty"`
-	Failure             string                  `json:"failure"`
-	ExecutionPhases     []phaseTiming           `json:"execution_phases,omitempty"`
-	CompletedResults    []publicBootstrapResult `json:"completed_results,omitempty"`
+	SchemaVersion          string                  `json:"schema_version"`
+	Status                 string                  `json:"status"`
+	Backend                string                  `json:"backend"`
+	BackendCommit          string                  `json:"backend_commit"`
+	PrimaryCommit          string                  `json:"primary_commit"`
+	PrimarySourceSHA256    string                  `json:"primary_measurement_source_sha256"`
+	PreflightPairSHA256    string                  `json:"preflight_pair_sha256"`
+	BootstrapNoiseEvidence json.RawMessage         `json:"bootstrap_noise_evidence,omitempty"`
+	ConfigSHA256           string                  `json:"config_sha256"`
+	QPSHA256               string                  `json:"qp_sha256"`
+	InputSHA256            string                  `json:"input_sha256"`
+	WorkloadSHA256         string                  `json:"workload_sha256"`
+	BootstrapBudget        int                     `json:"bootstrap_budget"`
+	BootstrapCalls         int                     `json:"reserved_bootstrap_calls"`
+	FailedPhase            string                  `json:"failed_phase,omitempty"`
+	Failure                string                  `json:"failure"`
+	ExecutionPhases        []phaseTiming           `json:"execution_phases,omitempty"`
+	CompletedResults       []publicBootstrapResult `json:"completed_results,omitempty"`
 }
 
 type publicPairCheckpoint struct {
@@ -581,7 +589,7 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 		return err
 	}
 	preflightPairSHA := ""
-	if opts.publicBootstrap || opts.publicRepeatability {
+	if opts.publicBootstrap || opts.publicBootstrapPilot || opts.publicRepeatability {
 		preflightPairSHA, err = validatePublicNativeBootstrapPreflightContract(
 			opts.preflightPair, primaryCommit, sourceHash, profile, publicBackendName(), opts.backendCommit,
 			configHash, qpHash, inputHash, workloadHash,
@@ -883,6 +891,7 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 	bootstrapResults := []publicBootstrapResult(nil)
 	bootstrapOutputMap := map[string][]complexValue(nil)
 	bootstrapCalls := 0
+	var bootstrapNoiseEvidence json.RawMessage
 	schemaVersion, mode, status := "fast-standard-public-native-preflight.v1", "public-native", "PASS_ZERO_BOOTSTRAP_PREBOOTSTRAP_CHAIN"
 	vectorSchema := "fast-standard-public-native-vectors.v1"
 	limitations := []string{
@@ -890,10 +899,18 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 		"Fast zero-c1 is the pinned implementation's declared zero-secret simulation mode, not secure public-key encryption; Standard uses native generated-secret encryption.",
 		"Existing fastdiag P93/E0 traces are not E32 evidence. This public-native run performs no in-circuit tracing; the separate test-only E32 trace is a distinct diagnostic lane.",
 	}
-	if opts.publicBootstrap || opts.publicRepeatability {
-		preBootstrapDecoded := decodedByCheckpoint["drop_level0"]
+	if opts.publicBootstrap || opts.publicBootstrapPilot || opts.publicRepeatability {
 		budget := &bootstrapBudget{limit: opts.bootstrapBudget, journalBase: opts.out}
 		var attemptPhases []phaseTiming
+		if opts.bootstrapNoiseEnabled {
+			phase, configureErr := measurePhase("bootstrap_noise_hook_configuration", func() error {
+				return configurePublicBootstrapNoise(backend.bootstrapEval, publicBootstrapNoiseSigma, opts.bootstrapNoiseRootSeed)
+			})
+			phaseTimings = append(phaseTimings, phase)
+			if configureErr != nil {
+				return fmt.Errorf("configure fixed-sigma Bootstrap hook: %w", configureErr)
+			}
+		}
 		bootstrapResults, bootstrapOutputMap, attemptPhases, err = runPublicBootstrapAttempts(
 			dropped,
 			budget,
@@ -908,7 +925,7 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 				if decodeErr != nil {
 					return publicCheckpoint{}, nil, fmt.Errorf("%s native Level1 DecryptNew/Decode: %w", name, decodeErr)
 				}
-				checkpoint, checkpointErr := makePublicCheckpoint(backend, name, output, decoded, preBootstrapDecoded, q, true)
+				checkpoint, checkpointErr := makePublicCheckpoint(backend, name, output, decoded, expectedRotated, q, true)
 				if checkpointErr != nil {
 					return publicCheckpoint{}, nil, checkpointErr
 				}
@@ -919,6 +936,9 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 				return checkpoint, decoded, nil
 			},
 		)
+		if opts.bootstrapNoiseEnabled {
+			bootstrapNoiseEvidence = publicBootstrapNoiseSnapshot(backend.bootstrapEval)
+		}
 		if err != nil {
 			failedPhase := "pre-call-validation"
 			var attemptErr *publicBootstrapAttemptError
@@ -931,7 +951,8 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 				PrimarySourceSHA256: sourceHash, PreflightPairSHA256: preflightPairSHA,
 				ConfigSHA256: configHash, QPSHA256: qpHash, InputSHA256: inputHash, WorkloadSHA256: workloadHash,
 				BootstrapBudget: opts.bootstrapBudget, BootstrapCalls: budget.attempts, FailedPhase: failedPhase,
-				Failure: err.Error(), ExecutionPhases: attemptPhases, CompletedResults: bootstrapResults,
+				BootstrapNoiseEvidence: bootstrapNoiseEvidence,
+				Failure:                err.Error(), ExecutionPhases: append(phaseTimings, attemptPhases...), CompletedResults: bootstrapResults,
 			}
 			failurePath := opts.out + ".failure.json"
 			if writeErr := writeExclusiveJSON(failurePath, failure); writeErr != nil {
@@ -941,7 +962,33 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 		}
 		bootstrapCalls = budget.attempts
 		phaseTimings = append(phaseTimings, attemptPhases...)
-		if opts.publicRepeatability {
+		if opts.bootstrapNoiseEnabled {
+			if err := validateBootstrapNoiseSnapshot(bootstrapNoiseEvidence, publicBootstrapNoiseSigma, opts.bootstrapNoiseRootSeed, full.N(), q); err != nil {
+				failure := publicBootstrapFailureDocument{
+					SchemaVersion: "fast-standard-public-native-bootstrap-failure.v1", Status: "STOPPED_NO_RETRY",
+					Backend: backend.name, BackendCommit: secondaryCommit, PrimaryCommit: primaryCommit,
+					PrimarySourceSHA256: sourceHash, PreflightPairSHA256: preflightPairSHA,
+					ConfigSHA256: configHash, QPSHA256: qpHash, InputSHA256: inputHash, WorkloadSHA256: workloadHash,
+					BootstrapNoiseEvidence: bootstrapNoiseEvidence, BootstrapBudget: opts.bootstrapBudget, BootstrapCalls: bootstrapCalls,
+					FailedPhase: "post-call-noise-evidence-validation", Failure: err.Error(),
+					ExecutionPhases: phaseTimings, CompletedResults: bootstrapResults,
+				}
+				failurePath := opts.out + ".failure.json"
+				if writeErr := writeExclusiveJSON(failurePath, failure); writeErr != nil {
+					return fmt.Errorf("fixed-sigma Bootstrap hook evidence failed after %d/%d reserved calls: %w (also could not persist failure evidence: %v)", bootstrapCalls, opts.bootstrapBudget, err, writeErr)
+				}
+				return fmt.Errorf("fixed-sigma Bootstrap hook evidence failed after %d/%d reserved calls: %w", bootstrapCalls, opts.bootstrapBudget, err)
+			}
+		}
+		if opts.publicBootstrapPilot {
+			schemaVersion, mode, status = "fast-standard-public-native-bootstrap-once.v1", "public-native-bootstrap-once", "PASS_PUBLIC_BOOTSTRAP_ONCE"
+			vectorSchema = "fast-standard-public-native-bootstrap-once-vectors.v1"
+			limitations = []string{
+				fmt.Sprintf("Exactly one cold Bootstrap call describes only this pinned %s/E32 profile; it is not a statistically stable speed estimate.", profile.Name),
+				"Standard uses genuine native key generation/encryption; Fast uses the pinned intentionally insecure zero-secret mode.",
+				"When enabled, fixed-sigma coefficient noise is an exploratory pre-ct×ct model, not a claim of complete CKKS noise fidelity.",
+			}
+		} else if opts.publicRepeatability {
 			schemaVersion, mode, status = "fast-standard-public-native-repeatability.v1", "public-native-repeatability", "PASS_PUBLIC_BOOTSTRAP_1COLD_5WARM"
 			vectorSchema = "fast-standard-public-native-repeatability-vectors.v1"
 			limitations = []string{
@@ -986,15 +1033,17 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 		ObservedNativeOracleStatus: observedOracleStatus, Level0Continuity: level0Continuity,
 		Capacity: capacity, NumericalGate: publicNumericalGate,
 		BootstrapBudget: opts.bootstrapBudget, BootstrapCalls: bootstrapCalls,
-		ExecutionPhases: phaseTimings, Checkpoints: checkpoints,
+		BootstrapInputSHA256: perfmeasure.Fingerprint(expectedRotated),
+		ExecutionPhases:      phaseTimings, Checkpoints: checkpoints,
 		MulRelinRescaleResidual: mulRelinRescaleResidual, MulRelinRescaleTotalError: mulRelinRescaleTotalError,
-		BootstrapResults: bootstrapResults,
-		Limitations:      limitations,
+		BootstrapResults: bootstrapResults, BootstrapNoiseEvidence: bootstrapNoiseEvidence,
+		Limitations: limitations,
 	}
 	vectorDoc := publicVectorDocument{
 		SchemaVersion: vectorSchema, Mode: mode, Backend: backend.name,
 		BackendCommit: secondaryCommit, PrimaryCommit: primaryCommit, SourceSHA256: sourceHash, ConfigSHA256: configHash,
-		QPSHA256: qpHash, InputSHA256: inputHash, WorkloadSHA256: workloadHash, E: params.EphemeralSecretWeight,
+		QPSHA256: qpHash, InputSHA256: inputHash, BootstrapInputSHA256: perfmeasure.Fingerprint(expectedRotated),
+		BootstrapPlaintextInput: encodeVector(expectedRotated), WorkloadSHA256: workloadHash, E: params.EphemeralSecretWeight,
 		Checkpoints:                        vectorMap,
 		MulRelinRescaleIncrementalResidual: mulRelinRescaleResidualVector,
 		MulRelinRescaleTotalError:          mulRelinRescaleTotalErrorVector,
@@ -1023,7 +1072,7 @@ func ensurePublicNativeOutputsAvailable(opts cliOptions) error {
 	if len(paths) == 0 {
 		return errors.New("at least one output path is required")
 	}
-	if opts.publicBootstrap || opts.publicRepeatability {
+	if opts.publicBootstrap || opts.publicBootstrapPilot || opts.publicRepeatability {
 		paths = append(paths, opts.out+".failure.json")
 		for index := 1; index <= opts.bootstrapBudget; index++ {
 			paths = append(paths, fmt.Sprintf("%s.bootstrap-attempt-%02d.json", opts.out, index))
@@ -1165,10 +1214,14 @@ func runTwoPublicBootstrapAttempts(
 }
 
 func publicBootstrapAttemptSpecs(limit int) ([]struct{ phase, name string }, error) {
-	if limit != 2 && limit != 6 {
-		return nil, fmt.Errorf("public Bootstrap attempts require an exact budget of 2 or 6, got %d", limit)
+	if limit != 1 && limit != 2 && limit != 6 {
+		return nil, fmt.Errorf("public Bootstrap attempts require an exact budget of 1, 2, or 6, got %d", limit)
 	}
 	attempts := make([]struct{ phase, name string }, limit)
+	if limit == 1 {
+		attempts[0] = struct{ phase, name string }{phase: "single_bootstrap", name: "bootstrap_once"}
+		return attempts, nil
+	}
 	attempts[0] = struct{ phase, name string }{phase: "first_cold_bootstrap", name: "bootstrap_first_cold"}
 	if limit == 2 {
 		attempts[1] = struct{ phase, name string }{phase: "later_warm_bootstrap", name: "bootstrap_later_warm"}
@@ -1180,6 +1233,105 @@ func publicBootstrapAttemptSpecs(limit int) ([]struct{ phase, name string }, err
 		}
 	}
 	return attempts, nil
+}
+
+func isPublicBootstrapMode(mode string) bool {
+	return mode == "public-native-bootstrap" || mode == "public-native-bootstrap-once" || mode == "public-native-repeatability"
+}
+
+type bootstrapNoisePolynomialEvidence struct {
+	Sigma             float64                        `json:"sigma_coefficient"`
+	Seed              int64                          `json:"sampling_seed"`
+	Level             int                            `json:"level"`
+	Scale             string                         `json:"scale"`
+	SampleCount       int                            `json:"coefficient_sample_count"`
+	CoefficientRMS    float64                        `json:"coefficient_rms"`
+	CoefficientSHA256 string                         `json:"coefficient_sha256"`
+	Capacity          bootstrapNoiseCapacityEvidence `json:"qprefix_capacity"`
+}
+
+type bootstrapNoiseCapacityEvidence struct {
+	Rows                int    `json:"rows"`
+	CheckedCoefficients int    `json:"checked_coefficients"`
+	PrefixProduct       string `json:"prefix_product"`
+	StrictFit           bool   `json:"strict_fit"`
+}
+
+type bootstrapNoiseEventEvidence struct {
+	Operation         uint64                           `json:"operation"`
+	Level             int                              `json:"level"`
+	Scale             string                           `json:"scale"`
+	Left              bootstrapNoisePolynomialEvidence `json:"left"`
+	Right             bootstrapNoisePolynomialEvidence `json:"right"`
+	MultiplyCompleted bool                             `json:"multiply_completed"`
+	Failure           string                           `json:"failure"`
+}
+
+type bootstrapNoiseSnapshotEvidence struct {
+	Enabled             bool                          `json:"enabled"`
+	Sigma               float64                       `json:"sigma_coefficient"`
+	RootSeed            int64                         `json:"root_seed"`
+	CtCtMultiplyCalls   uint64                        `json:"ct_ct_multiply_calls"`
+	InjectedPolynomials uint64                        `json:"injected_polynomials"`
+	Events              []bootstrapNoiseEventEvidence `json:"events"`
+}
+
+func validateBootstrapNoiseSnapshot(raw json.RawMessage, sigma float64, rootSeed int64, ringN int, qPrimes []uint64) error {
+	if len(raw) == 0 {
+		return errors.New("enabled Fast run did not record the noise-hook snapshot")
+	}
+	var evidence bootstrapNoiseSnapshotEvidence
+	if err := json.Unmarshal(raw, &evidence); err != nil {
+		return fmt.Errorf("decode hook evidence: %w", err)
+	}
+	if !evidence.Enabled || evidence.Sigma != sigma || evidence.RootSeed != rootSeed ||
+		evidence.CtCtMultiplyCalls == 0 || evidence.InjectedPolynomials != 2*evidence.CtCtMultiplyCalls ||
+		uint64(len(evidence.Events)) != evidence.CtCtMultiplyCalls {
+		return errors.New("hook configuration, ct×ct operation coverage, or injected-polynomial count is inconsistent")
+	}
+	for index, event := range evidence.Events {
+		if event.Operation != uint64(index+1) || event.Level < 0 || event.Scale == "" || !event.MultiplyCompleted || event.Failure != "" {
+			return fmt.Errorf("ct×ct event %d did not complete with valid Level/Scale evidence", index+1)
+		}
+		if event.Level != min(event.Left.Level, event.Right.Level) || event.Scale != event.Left.Scale {
+			return fmt.Errorf("ct×ct event %d does not describe its operand Level/Scale", index+1)
+		}
+		for sideName, side := range map[string]bootstrapNoisePolynomialEvidence{"left": event.Left, "right": event.Right} {
+			rows := side.Capacity.Rows
+			if side.Sigma != sigma || side.Level < 0 || side.Level+1 < rows || side.Scale == "" || side.SampleCount != ringN ||
+				math.IsNaN(side.CoefficientRMS) || math.IsInf(side.CoefficientRMS, 0) || side.CoefficientRMS <= 0 ||
+				!validSHA256Hex(side.CoefficientSHA256) || rows < 1 || rows > len(qPrimes) || !side.Capacity.StrictFit ||
+				side.Capacity.CheckedCoefficients != ringN || side.Capacity.PrefixProduct == "" {
+				return fmt.Errorf("ct×ct event %d %s injection lacks independent Gaussian/capacity evidence", index+1, sideName)
+			}
+			prefixProduct := big.NewInt(1)
+			for _, prime := range qPrimes[:rows] {
+				if prime == 0 {
+					return fmt.Errorf("ct×ct event %d %s Q-prefix has a zero modulus", index+1, sideName)
+				}
+				prefixProduct.Mul(prefixProduct, new(big.Int).SetUint64(prime))
+			}
+			if side.Capacity.PrefixProduct != prefixProduct.String() {
+				return fmt.Errorf("ct×ct event %d %s Q-prefix product does not match effective moduli", index+1, sideName)
+			}
+		}
+		if event.Left.Seed == event.Right.Seed {
+			return fmt.Errorf("ct×ct event %d reused the same side seed", index+1)
+		}
+	}
+	return nil
+}
+
+func parseEffectiveQPrimes(parameters perfmeasure.EffectiveParameters) ([]uint64, error) {
+	primes := make([]uint64, len(parameters.QPrimes))
+	for index, value := range parameters.QPrimes {
+		prime, err := strconv.ParseUint(value, 10, 64)
+		if err != nil || prime == 0 {
+			return nil, fmt.Errorf("effective Q prime %d is invalid", index)
+		}
+		primes[index] = prime
+	}
+	return primes, nil
 }
 
 func runPublicBootstrapAttempts(
@@ -1682,8 +1834,7 @@ func runPublicCompare(args []string) error {
 	if err := readJSON(*fastVectorsPath, &fastVectors); err != nil {
 		return err
 	}
-	bootstrapMode := standard.Mode == "public-native-bootstrap" || standard.Mode == "public-native-repeatability" ||
-		fast.Mode == "public-native-bootstrap" || fast.Mode == "public-native-repeatability"
+	bootstrapMode := isPublicBootstrapMode(standard.Mode) || isPublicBootstrapMode(fast.Mode)
 	if bootstrapMode {
 		if err := validatePublicBootstrapPairArtifacts(standard, fast, standardVectors, fastVectors); err != nil {
 			return err
@@ -1723,6 +1874,11 @@ func runPublicCompare(args []string) error {
 		if standard.Mode == "public-native-repeatability" {
 			pair.Limitations = []string{
 				fmt.Sprintf("One cold plus five warm public Bootstrap samples characterize only this pinned %s/E32 profile and environment.", standard.Profile),
+				"Standard uses genuine native encryption while Fast uses the pinned intentionally insecure zero-secret mode; security equivalence is not claimed.",
+			}
+		} else if standard.Mode == "public-native-bootstrap-once" {
+			pair.Limitations = []string{
+				fmt.Sprintf("Exactly one cold public Bootstrap sample per backend for %s is descriptive, not a statistically stable speed estimate.", standard.Profile),
 				"Standard uses genuine native encryption while Fast uses the pinned intentionally insecure zero-secret mode; security equivalence is not claimed.",
 			}
 		} else {
@@ -1955,12 +2111,15 @@ func publicEnvironmentsMatch(a, b publicNativeDocument) bool {
 }
 
 func validatePublicBootstrapPairArtifacts(standard, fast publicNativeDocument, standardVectors, fastVectors publicVectorDocument) error {
-	if standard.Mode != fast.Mode || (standard.Mode != "public-native-bootstrap" && standard.Mode != "public-native-repeatability") {
+	if standard.Mode != fast.Mode || !isPublicBootstrapMode(standard.Mode) {
 		return errors.New("paired Bootstrap artifacts do not share an approved public Bootstrap mode")
 	}
 	wantBudget, wantSchema, wantStatus, wantVectorSchema := 2,
 		"fast-standard-public-native-bootstrap.v1", "PASS_PUBLIC_BOOTSTRAP_COLD_WARM", "fast-standard-public-native-bootstrap-vectors.v1"
-	if standard.Mode == "public-native-repeatability" {
+	if standard.Mode == "public-native-bootstrap-once" {
+		wantBudget, wantSchema, wantStatus, wantVectorSchema = 1,
+			"fast-standard-public-native-bootstrap-once.v1", "PASS_PUBLIC_BOOTSTRAP_ONCE", "fast-standard-public-native-bootstrap-once-vectors.v1"
+	} else if standard.Mode == "public-native-repeatability" {
 		wantBudget, wantSchema, wantStatus, wantVectorSchema = 6,
 			"fast-standard-public-native-repeatability.v1", "PASS_PUBLIC_BOOTSTRAP_1COLD_5WARM", "fast-standard-public-native-repeatability-vectors.v1"
 	}
@@ -1975,6 +2134,11 @@ func validatePublicBootstrapPairArtifacts(standard, fast publicNativeDocument, s
 	if standardVectors.SchemaVersion != wantVectorSchema || fastVectors.SchemaVersion != wantVectorSchema ||
 		standardVectors.Mode != standard.Mode || fastVectors.Mode != standardVectors.Mode {
 		return errors.New("paired Bootstrap vector artifacts have the wrong schema or mode")
+	}
+	if standard.Mode == "public-native-bootstrap-once" &&
+		(standard.BootstrapInputSHA256 == "" || standard.BootstrapInputSHA256 != fast.BootstrapInputSHA256 ||
+			standardVectors.BootstrapInputSHA256 != standard.BootstrapInputSHA256 || fastVectors.BootstrapInputSHA256 != fast.BootstrapInputSHA256) {
+		return errors.New("paired single-call Bootstrap artifacts do not name the same canonical plaintext input")
 	}
 	standardBase, fastBase := standard, fast
 	standardVectorBase, fastVectorBase := standardVectors, fastVectors
@@ -2013,15 +2177,25 @@ func validatePublicBootstrapOutputEvidence(doc publicNativeDocument, vectors pub
 		return err
 	}
 	if len(doc.BootstrapResults) != len(wantPhases) || len(vectors.BootstrapOutputs) != len(wantPhases) {
-		return errors.New("Bootstrap evidence must contain exactly cold and warm outputs")
+		return errors.New("Bootstrap evidence count does not match the exact reserved budget")
 	}
 	baseInput, ok := baseVectors.Checkpoints["drop_level0"]
 	if !ok || len(baseInput) != profile.InputSlots {
 		return errors.New("held pre-Bootstrap Level0 decoded vector is missing or has an invalid length")
 	}
-	input := decodeComplexValues(baseInput)
-	if !allFinite(input) {
+	preBootstrap := decodeComplexValues(baseInput)
+	if !allFinite(preBootstrap) {
 		return errors.New("held pre-Bootstrap Level0 vector contains NaN or Inf")
+	}
+	input := preBootstrap
+	if doc.Mode == "public-native-bootstrap-once" {
+		if vectors.BootstrapInputSHA256 == "" || len(vectors.BootstrapPlaintextInput) != profile.InputSlots {
+			return errors.New("canonical plaintext supplied to Bootstrap is missing")
+		}
+		input = decodeComplexValues(vectors.BootstrapPlaintextInput)
+		if !allFinite(input) || perfmeasure.Fingerprint(input) != vectors.BootstrapInputSHA256 || vectors.BootstrapInputSHA256 != doc.BootstrapInputSHA256 {
+			return errors.New("canonical Bootstrap plaintext is non-finite or has a mismatched fingerprint")
+		}
 	}
 	inputFingerprint := ""
 	for index, want := range wantPhases {
@@ -2390,7 +2564,7 @@ func expectedPublicCheckpointScale(params effectiveParameters, checkpoint string
 	case "encrypt_a_level5", "encrypt_b_level5", "add_level5", "rescale_q5_level4", "rotate_level4", "drop_level0":
 		expected = defaultScale
 	default:
-		if isPublicBootstrapCheckpoint(checkpoint, 6) || isPublicBootstrapCheckpoint(checkpoint, 2) {
+		if isPublicBootstrapCheckpoint(checkpoint, 6) || isPublicBootstrapCheckpoint(checkpoint, 2) || isPublicBootstrapCheckpoint(checkpoint, 1) {
 			expected = defaultScale
 		} else {
 			return "", fmt.Errorf("unknown public checkpoint %q for Scale validation", checkpoint)
@@ -2400,6 +2574,9 @@ func expectedPublicCheckpointScale(params effectiveParameters, checkpoint string
 }
 
 func isPublicBootstrapCheckpoint(name string, budget int) bool {
+	if budget == 1 {
+		return name == "bootstrap_once"
+	}
 	if name == "bootstrap_first_cold" {
 		return budget == 2 || budget == 6
 	}
@@ -2635,10 +2812,10 @@ func validatePublicBackendPin(backend, commit string, profileNames ...string) er
 		}
 		return fmt.Errorf("Standard backend commit %s differs from pinned Standard %s", commit, publicStandardSHA)
 	case "fast":
-		if commit == publicCurrentFastSHA || (profileName == "logn13" && (commit == publicFastSHA || commit == publicFixedSigmaFastSHA || commit == publicFixedSigmaNoiseFastSHA)) {
+		if commit == publicCurrentFastSHA || (profileName == "logn13" && (commit == publicFastSHA || commit == publicFixedSigmaFastSHA || commit == publicFixedSigmaNoiseFastSHA || commit == publicBootstrapNoiseFastSHA)) {
 			return nil
 		}
-		return fmt.Errorf("Fast backend commit %s is not approved for %s (current=%s; fixed-sigma baseline=%s; fixed-sigma helper=%s; historical LogN13=%s)", commit, profileName, publicCurrentFastSHA, publicFixedSigmaFastSHA, publicFixedSigmaNoiseFastSHA, publicFastSHA)
+		return fmt.Errorf("Fast backend commit %s is not approved for %s (current=%s; fixed-sigma baseline=%s; fixed-sigma helper=%s; Bootstrap noise pin=%s; historical LogN13=%s)", commit, profileName, publicCurrentFastSHA, publicFixedSigmaFastSHA, publicFixedSigmaNoiseFastSHA, publicBootstrapNoiseFastSHA, publicFastSHA)
 	default:
 		return fmt.Errorf("unsupported public-native backend %q", backend)
 	}

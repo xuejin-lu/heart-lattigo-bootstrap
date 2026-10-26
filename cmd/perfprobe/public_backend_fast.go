@@ -3,6 +3,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
 
@@ -29,6 +30,24 @@ func publicEvaluatorDispatch(eval *bootstrapping.Evaluator) (string, error) {
 
 func publicMulRelinRescaleDispatchEvidence() string {
 	return "ordinary ckks.Evaluator.MulRelinNew -> Fast zero-secret MulCore.ApplyRows; ordinary ckks.Evaluator.Rescale -> shared Q-prefix RescaleCore.ApplyRows; no Standard fallback"
+}
+
+func configurePublicBootstrapNoise(evaluator *bootstrapping.Evaluator, sigma float64, rootSeed int64) error {
+	if evaluator == nil {
+		return fmt.Errorf("fixed-sigma Bootstrap hook requires an initialized public evaluator")
+	}
+	return evaluator.EnableFixedSigmaBootstrapNoiseDiagnostic(sigma, rootSeed)
+}
+
+func publicBootstrapNoiseSnapshot(evaluator *bootstrapping.Evaluator) json.RawMessage {
+	if evaluator == nil {
+		return nil
+	}
+	encoded, err := json.Marshal(evaluator.FixedSigmaBootstrapNoiseDiagnosticSnapshot())
+	if err != nil {
+		return nil
+	}
+	return encoded
 }
 
 func injectPublicFixedSigmaNoise(evaluator *ckks.Evaluator, ct *rlwe.Ciphertext, sigma float64, seed int64) (fixedSigmaNoiseEvidence, error) {
