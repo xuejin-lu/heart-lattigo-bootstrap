@@ -1,0 +1,209 @@
+{
+  "actual_bootstrap_calls": 0,
+  "builds": {
+    "fast_shared_by_F_and_FN": {
+      "binary_path": "/private/tmp/perfprobe-fast-bootstrap-noise-fidelity-fast-37ae2fa",
+      "binary_sha256": "85ca5a75b217616b2fd068c5006dc56327499d3b5c826a5deea912ce33a5e289",
+      "binary_size_bytes": 14153330,
+      "build_tag": "perf_fast",
+      "go_vcs": "git",
+      "go_vcs_modified": "false",
+      "go_vcs_revision": "37ae2faa5c30ad6f9be35d47acb17a57d5358670",
+      "go_vcs_time": "2026-10-26T23:37:31Z",
+      "go_version": "go1.26.4",
+      "go_version_m_file": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-001/preflight/build-info-fast.txt",
+      "go_version_m_normalization": "trailing horizontal whitespace removed; all metadata values preserved",
+      "go_version_m_raw_external_path": "/private/tmp/fbn001-go-version-fast-37ae.raw.txt",
+      "go_version_m_raw_external_sha256": "450190898a005decd547193f16dd63090d13021c1f9cc5104f5823ab16e170bf",
+      "go_version_m_sha256": "27b43453c818396517b5b0b779d1c189dcf06636422c5b9424e067c98b0f991a",
+      "goarch": "arm64",
+      "goos": "darwin",
+      "module_replace_path": "/private/tmp/lattigo-fast-bootstrap-noise-fidelity",
+      "primary_clean": true,
+      "primary_commit": "37ae2faa5c30ad6f9be35d47acb17a57d5358670",
+      "primary_source_sha256": "6c02139892f94b5af67f8cf8046be6438cd106a6b5b2be59622d6c78211bd195",
+      "secondary_clean": true,
+      "secondary_commit": "b81f54c2e0f98dc2b4a7474fb333fbae79be8c63",
+      "secondary_ref": "experiment/fast-bootstrap-noise-fidelity",
+      "secondary_worktree": "/private/tmp/lattigo-fast-bootstrap-noise-fidelity"
+    },
+    "standard": {
+      "binary_path": "/private/tmp/perfprobe-fast-bootstrap-noise-fidelity-standard-37ae2fa",
+      "binary_sha256": "f34bac107e00534fe0acbeedf252936a1fa7f9351a2aafcc5cf040f3af37410b",
+      "binary_size_bytes": 13454434,
+      "build_tag": "perf_standard",
+      "go_vcs": "git",
+      "go_vcs_modified": "false",
+      "go_vcs_revision": "37ae2faa5c30ad6f9be35d47acb17a57d5358670",
+      "go_vcs_time": "2026-10-26T23:37:31Z",
+      "go_version": "go1.26.4",
+      "go_version_m_file": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-001/preflight/build-info-standard.txt",
+      "go_version_m_normalization": "trailing horizontal whitespace removed; all metadata values preserved",
+      "go_version_m_raw_external_path": "/private/tmp/fbn001-go-version-standard-37ae.raw.txt",
+      "go_version_m_raw_external_sha256": "c5e0586a9ce5182773eab07aa1be816c45befc94dcf32d4b9ba3e394ea77a5b7",
+      "go_version_m_sha256": "afde394ee849b167d77918856f7fd2970d6a54ac47f49fbcc93a834434e82cb1",
+      "goarch": "arm64",
+      "goos": "darwin",
+      "module_replace_path": "/private/tmp/lattigo-fast-bootstrap-noise-fidelity-standard-5dbffbdea053",
+      "primary_clean": true,
+      "primary_commit": "37ae2faa5c30ad6f9be35d47acb17a57d5358670",
+      "primary_source_sha256": "6c02139892f94b5af67f8cf8046be6438cd106a6b5b2be59622d6c78211bd195",
+      "secondary_clean": true,
+      "secondary_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+      "secondary_ref": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+      "secondary_worktree": "/private/tmp/lattigo-fast-bootstrap-noise-fidelity-standard-5dbffbdea053"
+    }
+  },
+  "captured_at_utc": "2026-10-26T23:42:07.669728+00:00",
+  "captures": {
+    "fast": {
+      "backend_commit": "b81f54c2e0f98dc2b4a7474fb333fbae79be8c63",
+      "binary_sha256": "85ca5a75b217616b2fd068c5006dc56327499d3b5c826a5deea912ce33a5e289",
+      "input_c1_nonzero": false,
+      "path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-001/preflight/fast.json",
+      "sha256": "45639e61771c66f80438da1b30383d41c2f86a272ef71143b2577c5938994cd5"
+    },
+    "pair": {
+      "path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-001/preflight/compare-public-pair.json",
+      "sha256": "3c4f66a0f9aeff869ff86fec39ef4efc37f76a6a166fae0b5bfe6b11cee16445"
+    },
+    "standard": {
+      "backend_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+      "binary_sha256": "f34bac107e00534fe0acbeedf252936a1fa7f9351a2aafcc5cf040f3af37410b",
+      "input_c1_nonzero": true,
+      "path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-001/preflight/standard.json",
+      "sha256": "e4375fc73aa1cf39748e6def984b1326317a5916eaa05d5e5f9fbbba50ab8f9d"
+    }
+  },
+  "checkpoint": "CP-C_PRECALL",
+  "input": {
+    "bootstrap_plaintext_sha256": "c32c0d7b731c0fcd8d82fb9c1182a43a62d120f761c090ce21dc764e9aa1e703",
+    "canonical_original_input_sha256": "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285",
+    "config_sha256": "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98",
+    "qp_sha256": "1f045e603a856968779d62e045a037274bba08cbfce8b1dd3dec2828f1f6a46b",
+    "same_bootstrap_plaintext_across_arms": true,
+    "workload_sha256": "00b70a2e77887c7d6a41db1859246f6513f2c984915de648734e5dd8c584cf74"
+  },
+  "preflight": {
+    "all_fast_checkpoint_oracles_pass": true,
+    "all_standard_checkpoint_oracles_pass": true,
+    "capacity_policy": "strict-sufficient-bound-v1",
+    "conservative_bound_status": "SUFFICIENT",
+    "fast_actual_bootstrap_calls": 0,
+    "fast_checkpoint_count": 8,
+    "matched_environment": true,
+    "observed_native_oracle_status": "PASS_EIGHT_CHECKPOINT_PLAINTEXT_ORACLES",
+    "pair_sha256": "3c4f66a0f9aeff869ff86fec39ef4efc37f76a6a166fae0b5bfe6b11cee16445",
+    "pair_status": "PASS",
+    "standard_actual_bootstrap_calls": 0,
+    "standard_checkpoint_count": 8
+  },
+  "primary_source": {
+    "clean": true,
+    "commit": "37ae2faa5c30ad6f9be35d47acb17a57d5358670",
+    "source_sha256": "6c02139892f94b5af67f8cf8046be6438cd106a6b5b2be59622d6c78211bd195"
+  },
+  "profile": {
+    "effective_parameters": {
+      "circuit_order": 0,
+      "default_scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+      "double_angle": 3,
+      "ephemeral_secret_weight": 32,
+      "input_slots": 4096,
+      "k": 16,
+      "log_message_ratio": 10,
+      "log_n": 13,
+      "log_slots": 12,
+      "mod1_degree": 30,
+      "mod1_log_scale": 60,
+      "p_bits": [
+        61,
+        61,
+        62,
+        61,
+        62
+      ],
+      "p_primes": [
+        "2305843009213317121",
+        "2305843009213120513",
+        "2305843009214414849",
+        "2305843009212694529",
+        "2305843009214758913"
+      ],
+      "q0_bits": 55,
+      "q0_config_target_bits": 55,
+      "q_chain_bits": [
+        55,
+        39,
+        40,
+        39,
+        40,
+        60,
+        60,
+        61,
+        60,
+        60,
+        60,
+        61,
+        61,
+        56,
+        57,
+        56,
+        56
+      ],
+      "q_prefix_rows_at_max_level": 4,
+      "q_primes": [
+        "36028797018652673",
+        "549755731969",
+        "549756026881",
+        "549755486209",
+        "549756174337",
+        "1152921504606830593",
+        "1152921504606748673",
+        "1152921504606994433",
+        "1152921504606683137",
+        "1152921504606601217",
+        "1152921504606584833",
+        "1152921504607191041",
+        "1152921504607223809",
+        "72057594037616641",
+        "72057594038321153",
+        "72057594037370881",
+        "72057594037338113"
+      ],
+      "residual_ring_n": 8192,
+      "ring_n": 8192
+    },
+    "ephemeral_secret_weight": 32,
+    "input_slots": 4096,
+    "kind": "frozen-historical-fixture-v1",
+    "log_n": 13,
+    "log_slots": 12,
+    "name": "logn13",
+    "ring_n": 8192,
+    "scale": "2^45"
+  },
+  "schema_version": "fast-bootstrap-noise-fidelity-preflight-evidence.v1",
+  "sources": {
+    "fast_clean": true,
+    "fast_commit": "b81f54c2e0f98dc2b4a7474fb333fbae79be8c63",
+    "fast_ref": "experiment/fast-bootstrap-noise-fidelity",
+    "standard_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40"
+  },
+  "status": "PASS_ZERO_BOOTSTRAP_PREFLIGHT_PAIR",
+  "task": "FAST-BOOTSTRAP-NOISE-FIDELITY-001",
+  "vectors_external_not_versioned": [
+    {
+      "arm": "S",
+      "path": "/private/tmp/fbn001-standard-preflight-vectors-37ae.json",
+      "sha256": "7e5f44b325775f2945a269b7e76061212b3203aa9f1d0d7c24bb9b3c73e24356",
+      "size_bytes": 4165223
+    },
+    {
+      "arm": "F",
+      "path": "/private/tmp/fbn001-fast-preflight-vectors-37ae.json",
+      "sha256": "f4e4bf5bcfb40037c7ace1fee496d5782a09bf7694e41c1cb759c92963d54866",
+      "size_bytes": 4159726
+    }
+  ]
+}

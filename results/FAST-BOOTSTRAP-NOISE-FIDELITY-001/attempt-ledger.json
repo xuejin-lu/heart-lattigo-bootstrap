@@ -1,69 +1,97 @@
 {
-  "schema_version": "fast-bootstrap-noise-fidelity-attempt-ledger.v1",
-  "task": "FAST-BOOTSTRAP-NOISE-FIDELITY-001",
-  "checkpoint": "CP-C",
-  "authorization": {
-    "source": "CURRENT_TASK.md and specs/FAST-BOOTSTRAP-NOISE-FIDELITY-001.md, explicitly activated by the user on 2026-10-27",
-    "scope": "At most one successful full Bootstrap for each of S, F, and FN; at most 3 actual Bootstrap calls total; no retries or hidden warmups",
-    "cp_d_authorized": false,
-    "cp_e_authorized": false
-  },
-  "status": "RESERVED_NOT_STARTED",
   "actual_bootstrap_calls": 0,
-  "max_actual_bootstrap_calls": 3,
-  "retry_budget": 0,
-  "profile": {
-    "name": "logn13",
-    "log_n": 13,
-    "ephemeral_secret_weight": 32,
-    "scale": "2^45",
-    "config_path": "configs/bootstrap_config.logn13.json",
-    "config_sha256": "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98",
-    "workload_sha256": "00b70a2e77887c7d6a41db1859246f6513f2c984915de648734e5dd8c584cf74",
-    "canonical_original_input_sha256": "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285",
-    "bootstrap_plaintext_sha256": "PENDING_ZERO_BOOTSTRAP_PREFLIGHT"
-  },
-  "sources": {
-    "primary_code_commit_before_ledger": "ec43fe112441f26ad22480e7025db90c24b42e32",
-    "primary_runtime_commit": "PENDING_POST_LEDGER_BUILD",
-    "standard_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
-    "fast_commit": "b81f54c2e0f98dc2b4a7474fb333fbae79be8c63",
-    "fast_branch": "experiment/fast-bootstrap-noise-fidelity"
-  },
-  "fixed_sigma": 4.004280012097432,
-  "fast_noise_root_seed": 20261027,
   "attempts": [
     {
       "arm": "S",
-      "backend": "genuine-standard",
-      "injection": "OFF",
-      "status": "RESERVED_NOT_STARTED",
-      "max_actual_calls": 1,
       "attempts_used": 0,
-      "binary_sha256": "PENDING_POST_LEDGER_BUILD"
+      "backend": "genuine-standard",
+      "binary_sha256": "f34bac107e00534fe0acbeedf252936a1fa7f9351a2aafcc5cf040f3af37410b",
+      "injection": "OFF",
+      "max_actual_calls": 1,
+      "preflight_pair_sha256": "3c4f66a0f9aeff869ff86fec39ef4efc37f76a6a166fae0b5bfe6b11cee16445",
+      "status": "RESERVED_NOT_STARTED"
     },
     {
       "arm": "F",
-      "backend": "fast",
-      "injection": "OFF",
-      "status": "RESERVED_NOT_STARTED",
-      "max_actual_calls": 1,
       "attempts_used": 0,
-      "binary_sha256": "PENDING_POST_LEDGER_BUILD"
+      "backend": "fast",
+      "binary_sha256": "85ca5a75b217616b2fd068c5006dc56327499d3b5c826a5deea912ce33a5e289",
+      "injection": "OFF",
+      "max_actual_calls": 1,
+      "preflight_pair_sha256": "3c4f66a0f9aeff869ff86fec39ef4efc37f76a6a166fae0b5bfe6b11cee16445",
+      "status": "RESERVED_NOT_STARTED"
     },
     {
       "arm": "FN",
-      "backend": "fast",
-      "injection": "ON",
-      "status": "RESERVED_NOT_STARTED",
-      "max_actual_calls": 1,
       "attempts_used": 0,
-      "binary_sha256": "MUST_MATCH_F_BINARY"
+      "backend": "fast",
+      "binary_sha256": "85ca5a75b217616b2fd068c5006dc56327499d3b5c826a5deea912ce33a5e289",
+      "injection": "ON",
+      "max_actual_calls": 1,
+      "preflight_pair_sha256": "3c4f66a0f9aeff869ff86fec39ef4efc37f76a6a166fae0b5bfe6b11cee16445",
+      "status": "RESERVED_NOT_STARTED"
     }
   ],
+  "authorization": {
+    "cp_d_authorized": false,
+    "cp_e_authorized": false,
+    "scope": "At most one successful full Bootstrap for each of S, F, and FN; at most 3 actual Bootstrap calls total; no retries or hidden warmups",
+    "source": "CURRENT_TASK.md and specs/FAST-BOOTSTRAP-NOISE-FIDELITY-001.md, explicitly activated by the user on 2026-10-27"
+  },
+  "build_provenance": {
+    "fast_and_fast_noise_binary_sha256_match": true,
+    "fast_binary_sha256_shared_by_F_and_FN": "85ca5a75b217616b2fd068c5006dc56327499d3b5c826a5deea912ce33a5e289",
+    "go_version": "go1.26.4",
+    "goarch": "arm64",
+    "goos": "darwin",
+    "primary_vcs_modified": false,
+    "primary_vcs_revision": "37ae2faa5c30ad6f9be35d47acb17a57d5358670",
+    "standard_binary_sha256": "f34bac107e00534fe0acbeedf252936a1fa7f9351a2aafcc5cf040f3af37410b"
+  },
+  "checkpoint": "CP-C",
+  "events": [
+    {
+      "all_attempts_remain_reserved_not_started": true,
+      "bootstrap_calls_consumed": 0,
+      "event": "PRECALL_PREFLIGHT_AND_BINARY_FREEZE",
+      "preflight_evidence_sha256": "eb5f3d284d2fb45d802227761933b7e430a59afdb4ec1f2a070fb41c6c357d07",
+      "preflight_pair_sha256": "3c4f66a0f9aeff869ff86fec39ef4efc37f76a6a166fae0b5bfe6b11cee16445",
+      "primary_source_commit": "37ae2faa5c30ad6f9be35d47acb17a57d5358670",
+      "time_utc": "2026-10-26T23:42:07.669728+00:00"
+    }
+  ],
+  "fast_noise_root_seed": 20261027,
+  "fixed_sigma": 4.004280012097432,
+  "max_actual_bootstrap_calls": 3,
+  "preflight_evidence_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-001/preflight-evidence.json",
+  "preflight_evidence_sha256": "eb5f3d284d2fb45d802227761933b7e430a59afdb4ec1f2a070fb41c6c357d07",
+  "preflight_pair_sha256": "3c4f66a0f9aeff869ff86fec39ef4efc37f76a6a166fae0b5bfe6b11cee16445",
+  "profile": {
+    "bootstrap_plaintext_sha256": "c32c0d7b731c0fcd8d82fb9c1182a43a62d120f761c090ce21dc764e9aa1e703",
+    "canonical_original_input_sha256": "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285",
+    "config_path": "configs/bootstrap_config.logn13.json",
+    "config_sha256": "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98",
+    "ephemeral_secret_weight": 32,
+    "log_n": 13,
+    "name": "logn13",
+    "scale": "2^45",
+    "workload_sha256": "00b70a2e77887c7d6a41db1859246f6513f2c984915de648734e5dd8c584cf74"
+  },
+  "retry_budget": 0,
+  "schema_version": "fast-bootstrap-noise-fidelity-attempt-ledger.v1",
+  "sources": {
+    "fast_branch": "experiment/fast-bootstrap-noise-fidelity",
+    "fast_commit": "b81f54c2e0f98dc2b4a7474fb333fbae79be8c63",
+    "primary_code_commit_before_ledger": "ec43fe112441f26ad22480e7025db90c24b42e32",
+    "primary_runtime_commit": "37ae2faa5c30ad6f9be35d47acb17a57d5358670",
+    "primary_source_sha256": "6c02139892f94b5af67f8cf8046be6438cd106a6b5b2be59622d6c78211bd195",
+    "standard_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40"
+  },
+  "status": "PREFLIGHT_PASS_RESERVED_NOT_STARTED",
   "stop_conditions": [
     "Do not execute any Bootstrap until post-ledger clean-source builds, go version -m metadata, binary SHA, and zero-call Standard/Fast preflight pair all pass.",
     "If any actual call fails, or provenance, parameters, capacity, input, or output validation fails, stop immediately; do not retry or consume another slot.",
     "No LogN16 workload, BTS, large benchmark, CP-D, or CP-E execution is authorized."
-  ]
+  ],
+  "task": "FAST-BOOTSTRAP-NOISE-FIDELITY-001"
 }
