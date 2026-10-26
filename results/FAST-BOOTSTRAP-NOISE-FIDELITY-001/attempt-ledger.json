@@ -1,0 +1,69 @@
+{
+  "schema_version": "fast-bootstrap-noise-fidelity-attempt-ledger.v1",
+  "task": "FAST-BOOTSTRAP-NOISE-FIDELITY-001",
+  "checkpoint": "CP-C",
+  "authorization": {
+    "source": "CURRENT_TASK.md and specs/FAST-BOOTSTRAP-NOISE-FIDELITY-001.md, explicitly activated by the user on 2026-10-27",
+    "scope": "At most one successful full Bootstrap for each of S, F, and FN; at most 3 actual Bootstrap calls total; no retries or hidden warmups",
+    "cp_d_authorized": false,
+    "cp_e_authorized": false
+  },
+  "status": "RESERVED_NOT_STARTED",
+  "actual_bootstrap_calls": 0,
+  "max_actual_bootstrap_calls": 3,
+  "retry_budget": 0,
+  "profile": {
+    "name": "logn13",
+    "log_n": 13,
+    "ephemeral_secret_weight": 32,
+    "scale": "2^45",
+    "config_path": "configs/bootstrap_config.logn13.json",
+    "config_sha256": "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98",
+    "workload_sha256": "00b70a2e77887c7d6a41db1859246f6513f2c984915de648734e5dd8c584cf74",
+    "canonical_original_input_sha256": "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285",
+    "bootstrap_plaintext_sha256": "PENDING_ZERO_BOOTSTRAP_PREFLIGHT"
+  },
+  "sources": {
+    "primary_code_commit_before_ledger": "ec43fe112441f26ad22480e7025db90c24b42e32",
+    "primary_runtime_commit": "PENDING_POST_LEDGER_BUILD",
+    "standard_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+    "fast_commit": "b81f54c2e0f98dc2b4a7474fb333fbae79be8c63",
+    "fast_branch": "experiment/fast-bootstrap-noise-fidelity"
+  },
+  "fixed_sigma": 4.004280012097432,
+  "fast_noise_root_seed": 20261027,
+  "attempts": [
+    {
+      "arm": "S",
+      "backend": "genuine-standard",
+      "injection": "OFF",
+      "status": "RESERVED_NOT_STARTED",
+      "max_actual_calls": 1,
+      "attempts_used": 0,
+      "binary_sha256": "PENDING_POST_LEDGER_BUILD"
+    },
+    {
+      "arm": "F",
+      "backend": "fast",
+      "injection": "OFF",
+      "status": "RESERVED_NOT_STARTED",
+      "max_actual_calls": 1,
+      "attempts_used": 0,
+      "binary_sha256": "PENDING_POST_LEDGER_BUILD"
+    },
+    {
+      "arm": "FN",
+      "backend": "fast",
+      "injection": "ON",
+      "status": "RESERVED_NOT_STARTED",
+      "max_actual_calls": 1,
+      "attempts_used": 0,
+      "binary_sha256": "MUST_MATCH_F_BINARY"
+    }
+  ],
+  "stop_conditions": [
+    "Do not execute any Bootstrap until post-ledger clean-source builds, go version -m metadata, binary SHA, and zero-call Standard/Fast preflight pair all pass.",
+    "If any actual call fails, or provenance, parameters, capacity, input, or output validation fails, stop immediately; do not retry or consume another slot.",
+    "No LogN16 workload, BTS, large benchmark, CP-D, or CP-E execution is authorized."
+  ]
+}
