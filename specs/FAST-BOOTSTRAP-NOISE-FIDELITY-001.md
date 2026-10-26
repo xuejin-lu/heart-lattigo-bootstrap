@@ -1,6 +1,6 @@
 # FAST-BOOTSTRAP-NOISE-FIDELITY-001 — Three-way bootstrap precision study
 
-**Status: PLANNED — NOT AUTHORIZED TO IMPLEMENT OR RUN.** This spec is a durable plan, not a replacement of the unfinished `FIXED-SIGMA-DIRECT-MUL-004`. Do not change `CURRENT_TASK.md` until an explicit new-task activation, and do not start experiments just because this file exists.
+**Status: ACTIVE — explicitly activated by the user on 2026-10-27.** This task supersedes `FIXED-SIGMA-DIRECT-MUL-004` as the Primary current-task pointer but does not alter its historical artifacts. CP-A and CP-B are authorized. The user also explicitly authorizes the CP-C pilot budget below: at most one successful full Bootstrap per arm (S, F, FN), 3 total, with no retry or hidden Bootstrap warmup. CP-D requires a later Web decision; CP-E remains unauthorized.
 
 ## Primary research goal
 Make full Bootstrap output precision of intentionally insecure Lattigo_FAST match genuine Standard CKKS as closely as possible with **minimal Fast code changes and minimal runtime overhead**, rather than trying to reproduce every internal ciphertext noise term. First finish a complete, scientifically comparable three-arm measurement even if noise fails to improve precision. Preserve Fast zero-secret semantics and all original Q-prefix and safety invariants. No security-fidelity claim.
@@ -59,3 +59,7 @@ Before any implementation read Primary `AGENTS.md`, `docs/MEASUREMENT_PLATFORM.m
 
 ## Research context
 Bossuat et al., *Accurate and Composable Noise Estimates for CKKS with Application to Exact HE Computation*, especially component-wise noise, squaring covariance, Rescale/KeySwitch, and simulated Bootstrap. `https://github.com/tuneinsight/ckks-noise-estimator`. It motivates H1's evaluation, not a claim H1 reproduces their estimator or Standard CKKS noise.
+
+## Activation record — 2026-10-27
+
+The user explicitly activated this versioned task and instructed the work to use `experiment/fast-bootstrap-noise-fidelity`, never `fast-qprefix`, then run the authorized three-arm pilot budget. The Primary `CURRENT_TASK.md` pointer was updated accordingly. This activation authorizes only CP-A, CP-B, and CP-C's single three-arm pilot; it does not activate CP-D or CP-E.
