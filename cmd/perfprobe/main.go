@@ -137,6 +137,7 @@ type cliOptions struct {
 	bootstrapOncePreflight  bool
 	publicRepeatability     bool
 	noiseFidelity002        bool
+	noiseFidelity003        bool
 	preflightPair           string
 	traceFixtureOut         string
 	inputSmoke              bool
@@ -239,6 +240,7 @@ func run() error {
 	flag.BoolVar(&opts.bootstrapOncePreflight, "bootstrap-once-preflight", false, "zero-Bootstrap public-native preflight pinned for the one-call LogN13 pilot")
 	flag.BoolVar(&opts.publicRepeatability, "public-repeatability", false, "public-native mode: run exactly one cold and five warm Bootstrap calls after validating --preflight-pair")
 	flag.BoolVar(&opts.noiseFidelity002, "noise-fidelity-002", false, "task-scoped LogN13/E32 six-sample Noise Fidelity 002 preflight/measurement contract")
+	flag.BoolVar(&opts.noiseFidelity003, "noise-fidelity-003-logn16", false, "task-scoped LogN16/E32 six-sample Noise Fidelity 003 preflight/measurement contract")
 	flag.StringVar(&opts.preflightPair, "preflight-pair", "", "passing zero-call compare-public pair required for --public-bootstrap")
 	flag.StringVar(&opts.traceFixtureOut, "trace-fixture-out", "", "public-native Fast zero-call preflight: export held ciphertext/parameter manifest for the test-only E32 tracer")
 	flag.BoolVar(&opts.inputSmoke, "input-smoke", false, "bounded input-origin preflight only; no Bootstrap or timing")
@@ -283,7 +285,7 @@ func run() error {
 	if err := validateFixedSigmaNoiseOptions(opts); err != nil {
 		return err
 	}
-	if err := validateNoiseFidelity002Options(opts); err != nil {
+	if err := validateNoiseFidelityOptions(opts); err != nil {
 		return err
 	}
 	if !opts.inputSmoke && !opts.outputSmoke && opts.vectorsOut == "" {
@@ -331,8 +333,8 @@ func run() error {
 		if opts.bootstrapBudget != wantBudget {
 			return fmt.Errorf("public-native mode requires --bootstrap-budget=%d", wantBudget)
 		}
-		if opts.bootstrapNoiseEnabled && opts.profile != "logn13" {
-			return errors.New("--bootstrap-fixed-sigma-noise requires the explicit LogN13 profile")
+		if opts.bootstrapNoiseEnabled && !opts.noiseFidelity003 && opts.profile != "logn13" {
+			return errors.New("--bootstrap-fixed-sigma-noise requires the explicit LogN13 profile except for the task-scoped LogN16 Noise Fidelity 003 mode")
 		}
 		if opts.inputSmoke || opts.outputSmoke || opts.fastBootstrapAcceptance || opts.vectorsOut == "" {
 			return errors.New("public-native mode requires --vectors-out and does not accept legacy smoke/Bootstrap flags")
@@ -557,15 +559,26 @@ func run() error {
 	return nil
 }
 
-func validateNoiseFidelity002Options(opts cliOptions) error {
+func validateNoiseFidelityOptions(opts cliOptions) error {
+	if opts.noiseFidelity002 && opts.noiseFidelity003 {
+		return errors.New("Noise Fidelity 002 and 003 task contracts are mutually exclusive")
+	}
+	taskID, flagName, profile := "", "", ""
+	rootSeed := int64(0)
+	switch {
+	case opts.noiseFidelity002:
+		taskID, flagName, rootSeed, profile = publicNoiseFidelity002TaskID, "--noise-fidelity-002", publicNoiseFidelity002RootSeed, "logn13"
+	case opts.noiseFidelity003:
+		taskID, flagName, rootSeed, profile = publicNoiseFidelity003TaskID, "--noise-fidelity-003-logn16", publicNoiseFidelity003RootSeed, "logn16"
+	}
 	if opts.bootstrapNoiseEnabled {
-		if opts.noiseFidelity002 {
+		if taskID != "" {
 			if !opts.publicRepeatability || opts.mode != "public-native" || publicBackendName() != "fast" || !opts.bootstrapNoiseSeedGiven ||
 				opts.fixedSigmaNoise || opts.mulRescaleChain || opts.publicBootstrap || opts.publicBootstrapPilot {
-				return errors.New("--bootstrap-fixed-sigma-noise requires the Fast --noise-fidelity-002 --public-repeatability mode and an explicit --bootstrap-noise-root-seed")
+				return fmt.Errorf("--bootstrap-fixed-sigma-noise requires the Fast task-scoped --public-repeatability mode and an explicit --bootstrap-noise-root-seed (%s)", taskID)
 			}
-			if opts.bootstrapNoiseRootSeed != publicNoiseFidelity002RootSeed {
-				return fmt.Errorf("--noise-fidelity-002 freezes --bootstrap-noise-root-seed=%d", publicNoiseFidelity002RootSeed)
+			if opts.bootstrapNoiseRootSeed != rootSeed {
+				return fmt.Errorf("%s freezes --bootstrap-noise-root-seed=%d", taskID, rootSeed)
 			}
 		} else if !opts.publicBootstrapPilot || opts.mode != "public-native" || publicBackendName() != "fast" || !opts.bootstrapNoiseSeedGiven ||
 			opts.fixedSigmaNoise || opts.mulRescaleChain || opts.publicBootstrap || opts.publicRepeatability {
@@ -574,19 +587,24 @@ func validateNoiseFidelity002Options(opts cliOptions) error {
 	} else if opts.bootstrapNoiseSeedGiven {
 		return errors.New("--bootstrap-noise-root-seed requires --bootstrap-fixed-sigma-noise")
 	}
-	if opts.noiseFidelity002 {
-		if opts.mode != "public-native" || opts.profile != "logn13" || opts.ephemeralSecretWeight != 32 ||
+	if taskID != "" {
+		if opts.mode != "public-native" || opts.profile != profile || opts.ephemeralSecretWeight != 32 ||
 			opts.publicBootstrap || opts.publicBootstrapPilot || opts.bootstrapOncePreflight || opts.fixedSigmaNoise || opts.fixedSigmaAblationArm != "" ||
 			opts.fixedSigmaSigmaProvided || opts.fixedSigmaSeedProvided || opts.fixedSigmaCVariant != "" || opts.fixedSigmaWorkload != "" ||
 			opts.mulRescaleChain || opts.traceFixtureOut != "" || opts.inputSmoke || opts.outputSmoke || opts.fastBootstrapAcceptance ||
 			!((opts.publicRepeatability && opts.bootstrapBudget == 6) || (!opts.publicRepeatability && opts.bootstrapBudget == 0 && opts.preflightPair == "")) {
-			return errors.New("--noise-fidelity-002 requires LogN13/E32 public-native zero-call preflight or exact six-call --public-repeatability")
+			return fmt.Errorf("%s requires %s/E32 public-native zero-call preflight or exact six-call --public-repeatability", flagName, profile)
 		}
 		if opts.bootstrapNoiseEnabled && publicBackendName() != "fast" {
-			return errors.New("--noise-fidelity-002 Bootstrap Noise is Fast-only")
+			return fmt.Errorf("%s Bootstrap Noise is Fast-only", taskID)
 		}
 	}
 	return nil
+}
+
+// Kept as a narrow compatibility wrapper for existing task-contract tests.
+func validateNoiseFidelity002Options(opts cliOptions) error {
+	return validateNoiseFidelityOptions(opts)
 }
 
 func validateFixedSigmaNoiseOptions(opts cliOptions) error {

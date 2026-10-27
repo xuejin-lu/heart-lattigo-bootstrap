@@ -565,6 +565,460 @@ func TestNoiseFidelity002CLIContractRejectsModeAndBudgetDrift(t *testing.T) {
 	}
 }
 
+func TestNoiseFidelity003LogN16PinsPreflightAndCLIContract(t *testing.T) {
+	if err := validatePublicBackendPinForTaskID("standard", publicStandardSHA, "logn16", false, publicNoiseFidelity003TaskID); err != nil {
+		t.Fatalf("genuine Standard LogN16 pin rejected: %v", err)
+	}
+	if err := validatePublicBackendPinForTaskID("fast", publicNoiseFidelity003FastSHA, "logn16", false, publicNoiseFidelity003TaskID); err != nil {
+		t.Fatalf("exact 003 Fast source pin rejected: %v", err)
+	}
+	for _, test := range []struct{ commit, profile string }{
+		{publicNoiseFidelity002FastSHA, "logn16"},
+		{publicNoiseFidelity003FastSHA, "logn13"},
+		{publicNoiseFidelity003FastSHA, "logn14"},
+	} {
+		if err := validatePublicBackendPinForTaskID("fast", test.commit, test.profile, false, publicNoiseFidelity003TaskID); err == nil {
+			t.Errorf("003 accepted an unapproved source/profile pair %s/%s", test.commit, test.profile)
+		}
+	}
+	if err := validatePublicBackendPinForTaskID("fast", publicNoiseFidelity003FastSHA, "logn16", true, publicNoiseFidelity003TaskID); err == nil {
+		t.Fatal("003 repeatability pin leaked into the one-call pilot mode")
+	}
+
+	preflight := cliOptions{mode: "public-native", profile: "logn16", ephemeralSecretWeight: 32, bootstrapBudget: 0, noiseFidelity003: true}
+	if err := validateNoiseFidelityOptions(preflight); err != nil {
+		t.Fatalf("valid 003 zero-call preflight rejected: %v", err)
+	}
+	repeatability := preflight
+	repeatability.publicRepeatability, repeatability.bootstrapBudget, repeatability.preflightPair = true, 6, "pair.json"
+	if err := validateNoiseFidelityOptions(repeatability); err != nil {
+		t.Fatalf("valid 003 six-call measurement contract rejected: %v", err)
+	}
+	noise := repeatability
+	noise.bootstrapNoiseEnabled, noise.bootstrapNoiseSeedGiven = true, true
+	noise.bootstrapNoiseRootSeed = publicNoiseFidelity003RootSeed
+	if publicBackendName() == "fast" {
+		if err := validateNoiseFidelityOptions(noise); err != nil {
+			t.Fatalf("valid 003 Fast+Noise contract rejected: %v", err)
+		}
+	} else if err := validateNoiseFidelityOptions(noise); err == nil {
+		t.Fatal("Fast+Noise contract was accepted by a non-Fast build")
+	}
+	wrong := noise
+	wrong.bootstrapNoiseRootSeed++
+	if err := validateNoiseFidelityOptions(wrong); err == nil {
+		t.Fatal("003 accepted a changed root seed")
+	}
+	wrong = repeatability
+	wrong.profile = "logn13"
+	if err := validateNoiseFidelityOptions(wrong); err == nil {
+		t.Fatal("003 accepted a non-LogN16 profile")
+	}
+	wrong = repeatability
+	wrong.noiseFidelity002 = true
+	if err := validateNoiseFidelityOptions(wrong); err == nil {
+		t.Fatal("003 accepted a mixed 002 task contract")
+	}
+}
+
+func TestNoiseFidelity003LogN16PreflightRequiresObservedOracleAndExactBinaries(t *testing.T) {
+	profile, err := publicProfileFor("logn16")
+	if err != nil {
+		t.Fatal(err)
+	}
+	const (
+		standardBinary = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+		fastBinary     = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+		sourceSHA      = "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+	)
+	pair := publicPairDocument{
+		SchemaVersion: "fast-standard-public-native-pair.v1", TaskID: publicNoiseFidelity003TaskID,
+		Status: "PASS", Profile: "logn16", ProfileKind: publicProfileKindFrozen, NumericalGate: publicNumericalGate,
+		FastCommit: publicNoiseFidelity003FastSHA, StandardCommit: publicStandardSHA,
+		FastBinarySHA256: fastBinary, StandardBinarySHA256: standardBinary,
+		PrimaryCommit: publicStandardSHA, PrimaryEvidenceCommit: publicBootstrapNoisePilotFastSHA, SourceSHA256: sourceSHA,
+		InputSHA256: profile.InputSHA256, WorkloadSHA256: profile.WorkloadSHA256, ConfigSHA256: profile.ConfigSHA256, QPSHA256: profile.QPSHA256,
+		CapacityEvidenceVersion: publicCapacityEvidenceVersion, CapacityPolicy: publicCapacityPolicyLogN16Observed,
+		ConservativeBoundStatus: perfmeasure.PublicCapacityNotProven, ObservedNativeOracleStatus: publicObservedOraclePassed,
+		E: 32, BootstrapCalls: 0, MatchedEnvironment: true,
+		StandardLevel0Continuity: vectorMetrics{}, FastLevel0Continuity: vectorMetrics{},
+	}
+	for _, name := range []string{"encrypt_a_level5", "encrypt_b_level5", "encrypt_c_q5_level5", "add_level5", "mulrelin_level5", "rescale_q5_level4", "rotate_level4", "drop_level0"} {
+		pair.Checkpoints = append(pair.Checkpoints, publicPairCheckpoint{Name: name, Pass: true, StateMatched: true, Metrics: vectorMetrics{}})
+	}
+	path := filepath.Join(t.TempDir(), "003-preflight-pair.json")
+	if err := writeExclusiveJSON(path, pair); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := validatePublicPreflightGateForTaskID(path, publicStandardSHA, sourceSHA, profile, publicNoiseFidelity003FastSHA,
+		profile.ConfigSHA256, profile.QPSHA256, profile.InputSHA256, profile.WorkloadSHA256, false, publicNoiseFidelity003TaskID, "fast", fastBinary); err != nil {
+		t.Fatalf("valid exact-profile 003 preflight rejected: %v", err)
+	}
+	if _, err := validatePublicPreflightGateForTaskID(path, publicStandardSHA, sourceSHA, profile, publicNoiseFidelity003FastSHA,
+		profile.ConfigSHA256, profile.QPSHA256, profile.InputSHA256, profile.WorkloadSHA256, false, publicNoiseFidelity003TaskID, "fast", standardBinary); err == nil {
+		t.Fatal("003 preflight accepted a binary other than the paired Fast binary")
+	}
+	pair.ConservativeBoundStatus = perfmeasure.PublicCapacitySufficient
+	badPath := filepath.Join(t.TempDir(), "bad-pair.json")
+	if err := writeExclusiveJSON(badPath, pair); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := validatePublicPreflightGateForTaskID(badPath, publicStandardSHA, sourceSHA, profile, publicNoiseFidelity003FastSHA,
+		profile.ConfigSHA256, profile.QPSHA256, profile.InputSHA256, profile.WorkloadSHA256, false, publicNoiseFidelity003TaskID, "fast", fastBinary); err == nil {
+		t.Fatal("003 preflight relabeled the frozen conservative q0 NOT_PROVEN result")
+	}
+}
+
+func TestNoiseFidelity003LogN16TripletCompatibilityIsTaskAndProfileBound(t *testing.T) {
+	profile, err := publicProfileFor("logn16")
+	if err != nil {
+		t.Fatal(err)
+	}
+	config, _, err := perfmeasure.LoadConfig(filepath.Join("..", "..", "configs", "bootstrap_config.logN16.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, _, effective, err := perfmeasure.ParametersFromConfigWithE(config, 32)
+	if err != nil {
+		t.Fatal(err)
+	}
+	oracles, err := publicOracleCheckpoints(profile.InputSlots)
+	if err != nil {
+		t.Fatal(err)
+	}
+	input := encodeVector(oracles["drop_level0"])
+	inputSHA := perfmeasure.Fingerprint(decodeComplexValues(input))
+	const (
+		fastBinary = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+		sourceSHA  = "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+		preflight  = "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+	)
+	mode := "public-native-noise-fidelity-003-logn16-repeatability"
+	var docs [3]publicNativeDocument
+	var vectors [3]publicVectorDocument
+	for i, backend := range []string{"standard", "fast", "fast"} {
+		commit := publicStandardSHA
+		binary := "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+		if backend == "fast" {
+			commit, binary = publicNoiseFidelity003FastSHA, fastBinary
+		}
+		docs[i] = publicNativeDocument{
+			TaskID: publicNoiseFidelity003TaskID, Mode: mode, BootstrapBudget: 6, BootstrapCalls: 6, Profile: "logn16",
+			EphemeralSecretWeight: 32, PrimaryCommit: publicStandardSHA, PrimaryEvidenceCommit: publicBootstrapNoisePilotFastSHA,
+			PrimarySourceSHA256: sourceSHA, Backend: backend, BackendCommit: commit, BinarySHA256: binary,
+			Parameters: effective, ConfigSHA256: profile.ConfigSHA256, QPSHA256: profile.QPSHA256,
+			InputSHA256: profile.InputSHA256, WorkloadSHA256: profile.WorkloadSHA256, BootstrapInputSHA256: inputSHA,
+			PreflightPairSHA256: preflight, CapacityPolicy: publicCapacityPolicyLogN16Observed,
+			ExecutionPhases: []phaseTiming{
+				{Phase: "public_ckks_evaluator_construction", ElapsedNS: 100, Samples: 1, Available: true},
+				{Phase: "public_bootstrapping_evaluator_construction", ElapsedNS: 200, Samples: 1, Available: true},
+			},
+		}
+		if i == 2 {
+			docs[i].ExecutionPhases = append(docs[i].ExecutionPhases, phaseTiming{Phase: "bootstrap_noise_hook_configuration", ElapsedNS: 10, Samples: 1, Available: true})
+		}
+		vectors[i] = publicVectorDocument{
+			TaskID: publicNoiseFidelity003TaskID, Mode: mode, BootstrapInputSHA256: inputSHA,
+			ConfigSHA256: profile.ConfigSHA256, QPSHA256: profile.QPSHA256, InputSHA256: profile.InputSHA256,
+			WorkloadSHA256: profile.WorkloadSHA256, BootstrapPlaintextInput: input,
+		}
+	}
+	if err := validatePublicTripletCompatibilityTask(docs[0], docs[1], docs[2], vectors[0], vectors[1], vectors[2], publicNoiseFidelity003TaskID); err != nil {
+		t.Fatalf("valid exact-profile 003 triplet provenance rejected: %v", err)
+	}
+	docs[1].BackendCommit = publicNoiseFidelity002FastSHA
+	if err := validatePublicTripletCompatibilityTask(docs[0], docs[1], docs[2], vectors[0], vectors[1], vectors[2], publicNoiseFidelity003TaskID); err == nil {
+		t.Fatal("003 triplet accepted the 002 Fast source pin")
+	}
+	docs[1].BackendCommit = publicNoiseFidelity003FastSHA
+	docs[1].Parameters.LogN = 15
+	if err := validatePublicTripletCompatibilityTask(docs[0], docs[1], docs[2], vectors[0], vectors[1], vectors[2], publicNoiseFidelity003TaskID); err == nil {
+		t.Fatal("003 triplet accepted mismatched LogN dimensions")
+	}
+}
+
+func TestNoiseFidelity003LogN16ComparatorConsumesSixSamplesPerArm(t *testing.T) {
+	standard, standardVectors := makeNoiseFidelity003BaseArtifacts(t, "standard")
+	fast, fastVectors := makeNoiseFidelity003BaseArtifacts(t, "fast")
+	preflightPaths := []string{
+		filepath.Join(t.TempDir(), "standard.json"), filepath.Join(t.TempDir(), "fast.json"),
+		filepath.Join(t.TempDir(), "standard-vectors.json"), filepath.Join(t.TempDir(), "fast-vectors.json"),
+		filepath.Join(t.TempDir(), "pair.json"),
+	}
+	for _, item := range []struct {
+		path  string
+		value any
+	}{
+		{preflightPaths[0], standard}, {preflightPaths[1], fast},
+		{preflightPaths[2], standardVectors}, {preflightPaths[3], fastVectors},
+	} {
+		if err := writeExclusiveJSON(item.path, item.value); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if err := runPublicCompare([]string{
+		"--standard=" + preflightPaths[0], "--fast=" + preflightPaths[1],
+		"--standard-vectors=" + preflightPaths[2], "--fast-vectors=" + preflightPaths[3],
+		"--out=" + preflightPaths[4], "--noise-fidelity-003-logn16-preflight",
+	}); err != nil {
+		t.Fatalf("valid synthetic zero-call LogN16 pair rejected: %v", err)
+	}
+	pairData, err := os.ReadFile(preflightPaths[4])
+	if err != nil {
+		t.Fatal(err)
+	}
+	preflightSHA := fmt.Sprintf("%x", sha256.Sum256(pairData))
+
+	standard, standardVectors = promoteNoiseFidelity003Capture(t, standard, standardVectors, "standard", preflightSHA, 2e-6, false)
+	fastBase, fastBaseVectors := fast, fastVectors
+	fast, fastVectors = promoteNoiseFidelity003Capture(t, fastBase, fastBaseVectors, "fast", preflightSHA, 4e-6, false)
+	noise, noiseVectors := promoteNoiseFidelity003Capture(t, fastBase, fastBaseVectors, "fast", preflightSHA, 1.5e-6, true)
+	noise.BootstrapNoiseEvidence = makeNoiseFidelity003Snapshot(t, noise.Parameters)
+
+	paths := []string{
+		filepath.Join(t.TempDir(), "s.json"), filepath.Join(t.TempDir(), "sv.json"),
+		filepath.Join(t.TempDir(), "f.json"), filepath.Join(t.TempDir(), "fv.json"),
+		filepath.Join(t.TempDir(), "fn.json"), filepath.Join(t.TempDir(), "fnv.json"),
+		filepath.Join(t.TempDir(), "triplet.json"),
+	}
+	for _, item := range []struct {
+		path  string
+		value any
+	}{
+		{paths[0], standard}, {paths[1], standardVectors}, {paths[2], fast}, {paths[3], fastVectors},
+		{paths[4], noise}, {paths[5], noiseVectors},
+	} {
+		if err := writeExclusiveJSON(item.path, item.value); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if err := runPublicTripletCompare([]string{
+		"--standard=" + paths[0], "--standard-vectors=" + paths[1],
+		"--fast=" + paths[2], "--fast-vectors=" + paths[3],
+		"--fast-noise=" + paths[4], "--fast-noise-vectors=" + paths[5],
+		"--preflight-pair=" + preflightPaths[4], "--out=" + paths[6], "--noise-fidelity-003-logn16",
+	}); err != nil {
+		t.Fatalf("valid synthetic six-sample LogN16 triplet rejected: %v", err)
+	}
+	var result publicTripletFidelity002Document
+	if err := readJSON(paths[6], &result); err != nil {
+		t.Fatal(err)
+	}
+	if result.SchemaVersion != "fast-bootstrap-noise-fidelity-003-logn16-triplet.v1" || result.TaskID != publicNoiseFidelity003TaskID ||
+		result.Profile != "logn16" || result.NoiseRootSeed != publicNoiseFidelity003RootSeed || len(result.Arms["S"].Samples) != 6 ||
+		len(result.Arms["F"].Samples) != 6 || len(result.Arms["FN"].Samples) != 6 || result.Arms["FN"].Cold.NumericalGatePass {
+		t.Fatalf("unexpected 003 six-sample result contract: schema=%s task=%s profile=%s", result.SchemaVersion, result.TaskID, result.Profile)
+	}
+}
+
+func makeNoiseFidelity003BaseArtifacts(t *testing.T, backend string) (publicNativeDocument, publicVectorDocument) {
+	t.Helper()
+	config, configSHA, err := perfmeasure.LoadConfig(filepath.Join("..", "..", "configs", "bootstrap_config.logN16.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, _, effective, err := perfmeasure.ParametersFromConfigWithE(config, 32)
+	if err != nil {
+		t.Fatal(err)
+	}
+	profile, err := publicProfileFor("logn16")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if fmt.Sprintf("%x", configSHA) != profile.ConfigSHA256 {
+		t.Fatal("LogN16 config fixture hash differs from frozen profile")
+	}
+	oracles, err := publicOracleCheckpoints(profile.InputSlots)
+	if err != nil {
+		t.Fatal(err)
+	}
+	a, b, c, err := perfmeasure.PublicMulRescaleWorkload(profile.InputSlots)
+	if err != nil {
+		t.Fatal(err)
+	}
+	qPrimes, err := parseEffectiveQPrimes(effective)
+	if err != nil {
+		t.Fatal(err)
+	}
+	capacity, err := assessPublicCapacityForProfile(profile, a, b, c, qPrimes, effective.RingN)
+	if err != nil {
+		t.Fatal(err)
+	}
+	continuity, err := comparePublicLevel0Continuity(oracles["rotate_level4"], oracles["drop_level0"])
+	if err != nil {
+		t.Fatal(err)
+	}
+	backendCommit, buildTag := publicNoiseFidelity003FastSHA, "perf_fast"
+	if backend == "standard" {
+		backendCommit, buildTag = publicStandardSHA, "perf_standard"
+	}
+	inputKind, constructor := publicInputContract(backend)
+	checkpoints := make([]publicCheckpoint, 0, 8)
+	checkpointVectors := make(map[string][]complexValue, 8)
+	for _, name := range []string{"encrypt_a_level5", "encrypt_b_level5", "encrypt_c_q5_level5", "add_level5", "mulrelin_level5", "rescale_q5_level4", "rotate_level4", "drop_level0"} {
+		level := map[string]int{"encrypt_a_level5": 5, "encrypt_b_level5": 5, "encrypt_c_q5_level5": 5, "add_level5": 5, "mulrelin_level5": 5, "rescale_q5_level4": 4, "rotate_level4": 4, "drop_level0": 0}[name]
+		activeRows, physicalRows := min(level+1, 4), level+1
+		compact := backend == "fast" && name != "encrypt_a_level5" && name != "encrypt_b_level5" && name != "encrypt_c_q5_level5"
+		if backend == "fast" && !compact {
+			physicalRows = len(effective.QPrimes)
+		}
+		rowLengths, rowHashes := make([][]int, 2), make([][]string, 2)
+		for component := 0; component < 2; component++ {
+			rowLengths[component] = make([]int, physicalRows)
+			rowHashes[component] = make([]string, activeRows)
+			for row := range rowLengths[component] {
+				if row < activeRows || (backend == "fast" && !compact) {
+					rowLengths[component][row] = effective.RingN
+				}
+			}
+			for row := range rowHashes[component] {
+				rowHashes[component][row] = fmt.Sprintf("%s-%d-%d", name, component, row)
+			}
+		}
+		decodePath := "Fast c0 projection to the authoritative Q-prefix plaintext (zero-secret measurement adapter)"
+		if backend == "standard" {
+			decodePath = "rlwe.NewDecryptor(...).DecryptNew -> ckks.NewEncoder.Decode"
+		} else if name == "drop_level0" {
+			decodePath = "rlwe.NewDecryptor(...).DecryptNew -> ckks.NewEncoder.Decode"
+		}
+		scale, err := expectedPublicCheckpointScale(effective, name)
+		if err != nil {
+			t.Fatal(err)
+		}
+		values := oracles[name]
+		checkpoints = append(checkpoints, publicCheckpoint{
+			Name: name, State: ciphertextState{Level: level, Degree: 1, Scale: scale, QPrefixRows: activeRows},
+			DecodePath: decodePath, PhysicalRowLengths: rowLengths, RowSHA256: rowHashes,
+			FastCompactPrefix: compact, C1Nonzero: backend == "standard", DecodedSHA256: perfmeasure.Fingerprint(values),
+			Oracle: compareVectors(values, values, publicNumericalGate), OracleSNR: numericalmetrics.Compare(values, values), OraclePass: true,
+		})
+		checkpointVectors[name] = encodeVector(values)
+	}
+	primarySourceSHA := "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+	binarySHA := "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+	if backend == "fast" {
+		binarySHA = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+	}
+	doc := publicNativeDocument{
+		SchemaVersion: "fast-standard-public-native-preflight.v1", TaskID: publicNoiseFidelity003TaskID,
+		Mode: "public-native", Status: "PASS_ZERO_BOOTSTRAP_PREBOOTSTRAP_CHAIN", Profile: "logn16", ProfileKind: publicProfileKindFrozen,
+		Backend: backend, BackendCommit: backendCommit, BackendClean: true, PrimaryClean: true, BinarySHA256: binarySHA,
+		PrimaryCommit: publicStandardSHA, PrimaryEvidenceCommit: publicBootstrapNoisePilotFastSHA, PrimarySourceSHA256: primarySourceSHA,
+		BuildTag: buildTag, ConfigSHA256: profile.ConfigSHA256, QPSHA256: profile.QPSHA256,
+		InputSHA256: profile.InputSHA256, WorkloadSHA256: profile.WorkloadSHA256,
+		Parameters: effective, EphemeralSecretWeight: 32, InputSlots: profile.InputSlots, InputKind: inputKind, InputConstructor: constructor,
+		InputC1Nonzero: backend == "standard", NumericalGate: publicNumericalGate,
+		CapacityEvidenceVersion: publicCapacityEvidenceVersion, CapacityPolicy: profile.CapacityPolicy,
+		ConservativeBoundStatus: capacity.TerminalQ0Status, ObservedNativeOracleStatus: publicObservedOraclePassed,
+		Level0Continuity: continuity, Capacity: capacity, BootstrapBudget: 0, BootstrapCalls: 0, Checkpoints: checkpoints,
+	}
+	vectors := publicVectorDocument{
+		SchemaVersion: "fast-standard-public-native-vectors.v1", TaskID: publicNoiseFidelity003TaskID, Mode: "public-native",
+		Backend: backend, BackendCommit: backendCommit, PrimaryCommit: doc.PrimaryCommit, PrimaryEvidenceCommit: doc.PrimaryEvidenceCommit,
+		SourceSHA256: primarySourceSHA, ConfigSHA256: profile.ConfigSHA256, QPSHA256: profile.QPSHA256,
+		InputSHA256: profile.InputSHA256, WorkloadSHA256: profile.WorkloadSHA256, E: 32, Checkpoints: checkpointVectors,
+	}
+	return doc, vectors
+}
+
+func promoteNoiseFidelity003Capture(t *testing.T, doc publicNativeDocument, vectors publicVectorDocument, backend, preflightSHA string, offset float64, noiseEnabled bool) (publicNativeDocument, publicVectorDocument) {
+	t.Helper()
+	doc.SchemaVersion, doc.Mode, doc.Status = "fast-standard-public-native-noise-fidelity-003-logn16-repeatability.v1", "public-native-noise-fidelity-003-logn16-repeatability", "OBSERVED_PUBLIC_BOOTSTRAP_1COLD_5WARM"
+	doc.TaskID, doc.BootstrapBudget, doc.BootstrapCalls, doc.PreflightPairSHA256 = publicNoiseFidelity003TaskID, 6, 6, preflightSHA
+	oracles, err := publicOracleCheckpoints(doc.InputSlots)
+	if err != nil {
+		t.Fatal(err)
+	}
+	input := oracles["drop_level0"]
+	doc.BootstrapInputSHA256 = perfmeasure.Fingerprint(input)
+	doc.ExecutionPhases = []phaseTiming{
+		{Phase: "public_ckks_evaluator_construction", ElapsedNS: 100, Samples: 1, Available: true},
+		{Phase: "public_bootstrapping_evaluator_construction", ElapsedNS: 200, Samples: 1, Available: true},
+	}
+	if noiseEnabled {
+		doc.ExecutionPhases = append(doc.ExecutionPhases, phaseTiming{Phase: "bootstrap_noise_hook_configuration", ElapsedNS: 10, Samples: 1, Available: true})
+	}
+	bootstrapInput, err := expectedPublicCheckpointScale(doc.Parameters, "bootstrap_first_cold")
+	if err != nil || bootstrapInput == "" {
+		t.Fatalf("Bootstrap output Scale fixture: %v", err)
+	}
+	wants, err := publicBootstrapAttemptSpecs(6)
+	if err != nil {
+		t.Fatal(err)
+	}
+	doc.BootstrapResults = make([]publicBootstrapResult, 0, len(wants))
+	vectors.TaskID, vectors.Mode = publicNoiseFidelity003TaskID, doc.Mode
+	vectors.SchemaVersion = "fast-standard-public-native-noise-fidelity-003-logn16-repeatability-vectors.v1"
+	vectors.BootstrapInputSHA256, vectors.BootstrapPlaintextInput = doc.BootstrapInputSHA256, encodeVector(input)
+	vectors.Backend, vectors.BackendCommit = backend, doc.BackendCommit
+	vectors.PrimaryCommit, vectors.PrimaryEvidenceCommit, vectors.SourceSHA256 = doc.PrimaryCommit, doc.PrimaryEvidenceCommit, doc.PrimarySourceSHA256
+	vectors.BootstrapOutputs = make(map[string][]complexValue, len(wants))
+	for index, want := range wants {
+		output := append([]complex128(nil), input...)
+		output[0] += complex(offset+float64(index)*1e-9, 0)
+		rowLengths, rowHashes := [][]int{{doc.Parameters.RingN, doc.Parameters.RingN}, {doc.Parameters.RingN, doc.Parameters.RingN}}, [][]string{{"q0", "q1"}, {"q0", "q1"}}
+		decodePath := "rlwe.NewDecryptor(residual parameters, generated secret).DecryptNew -> ckks.NewEncoder.Decode"
+		if backend == "fast" {
+			decodePath = "rlwe.NewDecryptor(residual parameters, matching zero-secret-mode secret).DecryptNew -> ckks.NewEncoder.Decode"
+		}
+		checkpoint := publicCheckpoint{
+			Name: want.name, State: ciphertextState{Level: 1, Degree: 1, Scale: bootstrapInput, QPrefixRows: 2},
+			DecodePath: decodePath, PhysicalRowLengths: rowLengths, RowSHA256: rowHashes,
+			FastCompactPrefix: backend == "fast", C1Nonzero: backend == "standard", DecodedSHA256: perfmeasure.Fingerprint(output),
+			Oracle: compareVectors(input, output, publicNumericalGate), OracleSNR: numericalmetrics.Compare(input, output),
+			OraclePass: compareVectors(input, output, publicNumericalGate).MaxComplexDifference <= publicNumericalGate,
+		}
+		doc.BootstrapResults = append(doc.BootstrapResults, publicBootstrapResult{
+			Phase: want.phase, InputCiphertextSHA256: "held-n16-bootstrap-input-ciphertext-sha",
+			Timing: phaseTiming{Phase: want.phase, ElapsedNS: int64(1000 + index*100), AllocBytes: uint64(1 << 20), Allocs: 100, Samples: 1, Available: true}, Output: checkpoint,
+		})
+		vectors.BootstrapOutputs[want.name] = encodeVector(output)
+	}
+	return doc, vectors
+}
+
+func makeNoiseFidelity003Snapshot(t *testing.T, parameters perfmeasure.EffectiveParameters) json.RawMessage {
+	t.Helper()
+	qPrimes, err := parseEffectiveQPrimes(parameters)
+	if err != nil {
+		t.Fatal(err)
+	}
+	product := big.NewInt(1)
+	for _, prime := range qPrimes[:4] {
+		product.Mul(product, new(big.Int).SetUint64(prime))
+	}
+	phase := []bootstrapNoisePhaseEvidence{
+		{Name: "sampling_hash_moments", ElapsedNS: 10}, {Name: "coefficient_to_qprefix_ntt", ElapsedNS: 20},
+		{Name: "candidate_c0_add", ElapsedNS: 30}, {Name: "qprefix_centered_capacity_check", ElapsedNS: 40}, {Name: "commit_c0", ElapsedNS: 0},
+	}
+	leftSeed := expectedBootstrapNoiseSamplingSeed(publicNoiseFidelity003RootSeed, 1, false)
+	rightSeed := expectedBootstrapNoiseSamplingSeed(publicNoiseFidelity003RootSeed, 1, true)
+	left, right := bootstrapNoiseTestPolynomial(leftSeed), bootstrapNoiseTestPolynomial(rightSeed)
+	mod1Scale := rlwe.NewScale(math.Exp2(60))
+	for _, side := range []*bootstrapNoisePolynomialEvidence{&left, &right} {
+		side.Level = 12
+		side.Scale = mod1Scale.Value.Text('g', -1)
+		side.SampleCount = 1 << 16
+		side.Capacity.CheckedCoefficients = 1 << 16
+		side.Capacity.PrefixProduct = product.String()
+		side.SamplingAlgorithm = "deterministic Gaussian test fixture"
+		side.DispatchEvidence = "NTT and MForm-mapped coefficient noise"
+		side.CoefficientMean = 0
+		side.CoefficientVariance = publicBootstrapNoiseSigma * publicBootstrapNoiseSigma
+		side.CoefficientMaxAbs = 12
+		side.Phases = phase
+	}
+	encoded, err := json.Marshal(bootstrapNoiseSnapshotEvidence{
+		Enabled: true, Sigma: publicBootstrapNoiseSigma, RootSeed: publicNoiseFidelity003RootSeed,
+		CtCtMultiplyCalls: 1, InjectedPolynomials: 2,
+		Events: []bootstrapNoiseEventEvidence{{Operation: 1, Level: 12, Scale: left.Scale, Left: left, Right: right, MultiplyCompleted: true}},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	return encoded
+}
+
 func TestPrimaryTaskIdentityAllowsEvidenceOnlyCommitAfterCleanCodeBuild(t *testing.T) {
 	const sourceCommit = "ca9fc012e68d23cf1573e4f0ff26e2ddc05fa0af"
 	const evidenceCommit = "e0e6ade64a75b1a19874533fbdcb3d2daca5f818"

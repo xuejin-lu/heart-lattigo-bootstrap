@@ -1,0 +1,16 @@
+{
+  "schema_version": "fast-bootstrap-noise-fidelity-003-logn16-summary.v1",
+  "task_id": "FAST-BOOTSTRAP-NOISE-FIDELITY-003-LOGN16",
+  "status": "BATCH_IN_PROGRESS",
+  "checkpoint": "CP-B-PLATFORM-INTEGRATION",
+  "actual_bootstrap_calls": 0,
+  "authorized_maximum_bootstrap_calls": 18,
+  "retry_budget": 0,
+  "profile": {"log_n":16,"ring_n":65536,"log_slots":15,"slots":32768,"ephemeral_secret_weight":32,"default_scale":"2^45","mod1_scale":"2^60","noise_sigma":4.004280012097432,"noise_root_seed":20261027},
+  "arms": {"FN":{"planned":6,"succeeded":0},"S":{"planned":6,"succeeded":0},"F":{"planned":6,"succeeded":0}},
+  "preflight": {"zero_bootstrap_calls":0,"status":"NOT_RUN"},
+  "source_pins": {"standard":"5dbffbdea05394de2ca3a432ed5318aa832e3f40","fast":"9e540b30898cea74f0fa4acdf03477264344db79","fast_branch":"experiment/fast-bootstrap-noise-fidelity"},
+  "secondary_no_bootstrap_tests": {"ckks_hook":"PASS","fast_hook":"PASS","chebyshev_power_2_4_16":"PASS","mod1_degree30":"PASS","bootstrap_parameters_e32":"PASS"},
+  "primary_targeted_tests": {"perf_fast":"PASS_7_TARGETED_TESTS","perf_standard":"PASS_7_TARGETED_TESTS","synthetic_logn16_triplet":"PASS_OBSERVATIONAL_GATE_MISS_RECORDED","task_worktree_policy":"PASS_2_TESTS"},
+  "result": "No Bootstrap calls or reservations have been made. Secondary LogN16 hook commit is pushed; Primary task-scoped platform integration remains uncommitted and the fresh zero-call pair has not yet been generated. See journal.md for test commands and gates."
+}

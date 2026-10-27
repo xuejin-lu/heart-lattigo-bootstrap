@@ -1,0 +1,32 @@
+{
+  "schema_version": "fast-bootstrap-noise-fidelity-003-logn16-attempt-ledger.v1",
+  "task_id": "FAST-BOOTSTRAP-NOISE-FIDELITY-003-LOGN16",
+  "authorized_maximum_complete_bootstrap_calls": 18,
+  "calls_reserved": 0,
+  "calls_started": 0,
+  "calls_succeeded": 0,
+  "calls_failed": 0,
+  "retry_budget": 0,
+  "experiment_order": ["FN", "S", "F"],
+  "attempts": [
+    {"id":"FN-COLD","arm":"FN","phase":"first_cold_bootstrap","ordinal":1,"status":"PLANNED"},
+    {"id":"FN-WARM-01","arm":"FN","phase":"warm_bootstrap_01","ordinal":2,"status":"PLANNED"},
+    {"id":"FN-WARM-02","arm":"FN","phase":"warm_bootstrap_02","ordinal":3,"status":"PLANNED"},
+    {"id":"FN-WARM-03","arm":"FN","phase":"warm_bootstrap_03","ordinal":4,"status":"PLANNED"},
+    {"id":"FN-WARM-04","arm":"FN","phase":"warm_bootstrap_04","ordinal":5,"status":"PLANNED"},
+    {"id":"FN-WARM-05","arm":"FN","phase":"warm_bootstrap_05","ordinal":6,"status":"PLANNED"},
+    {"id":"S-COLD","arm":"S","phase":"first_cold_bootstrap","ordinal":1,"status":"PLANNED"},
+    {"id":"S-WARM-01","arm":"S","phase":"warm_bootstrap_01","ordinal":2,"status":"PLANNED"},
+    {"id":"S-WARM-02","arm":"S","phase":"warm_bootstrap_02","ordinal":3,"status":"PLANNED"},
+    {"id":"S-WARM-03","arm":"S","phase":"warm_bootstrap_03","ordinal":4,"status":"PLANNED"},
+    {"id":"S-WARM-04","arm":"S","phase":"warm_bootstrap_04","ordinal":5,"status":"PLANNED"},
+    {"id":"S-WARM-05","arm":"S","phase":"warm_bootstrap_05","ordinal":6,"status":"PLANNED"},
+    {"id":"F-COLD","arm":"F","phase":"first_cold_bootstrap","ordinal":1,"status":"PLANNED"},
+    {"id":"F-WARM-01","arm":"F","phase":"warm_bootstrap_01","ordinal":2,"status":"PLANNED"},
+    {"id":"F-WARM-02","arm":"F","phase":"warm_bootstrap_02","ordinal":3,"status":"PLANNED"},
+    {"id":"F-WARM-03","arm":"F","phase":"warm_bootstrap_03","ordinal":4,"status":"PLANNED"},
+    {"id":"F-WARM-04","arm":"F","phase":"warm_bootstrap_04","ordinal":5,"status":"PLANNED"},
+    {"id":"F-WARM-05","arm":"F","phase":"warm_bootstrap_05","ordinal":6,"status":"PLANNED"}
+  ],
+  "note": "PLANNED slots are immutable IDs, not reservations or authorization to call before all pre-Bootstrap gates and a pushed execution plan pass. Any begun call is permanently consumed; no retries."
+}

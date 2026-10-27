@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"math"
+	"math/bits"
 	"reflect"
 	"sort"
 	"strconv"
@@ -221,9 +222,10 @@ func runPublicTripletCompare(args []string) error {
 	fastVectorsPath := flags.String("fast-vectors", "", "single-call Fast hook-disabled decoded vectors JSON")
 	fastNoisePath := flags.String("fast-noise", "", "single-call Fast Bootstrap with fixed-sigma hook enabled JSON")
 	fastNoiseVectorsPath := flags.String("fast-noise-vectors", "", "single-call Fast fixed-sigma decoded vectors JSON")
-	preflightPairPath := flags.String("preflight-pair", "", "fresh zero-call task-bound Standard/Fast pair required by Noise Fidelity 002")
+	preflightPairPath := flags.String("preflight-pair", "", "fresh zero-call task-bound Standard/Fast pair required by Noise Fidelity comparison")
 	outPath := flags.String("out", "", "exclusive compact triplet result JSON")
 	noiseFidelity002 := flags.Bool("noise-fidelity-002", false, "compare the task-specific 1-cold/5-warm captures from FAST-BOOTSTRAP-NOISE-FIDELITY-002")
+	noiseFidelity003 := flags.Bool("noise-fidelity-003-logn16", false, "compare the task-specific 1-cold/5-warm captures from FAST-BOOTSTRAP-NOISE-FIDELITY-003-LOGN16")
 	if err := flags.Parse(args); err != nil {
 		return err
 	}
@@ -245,14 +247,21 @@ func runPublicTripletCompare(args []string) error {
 			return fmt.Errorf("read triplet artifact %s: %w", item.path, err)
 		}
 	}
-	if *noiseFidelity002 {
+	if *noiseFidelity002 && *noiseFidelity003 {
+		return errors.New("Noise Fidelity 002 and 003 triplet contracts are mutually exclusive")
+	}
+	if *noiseFidelity002 || *noiseFidelity003 {
 		if *preflightPairPath == "" {
-			return errors.New("Noise Fidelity 002 comparison requires --preflight-pair")
+			return errors.New("task-scoped Noise Fidelity comparison requires --preflight-pair")
 		}
-		return runPublicTripletCompare002(standard, standardVectors, fast, fastVectors, fastNoise, fastNoiseVectors, *preflightPairPath, *outPath)
+		taskID := publicNoiseFidelity002TaskID
+		if *noiseFidelity003 {
+			taskID = publicNoiseFidelity003TaskID
+		}
+		return runPublicTripletCompareTask(standard, standardVectors, fast, fastVectors, fastNoise, fastNoiseVectors, *preflightPairPath, *outPath, taskID)
 	}
 	if *preflightPairPath != "" {
-		return errors.New("--preflight-pair is reserved for --noise-fidelity-002 comparison")
+		return errors.New("--preflight-pair is reserved for a task-scoped Noise Fidelity comparison")
 	}
 	if err := validatePublicBootstrapTripletArm(standard, standardVectors, "standard", false); err != nil {
 		return fmt.Errorf("Standard arm: %w", err)
@@ -343,6 +352,15 @@ func runPublicTripletCompare002(
 	fastNoise publicNativeDocument, fastNoiseVectors publicVectorDocument,
 	preflightPairPath, outPath string,
 ) error {
+	return runPublicTripletCompareTask(standard, standardVectors, fast, fastVectors, fastNoise, fastNoiseVectors, preflightPairPath, outPath, publicNoiseFidelity002TaskID)
+}
+
+func runPublicTripletCompareTask(
+	standard publicNativeDocument, standardVectors publicVectorDocument,
+	fast publicNativeDocument, fastVectors publicVectorDocument,
+	fastNoise publicNativeDocument, fastNoiseVectors publicVectorDocument,
+	preflightPairPath, outPath, taskID string,
+) error {
 	for label, pair := range []struct {
 		standard publicNativeDocument
 		fast     publicNativeDocument
@@ -353,13 +371,13 @@ func runPublicTripletCompare002(
 		{standard, fastNoise, standardVectors, fastNoiseVectors},
 	} {
 		if err := validatePublicBootstrapPairArtifacts(pair.standard, pair.fast, pair.sv, pair.fv); err != nil {
-			return fmt.Errorf("Noise Fidelity 002 pair %d: %w", label+1, err)
+			return fmt.Errorf("%s pair %d: %w", taskID, label+1, err)
 		}
 	}
-	if err := validatePublicTripletCompatibility002(standard, fast, fastNoise, standardVectors, fastVectors, fastNoiseVectors); err != nil {
+	if err := validatePublicTripletCompatibilityTask(standard, fast, fastNoise, standardVectors, fastVectors, fastNoiseVectors, taskID); err != nil {
 		return err
 	}
-	if err := validateNoiseFidelity002TripletPreflight(preflightPairPath, standard, fast, fastNoise); err != nil {
+	if err := validateNoiseFidelityTripletPreflight(preflightPairPath, standard, fast, fastNoise, taskID); err != nil {
 		return err
 	}
 	oracles, err := publicOracleCheckpoints(standard.InputSlots)
@@ -368,11 +386,11 @@ func runPublicTripletCompare002(
 	}
 	input := decodeComplexValues(standardVectors.BootstrapPlaintextInput)
 	if len(input) != standard.InputSlots || !allFinite(input) || perfmeasure.Fingerprint(input) != standard.BootstrapInputSHA256 {
-		return errors.New("Noise Fidelity 002 comparator requires the canonical finite Bootstrap plaintext")
+		return fmt.Errorf("%s comparator requires the canonical finite Bootstrap plaintext", taskID)
 	}
 	canonical := decodeComplexValues(encodeVector(oracles["drop_level0"]))
 	if !reflect.DeepEqual(input, canonical) {
-		return errors.New("Noise Fidelity 002 Bootstrap plaintext differs from the frozen original workload input")
+		return fmt.Errorf("%s Bootstrap plaintext differs from the frozen original workload input", taskID)
 	}
 	standardArm, err := summarizePublicTriplet002Arm(standard, standardVectors, input)
 	if err != nil {
@@ -386,12 +404,12 @@ func runPublicTripletCompare002(
 	if err != nil {
 		return fmt.Errorf("Fast+Noise arm: %w", err)
 	}
-	noiseEvidence, err := summarizePublicTriplet002Noise(fastNoise)
+	noiseEvidence, err := summarizePublicTripletTaskNoise(fastNoise, taskID)
 	if err != nil {
 		return err
 	}
 	if standardArm.Samples[0].ElapsedNS <= 0 || fastArm.Samples[0].ElapsedNS <= 0 || noiseArm.Samples[0].ElapsedNS <= 0 {
-		return errors.New("Noise Fidelity 002 cold timing ratios require three positive measured calls")
+		return fmt.Errorf("%s cold timing ratios require three positive measured calls", taskID)
 	}
 	comparison := make([]publicTriplet002PrecisionComparison, 0, 6)
 	pairwise := make([]publicTriplet002PairwiseOutput, 0, 6)
@@ -432,17 +450,25 @@ func runPublicTripletCompare002(
 	fastWarmMedian := fastArm.WarmElapsedNS.Median
 	noiseWarmMedian := noiseArm.WarmElapsedNS.Median
 	if standardArm.WarmElapsedNS.Median <= 0 || fastWarmMedian <= 0 || noiseWarmMedian <= 0 {
-		return errors.New("Noise Fidelity 002 warm speedup ratios require positive warm medians")
+		return fmt.Errorf("%s warm speedup ratios require positive warm medians", taskID)
+	}
+	profileName := "logn13"
+	fastPin := publicNoiseFidelity002FastSHA
+	rootSeed := publicNoiseFidelity002RootSeed
+	schemaSuffix := "002"
+	if taskID == publicNoiseFidelity003TaskID {
+		profileName, fastPin, rootSeed = "logn16", publicNoiseFidelity003FastSHA, publicNoiseFidelity003RootSeed
+		schemaSuffix = "003-logn16"
 	}
 	doc := publicTripletFidelity002Document{
-		SchemaVersion: "fast-bootstrap-noise-fidelity-002-triplet.v1", TaskID: publicNoiseFidelity002TaskID,
-		Status: "TRIPLET_COMPLETE_EXPLORATORY", GeneratedAt: time.Now().UTC(), Profile: standard.Profile,
+		SchemaVersion: fmt.Sprintf("fast-bootstrap-noise-fidelity-%s-triplet.v1", schemaSuffix), TaskID: taskID,
+		Status: "TRIPLET_COMPLETE_EXPLORATORY", GeneratedAt: time.Now().UTC(), Profile: profileName,
 		PrimaryCommit: standard.PrimaryCommit, PrimarySourceSHA256: standard.PrimarySourceSHA256,
-		StandardCommit: standard.BackendCommit, FastCommit: fast.BackendCommit, FastBinarySHA256: fast.BinarySHA256,
+		StandardCommit: standard.BackendCommit, FastCommit: fastPin, FastBinarySHA256: fast.BinarySHA256,
 		InputSHA256: standard.InputSHA256, BootstrapInputSHA256: standard.BootstrapInputSHA256,
 		ConfigSHA256: standard.ConfigSHA256, QPSHA256: standard.QPSHA256, WorkloadSHA256: standard.WorkloadSHA256,
 		PreflightPairSHA256: standard.PreflightPairSHA256, SigmaCoefficient: publicBootstrapNoiseSigma,
-		NoiseRootSeed: publicNoiseFidelity002RootSeed, NumericalGateMaxAbs: publicNumericalGate,
+		NoiseRootSeed: rootSeed, NumericalGateMaxAbs: publicNumericalGate,
 		Arms:                              map[string]publicTriplet002Arm{"S": standardArm, "F": fastArm, "FN": noiseArm},
 		PrecisionComparisonByPhase:        comparison,
 		PairwiseOutputsByPhase:            pairwise,
@@ -472,65 +498,99 @@ func runPublicTripletCompare002(
 }
 
 func validateNoiseFidelity002TripletPreflight(path string, standard, fast, fastNoise publicNativeDocument) error {
+	return validateNoiseFidelityTripletPreflight(path, standard, fast, fastNoise, publicNoiseFidelity002TaskID)
+}
+
+func validateNoiseFidelityTripletPreflight(path string, standard, fast, fastNoise publicNativeDocument, taskID string) error {
 	if path == "" {
-		return errors.New("Noise Fidelity 002 triplet requires the exact zero-call preflight pair artifact")
+		return fmt.Errorf("%s triplet requires the exact zero-call preflight pair artifact", taskID)
 	}
-	profile, err := publicProfileFor("logn13")
+	profileName := "logn13"
+	if taskID == publicNoiseFidelity003TaskID {
+		profileName = "logn16"
+	}
+	fastPin, err := noiseFidelityTaskFastPin(taskID)
 	if err != nil {
 		return err
 	}
-	pairSHA, err := validatePublicPreflightGateForTaskMode(
-		path, standard.PrimaryCommit, standard.PrimarySourceSHA256, profile, publicNoiseFidelity002FastSHA,
-		standard.ConfigSHA256, standard.QPSHA256, standard.InputSHA256, standard.WorkloadSHA256,
-		false, true, "standard", standard.BinarySHA256,
-	)
+	profile, err := publicProfileFor(profileName)
 	if err != nil {
-		return fmt.Errorf("Noise Fidelity 002 Standard preflight/binary provenance: %w", err)
+		return err
 	}
-	fastPairSHA, err := validatePublicPreflightGateForTaskMode(
-		path, fast.PrimaryCommit, fast.PrimarySourceSHA256, profile, publicNoiseFidelity002FastSHA,
-		fast.ConfigSHA256, fast.QPSHA256, fast.InputSHA256, fast.WorkloadSHA256,
-		false, true, "fast", fast.BinarySHA256,
+	pairSHA, err := validatePublicPreflightGateForTaskID(
+		path, standard.PrimaryCommit, standard.PrimarySourceSHA256, profile, fastPin,
+		standard.ConfigSHA256, standard.QPSHA256, standard.InputSHA256, standard.WorkloadSHA256,
+		false, taskID, "standard", standard.BinarySHA256,
 	)
 	if err != nil {
-		return fmt.Errorf("Noise Fidelity 002 Fast preflight/binary provenance: %w", err)
+		return fmt.Errorf("%s Standard preflight/binary provenance: %w", taskID, err)
+	}
+	fastPairSHA, err := validatePublicPreflightGateForTaskID(
+		path, fast.PrimaryCommit, fast.PrimarySourceSHA256, profile, fastPin,
+		fast.ConfigSHA256, fast.QPSHA256, fast.InputSHA256, fast.WorkloadSHA256,
+		false, taskID, "fast", fast.BinarySHA256,
+	)
+	if err != nil {
+		return fmt.Errorf("%s Fast preflight/binary provenance: %w", taskID, err)
 	}
 	if pairSHA != fastPairSHA || pairSHA != standard.PreflightPairSHA256 || pairSHA != fast.PreflightPairSHA256 || pairSHA != fastNoise.PreflightPairSHA256 {
-		return errors.New("Noise Fidelity 002 captures do not reference the same exact binary-bound preflight pair")
+		return fmt.Errorf("%s captures do not reference the same exact binary-bound preflight pair", taskID)
 	}
 	return nil
 }
 
 func validatePublicTripletCompatibility002(standard, fast, fastNoise publicNativeDocument, standardVectors, fastVectors, fastNoiseVectors publicVectorDocument) error {
+	return validatePublicTripletCompatibilityTask(standard, fast, fastNoise, standardVectors, fastVectors, fastNoiseVectors, publicNoiseFidelity002TaskID)
+}
+
+func validatePublicTripletCompatibilityTask(standard, fast, fastNoise publicNativeDocument, standardVectors, fastVectors, fastNoiseVectors publicVectorDocument, taskID string) error {
+	profileName := "logn13"
+	if taskID == publicNoiseFidelity003TaskID {
+		profileName = "logn16"
+	}
+	profile, err := publicProfileFor(profileName)
+	if err != nil {
+		return err
+	}
+	wantMode := "public-native-noise-fidelity-002-repeatability"
+	if taskID == publicNoiseFidelity003TaskID {
+		wantMode = "public-native-noise-fidelity-003-logn16-repeatability"
+	}
 	for _, doc := range []publicNativeDocument{standard, fast, fastNoise} {
-		if doc.TaskID != publicNoiseFidelity002TaskID || doc.Mode != "public-native-noise-fidelity-002-repeatability" ||
-			doc.BootstrapBudget != 6 || doc.BootstrapCalls != 6 || doc.Profile != "logn13" || doc.EphemeralSecretWeight != 32 ||
+		if doc.TaskID != taskID || doc.Mode != wantMode ||
+			doc.BootstrapBudget != 6 || doc.BootstrapCalls != 6 || doc.Profile != profileName || doc.EphemeralSecretWeight != 32 ||
 			!validGitCommitSHA(doc.PrimaryCommit) || !validGitCommitSHA(doc.PrimaryEvidenceCommit) ||
-			doc.Parameters.LogN != 13 || doc.Parameters.LogSlots != 12 || !effectiveScaleIs2To45(doc.Parameters.DefaultScale) ||
-			doc.ConfigSHA256 != publicConfigSHA || doc.QPSHA256 != publicQPSHA || doc.InputSHA256 != publicInputSHA || doc.WorkloadSHA256 != publicWorkloadSHA ||
-			doc.BootstrapInputSHA256 != publicBootstrapInputSHA || doc.PreflightPairSHA256 == "" {
-			return fmt.Errorf("Noise Fidelity 002 arm violates its frozen task/profile/source workload contract: task=%q mode=%q budget=%d/%d profile=%q E=%d effective=(LogN%d,LogSlots%d,Scale%s) config=%s QP=%s input=%s workload=%s bootstrap_input=%s preflight=%t",
-				doc.TaskID, doc.Mode, doc.BootstrapBudget, doc.BootstrapCalls, doc.Profile, doc.EphemeralSecretWeight,
+			doc.Parameters.LogN != profile.LogN || doc.Parameters.LogSlots != bits.Len(uint(profile.InputSlots))-1 ||
+			doc.Parameters.InputSlots != profile.InputSlots || doc.Parameters.RingN != profile.RingN ||
+			!effectiveScaleIs2To45(doc.Parameters.DefaultScale) ||
+			doc.ConfigSHA256 != profile.ConfigSHA256 || doc.QPSHA256 != profile.QPSHA256 || doc.InputSHA256 != profile.InputSHA256 || doc.WorkloadSHA256 != profile.WorkloadSHA256 ||
+			doc.BootstrapInputSHA256 == "" || doc.PreflightPairSHA256 == "" || doc.CapacityPolicy != profile.CapacityPolicy {
+			return fmt.Errorf("%s arm violates its frozen task/profile/source workload contract: task=%q mode=%q budget=%d/%d profile=%q E=%d effective=(LogN%d,LogSlots%d,Scale%s) config=%s QP=%s input=%s workload=%s bootstrap_input=%s preflight=%t",
+				taskID, doc.TaskID, doc.Mode, doc.BootstrapBudget, doc.BootstrapCalls, doc.Profile, doc.EphemeralSecretWeight,
 				doc.Parameters.LogN, doc.Parameters.LogSlots, doc.Parameters.DefaultScale, doc.ConfigSHA256, doc.QPSHA256,
 				doc.InputSHA256, doc.WorkloadSHA256, doc.BootstrapInputSHA256, doc.PreflightPairSHA256 != "")
 		}
 	}
-	if standard.BackendCommit != publicStandardSHA || fast.BackendCommit != publicNoiseFidelity002FastSHA || fastNoise.BackendCommit != publicNoiseFidelity002FastSHA ||
+	fastPin, err := noiseFidelityTaskFastPin(taskID)
+	if err != nil {
+		return err
+	}
+	if standard.BackendCommit != publicStandardSHA || fast.BackendCommit != fastPin || fastNoise.BackendCommit != fastPin ||
 		!validSHA256Hex(fast.BinarySHA256) || fast.BinarySHA256 != fastNoise.BinarySHA256 ||
 		len(fast.BootstrapNoiseEvidence) != 0 || len(standard.BootstrapNoiseEvidence) != 0 {
-		return errors.New("Noise Fidelity 002 source pins, shared Fast/FN binary, or OFF-arm hook state do not match")
+		return fmt.Errorf("%s source pins, shared Fast/FN binary, or OFF-arm hook state do not match", taskID)
 	}
 	if standard.PrimaryCommit != fast.PrimaryCommit || standard.PrimaryCommit != fastNoise.PrimaryCommit ||
 		standard.PrimarySourceSHA256 != fast.PrimarySourceSHA256 || standard.PrimarySourceSHA256 != fastNoise.PrimarySourceSHA256 ||
 		standard.PreflightPairSHA256 != fast.PreflightPairSHA256 || standard.PreflightPairSHA256 != fastNoise.PreflightPairSHA256 ||
 		!reflect.DeepEqual(standard.Parameters, fast.Parameters) || !reflect.DeepEqual(standard.Parameters, fastNoise.Parameters) ||
 		!publicEnvironmentsMatch(standard, fast) || !publicEnvironmentsMatch(standard, fastNoise) {
-		return errors.New("Noise Fidelity 002 arms mismatch in source, preflight, effective parameters, or execution host")
+		return fmt.Errorf("%s arms mismatch in source, preflight, effective parameters, or execution host", taskID)
 	}
 	for _, doc := range []publicNativeDocument{standard, fast} {
 		for _, phase := range doc.ExecutionPhases {
 			if phase.Phase == "bootstrap_noise_hook_configuration" {
-				return fmt.Errorf("Noise Fidelity 002 %s arm unexpectedly configured the Noise hook", doc.Backend)
+				return fmt.Errorf("%s %s arm unexpectedly configured the Noise hook", taskID, doc.Backend)
 			}
 		}
 	}
@@ -541,19 +601,20 @@ func validatePublicTripletCompatibility002(standard, fast, fastNoise publicNativ
 		}
 	}
 	if noiseHookConfigurations != 1 {
-		return fmt.Errorf("Noise Fidelity 002 Fast+Noise arm has %d hook-configuration phases, want exactly one", noiseHookConfigurations)
+		return fmt.Errorf("%s Fast+Noise arm has %d hook-configuration phases, want exactly one", taskID, noiseHookConfigurations)
 	}
 	for _, vectors := range []publicVectorDocument{standardVectors, fastVectors, fastNoiseVectors} {
-		if vectors.TaskID != publicNoiseFidelity002TaskID || vectors.Mode != "public-native-noise-fidelity-002-repeatability" ||
-			vectors.BootstrapInputSHA256 != publicBootstrapInputSHA || vectors.ConfigSHA256 != publicConfigSHA ||
-			vectors.QPSHA256 != publicQPSHA || vectors.InputSHA256 != publicInputSHA || vectors.WorkloadSHA256 != publicWorkloadSHA {
-			return errors.New("Noise Fidelity 002 vector provenance or canonical Bootstrap input is mismatched")
+		if vectors.TaskID != taskID || vectors.Mode != wantMode ||
+			vectors.BootstrapInputSHA256 != standard.BootstrapInputSHA256 || vectors.ConfigSHA256 != profile.ConfigSHA256 ||
+			vectors.QPSHA256 != profile.QPSHA256 || vectors.InputSHA256 != profile.InputSHA256 || vectors.WorkloadSHA256 != profile.WorkloadSHA256 {
+			return fmt.Errorf("%s vector provenance or canonical Bootstrap input is mismatched", taskID)
 		}
 	}
-	if standardVectors.BootstrapInputSHA256 != fastVectors.BootstrapInputSHA256 || standardVectors.BootstrapInputSHA256 != fastNoiseVectors.BootstrapInputSHA256 ||
+	if standard.BootstrapInputSHA256 != fast.BootstrapInputSHA256 || standard.BootstrapInputSHA256 != fastNoise.BootstrapInputSHA256 ||
+		standardVectors.BootstrapInputSHA256 != fastVectors.BootstrapInputSHA256 || standardVectors.BootstrapInputSHA256 != fastNoiseVectors.BootstrapInputSHA256 ||
 		!reflect.DeepEqual(standardVectors.BootstrapPlaintextInput, fastVectors.BootstrapPlaintextInput) ||
 		!reflect.DeepEqual(standardVectors.BootstrapPlaintextInput, fastNoiseVectors.BootstrapPlaintextInput) {
-		return errors.New("Noise Fidelity 002 arms do not use the same Bootstrap plaintext vector")
+		return fmt.Errorf("%s arms do not use the same Bootstrap plaintext vector", taskID)
 	}
 	return nil
 }
@@ -673,6 +734,14 @@ func summarizePublicTriplet002Arm(doc publicNativeDocument, vectors publicVector
 }
 
 func summarizePublicTriplet002Noise(doc publicNativeDocument) (publicTriplet002NoiseEvidence, error) {
+	return summarizePublicTripletTaskNoise(doc, publicNoiseFidelity002TaskID)
+}
+
+func summarizePublicTripletTaskNoise(doc publicNativeDocument, taskID string) (publicTriplet002NoiseEvidence, error) {
+	rootSeed := publicNoiseFidelity002RootSeed
+	if taskID == publicNoiseFidelity003TaskID {
+		rootSeed = publicNoiseFidelity003RootSeed
+	}
 	var snapshot bootstrapNoiseSnapshotEvidence
 	if err := json.Unmarshal(doc.BootstrapNoiseEvidence, &snapshot); err != nil {
 		return publicTriplet002NoiseEvidence{}, fmt.Errorf("decode Fast+Noise hook snapshot: %w", err)
@@ -681,7 +750,7 @@ func summarizePublicTriplet002Noise(doc publicNativeDocument) (publicTriplet002N
 	if err != nil {
 		return publicTriplet002NoiseEvidence{}, err
 	}
-	if err := validateBootstrapNoiseSnapshot(doc.BootstrapNoiseEvidence, publicBootstrapNoiseSigma, publicNoiseFidelity002RootSeed, doc.Parameters.RingN, qPrimes); err != nil {
+	if err := validateBootstrapNoiseSnapshot(doc.BootstrapNoiseEvidence, publicBootstrapNoiseSigma, rootSeed, doc.Parameters.RingN, qPrimes); err != nil {
 		return publicTriplet002NoiseEvidence{}, fmt.Errorf("Fast+Noise hook evidence: %w", err)
 	}
 	result := publicTriplet002NoiseEvidence{
@@ -694,8 +763,8 @@ func summarizePublicTriplet002Noise(doc publicNativeDocument) (publicTriplet002N
 		if event.Left.Seed == 0 || event.Right.Seed == 0 || event.Left.Seed == event.Right.Seed {
 			return publicTriplet002NoiseEvidence{}, fmt.Errorf("Noise event %d has invalid independent sampling seeds", event.Operation)
 		}
-		if event.Left.Seed != expectedBootstrapNoiseSamplingSeed(publicNoiseFidelity002RootSeed, event.Operation, false) ||
-			event.Right.Seed != expectedBootstrapNoiseSamplingSeed(publicNoiseFidelity002RootSeed, event.Operation, true) {
+		if event.Left.Seed != expectedBootstrapNoiseSamplingSeed(rootSeed, event.Operation, false) ||
+			event.Right.Seed != expectedBootstrapNoiseSamplingSeed(rootSeed, event.Operation, true) {
 			return publicTriplet002NoiseEvidence{}, fmt.Errorf("Noise event %d seeds do not match the frozen root/operation/side derivation", event.Operation)
 		}
 		for _, side := range []bootstrapNoisePolynomialEvidence{event.Left, event.Right} {
