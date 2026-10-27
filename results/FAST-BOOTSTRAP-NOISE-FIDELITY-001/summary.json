@@ -1,12 +1,12 @@
 {
   "attempt_ledger": "attempt-ledger.json",
   "bootstrap_calls": {
-    "actual": 0,
+    "actual": 1,
     "authorized_maximum": 3,
     "fast": 0,
     "fast_noise": 0,
     "retries": 0,
-    "standard": 0
+    "standard": 1
   },
   "completed_checkpoints": [
     "CP-A",
@@ -20,7 +20,7 @@
     "standard_side_gate_expected_fast_commit": "2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f",
     "type": "STANDARD_BOOTSTRAP_PREFLIGHT_FAST_PIN_MISMATCH"
   },
-  "in_progress_checkpoint": "CP-C Standard slot reserved (1 attempt), actual calls still 0/3; no retry",
+  "in_progress_checkpoint": "CP-C Standard completed once; Fast arm next and not yet reserved",
   "latest_precompute_stops": [
     {
       "arm": "S",
@@ -95,6 +95,21 @@
     "test_scope": "Exact pilot pin accept/reject, unchanged generic/legacy pin policy, pilot pair schema and non-public-mode rejection, zero-call LogN13/E32 CLI constraints, synthetic above-1e-6 observation, historical strict-gate preservation"
   },
   "schema_version": "fast-bootstrap-noise-fidelity-summary.v1",
+  "standard_observation": {
+    "actual_calls": 1,
+    "allocated_bytes": 144164144,
+    "allocations": 36710,
+    "bootstrap_time_ns": 325032000,
+    "capture": "captures/cp-c-resume-ced6416/standard.json",
+    "capture_sha256": "69fc87e44ae05c1a582d92ef4b5c960f1e8da8c838208b13f9f0c4e0a2e3a179",
+    "evidence": "captures/cp-c-resume-ced6416/standard-capture-evidence.json",
+    "evidence_sha256": "61f9f51dd3f067376570fd9dd13a3ff6df7548b6233532c1df094866bd23853a",
+    "max_abs_error": 1.3775425943461399e-08,
+    "max_abs_gate_pass": true,
+    "max_abs_threshold": 1e-06,
+    "precision_bits": "DEFERRED_TO_SHARED_TRIPLET_COMPARATOR",
+    "rmse_vs_input": "DEFERRED_TO_SHARED_TRIPLET_COMPARATOR"
+  },
   "status": "BATCH_IN_PROGRESS",
   "task": "FAST-BOOTSTRAP-NOISE-FIDELITY-001"
 }

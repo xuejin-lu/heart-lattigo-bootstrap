@@ -186,3 +186,11 @@ The fresh CP-C pre-call freeze (including the new pair, source/binary metadata, 
 ### CP-C Standard arm reservation — before the first Bootstrap
 
 After the pre-call freeze `d85ab612b9552817cfa8d9448f5fab3b3c53cf3b` and ready-state commit `7f4a3d5204bc4f58eed25eedecb5c6a9c5e7a9ed` were pushed, I reserved exactly one Standard invocation. The reservation is durably recorded before process launch at `/private/tmp/fbn001-cp-c-runs-7f4a3d5/standard.json`; its runner reservation journal will use the same base path. No Standard Bootstrap call has started yet, actual count remains `0/3`, and this reserved slot cannot be retried if execution fails. F and FN remain unreserved and will only follow a successful S result.
+
+### CP-C Standard arm result — one call completed
+
+The pre-reserved Standard slot completed exactly once at `2026-10-27T00:57:07.439727Z`; the attempt journal says `RETURNED`, and the artifact reports `COMPLETE_PUBLIC_BOOTSTRAP_ONCE_OBSERVATION`, one Bootstrap call, one output, and no retry/warmup. Genuine Standard source is `5dbffbdea05394de2ca3a432ed5318aa832e3f40`, using the frozen original `LogN13/E32/Scale 2^45` profile, same canonical input and plaintext fingerprints, and the preflight pair SHA recorded in the freeze.
+
+The decoded output has 4096 finite slots. Its direct output-vs-input oracle reports RMSE `4.834315596317264e-09`, MaxAbs `1.3775425943461399e-08` (below the observational `1e-6` threshold), and one-call measured time `325032000 ns` (about `0.325 s`); the runner recorded 144,164,144 allocated bytes and 36,710 allocations. This is Standard's observed result, not the final triplet comparator output. The authoritative cross-arm RMSE/precision-bit table will come from the existing shared triplet comparator after F and FN; no metric implementation is being added.
+
+Standard capture and both runner attempt records are preserved under `captures/cp-c-resume-ced6416/`; their hashes and the external decoded-vector path/hash are in `standard-capture-evidence.json` and the attempt ledger. The full vector file remains outside Git at `/private/tmp/fbn001-cp-c-runs-7f4a3d5/standard-vectors.json` (SHA-256 `3de45885f870cfec5751221b4658a79893dc69507cba6c17f76b5c682096d942`). Actual call count is now `1/3`; F and FN remain at 0, and the next step is to commit/push this Standard result before reserving and running F.

@@ -1,24 +1,39 @@
 {
-  "actual_bootstrap_calls": 0,
+  "actual_bootstrap_calls": 1,
   "attempts": [
     {
+      "alloc_bytes": 144164144,
+      "allocations": 36710,
       "arm": "S",
       "attempt_output_base_external": "/private/tmp/fbn001-cp-c-runs-7f4a3d5/standard.json",
+      "attempt_reservation_sha256": "352c376e81cbeda0a4b9dfb365870e1aa3b6799d4604b096d4a37a8239608a36",
       "attempt_reservations": 1,
-      "attempts_used": 0,
+      "attempt_result_sha256": "4e23f9c40f47d765148ab29a5c4f8df5b264980dce4c69d8d950585feff3a88e",
+      "attempts_used": 1,
       "backend": "genuine-standard",
       "binary_sha256": "987bf4dbcd3456f2ded3bc7045fa23f988fe2ffb1305d0b2de259a50c267a520",
-      "bootstrap_calls_consumed": 0,
+      "bootstrap_calls_consumed": 1,
+      "bootstrap_time_ns": 325032000,
+      "capture_evidence_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-001/captures/cp-c-resume-ced6416/standard-capture-evidence.json",
+      "capture_evidence_sha256": "61f9f51dd3f067376570fd9dd13a3ff6df7548b6233532c1df094866bd23853a",
+      "capture_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-001/captures/cp-c-resume-ced6416/standard.json",
+      "capture_sha256": "69fc87e44ae05c1a582d92ef4b5c960f1e8da8c838208b13f9f0c4e0a2e3a179",
       "historical_binary_sha256": "f34bac107e00534fe0acbeedf252936a1fa7f9351a2aafcc5cf040f3af37410b",
       "historical_preflight_pair_sha256": "3c4f66a0f9aeff869ff86fec39ef4efc37f76a6a166fae0b5bfe6b11cee16445",
       "injection": "OFF",
+      "max_abs_gate_pass": true,
+      "max_abs_threshold": 1e-06,
       "max_actual_calls": 1,
+      "observed_max_abs_error": 1.3775425943461399e-08,
+      "output_vectors_external_path": "/private/tmp/fbn001-cp-c-runs-7f4a3d5/standard-vectors.json",
+      "output_vectors_sha256": "3de45885f870cfec5751221b4658a79893dc69507cba6c17f76b5c682096d942",
+      "output_vectors_size_bytes": 4558925,
       "precompute_attempts": 3,
       "preflight_pair_sha256": "0b09e98eedfc1d0e14971a08c4ae5bf7b276f78471bae37307e68d1a554fa854",
-      "reservation_status": "RESERVED_NOT_STARTED_NO_RETRY",
+      "reservation_status": "CONSUMED_COMPLETE_NO_RETRY",
       "reservation_time_utc": "2026-10-27T00:55:28Z",
       "reserved_preflight_pair_sha256": "0b09e98eedfc1d0e14971a08c4ae5bf7b276f78471bae37307e68d1a554fa854",
-      "status": "STANDARD_CALL_RESERVED_NOT_STARTED"
+      "status": "COMPLETE_PUBLIC_BOOTSTRAP_ONCE_OBSERVATION"
     },
     {
       "arm": "F",
@@ -75,8 +90,22 @@
     "standard_vcs_modified": "false"
   },
   "build_provenance_status": "PASS_CLEAN_VCS_STAMPED_STANDARD_FAST_BINARIES",
+  "captures": {
+    "S": {
+      "bootstrap_calls": 1,
+      "bootstrap_time_ns": 325032000,
+      "evidence_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-001/captures/cp-c-resume-ced6416/standard-capture-evidence.json",
+      "evidence_sha256": "61f9f51dd3f067376570fd9dd13a3ff6df7548b6233532c1df094866bd23853a",
+      "max_abs_error": 1.3775425943461399e-08,
+      "max_abs_gate_pass": true,
+      "path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-001/captures/cp-c-resume-ced6416/standard.json",
+      "precision_bits": "DEFERRED_TO_SHARED_TRIPLET_COMPARATOR",
+      "rmse_observed": 4.834315596317264e-09,
+      "sha256": "69fc87e44ae05c1a582d92ef4b5c960f1e8da8c838208b13f9f0c4e0a2e3a179"
+    }
+  },
   "checkpoint": "CP-C",
-  "current_phase": "STANDARD_ARM_RESERVED_NOT_STARTED",
+  "current_phase": "FAST_ARM_READY_NOT_RESERVED",
   "events": [
     {
       "all_attempts_remain_reserved_not_started": true,
@@ -175,6 +204,22 @@
       "standard_binary_sha256": "987bf4dbcd3456f2ded3bc7045fa23f988fe2ffb1305d0b2de259a50c267a520",
       "time_utc": "2026-10-27T00:55:28Z",
       "warmups": 0
+    },
+    {
+      "actual_bootstrap_calls": 1,
+      "arm": "S",
+      "attempt_index": 1,
+      "attempt_reservation_status": "CONSUMED_COMPLETE_NO_RETRY",
+      "bootstrap_time_ns": 325032000,
+      "capture_evidence_sha256": "61f9f51dd3f067376570fd9dd13a3ff6df7548b6233532c1df094866bd23853a",
+      "capture_sha256": "69fc87e44ae05c1a582d92ef4b5c960f1e8da8c838208b13f9f0c4e0a2e3a179",
+      "event": "CP_C_STANDARD_ARM_COMPLETED",
+      "max_abs_error": 1.3775425943461399e-08,
+      "max_abs_gate_pass": true,
+      "max_abs_threshold": 1e-06,
+      "output_vectors_sha256": "3de45885f870cfec5751221b4658a79893dc69507cba6c17f76b5c682096d942",
+      "time_utc": "2026-10-27T00:57:07.439727Z",
+      "total_actual_bootstrap_calls": 1
     }
   ],
   "fast_noise_root_seed": 20261027,
@@ -277,13 +322,13 @@
     "primary_source_sha256": "bef8af26f2de7369d0ff8ec0f6ece49882135e8c3b4d67e252abaf20b19b530f",
     "standard_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40"
   },
-  "status": "CP_C_STANDARD_ATTEMPT_RESERVED",
+  "status": "CP_C_STANDARD_COMPLETE_READY_FOR_FAST",
   "stop_conditions": [
     "Do not execute any Bootstrap until post-ledger clean-source builds, go version -m metadata, binary SHA, and zero-call Standard/Fast preflight pair all pass.",
     "If any actual call fails, or provenance, parameters, capacity, input, or output validation fails, stop immediately; do not retry or consume another slot.",
     "No LogN16 workload, BTS, large benchmark, CP-D, or CP-E execution is authorized."
   ],
-  "stop_reason": "NONE_PRECALL_GATES_PASS",
+  "stop_reason": "NONE_STANDARD_CALL_COMPLETED",
   "superseded_build_provenance": [
     {
       "reason": "Superseded by clean post-repair source-pinned binaries for CP-C resume; previous values retained as history.",
