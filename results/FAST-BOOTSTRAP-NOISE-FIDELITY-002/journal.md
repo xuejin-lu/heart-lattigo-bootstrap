@@ -83,3 +83,30 @@ Versioned compact documents:
 - `preflight/manifest.json` captures the source/build/module/environment identities and all artifact hashes. Both decoded 4096-slot preflight vectors are intentionally outside Git: Standard `/private/tmp/fast-bootstrap-noise-fidelity-002-preflight/standard-vectors.json`, 4,165,467 bytes, SHA-256 `ce90902d3b66cf56442db7cc6fccd9d330ffb2c6f9f08a30977080d3482f7f47`; Fast `/private/tmp/fast-bootstrap-noise-fidelity-002-preflight/fast-vectors.json`, 4,159,849 bytes, SHA-256 `66641219e5c9cec380c3a985da01c051cfbf931173a28b1a7bcfda2615427e12`.
 
 All manifest file sizes and hashes were rechecked against the files, including both binaries and the external vectors. No output-precision threshold was used to waive any preflight structural, capacity, provenance, finite-slot, or oracle checks. No Bootstrap was reserved or invoked. The plan, manifest, ledger, and preflight artifacts must be committed and pushed before the first FN reservation.
+
+
+## FN arm capture — complete and validated
+
+Date: 2026-10-27. The first measured arm used the pre-pinned Fast binary with Noise enabled. Exactly six Bootstrap calls were reserved and returned in the same evaluator lifetime: one Cold followed by five Warm. No warmup or retry was performed. All six calls used independent copies of the same held Level0 ciphertext (ciphertext fingerprint `e512061ab0cc1ca3ebab443ab8d03ae021286124ade946d97fc51bc216a0c95f`), and all output checks completed with 4096 finite slots, Level 1, degree 1, NTT non-Montgomery output, and Scale 2^45. The exploratory `1e-6` gate passed for these six samples; each per-sample gate remains explicitly recorded in the raw document.
+
+- Capture document `raw/fn.json`: 824394 bytes, SHA-256 `a38bf6548b208aabc0721763b56fcb69bbaf10738300159f3a4d6a3e94391612`.
+- Decoded vectors remain outside Git at `/private/tmp/fast-bootstrap-noise-fidelity-002-captures/fn-vectors.json`: 6519727 bytes, SHA-256 `758c35cd5bc0fae72d98358d9c6919b72d7f11e4ad8f8506ccbcc6dc950d72ce`. The document contains the 4096-slot bootstrap plaintext input hash, six decoded sample hashes, and complete metrics inputs.
+- Each of the six exclusive reservation files and six result sidecars is preserved under `raw/`; `attempt-ledger.json` binds each slot to its reservation/result sidecar hashes and decoded output hash. All reservations are `irrevocably_reserved_before_call`; all result sidecars are `RETURNED`.
+- `bootstrap_noise_evidence`: root seed `20261027`, sigma `4.004280012097432`, 156 ct×ct multiply hooks and 312 polynomial injections across six calls. Operations are ordered 1 through 156. The event evidence validates distinct deterministic left/right seeds, all operations completed, and all 312 strict Q-prefix capacity checks passed.
+
+| # | Phase | Elapsed ns | Allocated bytes | Allocations | RMSE | Global precision bits (`-log2(RMSE)`) | MaxAbs | Decoded output SHA-256 |
+|---:|---|---:|---:|---:|---:|---:|---:|---|
+| 1 | first_cold_bootstrap | 648866292 | 1033675696 | 19286917 | 6.20791478276e-09 | 27.263244 | 5.82553954106e-08 | `4b4783ba1b16383271f1fc55a4aaa84d4ca3865851b6e738d34c79e75ee24095` |
+| 2 | warm_bootstrap_01 | 131644667 | 79606120 | 12509 | 6.17040057222e-09 | 27.271989 | 5.80076097502e-08 | `d1ea874ced6a6cac559f3fc8784b5f663e81794890e0c46c8375ff6f75ecd2ad` |
+| 3 | warm_bootstrap_02 | 131107125 | 79638888 | 12509 | 6.20086156417e-09 | 27.264884 | 5.22368164053e-08 | `930ace6f98b746878a6f1f5d47a0a4a51eee4dabc7f265649c8028706a8411ba` |
+| 4 | warm_bootstrap_03 | 132045208 | 79573304 | 12507 | 6.14152732555e-09 | 27.278755 | 5.90075198002e-08 | `dc97e7cc524eb0980672ca612e0172997fc0bd5ce5445a72e79fabf964aad45a` |
+| 5 | warm_bootstrap_04 | 144226541 | 79573304 | 12507 | 6.21945942331e-09 | 27.260564 | 6.74194736557e-08 | `c73f4d3c1134a1254ac98f5cbcddc28dedcc9e4998f6e7600273e7440647b810` |
+| 6 | warm_bootstrap_05 | 133289917 | 79707656 | 12519 | 6.23092904695e-09 | 27.257906 | 5.97318770758e-08 | `c1afe15266282f73a397a0533ac275a117eb7269971133df4adc8924c10acad5` |
+
+Cold timing/allocation: 648866292 ns, 1033675696 bytes, 19286917 allocations. Warm timing (ns): `131644667, 131107125, 132045208, 144226541, 133289917`; mean 134462691.600, median 132045208.000, sample SD 5517097.792, min 131107125, max 144226541. Warm mean allocation: 79619854.4 bytes and 12510.2 allocations.
+
+Evaluator construction phases: CKKS evaluator 1097375 ns / 6195696 bytes / 16682 allocations; bootstrapping evaluator 2654542 ns / 9640480 bytes / 32101 allocations. Combined: 3751917 ns / 15836176 bytes / 48783 allocations; construction plus Cold Bootstrap: 652618209 ns. Hook configuration phase is separately recorded in `raw/fn.json`.
+
+Noise hook evidence is in the raw document, not expanded into separate files: root seed `20261027`, σ `4.004280012097432`, 156 ordered ct×ct events (operations 1–156), 312 sampled polynomial injections; every multiply completed, every left/right Q-prefix check reported `strict_fit=true`, and every event records the actual independent side seeds, Level/Scale, coefficient moments/max/SHA-256, and transformation/capacity evidence. No complete coefficient vector is serialized.
+
+The user authorized FN→S→F and requires each arm checkpoint to be committed/pushed before reserving the next arm. At this checkpoint the task ledger is 6/18 calls; Standard/Fast remain 0/6 each. Proceed only after this FN evidence is committed and pushed.

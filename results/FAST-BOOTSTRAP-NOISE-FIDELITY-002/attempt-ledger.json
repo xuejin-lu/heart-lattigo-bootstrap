@@ -1,10 +1,10 @@
 {
   "schema_version": "fast-bootstrap-noise-fidelity-002-attempt-ledger.v1",
   "task": "FAST-BOOTSTRAP-NOISE-FIDELITY-002",
-  "status": "PLANNED_NO_BOOTSTRAP_ATTEMPTS",
+  "status": "FN_COMPLETE_S_PENDING",
   "created_at_utc": "2026-10-27",
   "authorized_maximum_bootstrap_calls": 18,
-  "actual_bootstrap_calls": 0,
+  "actual_bootstrap_calls": 6,
   "retry_budget": 0,
   "attempt_order": [
     "FN",
@@ -14,9 +14,9 @@
   "per_arm": {
     "FN": {
       "planned": 6,
-      "reserved": 0,
-      "consumed": 0,
-      "succeeded": 0,
+      "reserved": 6,
+      "consumed": 6,
+      "succeeded": 6,
       "failed": 0
     },
     "S": {
@@ -79,11 +79,18 @@
       "arm": "FN",
       "mode": "FAST_NOISE_ON",
       "phase": "first_cold_bootstrap",
-      "status": "NOT_RESERVED",
-      "reservation_path": null,
-      "result_path": null,
-      "bootstrap_calls_consumed": 0,
-      "retry_of": null
+      "status": "SUCCEEDED",
+      "reservation_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-002/raw/fn.json.bootstrap-attempt-01.json",
+      "result_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-002/raw/fn.json.bootstrap-result-01.json",
+      "bootstrap_calls_consumed": 1,
+      "retry_of": null,
+      "reserved_at": "2026-10-27T02:22:56.272168Z",
+      "completed_at": "2026-10-27T02:22:56.925332Z",
+      "reservation_sha256": "03a6704cce6e263b1ae4a8a1c3ad581e992e0c8752cd6942b025230e0fba57ad",
+      "result_sidecar_sha256": "7b81788281ffb7dadeb6b5d8f5181af4aa7a459f6bda0c84553167b70950e4d2",
+      "capture_document_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-002/raw/fn.json",
+      "capture_document_sha256": "a38bf6548b208aabc0721763b56fcb69bbaf10738300159f3a4d6a3e94391612",
+      "decoded_output_sha256": "4b4783ba1b16383271f1fc55a4aaa84d4ca3865851b6e738d34c79e75ee24095"
     },
     {
       "attempt_id": "FN-WARM_01",
@@ -91,11 +98,18 @@
       "arm": "FN",
       "mode": "FAST_NOISE_ON",
       "phase": "warm_bootstrap_01",
-      "status": "NOT_RESERVED",
-      "reservation_path": null,
-      "result_path": null,
-      "bootstrap_calls_consumed": 0,
-      "retry_of": null
+      "status": "SUCCEEDED",
+      "reservation_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-002/raw/fn.json.bootstrap-attempt-02.json",
+      "result_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-002/raw/fn.json.bootstrap-result-02.json",
+      "bootstrap_calls_consumed": 1,
+      "retry_of": null,
+      "reserved_at": "2026-10-27T02:22:56.932162Z",
+      "completed_at": "2026-10-27T02:22:57.070313Z",
+      "reservation_sha256": "d524296c1ac98ee8b1c0dedfd443ef1f7ca5062164d1f9a2dbe2c143c6dda72f",
+      "result_sidecar_sha256": "3cd64861cb81fe3b7c77f4a4ebac7a45c11c79f0a52fa23831c761d93bb0756d",
+      "capture_document_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-002/raw/fn.json",
+      "capture_document_sha256": "a38bf6548b208aabc0721763b56fcb69bbaf10738300159f3a4d6a3e94391612",
+      "decoded_output_sha256": "d1ea874ced6a6cac559f3fc8784b5f663e81794890e0c46c8375ff6f75ecd2ad"
     },
     {
       "attempt_id": "FN-WARM_02",
@@ -103,11 +117,18 @@
       "arm": "FN",
       "mode": "FAST_NOISE_ON",
       "phase": "warm_bootstrap_02",
-      "status": "NOT_RESERVED",
-      "reservation_path": null,
-      "result_path": null,
-      "bootstrap_calls_consumed": 0,
-      "retry_of": null
+      "status": "SUCCEEDED",
+      "reservation_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-002/raw/fn.json.bootstrap-attempt-03.json",
+      "result_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-002/raw/fn.json.bootstrap-result-03.json",
+      "bootstrap_calls_consumed": 1,
+      "retry_of": null,
+      "reserved_at": "2026-10-27T02:22:57.078944Z",
+      "completed_at": "2026-10-27T02:22:57.214594Z",
+      "reservation_sha256": "ca89a6af5fff42e2a948d4178e0b705e221bcab29ead6085d97509d818013295",
+      "result_sidecar_sha256": "0b035d307bb2172b1b0e53e158cce1f710bd9660e27458d8c27a5c6c0fb419d9",
+      "capture_document_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-002/raw/fn.json",
+      "capture_document_sha256": "a38bf6548b208aabc0721763b56fcb69bbaf10738300159f3a4d6a3e94391612",
+      "decoded_output_sha256": "930ace6f98b746878a6f1f5d47a0a4a51eee4dabc7f265649c8028706a8411ba"
     },
     {
       "attempt_id": "FN-WARM_03",
@@ -115,11 +136,18 @@
       "arm": "FN",
       "mode": "FAST_NOISE_ON",
       "phase": "warm_bootstrap_03",
-      "status": "NOT_RESERVED",
-      "reservation_path": null,
-      "result_path": null,
-      "bootstrap_calls_consumed": 0,
-      "retry_of": null
+      "status": "SUCCEEDED",
+      "reservation_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-002/raw/fn.json.bootstrap-attempt-04.json",
+      "result_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-002/raw/fn.json.bootstrap-result-04.json",
+      "bootstrap_calls_consumed": 1,
+      "retry_of": null,
+      "reserved_at": "2026-10-27T02:22:57.221278Z",
+      "completed_at": "2026-10-27T02:22:57.35688Z",
+      "reservation_sha256": "f855f4197d79c3029e8728c8c3a0012c1add0365b74e1dc1d3254d2b1bab63dd",
+      "result_sidecar_sha256": "f41f7cb7aa3fe8f15a4a300b767d1ccb53023a559b9a812f5b920bfb1a7a749f",
+      "capture_document_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-002/raw/fn.json",
+      "capture_document_sha256": "a38bf6548b208aabc0721763b56fcb69bbaf10738300159f3a4d6a3e94391612",
+      "decoded_output_sha256": "dc97e7cc524eb0980672ca612e0172997fc0bd5ce5445a72e79fabf964aad45a"
     },
     {
       "attempt_id": "FN-WARM_04",
@@ -127,11 +155,18 @@
       "arm": "FN",
       "mode": "FAST_NOISE_ON",
       "phase": "warm_bootstrap_04",
-      "status": "NOT_RESERVED",
-      "reservation_path": null,
-      "result_path": null,
-      "bootstrap_calls_consumed": 0,
-      "retry_of": null
+      "status": "SUCCEEDED",
+      "reservation_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-002/raw/fn.json.bootstrap-attempt-05.json",
+      "result_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-002/raw/fn.json.bootstrap-result-05.json",
+      "bootstrap_calls_consumed": 1,
+      "retry_of": null,
+      "reserved_at": "2026-10-27T02:22:57.362638Z",
+      "completed_at": "2026-10-27T02:22:57.511299Z",
+      "reservation_sha256": "8b1840a5ecfb7e2c495fb3673336b20141acf34fe91608d36e1026377ca07bff",
+      "result_sidecar_sha256": "5f2cd86e3fd5753bb75fdba3f9a2ae33824bc522403cefac9642b3e4e6398bc8",
+      "capture_document_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-002/raw/fn.json",
+      "capture_document_sha256": "a38bf6548b208aabc0721763b56fcb69bbaf10738300159f3a4d6a3e94391612",
+      "decoded_output_sha256": "c73f4d3c1134a1254ac98f5cbcddc28dedcc9e4998f6e7600273e7440647b810"
     },
     {
       "attempt_id": "FN-WARM_05",
@@ -139,11 +174,18 @@
       "arm": "FN",
       "mode": "FAST_NOISE_ON",
       "phase": "warm_bootstrap_05",
-      "status": "NOT_RESERVED",
-      "reservation_path": null,
-      "result_path": null,
-      "bootstrap_calls_consumed": 0,
-      "retry_of": null
+      "status": "SUCCEEDED",
+      "reservation_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-002/raw/fn.json.bootstrap-attempt-06.json",
+      "result_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-002/raw/fn.json.bootstrap-result-06.json",
+      "bootstrap_calls_consumed": 1,
+      "retry_of": null,
+      "reserved_at": "2026-10-27T02:22:57.517401Z",
+      "completed_at": "2026-10-27T02:22:57.654097Z",
+      "reservation_sha256": "c7f719a8468b4e078ac99fa60b19445917a24aa631fa427c1d5ad206959626ab",
+      "result_sidecar_sha256": "7d8ab709824878b245e0c045974771e4a510a370eaa138f29907ddf901418fa3",
+      "capture_document_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-002/raw/fn.json",
+      "capture_document_sha256": "a38bf6548b208aabc0721763b56fcb69bbaf10738300159f3a4d6a3e94391612",
+      "decoded_output_sha256": "c1afe15266282f73a397a0533ac275a117eb7269971133df4adc8924c10acad5"
     },
     {
       "attempt_id": "S-COLD",
@@ -294,5 +336,33 @@
     "Any failed Bootstrap call consumes its slot and stops the batch; no retry or later arm.",
     "Any provenance, capacity, representation, Scale, slot-count, decode, non-finite, or evidence validation failure stops before the next arm.",
     "No LogN16 workload, BTS, hidden warmup, extra Bootstrap, or modification to 001/fast-qprefix."
-  ]
+  ],
+  "captures": {
+    "FN": {
+      "document_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-002/raw/fn.json",
+      "document_bytes": 824394,
+      "document_sha256": "a38bf6548b208aabc0721763b56fcb69bbaf10738300159f3a4d6a3e94391612",
+      "vectors_external_path": "/private/tmp/fast-bootstrap-noise-fidelity-002-captures/fn-vectors.json",
+      "vectors_bytes": 6519727,
+      "vectors_sha256": "758c35cd5bc0fae72d98358d9c6919b72d7f11e4ad8f8506ccbcc6dc950d72ce",
+      "output_sample_count": 6,
+      "output_sha256_by_attempt": {
+        "FN-COLD": "4b4783ba1b16383271f1fc55a4aaa84d4ca3865851b6e738d34c79e75ee24095",
+        "FN-WARM_01": "d1ea874ced6a6cac559f3fc8784b5f663e81794890e0c46c8375ff6f75ecd2ad",
+        "FN-WARM_02": "930ace6f98b746878a6f1f5d47a0a4a51eee4dabc7f265649c8028706a8411ba",
+        "FN-WARM_03": "dc97e7cc524eb0980672ca612e0172997fc0bd5ce5445a72e79fabf964aad45a",
+        "FN-WARM_04": "c73f4d3c1134a1254ac98f5cbcddc28dedcc9e4998f6e7600273e7440647b810",
+        "FN-WARM_05": "c1afe15266282f73a397a0533ac275a117eb7269971133df4adc8924c10acad5"
+      },
+      "noise_root_seed": 20261027,
+      "sigma": 4.004280012097432,
+      "ct_ct_multiply_calls": 156,
+      "injected_polynomials": 312,
+      "event_order_first_last": [
+        1,
+        156
+      ],
+      "capacity_checks_strict_fit": true
+    }
+  }
 }
