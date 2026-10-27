@@ -2,8 +2,8 @@
   "schema_version": "fast-bootstrap-noise-fidelity-002-summary.v1",
   "task": "FAST-BOOTSTRAP-NOISE-FIDELITY-002",
   "status": "BATCH_IN_PROGRESS",
-  "checkpoint": "FN complete: 1 Cold + 5 Warm validated and saved; S and F remain unstarted; commit/push this arm before the next reservation",
-  "actual_bootstrap_calls": 6,
+  "checkpoint": "FN and Standard complete (6/6 each); Fast OFF remains unstarted; commit/push Standard checkpoint before the next reservation",
+  "actual_bootstrap_calls": 12,
   "authorized_maximum_bootstrap_calls": 18,
   "retry_budget": 0,
   "attempt_ledger": "attempt-ledger.json",
@@ -34,10 +34,10 @@
   "results": {
     "state": "PARTIAL",
     "completed_arms": [
-      "FN"
+      "FN",
+      "S"
     ],
     "pending_arms": [
-      "S",
       "F"
     ],
     "final_triplet_comparison": null
@@ -67,6 +67,30 @@
       "warm_max_ns": 144226541,
       "noise_events": 156,
       "injected_polynomials": 312
+    },
+    "S": {
+      "calls": 6,
+      "status": "SUCCEEDED",
+      "document": "raw/standard.json",
+      "document_bytes": 45192,
+      "document_sha256": "8bff544b68f0c42306427c369a7150e3077ad0847a94574e1665da25230684e7",
+      "vectors_external_path": "/private/tmp/fast-bootstrap-noise-fidelity-002-captures/standard-vectors.json",
+      "vectors_bytes": 6525586,
+      "vectors_sha256": "db8ded36ed46fd0aabb66a81fe8de459709bb8af06a413de059ebb1096b94d81",
+      "cold_elapsed_ns": 325961917,
+      "warm_elapsed_ns": [
+        309807250,
+        307756208,
+        326458917,
+        321371375,
+        320322208
+      ],
+      "warm_mean_ns": 317143191.6,
+      "warm_median_ns": 320322208,
+      "warm_sample_sd_ns": 8010897.579687766,
+      "warm_min_ns": 307756208,
+      "warm_max_ns": 326458917,
+      "output_hashes_unique_count": 1
     }
   }
 }

@@ -110,3 +110,29 @@ Evaluator construction phases: CKKS evaluator 1097375 ns / 6195696 bytes / 16682
 Noise hook evidence is in the raw document, not expanded into separate files: root seed `20261027`, σ `4.004280012097432`, 156 ordered ct×ct events (operations 1–156), 312 sampled polynomial injections; every multiply completed, every left/right Q-prefix check reported `strict_fit=true`, and every event records the actual independent side seeds, Level/Scale, coefficient moments/max/SHA-256, and transformation/capacity evidence. No complete coefficient vector is serialized.
 
 The user authorized FN→S→F and requires each arm checkpoint to be committed/pushed before reserving the next arm. At this checkpoint the task ledger is 6/18 calls; Standard/Fast remain 0/6 each. Proceed only after this FN evidence is committed and pushed.
+
+
+## Standard arm capture — complete and validated
+
+Date: 2026-10-27. The genuine Standard binary, built against Lattigo `5dbffbdea05394de2ca3a432ed5318aa832e3f40`, completed exactly one Cold plus five Warm calls. All six calls used independent copies of the same held ciphertext fingerprint `bad8ac3f290de3408d9d8f9f52b29ddaacb15722ef48a7bd55d3304361883dc2` and the identical bootstrap plaintext input SHA-256 `c32c0d7b731c0fcd8d82fb9c1182a43a62d120f761c090ce21dc764e9aa1e703`. The native Standard lifecycle is confirmed by `input_c1_nonzero=true`; no Fast backend was used. All outputs have 4096 finite slots, Level 1, degree 1, NTT non-Montgomery representation, Scale 2^45, and passed the exploratory 1e-6 observation gate. The six decoded output hashes are identical in this capture; all six raw samples remain represented and were not deduplicated.
+
+- Capture document `raw/standard.json`: 45192 bytes, SHA-256 `8bff544b68f0c42306427c369a7150e3077ad0847a94574e1665da25230684e7`.
+- Decoded vectors remain outside Git at `/private/tmp/fast-bootstrap-noise-fidelity-002-captures/standard-vectors.json`: 6525586 bytes, SHA-256 `db8ded36ed46fd0aabb66a81fe8de459709bb8af06a413de059ebb1096b94d81`.
+- Six reservation and six result sidecars are preserved under `raw/`, with paths and SHA-256 values bound by `attempt-ledger.json`; all were reserved and returned exactly once. Noise was not configured for Standard.
+
+| # | Phase | Elapsed ns | Allocated bytes | Allocations | RMSE | Global precision bits (`-log2(RMSE)`) | MaxAbs | Decoded output SHA-256 |
+|---:|---|---:|---:|---:|---:|---:|---:|---|
+| 1 | first_cold_bootstrap | 325961917 | 143968736 | 36696 | 4.91010460178e-09 | 27.601599 | 1.46721660358e-08 | `ef6b65fffdd08061b2f8f93689df37dbf9380e71e0a49642e71002860d62fa18` |
+| 2 | warm_bootstrap_01 | 309807250 | 91944920 | 35027 | 4.91010460178e-09 | 27.601599 | 1.46721660358e-08 | `ef6b65fffdd08061b2f8f93689df37dbf9380e71e0a49642e71002860d62fa18` |
+| 3 | warm_bootstrap_02 | 307756208 | 91674088 | 35005 | 4.91010460178e-09 | 27.601599 | 1.46721660358e-08 | `ef6b65fffdd08061b2f8f93689df37dbf9380e71e0a49642e71002860d62fa18` |
+| 4 | warm_bootstrap_03 | 326458917 | 91874760 | 35043 | 4.91010460178e-09 | 27.601599 | 1.46721660358e-08 | `ef6b65fffdd08061b2f8f93689df37dbf9380e71e0a49642e71002860d62fa18` |
+| 5 | warm_bootstrap_04 | 321371375 | 91730064 | 35004 | 4.91010460178e-09 | 27.601599 | 1.46721660358e-08 | `ef6b65fffdd08061b2f8f93689df37dbf9380e71e0a49642e71002860d62fa18` |
+| 6 | warm_bootstrap_05 | 320322208 | 91664504 | 35002 | 4.91010460178e-09 | 27.601599 | 1.46721660358e-08 | `ef6b65fffdd08061b2f8f93689df37dbf9380e71e0a49642e71002860d62fa18` |
+
+Cold timing/allocation: 325961917 ns, 143968736 bytes, 36696 allocations. Warm timing (ns): `309807250, 307756208, 326458917, 321371375, 320322208`; mean 317143191.600, median 320322208.000, sample SD 8010897.580, min 307756208, max 326458917. Warm mean allocation: 91777667.2 bytes and 35016.2 allocations.
+
+Evaluator construction phases: CKKS evaluator 984375 ns / 2719992 bytes / 16610 allocations; bootstrapping evaluator 353882000 ns / 710670992 bytes / 14232896 allocations. Combined: 354866375 ns / 713390984 bytes / 14249506 allocations; construction plus Cold Bootstrap: 680828292 ns.
+
+The six Standard outputs have global RMSE `4.91010460178e-09`, corresponding to 27.601599 global precision bits; this is distinct from the output's median per-slot precision field. Full output hashes and vectors are retained for later comparator recomputation.
+
+The task ledger is now 12/18 calls. FN and Standard are each 6/6 successful; Fast OFF remains 0/6 and must not start until this checkpoint is committed and pushed.
