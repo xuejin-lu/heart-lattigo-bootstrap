@@ -1,9 +1,9 @@
 {
   "attempt_ledger": "attempt-ledger.json",
   "bootstrap_calls": {
-    "actual": 1,
+    "actual": 2,
     "authorized_maximum": 3,
-    "fast": 0,
+    "fast": 1,
     "fast_noise": 0,
     "retries": 0,
     "standard": 1
@@ -11,7 +11,8 @@
   "completed_checkpoints": [
     "CP-A",
     "CP-B",
-    "CP-C fresh source-pinned zero-call preflight"
+    "CP-C fresh source-pinned zero-call preflight",
+    "CP-C genuine Standard and Fast one-call captures"
   ],
   "historical_blocker": {
     "evidence": "preflight/cp-c-stop.json",
@@ -20,7 +21,7 @@
     "standard_side_gate_expected_fast_commit": "2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f",
     "type": "STANDARD_BOOTSTRAP_PREFLIGHT_FAST_PIN_MISMATCH"
   },
-  "in_progress_checkpoint": "CP-C F slot reserved; S=1/1 complete, F/FN actual calls=0",
+  "in_progress_checkpoint": "CP-C S/F=1/1 complete; FN actual calls=0, unreserved",
   "latest_precompute_stops": [
     {
       "arm": "S",
@@ -117,5 +118,23 @@
     "rmse_vs_input": "DEFERRED_TO_SHARED_TRIPLET_COMPARATOR"
   },
   "status": "BATCH_IN_PROGRESS",
-  "task": "FAST-BOOTSTRAP-NOISE-FIDELITY-001"
+  "task": "FAST-BOOTSTRAP-NOISE-FIDELITY-001",
+  "fast_observation": {
+    "actual_calls": 1,
+    "allocated_bytes": 961571032,
+    "allocations": 19282509,
+    "bootstrap_time_ns": 561364333,
+    "capture": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-001/captures/cp-c-resume-ced6416/fast.json",
+    "capture_sha256": "7fb2fc91b2157d1591803bd959aa950525cc75a9af630acfc863ecca1d6246be",
+    "evidence": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-001/captures/cp-c-resume-ced6416/fast-capture-evidence.json",
+    "evidence_sha256": "75952dd109504e31c38405b336c7acd7b3d0eba6ba3f8d3dc3e027c0df8f5219",
+    "max_abs_error": 5.7387742390963576e-08,
+    "max_abs_gate_pass": true,
+    "max_abs_threshold": 1e-06,
+    "noise_hook": "OFF",
+    "precision_bits": "DEFERRED_TO_SHARED_TRIPLET_COMPARATOR",
+    "rmse_vs_input_observation": 1.1795718406445398e-09,
+    "status": "COMPLETE_PUBLIC_BOOTSTRAP_ONCE_OBSERVATION",
+    "vector_sha256_external": "6b582f202b209ba964c286797c81d29ea7e118cbe0363dc86136f090551a9afe"
+  }
 }

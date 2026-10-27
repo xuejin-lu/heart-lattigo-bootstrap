@@ -1,0 +1,8 @@
+{
+  "schema_version": "perfmeasure-bootstrap-attempt-result.v1",
+  "attempt_index": 1,
+  "phase": "single_bootstrap",
+  "completed_at": "2026-10-27T01:01:47.071831Z",
+  "elapsed_ns": 561407542,
+  "status": "RETURNED"
+}
