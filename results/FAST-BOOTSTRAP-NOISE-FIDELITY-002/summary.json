@@ -1,8 +1,8 @@
 {
   "schema_version": "fast-bootstrap-noise-fidelity-002-summary.v1",
   "task": "FAST-BOOTSTRAP-NOISE-FIDELITY-002",
-  "status": "BATCH_IN_PROGRESS",
-  "checkpoint": "All three arms complete (18/18); final existing six-sample triplet comparator and result checkpoint pending",
+  "status": "BATCH_COMPLETE_READY_FOR_WEB_REVIEW",
+  "checkpoint": "All 18 authorized calls succeeded once; triplet comparator passed; ready for independent Web review.",
   "actual_bootstrap_calls": 18,
   "authorized_maximum_bootstrap_calls": 18,
   "retry_budget": 0,
@@ -17,103 +17,356 @@
     "cold_per_arm": 1,
     "warm_per_arm": 5
   },
+  "profile": {
+    "log_n": 13,
+    "log_slots": 12,
+    "slots": 4096,
+    "error": 32,
+    "bootstrap_scale": "2^45"
+  },
   "fixed_sigma": 4.004280012097432,
   "noise_root_seed": 20261027,
   "primary_source_code_commit": "9f3f53ff9639866605ab0dd13da0431cb4c2775f",
   "primary_source_sha256": "894668dd7efef96e2cf9d17680881be43c14bedf96f2279e5ac552a88f369f54",
-  "standard_binary_sha256": "df76ea83d25c3f428bb4567c6d34bb32af1434189b5918d6246484e3549bdbc8",
-  "fast_binary_sha256_shared_by_F_FN": "311fdca496368f42102192c39c0835454a0c41c3bd1bc4064b32ad4b117745c7",
   "standard_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
   "fast_commit": "49b65dd927780cec0d7e05772a3df8554ef58005",
+  "standard_binary_sha256": "df76ea83d25c3f428bb4567c6d34bb32af1434189b5918d6246484e3549bdbc8",
+  "fast_binary_sha256_shared_by_F_FN": "311fdca496368f42102192c39c0835454a0c41c3bd1bc4064b32ad4b117745c7",
   "fresh_preflight": {
     "status": "PASS_ZERO_BOOTSTRAP_PREFLIGHT",
     "actual_bootstrap_calls": 0,
     "pair_sha256": "37ab35c0eb724c381f7b6a78e5ebf17cc391708a596907a8f22e6e59a3cb0ae0",
     "manifest": "preflight/manifest.json"
   },
-  "results": {
-    "state": "ALL_ARMS_CAPTURED",
-    "completed_arms": [
-      "FN",
-      "S",
-      "F"
-    ],
-    "pending_arms": [],
-    "final_triplet_comparison": null
+  "environment": {
+    "host": "Apple M4",
+    "goos": "darwin",
+    "goarch": "arm64",
+    "go_version": "go1.26.4",
+    "cpus": 10,
+    "gomaxprocs": 10
   },
-  "completed_arms": {
-    "FN": {
-      "calls": 6,
-      "status": "SUCCEEDED",
-      "document": "raw/fn.json",
-      "document_bytes": 824394,
-      "document_sha256": "a38bf6548b208aabc0721763b56fcb69bbaf10738300159f3a4d6a3e94391612",
-      "vectors_external_path": "/private/tmp/fast-bootstrap-noise-fidelity-002-captures/fn-vectors.json",
-      "vectors_bytes": 6519727,
-      "vectors_sha256": "758c35cd5bc0fae72d98358d9c6919b72d7f11e4ad8f8506ccbcc6dc950d72ce",
-      "cold_elapsed_ns": 648866292,
-      "warm_elapsed_ns": [
-        131644667,
-        131107125,
-        132045208,
-        144226541,
-        133289917
-      ],
-      "warm_mean_ns": 134462691.6,
-      "warm_median_ns": 132045208,
-      "warm_sample_sd_ns": 5517097.791814895,
-      "warm_min_ns": 131107125,
-      "warm_max_ns": 144226541,
-      "noise_events": 156,
-      "injected_polynomials": 312
-    },
+  "comparator": {
+    "artifact": "triplet.json",
+    "bytes": 858526,
+    "sha256": "40dad6e49fe5d8c06adbec6c3bdd33af8ea2d25674668f9db43b762d0ba5435d",
+    "source_commit": "6168bf69b846a4e0a810bb5f834c575865dbdc06",
+    "binary_sha256": "d037678409bb5a6cdbb0e46131685183ab6a82e8cd0e447ec167918be9d13a88",
+    "status": "TRIPLET_COMPLETE_EXPLORATORY",
+    "all_18_finite_structural_provenance_pass": true,
+    "observational_1e-6_pass_count": 18
+  },
+  "arms": {
     "S": {
-      "calls": 6,
-      "status": "SUCCEEDED",
-      "document": "raw/standard.json",
-      "document_bytes": 45192,
-      "document_sha256": "8bff544b68f0c42306427c369a7150e3077ad0847a94574e1665da25230684e7",
-      "vectors_external_path": "/private/tmp/fast-bootstrap-noise-fidelity-002-captures/standard-vectors.json",
-      "vectors_bytes": 6525586,
-      "vectors_sha256": "db8ded36ed46fd0aabb66a81fe8de459709bb8af06a413de059ebb1096b94d81",
-      "cold_elapsed_ns": 325961917,
-      "warm_elapsed_ns": [
-        309807250,
-        307756208,
-        326458917,
-        321371375,
-        320322208
-      ],
-      "warm_mean_ns": 317143191.6,
-      "warm_median_ns": 320322208,
-      "warm_sample_sd_ns": 8010897.579687766,
-      "warm_min_ns": 307756208,
-      "warm_max_ns": 326458917,
-      "output_hashes_unique_count": 1
+      "backend": "standard",
+      "backend_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+      "binary_sha256": "df76ea83d25c3f428bb4567c6d34bb32af1434189b5918d6246484e3549bdbc8",
+      "raw_document": "raw/standard.json",
+      "raw_document_sha256": "8bff544b68f0c42306427c369a7150e3077ad0847a94574e1665da25230684e7",
+      "decoded_vectors_external": {
+        "path": "/private/tmp/fast-bootstrap-noise-fidelity-002-captures/standard-vectors.json",
+        "bytes": 6525586,
+        "sha256": "db8ded36ed46fd0aabb66a81fe8de459709bb8af06a413de059ebb1096b94d81"
+      },
+      "cold": {
+        "elapsed_ns": 325961917,
+        "allocated_bytes": 143968736,
+        "allocations": 36696,
+        "rmse": 4.910104601781021e-09,
+        "global_precision_bits": 27.601599094850915,
+        "max_abs": 1.4672166035753868e-08,
+        "p99": 1.056194938421835e-08,
+        "p99_9": 1.3225705254931206e-08,
+        "output_sha256": "ef6b65fffdd08061b2f8f93689df37dbf9380e71e0a49642e71002860d62fa18"
+      },
+      "warm_individual": {
+        "elapsed_ns": [
+          309807250,
+          307756208,
+          326458917,
+          321371375,
+          320322208
+        ],
+        "allocated_bytes": [
+          91944920,
+          91674088,
+          91874760,
+          91730064,
+          91664504
+        ],
+        "allocations": [
+          35027,
+          35005,
+          35043,
+          35004,
+          35002
+        ]
+      },
+      "warm_summaries": {
+        "elapsed_ns": {
+          "count": 5,
+          "mean": 317143191.6,
+          "median": 320322208,
+          "sample_stddev": 8010897.579687766,
+          "min": 307756208,
+          "max": 326458917
+        },
+        "allocated_bytes": {
+          "count": 5,
+          "mean": 91777667.2,
+          "median": 91730064,
+          "sample_stddev": 125699.18066240528,
+          "min": 91664504,
+          "max": 91944920
+        },
+        "allocations": {
+          "count": 5,
+          "mean": 35016.2,
+          "median": 35005,
+          "sample_stddev": 18.102486017119308,
+          "min": 35002,
+          "max": 35043
+        },
+        "accuracy_median": {
+          "rmse": 4.910104601781021e-09,
+          "global_precision_bits": 27.601599094850915,
+          "max_abs": 1.4672166035753868e-08,
+          "p99": 1.056194938421835e-08,
+          "p99_9": 1.3225705254931206e-08
+        }
+      },
+      "construction_plus_cold": {
+        "elapsed_ns": 680828292,
+        "allocated_bytes": 857359720,
+        "allocations": 14286202
+      },
+      "evaluator_construction_total": {
+        "elapsed_ns": 354866375,
+        "allocated_bytes": 713390984,
+        "allocations": 14249506
+      }
     },
     "F": {
-      "calls": 6,
-      "status": "SUCCEEDED",
-      "document": "raw/fast.json",
-      "document_bytes": 45583,
-      "document_sha256": "b5c25af9e1e6f54ae2696be29630e2441c65f80c96325edc4d8e77c897a1d2fb",
-      "vectors_external_path": "/private/tmp/fast-bootstrap-noise-fidelity-002-captures/fast-vectors.json",
-      "vectors_bytes": 6520359,
-      "vectors_sha256": "e266aeba87a80f73f0c49e7b11e30e990c837acc4d3a25d089ba68efad99082e",
-      "cold_elapsed_ns": 561848875,
-      "warm_elapsed_ns": [
-        70035916,
-        71019167,
-        70619708,
-        70844125,
-        73143792
-      ],
-      "warm_mean_ns": 71132541.6,
-      "warm_median_ns": 70844125,
-      "warm_sample_sd_ns": 1183929.064011565,
-      "warm_min_ns": 70035916,
-      "warm_max_ns": 73143792,
-      "output_hashes_unique_count": 1
+      "backend": "fast",
+      "backend_commit": "49b65dd927780cec0d7e05772a3df8554ef58005",
+      "binary_sha256": "311fdca496368f42102192c39c0835454a0c41c3bd1bc4064b32ad4b117745c7",
+      "raw_document": "raw/fast.json",
+      "raw_document_sha256": "b5c25af9e1e6f54ae2696be29630e2441c65f80c96325edc4d8e77c897a1d2fb",
+      "decoded_vectors_external": {
+        "path": "/private/tmp/fast-bootstrap-noise-fidelity-002-captures/fast-vectors.json",
+        "bytes": 6520359,
+        "sha256": "e266aeba87a80f73f0c49e7b11e30e990c837acc4d3a25d089ba68efad99082e"
+      },
+      "cold": {
+        "elapsed_ns": 561848875,
+        "allocated_bytes": 961512376,
+        "allocations": 19282518,
+        "rmse": 1.1795718406445398e-09,
+        "global_precision_bits": 29.6590895668329,
+        "max_abs": 5.7387742390963576e-08,
+        "p99": 1.540850831913314e-09,
+        "p99_9": 6.671572204542529e-09,
+        "output_sha256": "31cb3bb8b9f7377918ddd7cae659e9851230bd903acdba69bd32ca4a273bc934"
+      },
+      "warm_individual": {
+        "elapsed_ns": [
+          70035916,
+          71019167,
+          70619708,
+          70844125,
+          73143792
+        ],
+        "allocated_bytes": [
+          7506168,
+          7506624,
+          7506168,
+          7506168,
+          7506168
+        ],
+        "allocations": [
+          8107,
+          8115,
+          8107,
+          8107,
+          8107
+        ]
+      },
+      "warm_summaries": {
+        "elapsed_ns": {
+          "count": 5,
+          "mean": 71132541.6,
+          "median": 70844125,
+          "sample_stddev": 1183929.064011565,
+          "min": 70035916,
+          "max": 73143792
+        },
+        "allocated_bytes": {
+          "count": 5,
+          "mean": 7506259.2,
+          "median": 7506168,
+          "sample_stddev": 203.9293995479808,
+          "min": 7506168,
+          "max": 7506624
+        },
+        "allocations": {
+          "count": 5,
+          "mean": 8108.6,
+          "median": 8107,
+          "sample_stddev": 3.5777087639996634,
+          "min": 8107,
+          "max": 8115
+        },
+        "accuracy_median": {
+          "rmse": 1.1795718406445398e-09,
+          "global_precision_bits": 29.6590895668329,
+          "max_abs": 5.7387742390963576e-08,
+          "p99": 1.540850831913314e-09,
+          "p99_9": 6.671572204542529e-09
+        }
+      },
+      "construction_plus_cold": {
+        "elapsed_ns": 565814041,
+        "allocated_bytes": 977348680,
+        "allocations": 19331302
+      },
+      "evaluator_construction_total": {
+        "elapsed_ns": 3965166,
+        "allocated_bytes": 15836304,
+        "allocations": 48784
+      }
+    },
+    "FN": {
+      "backend": "fast",
+      "backend_commit": "49b65dd927780cec0d7e05772a3df8554ef58005",
+      "binary_sha256": "311fdca496368f42102192c39c0835454a0c41c3bd1bc4064b32ad4b117745c7",
+      "raw_document": "raw/fn.json",
+      "raw_document_sha256": "a38bf6548b208aabc0721763b56fcb69bbaf10738300159f3a4d6a3e94391612",
+      "decoded_vectors_external": {
+        "path": "/private/tmp/fast-bootstrap-noise-fidelity-002-captures/fn-vectors.json",
+        "bytes": 6519727,
+        "sha256": "758c35cd5bc0fae72d98358d9c6919b72d7f11e4ad8f8506ccbcc6dc950d72ce"
+      },
+      "cold": {
+        "elapsed_ns": 648866292,
+        "allocated_bytes": 1033675696,
+        "allocations": 19286917,
+        "rmse": 6.2079147827633975e-09,
+        "global_precision_bits": 27.26324410047676,
+        "max_abs": 5.825539541055948e-08,
+        "p99": 1.2986222109322388e-08,
+        "p99_9": 1.5368578185730084e-08,
+        "output_sha256": "4b4783ba1b16383271f1fc55a4aaa84d4ca3865851b6e738d34c79e75ee24095"
+      },
+      "warm_individual": {
+        "elapsed_ns": [
+          131644667,
+          131107125,
+          132045208,
+          144226541,
+          133289917
+        ],
+        "allocated_bytes": [
+          79606120,
+          79638888,
+          79573304,
+          79573304,
+          79707656
+        ],
+        "allocations": [
+          12509,
+          12509,
+          12507,
+          12507,
+          12519
+        ]
+      },
+      "warm_summaries": {
+        "elapsed_ns": {
+          "count": 5,
+          "mean": 134462691.6,
+          "median": 132045208,
+          "sample_stddev": 5517097.791814895,
+          "min": 131107125,
+          "max": 144226541
+        },
+        "allocated_bytes": {
+          "count": 5,
+          "mean": 79619854.4,
+          "median": 79606120,
+          "sample_stddev": 56111.3003663255,
+          "min": 79573304,
+          "max": 79707656
+        },
+        "allocations": {
+          "count": 5,
+          "mean": 12510.2,
+          "median": 12509,
+          "sample_stddev": 5.019960159204453,
+          "min": 12507,
+          "max": 12519
+        },
+        "accuracy_median": {
+          "rmse": 6.200861564170716e-09,
+          "global_precision_bits": 27.264884172680066,
+          "max_abs": 5.900751980021981e-08,
+          "p99": 1.3267446349511664e-08,
+          "p99_9": 1.6704021855460917e-08
+        }
+      },
+      "construction_plus_cold": {
+        "elapsed_ns": 652618209,
+        "allocated_bytes": 1049511872,
+        "allocations": 19335700
+      },
+      "noise_hook_configuration_phase": {
+        "phase": "bootstrap_noise_hook_configuration",
+        "elapsed_ns": 820875,
+        "allocated_bytes": 4224968,
+        "allocations": 16643,
+        "samples": 1,
+        "available": true
+      },
+      "evaluator_construction_total": {
+        "elapsed_ns": 3751917,
+        "allocated_bytes": 15836176,
+        "allocations": 48783
+      }
     }
+  },
+  "comparison": {
+    "fast_speedup_vs_standard": {
+      "cold": 0.5801594192032511,
+      "warm_median": 4.521507012755116
+    },
+    "fast_noise_speedup_vs_standard": {
+      "cold": 0.5023560647530139,
+      "warm_median": 2.425852576187392
+    },
+    "fast_noise_overhead_vs_fast": {
+      "cold_time_ns": 87017417,
+      "cold_time_ratio": 1.1548769088484871,
+      "warm_median_time_ns": 61201083,
+      "warm_median_time_ratio": 1.863883674193167,
+      "cold_allocated_bytes": 72163320,
+      "cold_allocations": 4399,
+      "warm_median_allocated_bytes": 72099952,
+      "warm_median_allocations": 4402
+    },
+    "precision_effect": {
+      "fast_off_absolute_gap_from_standard_bits": 2.0574904719819855,
+      "fast_noise_absolute_gap_range_bits": [
+        0.32284372235245584,
+        0.34369352955573973
+      ],
+      "noise_reduced_gap_samples": 6,
+      "noise_worsened_gap_samples": 0,
+      "interpretation": "Noise moved global precision bits closer to Standard in all six paired phases, ending slightly below Standard."
+    }
+  },
+  "metric_definitions": {
+    "global_precision_bits": "-log2(global output RMSE versus original Bootstrap plaintext)",
+    "p99_p99_9": "quantiles of complex error magnitude over 4096 slots",
+    "full_per_sample_metrics": "triplet.json contains every output RMSE, precision bits, MaxAbs, p99/p99.9, elapsed time, allocations, finite/gate status and output SHA",
+    "numerical_gate": "1e-6 MaxAbs is observational only; provenance, shape, finiteness, representation, scale and capacity remain strict"
   }
 }

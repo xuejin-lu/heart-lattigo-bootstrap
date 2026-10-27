@@ -1,9 +1,9 @@
 # FAST-BOOTSTRAP-NOISE-FIDELITY-002 journal
 
 Date: 2026-10-27
-Status: `BATCH_IN_PROGRESS`
-Actual Bootstrap calls: `0/18`
-Reservations: `0/18`
+Status: `BATCH_COMPLETE_READY_FOR_WEB_REVIEW`
+Actual Bootstrap calls: `18/18`
+Reservations: `18/18`
 
 ## Authorization and preservation
 
@@ -166,3 +166,36 @@ This completes the authorized 18/18 calls: FN 6/6, genuine Standard 6/6, and Fas
 The first offline run of the existing `compare-public-triplet --noise-fidelity-002` failed before it wrote an output file. It reported: `Noise event 3 phase commit_c0 is absent or collected per-operation MemStats`. Inspection of the unchanged FN capture showed all five named phases in the required order, with `memory_stats_collected=false`. Of 312 recorded left/right `commit_c0` phase measurements, 103 are `0 ns`; all 1,248 other subphase measurements are positive, and all 312 `commit_c0` entries are present. Raw events, seeds, coefficient summaries/hashes, and strict capacity evidence are intact. No Bootstrap was executed by this comparator attempt, and the capture files were not modified.
 
 This is a comparator validation defect: timer granularity can record a present `commit_c0` operation as 0 ns. The narrowly scoped repair accepts 0 ns only for a present, correctly ordered `commit_c0` phase; it continues to reject zero-duration sampling/transform/add/capacity phases and any per-operation MemStats collection. Regression tests exercise those cases in both `perf_standard` and `perf_fast` builds and pass. No Secondary helper or arithmetic changed, and no Bootstrap was repeated. The analysis binary will be rebuilt from the repaired Primary comparator source; its source revision and binary SHA will be recorded separately from the already-frozen measurement binaries.
+
+
+## Final comparison — BATCH_COMPLETE_READY_FOR_WEB_REVIEW
+
+The accepted 18-call budget is fully consumed: FN 6/6, genuine Standard 6/6, Fast OFF 6/6; all reservations returned successfully exactly once. No hidden warmup, retry, or extra Bootstrap occurred. The final existing comparator validated all 18 finite 4096-slot outputs and all task/source/binary/preflight/input identities. It recorded the `1e-6` MaxAbs observation for every output; all 18 happened to pass. The measured run used Apple M4 / darwin-arm64, Go `go1.26.4`, 10 CPUs and `GOMAXPROCS=10`, with matched host/runtime configuration.
+
+Final comparator artifact: `triplet.json`, 858,526 bytes, SHA-256 `40dad6e49fe5d8c06adbec6c3bdd33af8ea2d25674668f9db43b762d0ba5435d`. It contains all 18 per-sample RMSE, global `-log2(RMSE)` precision bits, MaxAbs, p99/p99.9, numerical-gate flag, elapsed time, allocation bytes/count, and decoded output SHA-256; it also contains paired phase comparisons and pairwise output RMSE. The three decoded-vector files remain external at the exact paths and hashes recorded in `attempt-ledger.json`; the comparator read and recomputed all 18 outputs.
+
+The table separates the cold observation from the five warm observations. Warm time and allocation lists retain each call; timing summaries are mean / median / sample standard deviation (`n-1`). Precision bits are global `-log2(RMSE)`, not median per-slot precision. Tail columns are MaxAbs / p99 / p99.9.
+
+| Arm | Cold time | Cold alloc bytes / count | Five Warm times (ms) | Warm mean / median / SD (ms) | Five Warm alloc bytes (MB); allocation counts | Cold RMSE / global bits | Warm median RMSE / global bits | Cold MaxAbs / p99 / p99.9 | Warm median MaxAbs / p99 / p99.9 |
+|---|---:|---:|---|---:|---|---:|---:|---:|---:|
+| S | 325.962 ms | 143,968,736 / 36,696 | `309.807, 307.756, 326.459, 321.371, 320.322` ms | 317.143 / 320.322 / 8.011 ms | `91.945, 91.674, 91.875, 91.730, 91.665` MB; `35027, 35005, 35043, 35004, 35002` | 4.9101e-09 / 27.6016 | 4.9101e-09 / 27.6016 | 1.46722e-08 / 1.05619e-08 / 1.32257e-08 | 1.46722e-08 / 1.05619e-08 / 1.32257e-08 |
+| F | 561.849 ms | 961,512,376 / 19,282,518 | `70.036, 71.019, 70.620, 70.844, 73.144` ms | 71.133 / 70.844 / 1.184 ms | `7.506, 7.507, 7.506, 7.506, 7.506` MB; `8107, 8115, 8107, 8107, 8107` | 1.17957e-09 / 29.6591 | 1.17957e-09 / 29.6591 | 5.73877e-08 / 1.54085e-09 / 6.67157e-09 | 5.73877e-08 / 1.54085e-09 / 6.67157e-09 |
+| FN | 648.866 ms | 1,033,675,696 / 19,286,917 | `131.645, 131.107, 132.045, 144.227, 133.290` ms | 134.463 / 132.045 / 5.517 ms | `79.606, 79.639, 79.573, 79.573, 79.708` MB; `12509, 12509, 12507, 12507, 12519` | 6.20791e-09 / 27.2632 | 6.20086e-09 / 27.2649 | 5.82554e-08 / 1.29862e-08 / 1.53686e-08 | 5.90075e-08 / 1.32674e-08 / 1.6704e-08 |
+
+Warm timing summaries (mean / median / sample SD / min–max) are Standard `317.143 / 320.322 / 8.011 / 307.756–326.459 ms`, Fast `71.133 / 70.844 / 1.184 / 70.036–73.144 ms`, and Fast+Noise `134.463 / 132.045 / 5.517 / 131.107–144.227 ms`.
+
+| Construction cost | Standard | Fast OFF | Fast+Noise |
+|---|---:|---:|---:|
+| CKKS + Bootstrapping evaluator construction (ns / bytes / allocations) | 354,866,375 / 713,390,984 / 14,249,506 | 3,965,166 / 15,836,304 / 48,784 | 3,751,917 / 15,836,176 / 48,783 |
+| Construction + Cold Bootstrap (ns / bytes / allocations) | 680,828,292 / 857,359,720 / 14,286,202 | 565,814,041 / 977,348,680 / 19,331,302 | 652,618,209 / 1,049,511,872 / 19,335,700 |
+| Noise hook configuration (ns / bytes / allocations) | n/a | n/a | 820,875 / 4,224,968 / 16,643 |
+
+Fast warm median was 4.522x faster than Standard; Fast+Noise warm median was 2.426x faster than Standard. The Cold Bootstrap-only ratios were `0.580x` for Fast and `0.502x` for Fast+Noise; both Fast cold calls were slower than Standard's cold call on this host, while construction costs are reported separately above.
+
+Against Standard, Fast OFF precision bits were `29.6591` Cold and `29.6591` at the Warm median, a positive gap of `2.0575` bits. Fast+Noise was `27.2632` Cold and `27.2649` at the Warm median, below Standard by about `0.3384` Cold and `0.3296` bits at the Warm median. Noise reduced the absolute precision-bit gap in all six paired phases (from `2.0575` to `0.3384` bits Cold, and from `2.0575` to `0.3296` bits on the first Warm sample). Thus Noise moved Fast closer to Standard here, while ending slightly below Standard's precision; it did not match Standard exactly.
+
+Compared with Fast OFF, Fast+Noise added `87.017 ms` to Cold (`1.155x`, or 15.5% higher) and `61.201 ms` to Warm median (`1.864x`, or 86.4% higher). Median Warm allocation increased by 72,099,952 bytes and 4,402 allocations; Cold increased by 72,163,320 bytes and 4,399 allocations. Across six calls the hook recorded 156 ct×ct multiply events and 312 polynomial injections at σ `4.004280012097432`, root seed `20261027`; all q-prefix capacity checks passed. Aggregate injection subphase time was 361,862,854 ns. Per-injection MemStats collection was disabled; allocation overhead is the paired full-call measurement.
+
+Comparator repair/build provenance: source commit `6168bf69b846a4e0a810bb5f834c575865dbdc06`, analysis binary `/private/tmp/perfprobe-standard-002-comparator-6168bf6`, SHA-256 `d037678409bb5a6cdbb0e46131685183ab6a82e8cd0e447ec167918be9d13a88`, `vcs.modified=false`, `perf_standard`, darwin/arm64, Go `go1.26.4`. The focused regression passed under both `perf_standard` and `perf_fast`; it uses synthetic comparator fixtures and invokes no Bootstrap. The build succeeded with an optional Go module stat-cache write warning (`operation not permitted`); VCS metadata and binary hash were verified. Measurement binaries and their frozen source revision remain unchanged.
+
+The completed result is exploratory and host/profile-specific. It supports the observed conclusion that fixed-sigma Noise moved Fast's global precision bits closer to genuine Standard in all six paired phases, with a clear increase in measured runtime and allocations. It does not establish cryptographic-noise equivalence or a causal model beyond this controlled three-arm run.

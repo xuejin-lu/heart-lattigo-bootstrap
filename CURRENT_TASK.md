@@ -1,7 +1,7 @@
 # CURRENT TASK — FAST-BOOTSTRAP-NOISE-FIDELITY-002
 
 Task: `FAST-BOOTSTRAP-NOISE-FIDELITY-002`
-Status: `BATCH_IN_PROGRESS` — user-authorized on 2026-10-27. The new task has an independent hard maximum of 18 actual Bootstrap calls: Fast+Noise 6, genuine Standard 6, Fast OFF 6; one Cold and five Warm per arm, no retries.
+Status: `BATCH_COMPLETE_READY_FOR_WEB_REVIEW` — all 18 authorized calls and the six-sample triplet comparison are complete; evidence awaits independent Web review. The new task has an independent hard maximum of 18 actual Bootstrap calls: Fast+Noise 6, genuine Standard 6, Fast OFF 6; one Cold and five Warm per arm, no retries.
 **Spec:** `specs/FAST-BOOTSTRAP-NOISE-FIDELITY-002.md`
 **Primary journal:** `results/FAST-BOOTSTRAP-NOISE-FIDELITY-002/journal.md`
 **Attempt ledger:** `results/FAST-BOOTSTRAP-NOISE-FIDELITY-002/attempt-ledger.json`

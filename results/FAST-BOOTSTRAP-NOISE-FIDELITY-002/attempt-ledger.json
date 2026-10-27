@@ -1,7 +1,7 @@
 {
   "schema_version": "fast-bootstrap-noise-fidelity-002-attempt-ledger.v1",
   "task": "FAST-BOOTSTRAP-NOISE-FIDELITY-002",
-  "status": "ALL_ARMS_COMPLETE_COMPARATOR_PENDING",
+  "status": "BATCH_COMPLETE_READY_FOR_WEB_REVIEW",
   "created_at_utc": "2026-10-27",
   "authorized_maximum_bootstrap_calls": 18,
   "actual_bootstrap_calls": 18,
@@ -488,5 +488,29 @@
       "fast_binary_sha256_shared_by_FN": "311fdca496368f42102192c39c0835454a0c41c3bd1bc4064b32ad4b117745c7",
       "noise_hook": "OFF"
     }
+  },
+  "analysis": {
+    "status": "TRIPLET_COMPLETE_EXPLORATORY",
+    "comparator_command": "compare-public-triplet --noise-fidelity-002",
+    "comparator_source_commit": "6168bf69b846a4e0a810bb5f834c575865dbdc06",
+    "comparator_binary_path": "/private/tmp/perfprobe-standard-002-comparator-6168bf6",
+    "comparator_binary_sha256": "d037678409bb5a6cdbb0e46131685183ab6a82e8cd0e447ec167918be9d13a88",
+    "comparator_binary_go_version": "go1.26.4",
+    "comparator_binary_build_tag": "perf_standard",
+    "comparator_binary_goos": "darwin",
+    "comparator_binary_goarch": "arm64",
+    "comparator_binary_vcs_modified": false,
+    "comparator_standard_modfile_sha256": "ee472d541256e8d855d22c4c081f6d8d608ab8ece1465b93f60bda2079225e4a",
+    "artifact_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-002/triplet.json",
+    "artifact_bytes": 858526,
+    "artifact_sha256": "40dad6e49fe5d8c06adbec6c3bdd33af8ea2d25674668f9db43b762d0ba5435d",
+    "finite_samples": 18,
+    "structural_and_provenance_validation": "PASS",
+    "observational_max_abs_gate_pass_count": 18,
+    "matched_host": true,
+    "preflight_pair_sha256": "37ab35c0eb724c381f7b6a78e5ebf17cc391708a596907a8f22e6e59a3cb0ae0",
+    "noise_improved_absolute_precision_gap_samples": 6,
+    "noise_worsened_absolute_precision_gap_samples": 0,
+    "noise_equal_absolute_precision_gap_samples": 0
   }
 }
