@@ -1,6 +1,6 @@
 # BTS-FAST-NOISE-FIDELITY-009 execution plan
 
-Status: `BATCH_IN_PROGRESS` — Fast+Noise and Standard complete (6/6 each); Fast OFF pending.
+Status: `BATCH_COMPLETE_READY_FOR_WEB_REVIEW` — all 18 calls and the three-arm report are complete.
 
 ## Frozen source and profile
 

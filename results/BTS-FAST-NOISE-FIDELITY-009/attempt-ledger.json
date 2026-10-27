@@ -1,7 +1,7 @@
 {
   "schema_version": "bts-fast-noise-fidelity-009-attempt-ledger.v1",
   "task": "BTS-FAST-NOISE-FIDELITY-009",
-  "status": "FAST_NOISE_AND_STANDARD_COMPLETE_FAST_OFF_PENDING",
+  "status": "BATCH_COMPLETE_READY_FOR_WEB_REVIEW",
   "authorization_source": "User-provided task specification pasted 2026-10-27",
   "profile": {
     "log_n": 16,
@@ -92,9 +92,9 @@
     }
   },
   "counters": {
-    "reserved": 12,
-    "entered": 12,
-    "completed": 12,
+    "reserved": 18,
+    "entered": 18,
+    "completed": 18,
     "failed": 0
   },
   "attempts": [
@@ -186,67 +186,85 @@
       "attempt_id": "F-01",
       "arm": "fast_off",
       "phase": "cold",
-      "status": "NOT_RESERVED",
-      "reservation_file": null,
-      "result_file": null,
-      "entered_bootstrap": false,
-      "completed": false,
-      "failure": null
+      "status": "COMPLETED",
+      "reservation_file": "fast-off/attempt.bootstrap-attempt-01.json",
+      "result_file": "fast-off/attempt.bootstrap-result-01.json",
+      "entered_bootstrap": true,
+      "completed": true,
+      "failure": null,
+      "reservation_sha256": "5f793b4aa6f54f7d4876ccab4dd6bf6d01b8c1a4022ccf72bbf28272d542f25c",
+      "result_sha256": "5c1f4ba6dec95fb51bac50d58acfec1e9c652e1a3931f03c06df7ac4aca23a7e",
+      "output_vector_sha256": "577c0ff802da8036ce2557cc37cac04416f0b185d5393e1de617083b35e17f0b"
     },
     {
       "attempt_id": "F-02",
       "arm": "fast_off",
       "phase": "warm_01",
-      "status": "NOT_RESERVED",
-      "reservation_file": null,
-      "result_file": null,
-      "entered_bootstrap": false,
-      "completed": false,
-      "failure": null
+      "status": "COMPLETED",
+      "reservation_file": "fast-off/attempt.bootstrap-attempt-02.json",
+      "result_file": "fast-off/attempt.bootstrap-result-02.json",
+      "entered_bootstrap": true,
+      "completed": true,
+      "failure": null,
+      "reservation_sha256": "1944576edb11a5d3c9854199ae5ab913ea7ab9a0bc27c48b7b3f509c25cf0334",
+      "result_sha256": "fb8e93c80c25e9ae73cd3421067e7f795f0909ad7b13238630df30de6716a12f",
+      "output_vector_sha256": "577c0ff802da8036ce2557cc37cac04416f0b185d5393e1de617083b35e17f0b"
     },
     {
       "attempt_id": "F-03",
       "arm": "fast_off",
       "phase": "warm_02",
-      "status": "NOT_RESERVED",
-      "reservation_file": null,
-      "result_file": null,
-      "entered_bootstrap": false,
-      "completed": false,
-      "failure": null
+      "status": "COMPLETED",
+      "reservation_file": "fast-off/attempt.bootstrap-attempt-03.json",
+      "result_file": "fast-off/attempt.bootstrap-result-03.json",
+      "entered_bootstrap": true,
+      "completed": true,
+      "failure": null,
+      "reservation_sha256": "dc780624e4932b3ff1e3cf9fc8616d3ef132e406607baf5c0a1a3f78d17b5f6b",
+      "result_sha256": "e1260a6d337544cbe32d083c009dcc2eec868f155a015e7eefaaf925800cc149",
+      "output_vector_sha256": "577c0ff802da8036ce2557cc37cac04416f0b185d5393e1de617083b35e17f0b"
     },
     {
       "attempt_id": "F-04",
       "arm": "fast_off",
       "phase": "warm_03",
-      "status": "NOT_RESERVED",
-      "reservation_file": null,
-      "result_file": null,
-      "entered_bootstrap": false,
-      "completed": false,
-      "failure": null
+      "status": "COMPLETED",
+      "reservation_file": "fast-off/attempt.bootstrap-attempt-04.json",
+      "result_file": "fast-off/attempt.bootstrap-result-04.json",
+      "entered_bootstrap": true,
+      "completed": true,
+      "failure": null,
+      "reservation_sha256": "865aa1edb91dd7f6913856a8bfeebd6bdf0491037c67026a3c7c68843258720f",
+      "result_sha256": "d18be78b1490371c339cd4a9c3bcc70def64bd2ae4e2bce7052253842f8f8c49",
+      "output_vector_sha256": "577c0ff802da8036ce2557cc37cac04416f0b185d5393e1de617083b35e17f0b"
     },
     {
       "attempt_id": "F-05",
       "arm": "fast_off",
       "phase": "warm_04",
-      "status": "NOT_RESERVED",
-      "reservation_file": null,
-      "result_file": null,
-      "entered_bootstrap": false,
-      "completed": false,
-      "failure": null
+      "status": "COMPLETED",
+      "reservation_file": "fast-off/attempt.bootstrap-attempt-05.json",
+      "result_file": "fast-off/attempt.bootstrap-result-05.json",
+      "entered_bootstrap": true,
+      "completed": true,
+      "failure": null,
+      "reservation_sha256": "02472b833248dd4637d7925a553384d28809f6f1670dd2863bc716cc3062552b",
+      "result_sha256": "c54cb7b84c9d3ff08b825edcea4cf61a408db868b52aa5e96c290943c6d8a630",
+      "output_vector_sha256": "577c0ff802da8036ce2557cc37cac04416f0b185d5393e1de617083b35e17f0b"
     },
     {
       "attempt_id": "F-06",
       "arm": "fast_off",
       "phase": "warm_05",
-      "status": "NOT_RESERVED",
-      "reservation_file": null,
-      "result_file": null,
-      "entered_bootstrap": false,
-      "completed": false,
-      "failure": null
+      "status": "COMPLETED",
+      "reservation_file": "fast-off/attempt.bootstrap-attempt-06.json",
+      "result_file": "fast-off/attempt.bootstrap-result-06.json",
+      "entered_bootstrap": true,
+      "completed": true,
+      "failure": null,
+      "reservation_sha256": "e58445fd49cedbbd814e432c1c1e84361704d6d0ed51b32ec687f99b1a026cf5",
+      "result_sha256": "dbdec87e8adc8ef42ee940502d50ea9f0c776760aafae7446582216105aca9bb",
+      "output_vector_sha256": "577c0ff802da8036ce2557cc37cac04416f0b185d5393e1de617083b35e17f0b"
     },
     {
       "attempt_id": "FN-01",
@@ -382,11 +400,39 @@
       "run_summary_sha256": "388f51c23f1fbdb35c9516c717cedd118960308a112977b0aa63e120b73bb157"
     },
     "fast_off": {
-      "status": "NOT_STARTED",
-      "reserved": 0,
-      "entered": 0,
-      "completed": 0,
-      "failed": 0
+      "status": "COMPLETE",
+      "reserved": 6,
+      "entered": 6,
+      "completed": 6,
+      "failed": 0,
+      "run_summary": "fast-off/run.json",
+      "run_summary_sha256": "66ea8a685fcd9423aeed06f8dd7782cf09626c907d6e42bb9c4bcc92a2caaad3"
     }
+  },
+  "comparison": {
+    "status": "ALL_THREE_ARMS_COMPLETE_AND_VALIDATED",
+    "json_path": "comparison.json",
+    "json_sha256": "340fb659b8b2bf8113c4f3b2269671fe0ce4755c876ae8c172839d9c7d01be40",
+    "markdown_path": "comparison.md",
+    "markdown_sha256": "eacdb844edb6078483da4ea8c6f89fd9a99f8f5ee4bbb56fbcede7d0cd3b0e6e",
+    "source_path": "cmd/perfprobe/bts_report_009.go",
+    "source_sha256": "7ebff4bde3861bcaafbf14161a7608b00b03285337f79316c2fc443fd0ca8011",
+    "targeted_test_path": "cmd/perfprobe/bts_report_test.go",
+    "targeted_test_sha256": "370985d7e0b0c75cffa3584ebedeafaa2e6f6854a1e9c77cc878d604ff19d447",
+    "initial_render_preserved": {
+      "json_path": "comparison-initial-render.json",
+      "json_sha256": "a0f98013c575b7ef18ee9ce78d04b3d605c56c8d8cc44ea9c44f5220be0df5ff",
+      "markdown_path": "comparison-initial-render.md",
+      "markdown_sha256": "c24801ebce29c2e791472a0c59e9f0af6d1399bb59db4f6fbb006028a9aec8af",
+      "reason": "cold timing row repeated its label; kept immutable as first comparator output"
+    },
+    "warm_global_rmse_precision_bits": {
+      "standard": 12.58067730590772,
+      "fast_off": 17.418462711048253,
+      "fast_noise_mean": 14.768377934598245
+    },
+    "noise_moved_closer_to_standard": true,
+    "fast_noise_warm_median_overhead_ns": 239607833,
+    "fast_noise_warm_allocation_bytes_extra": 308521156.79999924
   }
 }

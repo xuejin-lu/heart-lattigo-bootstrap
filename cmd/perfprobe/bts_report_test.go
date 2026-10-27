@@ -69,6 +69,16 @@ func TestBTS009ReportRejectsNoiseCapacityEvidenceThatDoesNotStrictlyFit(t *testi
 	}
 }
 
+func TestBTS009ReportRendersColdLabelOnce(t *testing.T) {
+	rendered := renderBTS009Report(bts009ReportDocument{})
+	if strings.Contains(rendered, "| cold cold (ms) |") {
+		t.Fatal("cold timing row repeats the cold label")
+	}
+	if !strings.Contains(rendered, "| cold (ms) |") {
+		t.Fatal("cold timing row is missing")
+	}
+}
+
 func TestBTS009CapacityEvidenceRecomputesExactPrefixAndStrictBound(t *testing.T) {
 	side := bts009NoiseSide{}
 	side.Capacity.Rows = 4

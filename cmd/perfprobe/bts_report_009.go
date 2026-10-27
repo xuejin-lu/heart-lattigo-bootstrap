@@ -457,10 +457,7 @@ func renderBTS009Report(report bts009ReportDocument) string {
 	output.WriteString("## Three-arm comparison\n\n")
 	output.WriteString("Times are milliseconds; precision is global `-log2(RMSE)`, with the separate median per-slot precision shown explicitly. Allocation values are mean bytes/count over five warm calls.\n\n")
 	output.WriteString("| 指標 | Standard | Fast OFF | Fast+Noise |\n|---|---:|---:|---:|\n")
-	writeArm := func(label string) {
-		fmt.Fprintf(&output, "| %s cold (ms) | %.3f | %.3f | %.3f |\n", label, float64(report.Standard.Cold.BootstrapNS)/1e6, float64(report.FastOff.Cold.BootstrapNS)/1e6, float64(report.FastNoise.Cold.BootstrapNS)/1e6)
-	}
-	writeArm("cold")
+	fmt.Fprintf(&output, "| cold (ms) | %.3f | %.3f | %.3f |\n", float64(report.Standard.Cold.BootstrapNS)/1e6, float64(report.FastOff.Cold.BootstrapNS)/1e6, float64(report.FastNoise.Cold.BootstrapNS)/1e6)
 	fmt.Fprintf(&output, "| warm mean (ms) | %.3f | %.3f | %.3f |\n", report.Standard.WarmTime.Mean/1e6, report.FastOff.WarmTime.Mean/1e6, report.FastNoise.WarmTime.Mean/1e6)
 	fmt.Fprintf(&output, "| warm median (ms) | %.3f | %.3f | %.3f |\n", report.Standard.WarmTime.Median/1e6, report.FastOff.WarmTime.Median/1e6, report.FastNoise.WarmTime.Median/1e6)
 	fmt.Fprintf(&output, "| warm sample stddev (ms) | %.3f | %.3f | %.3f |\n", report.Standard.WarmTime.SampleStandardDeviation/1e6, report.FastOff.WarmTime.SampleStandardDeviation/1e6, report.FastNoise.WarmTime.SampleStandardDeviation/1e6)
