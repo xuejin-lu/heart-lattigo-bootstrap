@@ -53,3 +53,22 @@ func TestBTSBuildHashesEveryLinkedPrimaryMeasurementSource(t *testing.T) {
 		}
 	}
 }
+
+func TestBTSBuildKeepsHistoricalAndNoiseFidelityPinsTaskSpecific(t *testing.T) {
+	for _, test := range []struct {
+		task, backend, want string
+	}{
+		{"BTS-NOTRACE-WARM-AND-NUMERICAL-008", "standard", bts008StandardCommit},
+		{"BTS-NOTRACE-WARM-AND-NUMERICAL-008", "fast", bts008FastCommit},
+		{bts009Task, "standard", bts008StandardCommit},
+		{bts009Task, "fast", bts009FastCommit},
+	} {
+		got, err := btsBackendPin(test.task, test.backend)
+		if err != nil || got != test.want {
+			t.Fatalf("btsBackendPin(%q, %q) = %q, %v; want %q", test.task, test.backend, got, err, test.want)
+		}
+	}
+	if _, err := btsBackendPin(bts009Task, "fast-qprefix"); err == nil {
+		t.Fatal("unsupported backend was accepted")
+	}
+}

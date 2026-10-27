@@ -22,10 +22,13 @@ const (
 	bts008PrimaryBaseline   = "f3eb665e35f15b91d5f290626fbb7a3bb360a95c"
 	bts008StandardCommit    = "5dbffbdea05394de2ca3a432ed5318aa832e3f40"
 	bts008FastCommit        = "ee308c9743000b5f281a84a871e7c4bd59b176c4"
+	bts009FastCommit        = "be9c42ff23662300769b77f1eead3f12fc53adef"
+	bts009Task              = "BTS-FAST-NOISE-FIDELITY-009"
 	bts008NestedModulePath  = "github.com/xuejin-lu/heart-lattigo-bootstrap/btsmeasurement"
 )
 
 type btsBuildOptions struct {
+	task          string
 	backend       string
 	primaryRoot   string
 	secondaryRoot string
@@ -61,6 +64,7 @@ type btsBuildManifest struct {
 func runBTSBuild(args []string) error {
 	flags := flag.NewFlagSet("perfprobe bts-build", flag.ContinueOnError)
 	var opts btsBuildOptions
+	flags.StringVar(&opts.task, "task", "BTS-NOTRACE-WARM-AND-NUMERICAL-008", "BTS task profile (008 or BTS-FAST-NOISE-FIDELITY-009)")
 	flags.StringVar(&opts.backend, "backend", "", "standard or fast")
 	flags.StringVar(&opts.primaryRoot, "primary-root", "", "Primary repository root")
 	flags.StringVar(&opts.secondaryRoot, "secondary-root", "", "clean pinned Standard or Fast Lattigo checkout")
@@ -103,9 +107,9 @@ func runBTSBuild(args []string) error {
 		return err
 	}
 
-	wantBackend := bts008StandardCommit
-	if opts.backend == "fast" {
-		wantBackend = bts008FastCommit
+	wantBackend, err := btsBackendPin(opts.task, opts.backend)
+	if err != nil {
+		return err
 	}
 	backendRoot, backendCommit, backendRef, err := cleanSecondaryState(secondaryRoot, wantBackend)
 	if err != nil {
@@ -170,7 +174,7 @@ func runBTSBuild(args []string) error {
 	if err := os.MkdirAll(cachePath, 0o700); err != nil {
 		return err
 	}
-	buildArgs := []string{"build", "-mod=mod", "-modfile=" + modPath, "-overlay=" + overlayPath, "-o", binaryOut, "."}
+	buildArgs := []string{"build", "-buildvcs=true", "-mod=mod", "-modfile=" + modPath, "-overlay=" + overlayPath, "-o", binaryOut, "."}
 	command := exec.Command("go", buildArgs...)
 	command.Dir = btsRoot
 	command.Env = setEnvironment(os.Environ(), map[string]string{"GOWORK": "off", "GOCACHE": cachePath})
@@ -189,11 +193,16 @@ func runBTSBuild(args []string) error {
 		return fmt.Errorf("read built binary module provenance: %w", err)
 	}
 	info := string(infoBytes)
-	if !strings.Contains(info, backendRoot) || !strings.Contains(info, primaryRoot) {
+	if !strings.Contains(info, backendRoot) || !strings.Contains(info, primaryRoot) ||
+		!strings.Contains(info, "vcs.revision="+primaryCommit) || !strings.Contains(info, "vcs.modified=false") {
 		return fmt.Errorf("binary provenance does not bind both selected backend and Primary measurement helper; go version -m:\n%s", info)
 	}
+	manifestSchema := "bts-notrace-warm-and-numerical-008-build.v1"
+	if opts.task == bts009Task {
+		manifestSchema = "bts-fast-noise-fidelity-009-build.v1"
+	}
 	manifest := btsBuildManifest{
-		SchemaVersion: "bts-notrace-warm-and-numerical-008-build.v1", Task: "BTS-NOTRACE-WARM-AND-NUMERICAL-008",
+		SchemaVersion: manifestSchema, Task: opts.task,
 		Backend: opts.backend, BackendCommit: backendCommit, BackendRef: backendRef, BackendClean: true,
 		BackendRoot: backendRoot, PrimaryCommit: primaryCommit, PrimaryDirty: primaryStatus != "",
 		PrimaryMeasurementSourceSHA256: measurementSourceSHAs,
@@ -209,6 +218,26 @@ func runBTSBuild(args []string) error {
 	}
 	fmt.Printf("BTS %s build ready: commit=%s binary_sha256=%s manifest=%s\n", opts.backend, backendCommit, binarySHA, manifestPath)
 	return nil
+}
+
+func btsBackendPin(task, backend string) (string, error) {
+	if backend != "standard" && backend != "fast" {
+		return "", fmt.Errorf("unsupported BTS backend %q", backend)
+	}
+	switch task {
+	case "BTS-NOTRACE-WARM-AND-NUMERICAL-008":
+		if backend == "standard" {
+			return bts008StandardCommit, nil
+		}
+		return bts008FastCommit, nil
+	case bts009Task:
+		if backend == "standard" {
+			return bts008StandardCommit, nil
+		}
+		return bts009FastCommit, nil
+	default:
+		return "", fmt.Errorf("unsupported BTS task %q", task)
+	}
 }
 
 func hashPrimaryMeasurementSources(primaryRoot string) (map[string]string, error) {

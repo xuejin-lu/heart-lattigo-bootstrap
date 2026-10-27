@@ -90,10 +90,17 @@ func runBTSReport(args []string) error {
 	flags := flag.NewFlagSet("perfprobe bts-report", flag.ContinueOnError)
 	standardPath := flags.String("standard-run", "", "completed Standard Batch008 run manifest")
 	fastPath := flags.String("fast-run", "", "completed Fast Batch008 run manifest")
+	fastNoisePath := flags.String("fast-noise-run", "", "completed Fast+Noise BTS-009 run manifest (enables tri-arm report mode)")
 	outJSON := flags.String("out-json", "", "new compact JSON report path")
 	outMarkdown := flags.String("out-markdown", "", "new Markdown report path")
 	if err := flags.Parse(args); err != nil {
 		return err
+	}
+	if *fastNoisePath != "" {
+		if flags.NArg() != 0 || *standardPath == "" || *fastPath == "" || *outJSON == "" || *outMarkdown == "" {
+			return errors.New("BTS-009 requires --standard-run, --fast-run (Noise OFF), --fast-noise-run, --out-json, and --out-markdown")
+		}
+		return runBTS009Report(*standardPath, *fastPath, *fastNoisePath, *outJSON, *outMarkdown)
 	}
 	if flags.NArg() != 0 || *standardPath == "" || *fastPath == "" || *outJSON == "" || *outMarkdown == "" {
 		return errors.New("--standard-run, --fast-run, --out-json, and --out-markdown are required")

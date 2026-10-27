@@ -4,6 +4,7 @@ package numericalmetrics
 import (
 	"math"
 	"math/cmplx"
+	"sort"
 )
 
 // SNRStatus identifies mathematically special or non-comparable SNR cases.
@@ -97,26 +98,69 @@ type RealVectorError struct {
 	Reason     string  `json:"reason,omitempty"`
 }
 
+// RealVectorQuality contains the complete decoded-real error distribution
+// and both global and per-slot precision summaries. The per-slot median is
+// explicitly not interchangeable with global RMSE precision.
+type RealVectorQuality struct {
+	Count                        int      `json:"count"`
+	MaxAbs                       float64  `json:"max_abs"`
+	MeanAbs                      float64  `json:"mean_abs"`
+	RMSE                         float64  `json:"rmse"`
+	P99                          float64  `json:"p99"`
+	P999                         float64  `json:"p99_9"`
+	WorstIndex                   int      `json:"worst_index"`
+	GlobalRMSEPrecisionBits      *float64 `json:"global_rmse_precision_bits,omitempty"`
+	GlobalRMSEPrecisionStatus    string   `json:"global_rmse_precision_status"`
+	MedianPerSlotPrecisionBits   *float64 `json:"median_per_slot_precision_bits,omitempty"`
+	MedianPerSlotPrecisionStatus string   `json:"median_per_slot_precision_status"`
+	ExactMatchSlots              int      `json:"exact_match_slots"`
+	Status                       string   `json:"status"`
+	Reason                       string   `json:"reason,omitempty"`
+}
+
 // CompareRealVectors computes absolute-error metrics for aligned real vectors.
 // It rejects empty, mismatched, non-finite, or overflowed inputs explicitly.
 func CompareRealVectors(reference, output []float64) RealVectorError {
+	quality := CompareRealVectorQuality(reference, output)
+	return RealVectorError{
+		Count: quality.Count, MaxAbs: quality.MaxAbs, MeanAbs: quality.MeanAbs,
+		RMSE: quality.RMSE, WorstIndex: quality.WorstIndex,
+		Status: quality.Status, Reason: quality.Reason,
+	}
+}
+
+// CompareRealVectorQuality computes finite real-vector error metrics, nearest-
+// rank p99/p99.9 tails, global RMSE precision, and median per-slot precision.
+// A zero RMSE or a zero per-slot error is represented explicitly as positive
+// infinity through the corresponding status field, never serialized as Inf.
+func CompareRealVectorQuality(reference, output []float64) RealVectorQuality {
 	if len(reference) == 0 || len(reference) != len(output) {
-		return RealVectorError{Status: "NOT_COMPARABLE", Reason: "vectors must have the same non-zero length"}
+		return RealVectorQuality{Status: "NOT_COMPARABLE", Reason: "vectors must have the same non-zero length"}
 	}
 	var absoluteSum, squaredSum float64
 	var maxAbs float64
 	worstIndex := 0
+	exactSlots := 0
+	absoluteErrors := make([]float64, len(reference))
+	perSlotBits := make([]float64, len(reference))
 	for index, ref := range reference {
 		observed := output[index]
 		if !finite(ref) || !finite(observed) {
-			return RealVectorError{Status: "NOT_COMPARABLE", Reason: "vector contains a non-finite value"}
+			return RealVectorQuality{Status: "NOT_COMPARABLE", Reason: "vector contains a non-finite value"}
 		}
 		difference := math.Abs(observed - ref)
 		if !finite(difference) {
-			return RealVectorError{Status: "NOT_COMPARABLE", Reason: "absolute difference is not finite"}
+			return RealVectorQuality{Status: "NOT_COMPARABLE", Reason: "absolute difference is not finite"}
 		}
+		absoluteErrors[index] = difference
 		absoluteSum += difference
 		squaredSum += difference * difference
+		if difference == 0 {
+			perSlotBits[index] = math.Inf(1)
+			exactSlots++
+		} else {
+			perSlotBits[index] = -math.Log2(difference)
+		}
 		if difference > maxAbs {
 			maxAbs, worstIndex = difference, index
 		}
@@ -125,12 +169,50 @@ func CompareRealVectors(reference, output []float64) RealVectorError {
 	meanAbs := absoluteSum / float64(count)
 	rmse := math.Sqrt(squaredSum / float64(count))
 	if !finite(absoluteSum) || !finite(squaredSum) || !finite(meanAbs) || !finite(rmse) {
-		return RealVectorError{Status: "NOT_COMPARABLE", Reason: "error aggregation overflowed the finite float64 range"}
+		return RealVectorQuality{Status: "NOT_COMPARABLE", Reason: "error aggregation overflowed the finite float64 range"}
 	}
-	return RealVectorError{
+	sort.Float64s(absoluteErrors)
+	sort.Float64s(perSlotBits)
+	nearestRank := func(p float64) float64 {
+		rank := int(math.Ceil(p * float64(count)))
+		if rank < 1 {
+			rank = 1
+		}
+		return absoluteErrors[rank-1]
+	}
+	quality := RealVectorQuality{
 		Count: count, MaxAbs: maxAbs, MeanAbs: meanAbs, RMSE: rmse,
-		WorstIndex: worstIndex, Status: "FINITE",
+		P99: nearestRank(0.99), P999: nearestRank(0.999), WorstIndex: worstIndex,
+		ExactMatchSlots: exactSlots, Status: "FINITE",
 	}
+	if rmse == 0 {
+		quality.GlobalRMSEPrecisionStatus = "POSITIVE_INFINITY_ZERO_RMSE"
+	} else {
+		bits := -math.Log2(rmse)
+		if !finite(bits) {
+			return RealVectorQuality{Status: "NOT_COMPARABLE", Reason: "global RMSE precision overflowed the finite float64 range"}
+		}
+		quality.GlobalRMSEPrecisionBits = &bits
+		quality.GlobalRMSEPrecisionStatus = "FINITE"
+	}
+	median := perSlotBits[count/2]
+	if count%2 == 0 {
+		lower, upper := perSlotBits[count/2-1], perSlotBits[count/2]
+		if math.IsInf(lower, 1) || math.IsInf(upper, 1) {
+			median = math.Inf(1)
+		} else {
+			median = (lower + upper) / 2
+		}
+	}
+	if math.IsInf(median, 1) {
+		quality.MedianPerSlotPrecisionStatus = "POSITIVE_INFINITY_AT_LEAST_HALF_EXACT"
+	} else if !finite(median) {
+		return RealVectorQuality{Status: "NOT_COMPARABLE", Reason: "per-slot precision median is not finite"}
+	} else {
+		quality.MedianPerSlotPrecisionBits = &median
+		quality.MedianPerSlotPrecisionStatus = "FINITE"
+	}
+	return quality
 }
 
 func finiteComplex(value complex128) bool {

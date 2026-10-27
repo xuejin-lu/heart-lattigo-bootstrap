@@ -96,6 +96,40 @@ func TestCompareRealVectorsZeroErrorIsFiniteAndZero(t *testing.T) {
 	}
 }
 
+func TestCompareRealVectorQualitySeparatesGlobalAndSlotPrecision(t *testing.T) {
+	metric := CompareRealVectorQuality([]float64{0, 0, 0, 0}, []float64{0.5, 0.25, 0.125, 0})
+	wantRMSE := math.Sqrt((0.5*0.5 + 0.25*0.25 + 0.125*0.125) / 4)
+	if metric.Status != "FINITE" || metric.Count != 4 || metric.ExactMatchSlots != 1 {
+		t.Fatalf("unexpected quality result: %+v", metric)
+	}
+	if metric.GlobalRMSEPrecisionBits == nil || math.Abs(*metric.GlobalRMSEPrecisionBits+math.Log2(wantRMSE)) > 1e-12 {
+		t.Fatalf("global precision must be derived from RMSE: %+v", metric)
+	}
+	if metric.MedianPerSlotPrecisionBits == nil || math.Abs(*metric.MedianPerSlotPrecisionBits-2.5) > 1e-12 {
+		t.Fatalf("per-slot median precision was conflated with global RMSE precision: %+v", metric)
+	}
+	if metric.P99 != 0.5 || metric.P999 != 0.5 || metric.MaxAbs != 0.5 {
+		t.Fatalf("unexpected nearest-rank error tails: %+v", metric)
+	}
+	if math.Abs(metric.RMSE-wantRMSE) > 1e-15 {
+		t.Fatalf("unexpected RMSE: got %.17g want %.17g", metric.RMSE, wantRMSE)
+	}
+	encoded, err := json.Marshal(metric)
+	if err != nil || strings.Contains(string(encoded), "Inf") || strings.Contains(string(encoded), "NaN") {
+		t.Fatalf("quality result must be strict JSON: %s (%v)", encoded, err)
+	}
+}
+
+func TestCompareRealVectorQualityRepresentsExactMatchPrecisionAsStatus(t *testing.T) {
+	metric := CompareRealVectorQuality([]float64{1, 2}, []float64{1, 2})
+	if metric.Status != "FINITE" || metric.GlobalRMSEPrecisionBits != nil || metric.GlobalRMSEPrecisionStatus != "POSITIVE_INFINITY_ZERO_RMSE" {
+		t.Fatalf("zero RMSE must use an explicit infinity status: %+v", metric)
+	}
+	if metric.MedianPerSlotPrecisionBits != nil || metric.MedianPerSlotPrecisionStatus != "POSITIVE_INFINITY_AT_LEAST_HALF_EXACT" {
+		t.Fatalf("exact per-slot matches must use an explicit infinity status: %+v", metric)
+	}
+}
+
 func TestSummarizeComplexVectorUsesPopulationVariance(t *testing.T) {
 	metric := SummarizeComplexVector([]complex128{1 + 1i, 3 + 3i})
 	if metric.Status != "FINITE" || metric.Count != 2 || metric.WorstSlot != 1 {
