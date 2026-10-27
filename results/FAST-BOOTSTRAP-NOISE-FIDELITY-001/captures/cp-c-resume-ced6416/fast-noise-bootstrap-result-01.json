@@ -1,0 +1,9 @@
+{
+  "schema_version": "perfmeasure-bootstrap-attempt-result.v1",
+  "attempt_index": 1,
+  "phase": "single_bootstrap",
+  "completed_at": "2026-10-27T01:06:11.399223Z",
+  "elapsed_ns": 473760625,
+  "status": "ERROR_RETURNED",
+  "error": "cannot Fast Bootstrap circuit 0: Fast Mod1 polynomial evaluation: Fast power 16: power 8: Fast power 8: power 4: Fast power 4: power 2: Fast power 2: multiply: fixed-sigma Bootstrap Mul target requires a positive Scale and NTT non-Montgomery representation"
+}

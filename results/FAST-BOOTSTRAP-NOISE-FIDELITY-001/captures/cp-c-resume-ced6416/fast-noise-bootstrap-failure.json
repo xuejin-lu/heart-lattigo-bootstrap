@@ -1,0 +1,257 @@
+{
+  "schema_version": "fast-standard-public-native-bootstrap-failure.v1",
+  "status": "STOPPED_NO_RETRY",
+  "backend": "fast",
+  "backend_commit": "715ef5856159f8ae00955f4c8bfbbb43a8692308",
+  "primary_commit": "ced64162cd79e039c829a67a31316a237d4cf41a",
+  "primary_measurement_source_sha256": "bef8af26f2de7369d0ff8ec0f6ece49882135e8c3b4d67e252abaf20b19b530f",
+  "preflight_pair_sha256": "0b09e98eedfc1d0e14971a08c4ae5bf7b276f78471bae37307e68d1a554fa854",
+  "bootstrap_noise_evidence": {
+    "enabled": true,
+    "sigma_coefficient": 4.004280012097432,
+    "root_seed": 20261027,
+    "ct_ct_multiply_calls": 1,
+    "injected_polynomials": 0,
+    "events": [
+      {
+        "operation": 1,
+        "level": 12,
+        "scale": "1.152921504606846976e+18",
+        "left": {
+          "sigma_coefficient": 4.004280012097432,
+          "sampling_seed": -6757226385496583227,
+          "level": 0,
+          "scale": "",
+          "no_op": false,
+          "coefficient_sample_count": 0,
+          "coefficient_mean": 0,
+          "coefficient_variance": 0,
+          "coefficient_rms": 0,
+          "coefficient_max_abs": 0,
+          "coefficient_sha256": "",
+          "sampling_algorithm": "",
+          "qprefix_capacity": {
+            "rows": 0,
+            "checked_coefficients": 0,
+            "max_coefficient_index": 0,
+            "max_abs": "",
+            "prefix_product": "",
+            "strict_fit": false
+          },
+          "dispatch_evidence": ""
+        },
+        "right": {
+          "sigma_coefficient": 0,
+          "sampling_seed": 0,
+          "level": 0,
+          "scale": "",
+          "no_op": false,
+          "coefficient_sample_count": 0,
+          "coefficient_mean": 0,
+          "coefficient_variance": 0,
+          "coefficient_rms": 0,
+          "coefficient_max_abs": 0,
+          "coefficient_sha256": "",
+          "sampling_algorithm": "",
+          "qprefix_capacity": {
+            "rows": 0,
+            "checked_coefficients": 0,
+            "max_coefficient_index": 0,
+            "max_abs": "",
+            "prefix_product": "",
+            "strict_fit": false
+          },
+          "dispatch_evidence": ""
+        },
+        "multiply_completed": false,
+        "failure": "left injection: fixed-sigma Bootstrap Mul target requires a positive Scale and NTT non-Montgomery representation"
+      }
+    ]
+  },
+  "config_sha256": "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98",
+  "qp_sha256": "1f045e603a856968779d62e045a037274bba08cbfce8b1dd3dec2828f1f6a46b",
+  "input_sha256": "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285",
+  "workload_sha256": "00b70a2e77887c7d6a41db1859246f6513f2c984915de648734e5dd8c584cf74",
+  "bootstrap_budget": 1,
+  "reserved_bootstrap_calls": 1,
+  "failed_phase": "single_bootstrap",
+  "failure": "single_bootstrap Bootstrap attempt: cannot Fast Bootstrap circuit 0: Fast Mod1 polynomial evaluation: Fast power 16: power 8: Fast power 8: power 4: Fast power 4: power 2: Fast power 2: multiply: fixed-sigma Bootstrap Mul target requires a positive Scale and NTT non-Montgomery representation",
+  "execution_phases": [
+    {
+      "phase": "secret_key_generation",
+      "elapsed_ns": 243750,
+      "allocated_bytes": 198432,
+      "allocations": 206,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "public_GenEvaluationKeys",
+      "elapsed_ns": 947504625,
+      "allocated_bytes": 894088880,
+      "allocations": 428351,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "public_ckks_evaluator_construction",
+      "elapsed_ns": 1066833,
+      "allocated_bytes": 6195696,
+      "allocations": 16682,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "public_bootstrapping_evaluator_construction",
+      "elapsed_ns": 2431208,
+      "allocated_bytes": 9640608,
+      "allocations": 32102,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "public_encrypt_a_level5",
+      "elapsed_ns": 1202083,
+      "allocated_bytes": 5223152,
+      "allocations": 21554,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "public_encrypt_b_level5",
+      "elapsed_ns": 1192000,
+      "allocated_bytes": 5223152,
+      "allocations": 21554,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "public_encrypt_c_q5_level5",
+      "elapsed_ns": 1280500,
+      "allocated_bytes": 5223152,
+      "allocations": 21554,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "checkpoint_decode_encrypt_a_level5",
+      "elapsed_ns": 2793583,
+      "allocated_bytes": 4768120,
+      "allocations": 139398,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "checkpoint_decode_encrypt_b_level5",
+      "elapsed_ns": 2822375,
+      "allocated_bytes": 4768376,
+      "allocations": 139399,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "checkpoint_decode_encrypt_c_q5_level5",
+      "elapsed_ns": 2806583,
+      "allocated_bytes": 4768120,
+      "allocations": 139398,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "public_AddNew",
+      "elapsed_ns": 168292,
+      "allocated_bytes": 525376,
+      "allocations": 18,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "checkpoint_decode_add_level5",
+      "elapsed_ns": 2834959,
+      "allocated_bytes": 4768120,
+      "allocations": 139398,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "public_MulRelinNew",
+      "elapsed_ns": 257042,
+      "allocated_bytes": 525504,
+      "allocations": 19,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "checkpoint_decode_mulrelin_level5",
+      "elapsed_ns": 3027708,
+      "allocated_bytes": 5423480,
+      "allocations": 139398,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "public_Rescale_q5",
+      "elapsed_ns": 1732541,
+      "allocated_bytes": 658528,
+      "allocations": 41,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "checkpoint_decode_rescale_q5_level4",
+      "elapsed_ns": 2789542,
+      "allocated_bytes": 4768008,
+      "allocations": 139398,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "public_RotateNew_1",
+      "elapsed_ns": 128459,
+      "allocated_bytes": 591600,
+      "allocations": 30,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "checkpoint_decode_rotate_level4",
+      "elapsed_ns": 2798208,
+      "allocated_bytes": 4768552,
+      "allocations": 139399,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "public_DropLevelNew_4",
+      "elapsed_ns": 50000,
+      "allocated_bytes": 524752,
+      "allocations": 15,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "checkpoint_decode_drop_level0",
+      "elapsed_ns": 180792,
+      "allocated_bytes": 636168,
+      "allocations": 52,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "bootstrap_noise_hook_configuration",
+      "elapsed_ns": 719167,
+      "allocated_bytes": 4224968,
+      "allocations": 16643,
+      "samples": 1,
+      "available": true
+    },
+    {
+      "phase": "single_bootstrap",
+      "elapsed_ns": 473711916,
+      "allocated_bytes": 951018488,
+      "allocations": 19275220,
+      "samples": 1,
+      "available": true
+    }
+  ]
+}

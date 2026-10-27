@@ -1,10 +1,10 @@
 {
   "attempt_ledger": "attempt-ledger.json",
   "bootstrap_calls": {
-    "actual": 2,
+    "actual": 3,
     "authorized_maximum": 3,
     "fast": 1,
-    "fast_noise": 0,
+    "fast_noise": 1,
     "retries": 0,
     "standard": 1
   },
@@ -21,7 +21,7 @@
     "standard_side_gate_expected_fast_commit": "2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f",
     "type": "STANDARD_BOOTSTRAP_PREFLIGHT_FAST_PIN_MISMATCH"
   },
-  "in_progress_checkpoint": "CP-C S/F=1/1 complete; FN reserved once, not started",
+  "in_progress_checkpoint": "CP-C blocked: FN consumed its one attempt before completing Bootstrap; no retry",
   "latest_precompute_stops": [
     {
       "arm": "S",
@@ -117,7 +117,7 @@
     "precision_bits": "DEFERRED_TO_SHARED_TRIPLET_COMPARATOR",
     "rmse_vs_input": "DEFERRED_TO_SHARED_TRIPLET_COMPARATOR"
   },
-  "status": "BATCH_IN_PROGRESS",
+  "status": "BATCH_BLOCKED_NEEDS_WEB_REVIEW",
   "task": "FAST-BOOTSTRAP-NOISE-FIDELITY-001",
   "fast_observation": {
     "actual_calls": 1,
@@ -144,9 +144,27 @@
     "noise_hook": "ON",
     "output_base_external": "/private/tmp/fbn001-cp-c-runs-after-FN/fn.json",
     "preflight_pair_sha256": "0b09e98eedfc1d0e14971a08c4ae5bf7b276f78471bae37307e68d1a554fa854",
-    "reservation_status": "RESERVED_NOT_STARTED_NO_RETRY",
+    "reservation_status": "CONSUMED_FAILURE_NO_RETRY",
     "root_seed": 20261027,
     "time_utc": "2026-10-27T01:05:19Z",
     "warmups": 0
+  },
+  "fast_noise_failure": {
+    "actual_attempts": 1,
+    "binary_sha256": "c00e6e094292da487a5933ec1d7b46f61f0d69fea9ee31eda821a214f57ad54e",
+    "bootstrap_failure_elapsed_ns": 473711916,
+    "failure": "single_bootstrap Bootstrap attempt: cannot Fast Bootstrap circuit 0: Fast Mod1 polynomial evaluation: Fast power 16: power 8: Fast power 8: power 4: Fast power 4: power 2: Fast power 2: multiply: fixed-sigma Bootstrap Mul target requires a positive Scale and NTT non-Montgomery representation",
+    "failure_evidence": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-001/captures/cp-c-resume-ced6416/fast-noise-failure-evidence.json",
+    "failure_evidence_sha256": "3580b713480bf1ec775699ce9af59ee442c58e4d4c1c373bca8dbbf1810ee894",
+    "fixed_sigma": 4.004280012097432,
+    "hook_ct_ct_multiply_calls": 1,
+    "injected_polynomials": 0,
+    "root_seed": 20261027,
+    "status": "STOPPED_NO_RETRY_NEEDS_WEB_REVIEW"
+  },
+  "blocking_issue": {
+    "classification": "SCALE_NTT_REPRESENTATION_COMPATIBILITY",
+    "detail": "single_bootstrap Bootstrap attempt: cannot Fast Bootstrap circuit 0: Fast Mod1 polynomial evaluation: Fast power 16: power 8: Fast power 8: power 4: Fast power 4: power 2: Fast power 2: multiply: fixed-sigma Bootstrap Mul target requires a positive Scale and NTT non-Montgomery representation",
+    "needs_web_review": true
   }
 }

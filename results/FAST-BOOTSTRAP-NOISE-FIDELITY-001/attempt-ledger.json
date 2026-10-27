@@ -1,5 +1,5 @@
 {
-  "actual_bootstrap_calls": 2,
+  "actual_bootstrap_calls": 3,
   "attempts": [
     {
       "alloc_bytes": 144164144,
@@ -77,22 +77,36 @@
     },
     {
       "arm": "FN",
-      "attempts_used": 0,
+      "attempts_used": 1,
       "backend": "fast",
       "binary_sha256": "c00e6e094292da487a5933ec1d7b46f61f0d69fea9ee31eda821a214f57ad54e",
-      "bootstrap_calls_consumed": 0,
+      "bootstrap_calls_consumed": 1,
       "historical_binary_sha256": "85ca5a75b217616b2fd068c5006dc56327499d3b5c826a5deea912ce33a5e289",
       "historical_preflight_pair_sha256": "3c4f66a0f9aeff869ff86fec39ef4efc37f76a6a166fae0b5bfe6b11cee16445",
       "injection": "ON",
       "max_actual_calls": 1,
       "precompute_attempts": 2,
       "preflight_pair_sha256": "0b09e98eedfc1d0e14971a08c4ae5bf7b276f78471bae37307e68d1a554fa854",
-      "status": "FAST_NOISE_CALL_RESERVED_NOT_STARTED",
+      "status": "STOPPED_NO_RETRY_REPRESENTATION_ERROR",
       "attempt_output_base_external": "/private/tmp/fbn001-cp-c-runs-after-FN/fn.json",
       "attempt_reservations": 1,
-      "reservation_status": "RESERVED_NOT_STARTED_NO_RETRY",
+      "reservation_status": "CONSUMED_FAILURE_NO_RETRY",
       "reservation_time_utc": "2026-10-27T01:05:19Z",
-      "reserved_preflight_pair_sha256": "0b09e98eedfc1d0e14971a08c4ae5bf7b276f78471bae37307e68d1a554fa854"
+      "reserved_preflight_pair_sha256": "0b09e98eedfc1d0e14971a08c4ae5bf7b276f78471bae37307e68d1a554fa854",
+      "attempt_reservation_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-001/captures/cp-c-resume-ced6416/fast-noise-bootstrap-attempt-01.json",
+      "attempt_reservation_sha256": "154501f2c515c3bcda2e969118986770ab4482756b5897e7935def21729d4c9f",
+      "attempt_result_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-001/captures/cp-c-resume-ced6416/fast-noise-bootstrap-result-01.json",
+      "attempt_result_sha256": "3e0796e5c1f39f292765b1588a20bc8452e6a1cd1d247d55eceff2caf4d0f5d2",
+      "attempt_result_elapsed_ns": 473760625,
+      "attempt_result_status": "ERROR_RETURNED",
+      "failure_artifact_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-001/captures/cp-c-resume-ced6416/fast-noise-bootstrap-failure.json",
+      "failure_artifact_sha256": "3fef10b1ff728e10a928d13a30890b371e5e154d09f715e0ffe24baa3072cca8",
+      "failure_evidence_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-001/captures/cp-c-resume-ced6416/fast-noise-failure-evidence.json",
+      "failure_evidence_sha256": "3580b713480bf1ec775699ce9af59ee442c58e4d4c1c373bca8dbbf1810ee894",
+      "failure_elapsed_ns": 473711916,
+      "failure_reason": "single_bootstrap Bootstrap attempt: cannot Fast Bootstrap circuit 0: Fast Mod1 polynomial evaluation: Fast power 16: power 8: Fast power 8: power 4: Fast power 4: power 2: Fast power 2: multiply: fixed-sigma Bootstrap Mul target requires a positive Scale and NTT non-Montgomery representation",
+      "hook_ct_ct_multiply_calls": 1,
+      "injected_polynomials": 0
     }
   ],
   "authorization": {
@@ -145,10 +159,21 @@
       "precision_bits": "DEFERRED_TO_SHARED_TRIPLET_COMPARATOR",
       "rmse_observed": 1.1795718406445398e-09,
       "sha256": "7fb2fc91b2157d1591803bd959aa950525cc75a9af630acfc863ecca1d6246be"
+    },
+    "FN": {
+      "attempt_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-001/captures/cp-c-resume-ced6416/fast-noise-bootstrap-attempt-01.json",
+      "attempt_result_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-001/captures/cp-c-resume-ced6416/fast-noise-bootstrap-result-01.json",
+      "bootstrap_call_attempts": 1,
+      "failure_evidence_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-001/captures/cp-c-resume-ced6416/fast-noise-failure-evidence.json",
+      "failure_evidence_sha256": "3580b713480bf1ec775699ce9af59ee442c58e4d4c1c373bca8dbbf1810ee894",
+      "failure_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-001/captures/cp-c-resume-ced6416/fast-noise-bootstrap-failure.json",
+      "failure_sha256": "3fef10b1ff728e10a928d13a30890b371e5e154d09f715e0ffe24baa3072cca8",
+      "injected_polynomials": 0,
+      "status": "STOPPED_NO_RETRY_NEEDS_WEB_REVIEW"
     }
   },
   "checkpoint": "CP-C",
-  "current_phase": "FAST_NOISE_ARM_RESERVED_NOT_STARTED",
+  "current_phase": "STOPPED_AFTER_FAST_NOISE_SCALE_NTT_REPRESENTATION_FAILURE",
   "events": [
     {
       "all_attempts_remain_reserved_not_started": true,
@@ -304,6 +329,22 @@
       "root_seed": 20261027,
       "time_utc": "2026-10-27T01:05:19Z",
       "warmups": 0
+    },
+    {
+      "actual_bootstrap_calls": 3,
+      "arm": "FN",
+      "attempt_index": 1,
+      "event": "CP_C_FAST_NOISE_ARM_FAILED_SCALE_NTT_REPRESENTATION",
+      "failure": "single_bootstrap Bootstrap attempt: cannot Fast Bootstrap circuit 0: Fast Mod1 polynomial evaluation: Fast power 16: power 8: Fast power 8: power 4: Fast power 4: power 2: Fast power 2: multiply: fixed-sigma Bootstrap Mul target requires a positive Scale and NTT non-Montgomery representation",
+      "failure_artifact_sha256": "3fef10b1ff728e10a928d13a30890b371e5e154d09f715e0ffe24baa3072cca8",
+      "fast_binary_sha256": "c00e6e094292da487a5933ec1d7b46f61f0d69fea9ee31eda821a214f57ad54e",
+      "fixed_sigma": 4.004280012097432,
+      "hook_ct_ct_multiply_calls": 1,
+      "injected_polynomials": 0,
+      "retry_allowed": false,
+      "root_seed": 20261027,
+      "time_utc": "2026-10-27T01:06:11.399223Z",
+      "total_actual_bootstrap_calls": 3
     }
   ],
   "fast_noise_root_seed": 20261027,
@@ -406,13 +447,13 @@
     "primary_source_sha256": "bef8af26f2de7369d0ff8ec0f6ece49882135e8c3b4d67e252abaf20b19b530f",
     "standard_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40"
   },
-  "status": "CP_C_FAST_NOISE_ATTEMPT_RESERVED",
+  "status": "BATCH_BLOCKED_NEEDS_WEB_REVIEW",
   "stop_conditions": [
     "Do not execute any Bootstrap until post-ledger clean-source builds, go version -m metadata, binary SHA, and zero-call Standard/Fast preflight pair all pass.",
     "If any actual call fails, or provenance, parameters, capacity, input, or output validation fails, stop immediately; do not retry or consume another slot.",
     "No LogN16 workload, BTS, large benchmark, CP-D, or CP-E execution is authorized."
   ],
-  "stop_reason": "NONE_FAST_NOISE_RESERVED_NOT_STARTED",
+  "stop_reason": "FAST_NOISE_HOOK_REQUIRES_POSITIVE_SCALE_NTT_NON_MONTGOMERY_REPRESENTATION",
   "superseded_build_provenance": [
     {
       "reason": "Superseded by clean post-repair source-pinned binaries for CP-C resume; previous values retained as history.",
