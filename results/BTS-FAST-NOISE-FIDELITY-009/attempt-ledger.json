@@ -33,6 +33,7 @@
     "primary_start": "3df02885e9ab99f8760f2319a7577fba5f338ad6",
     "primary_task_authorization": "85989a005cad0e88d852f032a0d08321c22efe1f",
     "primary_implementation": "369ce3a84eb072392bacf2359d651413c159e5e8",
+    "primary_zero_call_preflight_gate": "42b9840a6ea42bb6d9f4ba368b7c161617d4a02d",
     "standard": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
     "fast_pre_hook": "325e501709c42ab5995bf7f36fb8d19621d34131",
     "fast_final": "be9c42ff23662300769b77f1eead3f12fc53adef",

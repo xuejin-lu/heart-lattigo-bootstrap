@@ -111,6 +111,8 @@ Hook 只依賴合法 CKKS 參數、Fast zero-secret capability、密文表示、
 
 **零呼叫預檢通過、程式提交並固定 Binary SHA 之前，禁止開始正式 Bootstrap。**
 
+零呼叫預檢返回前，必須讀取並保存 evaluator Noise Hook 的 supported/enabled 狀態及初始事件計數：Standard/OFF 不得啟用 Hook，Fast/OFF 必須保持關閉，Fast/ON 必須顯示支援且以凍結 σ/root seed 啟用；三者初始 Noise 事件及注入計數都必須為零。
+
 ## 四、第三階段：正式三組 Bootstrap 實驗
 
 上述全部通過後，啟動新的獨立實驗預算：
@@ -217,5 +219,5 @@ BTS-008 歷史 Warm 中位：
 - `325e501709c42ab5995bf7f36fb8d19621d34131` 是任務建立時的通用 Noise Hook 前置版本，不是 BTS-009 最終量測版本。
 - 本任務最終 Fast source pin 為 `experiment/fast-bootstrap-noise-fidelity@be9c42ff23662300769b77f1eead3f12fc53adef`，包含本任務要求的 public CKKS evaluator Noise Hook 接線；Fast OFF 與 Fast+Noise 必須使用同一個以此版本建置的 Binary。
 - Genuine Standard pin 維持 `5dbffbdea05394de2ca3a432ed5318aa832e3f40`。
-- Primary measurement implementation commit 為 `369ce3a84eb072392bacf2359d651413c159e5e8`。正式 Binary 必須記錄其實際建置時的完整 Primary VCS revision，並以 measurement source SHA-256 證明實作與此 commit 完全一致；建置後的 evidence-only commit 不得改動任何已連結的 Go source。
+- Primary measurement implementation commit 為 `369ce3a84eb072392bacf2359d651413c159e5e8`，零呼叫預檢 Hook-state Gate 修復為 `42b9840a6ea42bb6d9f4ba368b7c161617d4a02d`。正式 Binary 必須記錄其實際建置時的完整 Primary VCS revision，並以 measurement source SHA-256 證明實作與這些 commit 完全一致；建置後的 evidence-only commit 不得改動任何已連結的 Go source。
 - 這些執行 pin 不改變凍結的 BTS profile、σ、seed、18 次總預算或禁止事項，也不改寫 BTS-008、002、003 歷史。

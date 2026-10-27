@@ -4,7 +4,7 @@ Status: `ZERO_BOOTSTRAP_PREFLIGHT_PENDING`
 
 ## Frozen source and profile
 
-- Primary measurement implementation commit: `369ce3a84eb072392bacf2359d651413c159e5e8`. The build will record the exact clean Primary VCS revision after this plan checkpoint is committed; its linked measurement-source SHA-256 values must match the implementation, and no Go source may change after building.
+- Primary measurement implementation commits: `369ce3a84eb072392bacf2359d651413c159e5e8` and zero-call Hook-state gate `42b9840a6ea42bb6d9f4ba368b7c161617d4a02d`. The build will record the exact clean Primary VCS revision after the refreshed plan checkpoint is committed; its linked measurement-source SHA-256 values must match these implementation commits, and no Go source may change after building.
 - Genuine Standard Lattigo: `5dbffbdea05394de2ca3a432ed5318aa832e3f40` (clean detached checkout).
 - Fast Lattigo: `experiment/fast-bootstrap-noise-fidelity@be9c42ff23662300769b77f1eead3f12fc53adef` (clean, pushed dedicated worktree).
 - Original BTS manifest SHA-256: `53205b37abd1fb57a960394256b958f5d5e5b1a66f527bfb7cbadabfe3cf0cda`.
