@@ -74,3 +74,7 @@ The user explicitly activated this versioned task and instructed the work to use
 - Rebuild clean source-pinned binaries and establish a fresh zero-call preflight pair after this repair. Earlier `d3d5b0a` preflight and binaries remain historical and are not proof of the repaired source. The precompute pin mismatch remains in the attempt ledger. CP-C remains at most one successful call per arm and three total; no retry, warmup, LogN16, BTS, CP-D, or CP-E is authorized by this ruling.
 
 After every fresh source, binary, preflight, parameter, input, and capacity gate passes, resume S, F, FN sequentially using the already frozen input, sigma, and root seed. Stop on any new failure; do not consume another call.
+
+### CP-C exact-source refresh after the authorized diagnostic-timing repair
+
+The Bootstrap-only fixed-sigma helper's approved diagnostic-overhead repair was committed on the task branch as `715ef5856159f8ae00955f4c8bfbbb43a8692308`, descending from the previously reviewed implementation `b81f54c2e0f98dc2b4a7474fb333fbae79be8c63`. Fresh CP-C binaries and the new zero-call pair must therefore identify the actual clean pilot source exactly as `715ef5856159f8ae00955f4c8bfbbb43a8692308`. Primary accepts that exact commit only in the explicitly marked `public-native-bootstrap-once` / LogN13 / E32 preflight and capture path. The earlier `b81f54c2e0f98dc2b4a7474fb333fbae79be8c63` remains the historical CP-B pin; the generic/current pin policy and every legacy mode remain unchanged. Any other Fast commit must fail closed.

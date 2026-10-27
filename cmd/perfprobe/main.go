@@ -134,6 +134,7 @@ type cliOptions struct {
 	bootstrapBudget         int
 	publicBootstrap         bool
 	publicBootstrapPilot    bool
+	bootstrapOncePreflight  bool
 	publicRepeatability     bool
 	preflightPair           string
 	traceFixtureOut         string
@@ -234,6 +235,7 @@ func run() error {
 	flag.IntVar(&opts.bootstrapBudget, "bootstrap-budget", -1, "hard maximum actual Bootstrap attempts for this process; required when mode can invoke Bootstrap")
 	flag.BoolVar(&opts.publicBootstrap, "public-bootstrap", false, "public-native mode: run exactly one cold and one warm Bootstrap after validating --preflight-pair")
 	flag.BoolVar(&opts.publicBootstrapPilot, "public-bootstrap-once", false, "bounded public-native pilot: run exactly one full Bootstrap after validating --preflight-pair")
+	flag.BoolVar(&opts.bootstrapOncePreflight, "bootstrap-once-preflight", false, "zero-Bootstrap public-native preflight pinned for the one-call LogN13 pilot")
 	flag.BoolVar(&opts.publicRepeatability, "public-repeatability", false, "public-native mode: run exactly one cold and five warm Bootstrap calls after validating --preflight-pair")
 	flag.StringVar(&opts.preflightPair, "preflight-pair", "", "passing zero-call compare-public pair required for --public-bootstrap")
 	flag.StringVar(&opts.traceFixtureOut, "trace-fixture-out", "", "public-native Fast zero-call preflight: export held ciphertext/parameter manifest for the test-only E32 tracer")
@@ -643,6 +645,14 @@ func validateExecutionLimits(opts cliOptions) error {
 	}
 	if opts.mode == "public-native" {
 		wantBudget := 0
+		if opts.bootstrapOncePreflight && (opts.bootstrapBudget != 0 || opts.ephemeralSecretWeight != 32 || opts.profile != "logn13" ||
+			opts.publicBootstrap || opts.publicBootstrapPilot || opts.publicRepeatability || opts.preflightPair != "" || opts.traceFixtureOut != "" ||
+			opts.mulRescaleChain || opts.fixedSigmaNoise || opts.bootstrapNoiseEnabled || opts.bootstrapNoiseSeedGiven ||
+			opts.inputSmoke || opts.outputSmoke || opts.fastBootstrapAcceptance || opts.vectorsOut == "" ||
+			opts.fixedSigmaSigmaProvided || opts.fixedSigmaSeedProvided || opts.fixedSigmaAblationArm != "" ||
+			opts.fixedSigmaCVariant != "" || opts.fixedSigmaWorkload != "") {
+			return errors.New("--bootstrap-once-preflight requires only the zero-call public-native LogN13/E32 mode")
+		}
 		if opts.mulRescaleChain && (opts.publicBootstrap || opts.publicBootstrapPilot || opts.publicRepeatability || opts.preflightPair != "" || opts.traceFixtureOut != "") {
 			return errors.New("--mul-rescale-chain is a zero-Bootstrap path and does not accept Bootstrap or trace flags")
 		}
@@ -677,7 +687,7 @@ func validateExecutionLimits(opts cliOptions) error {
 		}
 		return nil
 	}
-	if opts.publicBootstrap || opts.publicBootstrapPilot || opts.publicRepeatability || opts.preflightPair != "" || opts.traceFixtureOut != "" {
+	if opts.publicBootstrap || opts.publicBootstrapPilot || opts.bootstrapOncePreflight || opts.publicRepeatability || opts.preflightPair != "" || opts.traceFixtureOut != "" {
 		return errors.New("public-native Bootstrap/trace fixture flags require --mode=public-native")
 	}
 	if opts.inputSmoke || opts.outputSmoke {

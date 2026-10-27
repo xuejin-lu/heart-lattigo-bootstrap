@@ -164,6 +164,27 @@ func TestPublicNativeModeIsExplicitlyZeroBootstrap(t *testing.T) {
 	}
 }
 
+func TestPublicBootstrapOncePreflightCLIIsOnlyZeroCallLogN13E32(t *testing.T) {
+	valid := cliOptions{mode: "public-native", bootstrapBudget: 0, ephemeralSecretWeight: 32, profile: "logn13", vectorsOut: "vectors.json", bootstrapOncePreflight: true}
+	if err := validateExecutionLimits(valid); err != nil {
+		t.Fatalf("valid one-call zero-Bootstrap preflight rejected: %v", err)
+	}
+	for _, invalid := range []cliOptions{
+		{mode: "public-native", bootstrapBudget: 1, ephemeralSecretWeight: 32, profile: "logn13", vectorsOut: "vectors.json", bootstrapOncePreflight: true},
+		{mode: "public-native", bootstrapBudget: 0, ephemeralSecretWeight: 0, profile: "logn13", vectorsOut: "vectors.json", bootstrapOncePreflight: true},
+		{mode: "public-native", bootstrapBudget: 0, ephemeralSecretWeight: 32, profile: "logn14", vectorsOut: "vectors.json", bootstrapOncePreflight: true},
+		{mode: "public-native", bootstrapBudget: 0, ephemeralSecretWeight: 32, profile: "logn13", vectorsOut: "vectors.json", bootstrapOncePreflight: true, publicBootstrapPilot: true, preflightPair: "pair.json"},
+		{mode: "public-native", bootstrapBudget: 0, ephemeralSecretWeight: 32, profile: "logn13", vectorsOut: "vectors.json", bootstrapOncePreflight: true, fixedSigmaNoise: true},
+		{mode: "public-native", bootstrapBudget: 0, ephemeralSecretWeight: 32, profile: "logn13", vectorsOut: "vectors.json", bootstrapOncePreflight: true, bootstrapNoiseSeedGiven: true},
+		{mode: "public-native", bootstrapBudget: 0, ephemeralSecretWeight: 32, profile: "logn13", bootstrapOncePreflight: true},
+		{mode: "", bootstrapBudget: 0, ephemeralSecretWeight: 32, profile: "logn13", vectorsOut: "vectors.json", bootstrapOncePreflight: true},
+	} {
+		if err := validateExecutionLimits(invalid); err == nil {
+			t.Errorf("invalid one-call preflight CLI contract accepted: %+v", invalid)
+		}
+	}
+}
+
 func TestStandardAZeroDiagnosticRequiresExactlyOneE32OutputSmokeCall(t *testing.T) {
 	valid := cliOptions{
 		mode: "standard-a-zero-diagnostic", ephemeralSecretWeight: 32,
@@ -556,8 +577,8 @@ func TestPublicBootstrapOnceStandardPreflightUsesOnlyApprovedTaskFastPin(t *test
 		t.Fatal(err)
 	}
 	pair := publicPairDocument{
-		SchemaVersion: "fast-standard-public-native-pair.v1", Status: "PASS", NumericalGate: publicNumericalGate,
-		FastCommit: publicBootstrapNoiseFastSHA, StandardCommit: publicStandardSHA, PrimaryCommit: "primary-sha", SourceSHA256: "source-sha",
+		SchemaVersion: "fast-standard-public-pair.v2", BootstrapTargetMode: "public-native-bootstrap-once", Status: "PASS", NumericalGate: publicNumericalGate,
+		FastCommit: publicBootstrapNoisePilotFastSHA, StandardCommit: publicStandardSHA, PrimaryCommit: "primary-sha", SourceSHA256: "source-sha",
 		InputSHA256: publicInputSHA, WorkloadSHA256: publicWorkloadSHA, ConfigSHA256: publicConfigSHA, QPSHA256: publicQPSHA,
 		E: 32, BootstrapCalls: 0, MatchedEnvironment: true,
 	}
@@ -583,24 +604,117 @@ func TestPublicBootstrapOnceStandardPreflightUsesOnlyApprovedTaskFastPin(t *test
 		t.Fatalf("one-call LogN13 Standard rejected the exact approved Fast task pin: %v", err)
 	}
 
-	// The same new mode rejects a valid but unrelated current Fast pin.
-	pair.FastCommit = publicCurrentFastSHA
-	writePair()
-	if _, err := validatePublicNativeBootstrapPreflightContractForMode(path, "primary-sha", "source-sha", profile, "standard", publicStandardSHA,
-		publicConfigSHA, publicQPSHA, publicInputSHA, publicWorkloadSHA, true); err == nil {
-		t.Fatal("one-call LogN13 Standard accepted a Fast pin other than the task-approved commit")
+	// The one-call mode rejects both the earlier CP-B pin and the unrelated current pin.
+	for _, rejectedPin := range []string{publicBootstrapNoiseFastSHA, publicCurrentFastSHA} {
+		pair.FastCommit = rejectedPin
+		writePair()
+		if _, err := validatePublicNativeBootstrapPreflightContractForMode(path, "primary-sha", "source-sha", profile, "standard", publicStandardSHA,
+			publicConfigSHA, publicQPSHA, publicInputSHA, publicWorkloadSHA, true); err == nil {
+			t.Fatalf("one-call LogN13 Standard accepted non-pilot Fast pin %s", rejectedPin)
+		}
 	}
 
 	// Legacy Bootstrap modes retain their pre-existing current-Fast pin.
+	pair.SchemaVersion, pair.BootstrapTargetMode = "fast-standard-public-native-pair.v1", ""
+	pair.FastCommit = publicCurrentFastSHA
+	writePair()
 	if _, err := validatePublicNativeBootstrapPreflightContractForMode(path, "primary-sha", "source-sha", profile, "standard", publicStandardSHA,
 		publicConfigSHA, publicQPSHA, publicInputSHA, publicWorkloadSHA, false); err != nil {
 		t.Fatalf("legacy Standard preflight no longer accepts its original current Fast pin: %v", err)
 	}
-	pair.FastCommit = publicBootstrapNoiseFastSHA
+	pair.FastCommit = publicBootstrapNoisePilotFastSHA
 	writePair()
 	if _, err := validatePublicNativeBootstrapPreflightContractForMode(path, "primary-sha", "source-sha", profile, "standard", publicStandardSHA,
 		publicConfigSHA, publicQPSHA, publicInputSHA, publicWorkloadSHA, false); err == nil {
 		t.Fatal("legacy Standard preflight accepted the task-specific Fast pin in place of its original current pin")
+	}
+}
+
+func TestPublicBootstrapOneCallFastPinIsExactAndModeScoped(t *testing.T) {
+	if err := validatePublicBackendPinForBootstrapOnce("fast", publicBootstrapNoisePilotFastSHA, "logn13", true); err != nil {
+		t.Fatalf("one-call mode rejected its exact task Fast source: %v", err)
+	}
+	for _, pin := range []string{publicBootstrapNoiseFastSHA, publicCurrentFastSHA, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"} {
+		if err := validatePublicBackendPinForBootstrapOnce("fast", pin, "logn13", true); err == nil {
+			t.Errorf("one-call mode accepted non-exact Fast source pin %s", pin)
+		}
+	}
+	if err := validatePublicBackendPin("fast", publicBootstrapNoisePilotFastSHA, "logn13"); err == nil {
+		t.Fatal("generic/legacy mode accepted the pilot-only Fast source pin")
+	}
+	if err := validatePublicBackendPinForBootstrapOnce("fast", publicBootstrapNoisePilotFastSHA, "logn14", true); err == nil {
+		t.Fatal("one-call mode accepted its pilot pin outside LogN13")
+	}
+	if err := validatePublicBackendPinForBootstrapOnce("fast", publicCurrentFastSHA, "logn13", false); err != nil {
+		t.Fatalf("legacy mode no longer uses the generic current-Fast pin: %v", err)
+	}
+}
+
+func TestPublicOneCallZeroCallPairRequiresPilotSchemaAndExactFastPin(t *testing.T) {
+	standard, standardVectors := makePublicPairArtifactFixture(t, "standard")
+	fast, fastVectors := makePublicPairArtifactFixture(t, "fast")
+	fast.BackendCommit, fastVectors.BackendCommit = publicBootstrapNoisePilotFastSHA, publicBootstrapNoisePilotFastSHA
+	if err := validatePublicPairArtifactsForBootstrapOnce(standard, fast, standardVectors, fastVectors, true); err != nil {
+		t.Fatalf("one-call zero-call preflight rejected the exact pilot pin: %v", err)
+	}
+	wrongMode := fast
+	wrongMode.Mode = "fixed-sigma-two-step-chain"
+	if err := validatePublicPairArtifactsForBootstrapOnce(standard, wrongMode, standardVectors, fastVectors, true); err == nil {
+		t.Fatal("one-call pilot preflight accepted a non-public-native mode")
+	}
+	if err := validatePublicPairArtifacts(standard, fast, standardVectors, fastVectors); err == nil {
+		t.Fatal("generic legacy zero-call comparator accepted the pilot-only source pin")
+	}
+	fast.BackendCommit, fastVectors.BackendCommit = publicBootstrapNoiseFastSHA, publicBootstrapNoiseFastSHA
+	if err := validatePublicPairArtifactsForBootstrapOnce(standard, fast, standardVectors, fastVectors, true); err == nil {
+		t.Fatal("one-call zero-call preflight accepted the historical CP-B source pin instead of the exact pilot source")
+	}
+}
+
+func TestRunPublicCompareMarksZeroCallPairForOneCallPilot(t *testing.T) {
+	standard, standardVectors := makePublicPairArtifactFixture(t, "standard")
+	fast, fastVectors := makePublicPairArtifactFixture(t, "fast")
+	fast.BackendCommit, fastVectors.BackendCommit = publicBootstrapNoisePilotFastSHA, publicBootstrapNoisePilotFastSHA
+	dir := t.TempDir()
+	paths := []string{
+		filepath.Join(dir, "standard.json"), filepath.Join(dir, "standard-vectors.json"),
+		filepath.Join(dir, "fast.json"), filepath.Join(dir, "fast-vectors.json"), filepath.Join(dir, "pair.json"),
+	}
+	for _, item := range []struct {
+		path string
+		data any
+	}{
+		{paths[0], standard}, {paths[1], standardVectors}, {paths[2], fast}, {paths[3], fastVectors},
+	} {
+		if err := writeExclusiveJSON(item.path, item.data); err != nil {
+			t.Fatal(err)
+		}
+	}
+	args := []string{
+		"--standard=" + paths[0], "--standard-vectors=" + paths[1], "--fast=" + paths[2],
+		"--fast-vectors=" + paths[3], "--out=" + paths[4], "--bootstrap-once-preflight",
+	}
+	if err := runPublicCompare(args); err != nil {
+		t.Fatalf("one-call preflight compare rejected exact pilot pair: %v", err)
+	}
+	var pair publicPairDocument
+	if err := readJSON(paths[4], &pair); err != nil {
+		t.Fatal(err)
+	}
+	if pair.SchemaVersion != "fast-standard-public-pair.v2" || pair.BootstrapTargetMode != "public-native-bootstrap-once" ||
+		pair.FastCommit != publicBootstrapNoisePilotFastSHA || pair.BootstrapCalls != 0 || pair.Status != "PASS" {
+		t.Fatalf("one-call preflight pair did not preserve its scoped marker/provenance: %+v", pair)
+	}
+	fast.Mode = "fixed-sigma-two-step-chain"
+	encoded, err := json.Marshal(fast)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(paths[2], encoded, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if err := runPublicCompare(args); err == nil {
+		t.Fatal("one-call preflight flag accepted non-public-native artifacts")
 	}
 }
 

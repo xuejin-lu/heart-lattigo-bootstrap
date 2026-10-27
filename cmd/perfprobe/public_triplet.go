@@ -204,7 +204,7 @@ func validatePublicBootstrapTripletArm(doc publicNativeDocument, vectors publicV
 		!doc.PrimaryClean || !doc.BackendClean || !validSHA256Hex(doc.BinarySHA256) || doc.PreflightPairSHA256 == "" {
 		return errors.New("artifact does not satisfy the exact one-call LogN13/E32 provenance contract")
 	}
-	if err := validatePublicBackendPin(backend, doc.BackendCommit, doc.Profile); err != nil {
+	if err := validatePublicBackendPinForBootstrapOnce(backend, doc.BackendCommit, doc.Profile, backend == "fast"); err != nil {
 		return err
 	}
 	if vectors.SchemaVersion != "fast-standard-public-native-bootstrap-once-vectors.v1" || vectors.Mode != doc.Mode ||
@@ -265,7 +265,7 @@ func jsonUnmarshalBootstrapNoise(raw []byte, dst any) error {
 }
 
 func validatePublicBootstrapTripletCompatibility(standard, fast, fastNoise publicNativeDocument, standardVectors, fastVectors, fastNoiseVectors publicVectorDocument) error {
-	if standard.BackendCommit != publicStandardSHA || fast.BackendCommit != publicBootstrapNoiseFastSHA || fastNoise.BackendCommit != publicBootstrapNoiseFastSHA ||
+	if standard.BackendCommit != publicStandardSHA || fast.BackendCommit != publicBootstrapNoisePilotFastSHA || fastNoise.BackendCommit != publicBootstrapNoisePilotFastSHA ||
 		fast.BinarySHA256 != fastNoise.BinarySHA256 {
 		return errors.New("triplet source pins or shared Fast/Fast+Noise binary identity do not match")
 	}

@@ -102,7 +102,7 @@ func TestPublicBootstrapNoiseSnapshotRequiresTwoIndependentCapacityCheckedSides(
 
 func TestPublicTripletSummaryUsesGlobalRMSEPrecisionAndTails(t *testing.T) {
 	doc := publicNativeDocument{
-		Backend: "fast", BackendCommit: publicBootstrapNoiseFastSHA, BinarySHA256: string(make([]byte, 64)),
+		Backend: "fast", BackendCommit: publicBootstrapNoisePilotFastSHA, BinarySHA256: string(make([]byte, 64)),
 		BootstrapCalls: 1, InputSlots: 4, BootstrapInputSHA256: "same-input",
 		BootstrapResults: []publicBootstrapResult{{
 			Phase: "single_bootstrap", Output: publicCheckpoint{DecodedSHA256: "decoded"},
@@ -156,8 +156,8 @@ func TestRunPublicTripletCompareUsesSameOriginalInputAndValidatesSharedFastBinar
 	fast, fastVectors = promotePublicBootstrapFixtureToOnce(t, fast, fastVectors)
 	noise, noiseVectors = promotePublicBootstrapFixtureToOnce(t, noise, noiseVectors)
 	prepareTripletFixtureMetadata(&standard, &standardVectors, "standard", publicStandardSHA, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-	prepareTripletFixtureMetadata(&fast, &fastVectors, "fast", publicBootstrapNoiseFastSHA, "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")
-	prepareTripletFixtureMetadata(&noise, &noiseVectors, "fast", publicBootstrapNoiseFastSHA, "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")
+	prepareTripletFixtureMetadata(&fast, &fastVectors, "fast", publicBootstrapNoisePilotFastSHA, "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")
+	prepareTripletFixtureMetadata(&noise, &noiseVectors, "fast", publicBootstrapNoisePilotFastSHA, "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")
 	bootstrapInput, err := publicOracleCheckpoints(standard.InputSlots)
 	if err != nil {
 		t.Fatal(err)
@@ -236,6 +236,11 @@ func TestRunPublicTripletCompareUsesSameOriginalInputAndValidatesSharedFastBinar
 		t.Fatalf("synthetic FN should be closer in absolute precision bits: %+v", result)
 	}
 
+	noise.BackendCommit, noiseVectors.BackendCommit = publicBootstrapNoiseFastSHA, publicBootstrapNoiseFastSHA
+	if err := validatePublicBootstrapTripletArm(noise, noiseVectors, "fast", true); err == nil {
+		t.Fatal("one-call triplet accepted the historical CP-B pin instead of its exact pilot source")
+	}
+	noise.BackendCommit, noiseVectors.BackendCommit = publicBootstrapNoisePilotFastSHA, publicBootstrapNoisePilotFastSHA
 	noise.BinarySHA256 = "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
 	if err := validatePublicBootstrapTripletCompatibility(standard, fast, noise, standardVectors, fastVectors, noiseVectors); err == nil {
 		t.Fatal("triplet accepted Fast and Fast+Noise artifacts from different binaries")

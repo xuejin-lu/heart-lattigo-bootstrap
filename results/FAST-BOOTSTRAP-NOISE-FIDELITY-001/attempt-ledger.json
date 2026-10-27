@@ -21,9 +21,9 @@
       "bootstrap_calls_consumed": 0,
       "injection": "OFF",
       "max_actual_calls": 1,
-      "precompute_attempts": 0,
+      "precompute_attempts": 1,
       "preflight_pair_sha256": "3c4f66a0f9aeff869ff86fec39ef4efc37f76a6a166fae0b5bfe6b11cee16445",
-      "status": "NOT_STARTED_AFTER_CP_C_STOP"
+      "status": "PRECOMPUTE_FAILED_NO_CALL"
     },
     {
       "arm": "FN",
@@ -54,7 +54,9 @@
     "primary_vcs_revision": "37ae2faa5c30ad6f9be35d47acb17a57d5358670",
     "standard_binary_sha256": "f34bac107e00534fe0acbeedf252936a1fa7f9351a2aafcc5cf040f3af37410b"
   },
+  "build_provenance_status": "Historical eb80 binaries retained and not used; fresh clean binaries must be built after Primary repair commit",
   "checkpoint": "CP-C",
+  "current_phase": "FRESH_CLEAN_BINARY_BUILD_AND_ZERO_CALL_PREFLIGHT",
   "events": [
     {
       "all_attempts_remain_reserved_not_started": true,
@@ -76,22 +78,35 @@
       "time_utc": "2026-10-26T23:47:12.520874+00:00"
     },
     {
-      "event": "WEB_REVIEW_AUTHORIZED_SCOPED_REPAIR_AND_CP_C_RESUME",
-      "time_utc": "2026-10-27",
       "actual_bootstrap_calls": 0,
+      "allowed_fast_commit": "b81f54c2e0f98dc2b4a7474fb333fbae79be8c63",
       "bootstrap_calls_authorized_max": 3,
+      "details": "Rebuild clean binaries and pass a new zero-call preflight before any one-call CP-C reservation.",
+      "event": "WEB_REVIEW_AUTHORIZED_SCOPED_REPAIR_AND_CP_C_RESUME",
       "precompute_pin_failure_preserved": true,
       "preflight_pair_sha256_current": null,
       "repair_tests_run_without_bootstrap": true,
-      "allowed_fast_commit": "b81f54c2e0f98dc2b4a7474fb333fbae79be8c63",
-      "details": "Rebuild clean binaries and pass a new zero-call preflight before any one-call CP-C reservation.",
-      "secondary_repair_commit": "715ef5856159f8ae00955f4c8bfbbb43a8692308"
+      "secondary_repair_commit": "715ef5856159f8ae00955f4c8bfbbb43a8692308",
+      "time_utc": "2026-10-27"
+    },
+    {
+      "actual_bootstrap_calls": 0,
+      "arm": "F",
+      "binary_sha256": "2ee21967f8c91e7a7e48f1b8f8ad39975ddf1280948bbc145d02d463511392d9",
+      "bootstrap_budget_reservations": 0,
+      "ckks_arithmetic_started": false,
+      "event": "CP_C_FAST_ZERO_CALL_PREFLIGHT_STOPPED_EXACT_PIN_NOT_ENABLED",
+      "evidence_path": "preflight/cp-c-fast-pin-stop.json",
+      "evidence_sha256": "20b6407c0d3d211ee5353b4b94b15e3e470d2108deb471cad5108a7bc5f0ec97",
+      "primary_source_commit": "eb80a2de63ae06d1d4eadf874b7e1866a44dbff1",
+      "secondary_source_commit": "715ef5856159f8ae00955f4c8bfbbb43a8692308",
+      "time_utc": "2026-10-27T00:35:25Z"
     }
   ],
   "fast_noise_root_seed": 20261027,
   "fixed_sigma": 4.004280012097432,
   "max_actual_bootstrap_calls": 3,
-  "precompute_attempt_count": 1,
+  "precompute_attempt_count": 2,
   "precompute_failures": [
     {
       "arm": "S",
@@ -104,6 +119,23 @@
       "phase": "public-bootstrap-preflight-contract-before-budget-reservation",
       "preflight_pair_sha256": "3c4f66a0f9aeff869ff86fec39ef4efc37f76a6a166fae0b5bfe6b11cee16445",
       "retry_authorized": false
+    },
+    {
+      "arm": "F",
+      "binary_sha256": "2ee21967f8c91e7a7e48f1b8f8ad39975ddf1280948bbc145d02d463511392d9",
+      "bootstrap_attempt_reserved": false,
+      "bootstrap_calls_consumed": 0,
+      "error": "Fast backend commit 715ef5856159f8ae00955f4c8bfbbb43a8692308 was not approved for LogN13 by the then-current generic public pin validator.",
+      "error_class": "UNSUPPORTED_BACKEND_PROFILE",
+      "evidence_path": "preflight/cp-c-fast-pin-stop.json",
+      "evidence_sha256": "20b6407c0d3d211ee5353b4b94b15e3e470d2108deb471cad5108a7bc5f0ec97",
+      "expected_fast_commit": "publicBootstrapNoiseFastSHA=b81f54c2e0f98dc2b4a7474fb333fbae79be8c63 (historical/task implementation pin before timing-only repair)",
+      "observed_fast_commit": "715ef5856159f8ae00955f4c8bfbbb43a8692308",
+      "phase": "public-native-zero-bootstrap-preflight-before-CKKS-arithmetic",
+      "preflight_pair_sha256": null,
+      "prior_historical_preflight_pair_sha256": "3c4f66a0f9aeff869ff86fec39ef4efc37f76a6a166fae0b5bfe6b11cee16445",
+      "retry_authorized": false,
+      "time_utc": "2026-10-27T00:35:25Z"
     }
   ],
   "preflight_evidence_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-001/preflight-evidence.json",
@@ -120,6 +152,28 @@
     "scale": "2^45",
     "workload_sha256": "00b70a2e77887c7d6a41db1859246f6513f2c984915de648734e5dd8c584cf74"
   },
+  "resolved_precompute_stop": "FAST_ZERO_CALL_PREFLIGHT_EXACT_PIN_NOT_ENABLED; scoped exact pilot pin and targeted regressions now pass",
+  "resume_authorization": {
+    "approved_fast_commit": "b81f54c2e0f98dc2b4a7474fb333fbae79be8c63",
+    "bootstrap_budget_unchanged": {
+      "actual_calls": 0,
+      "fast": 1,
+      "fast_noise": 1,
+      "maximum": 3,
+      "retries": 0,
+      "standard": 1,
+      "warmups": 0
+    },
+    "date": "2026-10-27",
+    "fast_pin_followup_reason": "Authorized Secondary diagnostic timing repair advanced the task source; new binaries must bind to the exact clean source actually built.",
+    "fast_pin_scope": "public-native-bootstrap-once / LogN13 / E32 preflight and capture only; exact task pilot commit 715ef5856159f8ae00955f4c8bfbbb43a8692308",
+    "historical_fast_commit": "b81f54c2e0f98dc2b4a7474fb333fbae79be8c63",
+    "output_precision_gate": "OBSERVATIONAL_ONLY_FOR_PUBLIC_BOOTSTRAP_ONCE; structural and finite-data checks remain strict",
+    "pilot_execution_fast_commit": "715ef5856159f8ae00955f4c8bfbbb43a8692308",
+    "precompute_failure_preserved": "preflight/cp-c-stop.json",
+    "ruling": "AUTHORIZED_SCOPED_REPAIR_AND_CP_C_RESUME",
+    "secondary_repair_commit": "715ef5856159f8ae00955f4c8bfbbb43a8692308"
+  },
   "retry_budget": 0,
   "schema_version": "fast-bootstrap-noise-fidelity-attempt-ledger.v1",
   "sources": {
@@ -130,32 +184,12 @@
     "primary_source_sha256": "6c02139892f94b5af67f8cf8046be6438cd106a6b5b2be59622d6c78211bd195",
     "standard_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40"
   },
-  "status": "CP_C_SCOPED_REPAIR_IN_PROGRESS",
+  "status": "CP_C_FRESH_BINARY_AND_PREFLIGHT_REQUIRED",
   "stop_conditions": [
     "Do not execute any Bootstrap until post-ledger clean-source builds, go version -m metadata, binary SHA, and zero-call Standard/Fast preflight pair all pass.",
     "If any actual call fails, or provenance, parameters, capacity, input, or output validation fails, stop immediately; do not retry or consume another slot.",
     "No LogN16 workload, BTS, large benchmark, CP-D, or CP-E execution is authorized."
   ],
-  "stop_reason": "STANDARD_BOOTSTRAP_PREFLIGHT_FAST_PIN_MISMATCH",
-  "task": "FAST-BOOTSTRAP-NOISE-FIDELITY-001",
-  "current_phase": "REPAIR_AND_FRESH_ZERO_CALL_PREFLIGHT",
-  "build_provenance_status": "HISTORICAL_D3D5B0A_PRECHECK_NOT_VALID_FOR_REPAIRED_SOURCE",
-  "resume_authorization": {
-    "ruling": "AUTHORIZED_SCOPED_REPAIR_AND_CP_C_RESUME",
-    "date": "2026-10-27",
-    "fast_pin_scope": "public-native-bootstrap-once / LogN13 / E32 Standard preflight only",
-    "approved_fast_commit": "b81f54c2e0f98dc2b4a7474fb333fbae79be8c63",
-    "output_precision_gate": "OBSERVATIONAL_ONLY_FOR_PUBLIC_BOOTSTRAP_ONCE; structural and finite-data checks remain strict",
-    "bootstrap_budget_unchanged": {
-      "maximum": 3,
-      "standard": 1,
-      "fast": 1,
-      "fast_noise": 1,
-      "actual_calls": 0,
-      "retries": 0,
-      "warmups": 0
-    },
-    "precompute_failure_preserved": "preflight/cp-c-stop.json",
-    "secondary_repair_commit": "715ef5856159f8ae00955f4c8bfbbb43a8692308"
-  }
+  "stop_reason": "FRESH_SOURCE_PIN_PAIR_NOT_YET_REBUILT",
+  "task": "FAST-BOOTSTRAP-NOISE-FIDELITY-001"
 }

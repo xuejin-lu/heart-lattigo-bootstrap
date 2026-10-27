@@ -36,6 +36,7 @@ const (
 	publicFixedSigmaNoiseFastSHA       = "9ef0315feaf59dbee03bf0852b72c76fdeb6b800"
 	publicFixedSigmaChainFastSHA       = "1e7828293c36f9845e30723ba4e9500d84bb50d2"
 	publicBootstrapNoiseFastSHA        = "b81f54c2e0f98dc2b4a7474fb333fbae79be8c63"
+	publicBootstrapNoisePilotFastSHA   = "715ef5856159f8ae00955f4c8bfbbb43a8692308"
 	publicBootstrapNoiseSigma          = 4.004280012097432
 	publicConfigSHA                    = "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98"
 	publicInputSHA                     = "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285"
@@ -464,6 +465,7 @@ type publicPairDocument struct {
 	SchemaVersion              string                          `json:"schema_version"`
 	GeneratedAt                time.Time                       `json:"generated_at"`
 	Mode                       string                          `json:"mode,omitempty"`
+	BootstrapTargetMode        string                          `json:"bootstrap_target_mode,omitempty"`
 	Status                     string                          `json:"status"`
 	Profile                    string                          `json:"profile,omitempty"`
 	NumericalGate              float64                         `json:"max_complex_gate"`
@@ -553,7 +555,8 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 	if err != nil {
 		return fmt.Errorf("backend provenance: %w", err)
 	}
-	if err := validatePublicBackendPin(publicBackendName(), secondaryCommit, profile.Name); err != nil {
+	if err := validatePublicBackendPinForBootstrapOnce(publicBackendName(), secondaryCommit, profile.Name,
+		opts.publicBootstrapPilot || opts.bootstrapOncePreflight); err != nil {
 		return fmt.Errorf("UNSUPPORTED_BACKEND_PROFILE: %s for %s: %w", publicBackendName(), profile.Name, err)
 	}
 	sourceHash, err := primaryMeasurementSourceFingerprint(primaryRoot)
@@ -1499,18 +1502,18 @@ func validatePublicNativeBootstrapPreflightContractForMode(
 			if profile.Name != "logn13" || profile.LogN != 13 {
 				return "", fmt.Errorf("public-native-bootstrap-once Standard preflight supports only the frozen LogN13/E32 profile")
 			}
-			fastCommit = publicBootstrapNoiseFastSHA
+			fastCommit = publicBootstrapNoisePilotFastSHA
 		}
 	case "fast":
-		if err := validatePublicBackendPin("fast", backendCommit, profile.Name); err != nil {
+		if err := validatePublicBackendPinForBootstrapOnce("fast", backendCommit, profile.Name, bootstrapOnce); err != nil {
 			return "", err
 		}
 		fastCommit = backendCommit
 	default:
 		return "", fmt.Errorf("unsupported public-native backend %q", backendName)
 	}
-	return validatePublicPreflightGateForContract(path, primaryCommit, sourceSHA256, profile, fastCommit,
-		configSHA256, qpSHA256, inputSHA256, workloadSHA256)
+	return validatePublicPreflightGateForContractMode(path, primaryCommit, sourceSHA256, profile, fastCommit,
+		configSHA256, qpSHA256, inputSHA256, workloadSHA256, bootstrapOnce)
 }
 
 func validatePublicPreflightGateForProfile(path, primaryCommit, sourceSHA256, profileName, fastCommit, configSHA256, qpSHA256, inputSHA256, workloadSHA256 string) (string, error) {
@@ -1523,6 +1526,11 @@ func validatePublicPreflightGateForProfile(path, primaryCommit, sourceSHA256, pr
 }
 
 func validatePublicPreflightGateForContract(path, primaryCommit, sourceSHA256 string, profile publicProfileContract, fastCommit, configSHA256, qpSHA256, inputSHA256, workloadSHA256 string) (string, error) {
+	return validatePublicPreflightGateForContractMode(path, primaryCommit, sourceSHA256, profile, fastCommit,
+		configSHA256, qpSHA256, inputSHA256, workloadSHA256, false)
+}
+
+func validatePublicPreflightGateForContractMode(path, primaryCommit, sourceSHA256 string, profile publicProfileContract, fastCommit, configSHA256, qpSHA256, inputSHA256, workloadSHA256 string, bootstrapOnce bool) (string, error) {
 	var pair publicPairDocument
 	if err := readJSON(path, &pair); err != nil {
 		return "", fmt.Errorf("read passing compare-public pair %s: %w", path, err)
@@ -1537,7 +1545,15 @@ func validatePublicPreflightGateForContract(path, primaryCommit, sourceSHA256 st
 		(pair.Profile != profile.Name || pair.ProfileKind != profile.Kind || pair.InputSlots != profile.InputSlots || pair.Parameters.LogN != profile.LogN || pair.Parameters.InputSlots != profile.InputSlots || pair.Parameters.RingN != profile.RingN) {
 		return "", errors.New("parameterized preflight pair is missing or mismatches its effective profile metadata")
 	}
-	if pair.SchemaVersion != "fast-standard-public-native-pair.v1" || pair.Status != "PASS" || !pair.MatchedEnvironment || pair.BootstrapCalls != 0 || len(pair.Bootstrap) != 0 || pair.E != 32 || pair.NumericalGate != publicNumericalGate {
+	wantPairSchema, wantTargetMode := "fast-standard-public-native-pair.v1", ""
+	if bootstrapOnce {
+		if profile.Name != "logn13" || profile.LogN != 13 {
+			return "", errors.New("one-call preflight pair is restricted to frozen LogN13/E32")
+		}
+		wantPairSchema, wantTargetMode = "fast-standard-public-pair.v2", "public-native-bootstrap-once"
+	}
+	if pair.SchemaVersion != wantPairSchema || pair.BootstrapTargetMode != wantTargetMode || pair.Status != "PASS" ||
+		!pair.MatchedEnvironment || pair.BootstrapCalls != 0 || len(pair.Bootstrap) != 0 || pair.E != 32 || pair.NumericalGate != publicNumericalGate {
 		return "", fmt.Errorf("preflight pair is not a passing zero-Bootstrap %s/E32 pair", profile.Name)
 	}
 	if profile.CapacityPolicy == publicCapacityPolicyLogN16Observed &&
@@ -1830,6 +1846,7 @@ func runPublicCompare(args []string) error {
 	standardVectorsPath := flags.String("standard-vectors", "", "Standard ephemeral vectors JSON")
 	fastVectorsPath := flags.String("fast-vectors", "", "Fast ephemeral vectors JSON")
 	outPath := flags.String("out", "", "compact paired preflight JSON")
+	bootstrapOncePreflight := flags.Bool("bootstrap-once-preflight", false, "validate and mark this zero-call pair for the exact LogN13 one-call Bootstrap source pin")
 	if err := flags.Parse(args); err != nil {
 		return err
 	}
@@ -1851,6 +1868,12 @@ func runPublicCompare(args []string) error {
 		return err
 	}
 	bootstrapMode := isPublicBootstrapMode(standard.Mode) || isPublicBootstrapMode(fast.Mode)
+	if *bootstrapOncePreflight && (standard.Mode != "public-native" || fast.Mode != "public-native") {
+		return errors.New("--bootstrap-once-preflight requires paired zero-call public-native artifacts")
+	}
+	if *bootstrapOncePreflight && bootstrapMode {
+		return errors.New("--bootstrap-once-preflight accepts only zero-Bootstrap public-native artifacts")
+	}
 	if bootstrapMode {
 		if err := validatePublicBootstrapPairArtifacts(standard, fast, standardVectors, fastVectors); err != nil {
 			return err
@@ -1859,7 +1882,7 @@ func runPublicCompare(args []string) error {
 		if err := validatePublicFixedSigmaChainPairArtifacts(standard, fast, standardVectors, fastVectors); err != nil {
 			return err
 		}
-	} else if err := validatePublicPairArtifacts(standard, fast, standardVectors, fastVectors); err != nil {
+	} else if err := validatePublicPairArtifactsForBootstrapOnce(standard, fast, standardVectors, fastVectors, *bootstrapOncePreflight); err != nil {
 		return err
 	}
 	standardStates, fastStates := map[string]publicCheckpoint{}, map[string]publicCheckpoint{}
@@ -1873,8 +1896,13 @@ func runPublicCompare(args []string) error {
 		len(standardStates) != len(fastStates) || len(standardVectors.Checkpoints) != len(standardStates) || len(fastVectors.Checkpoints) != len(fastStates) {
 		return errors.New("paired artifacts have empty or mismatched checkpoint coverage")
 	}
+	pairSchemaVersion, bootstrapTargetMode := "fast-standard-public-native-pair.v1", ""
+	if *bootstrapOncePreflight {
+		pairSchemaVersion, bootstrapTargetMode = "fast-standard-public-pair.v2", "public-native-bootstrap-once"
+	}
 	pair := publicPairDocument{
-		SchemaVersion: "fast-standard-public-native-pair.v1", GeneratedAt: time.Now().UTC(), Mode: standard.Mode, Status: "PASS",
+		SchemaVersion: pairSchemaVersion, GeneratedAt: time.Now().UTC(), Mode: standard.Mode,
+		BootstrapTargetMode: bootstrapTargetMode, Status: "PASS",
 		Profile: standard.Profile, ProfileKind: standard.ProfileKind,
 		NumericalGate: publicNumericalGate, FastCommit: fast.BackendCommit, StandardCommit: standard.BackendCommit,
 		PrimaryCommit: standard.PrimaryCommit, SourceSHA256: standard.PrimarySourceSHA256, InputSHA256: standard.InputSHA256,
@@ -2020,9 +2048,16 @@ func runPublicCompare(args []string) error {
 }
 
 func validatePublicPairArtifacts(standard, fast publicNativeDocument, standardVectors, fastVectors publicVectorDocument) error {
+	return validatePublicPairArtifactsForBootstrapOnce(standard, fast, standardVectors, fastVectors, false)
+}
+
+func validatePublicPairArtifactsForBootstrapOnce(standard, fast publicNativeDocument, standardVectors, fastVectors publicVectorDocument, bootstrapOnce bool) error {
 	profile, err := publicProfileForNativeDocument(standard)
 	if err != nil {
 		return err
+	}
+	if bootstrapOnce && (standard.Mode != "public-native" || fast.Mode != "public-native" || profile.Name != "logn13" || profile.LogN != 13) {
+		return errors.New("one-call pilot preflight pairing is restricted to public-native LogN13 zero-call artifacts")
 	}
 	if standard.SchemaVersion != "fast-standard-public-native-preflight.v1" || fast.SchemaVersion != standard.SchemaVersion || standard.Status != "PASS_ZERO_BOOTSTRAP_PREBOOTSTRAP_CHAIN" || fast.Status != standard.Status {
 		return errors.New("paired inputs are not successful public-native preflight artifacts")
@@ -2041,7 +2076,7 @@ func validatePublicPairArtifacts(standard, fast publicNativeDocument, standardVe
 	if err := validatePublicBackendPin(standard.Backend, standard.BackendCommit, profile.Name); err != nil {
 		return err
 	}
-	if err := validatePublicBackendPin(fast.Backend, fast.BackendCommit, profile.Name); err != nil {
+	if err := validatePublicBackendPinForBootstrapOnce(fast.Backend, fast.BackendCommit, profile.Name, bootstrapOnce); err != nil {
 		return err
 	}
 	if standard.BuildTag != "perf_standard" || fast.BuildTag != "perf_fast" ||
@@ -2815,6 +2850,16 @@ func sameComplexVectorStats(left, right numericalmetrics.ComplexVectorStats) boo
 func validSHA256Hex(value string) bool {
 	decoded, err := hex.DecodeString(value)
 	return err == nil && len(decoded) == sha256.Size
+}
+
+func validatePublicBackendPinForBootstrapOnce(backend, commit, profile string, bootstrapOnce bool) error {
+	if !bootstrapOnce || backend != "fast" {
+		return validatePublicBackendPin(backend, commit, profile)
+	}
+	if profile != "logn13" || commit != publicBootstrapNoisePilotFastSHA {
+		return fmt.Errorf("one-call Fast source pin requires LogN13 commit %s; got profile=%s commit=%s", publicBootstrapNoisePilotFastSHA, profile, commit)
+	}
+	return nil
 }
 
 func validatePublicBackendPin(backend, commit string, profileNames ...string) error {
