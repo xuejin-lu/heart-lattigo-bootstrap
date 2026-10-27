@@ -1,0 +1,278 @@
+{
+  "schema_version": "fast-bootstrap-noise-fidelity-002-attempt-ledger.v1",
+  "task": "FAST-BOOTSTRAP-NOISE-FIDELITY-002",
+  "status": "PLANNED_NO_BOOTSTRAP_ATTEMPTS",
+  "created_at_utc": "2026-10-27",
+  "authorized_maximum_bootstrap_calls": 18,
+  "actual_bootstrap_calls": 0,
+  "retry_budget": 0,
+  "attempt_order": [
+    "FN",
+    "S",
+    "F"
+  ],
+  "per_arm": {
+    "FN": {
+      "planned": 6,
+      "reserved": 0,
+      "consumed": 0,
+      "succeeded": 0,
+      "failed": 0
+    },
+    "S": {
+      "planned": 6,
+      "reserved": 0,
+      "consumed": 0,
+      "succeeded": 0,
+      "failed": 0
+    },
+    "F": {
+      "planned": 6,
+      "reserved": 0,
+      "consumed": 0,
+      "succeeded": 0,
+      "failed": 0
+    }
+  },
+  "frozen": {
+    "profile": "LogN13/E32/BootstrapScale2^45",
+    "fast_secondary_commit": "49b65dd927780cec0d7e05772a3df8554ef58005",
+    "standard_secondary_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+    "fixed_sigma": 4.004280012097432,
+    "noise_root_seed": 20261027,
+    "config_sha256": "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98",
+    "qp_sha256": "1f045e603a856968779d62e045a037274bba08cbfce8b1dd3dec2828f1f6a46b",
+    "canonical_input_sha256": "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285",
+    "workload_sha256": "00b70a2e77887c7d6a41db1859246f6513f2c984915de648734e5dd8c584cf74",
+    "bootstrap_plaintext_sha256": "c32c0d7b731c0fcd8d82fb9c1182a43a62d120f761c090ce21dc764e9aa1e703",
+    "primary_source_code_commit": null,
+    "primary_source_sha256": null,
+    "standard_binary_sha256": null,
+    "fast_binary_sha256_shared_by_F_FN": null,
+    "fresh_zero_call_preflight_pair_sha256": null,
+    "preflight_status": "NOT_RUN"
+  },
+  "attempts": [
+    {
+      "attempt_id": "FN-COLD",
+      "sequence": 1,
+      "arm": "FN",
+      "mode": "FAST_NOISE_ON",
+      "phase": "first_cold_bootstrap",
+      "status": "NOT_RESERVED",
+      "reservation_path": null,
+      "result_path": null,
+      "bootstrap_calls_consumed": 0,
+      "retry_of": null
+    },
+    {
+      "attempt_id": "FN-WARM_01",
+      "sequence": 2,
+      "arm": "FN",
+      "mode": "FAST_NOISE_ON",
+      "phase": "warm_bootstrap_01",
+      "status": "NOT_RESERVED",
+      "reservation_path": null,
+      "result_path": null,
+      "bootstrap_calls_consumed": 0,
+      "retry_of": null
+    },
+    {
+      "attempt_id": "FN-WARM_02",
+      "sequence": 3,
+      "arm": "FN",
+      "mode": "FAST_NOISE_ON",
+      "phase": "warm_bootstrap_02",
+      "status": "NOT_RESERVED",
+      "reservation_path": null,
+      "result_path": null,
+      "bootstrap_calls_consumed": 0,
+      "retry_of": null
+    },
+    {
+      "attempt_id": "FN-WARM_03",
+      "sequence": 4,
+      "arm": "FN",
+      "mode": "FAST_NOISE_ON",
+      "phase": "warm_bootstrap_03",
+      "status": "NOT_RESERVED",
+      "reservation_path": null,
+      "result_path": null,
+      "bootstrap_calls_consumed": 0,
+      "retry_of": null
+    },
+    {
+      "attempt_id": "FN-WARM_04",
+      "sequence": 5,
+      "arm": "FN",
+      "mode": "FAST_NOISE_ON",
+      "phase": "warm_bootstrap_04",
+      "status": "NOT_RESERVED",
+      "reservation_path": null,
+      "result_path": null,
+      "bootstrap_calls_consumed": 0,
+      "retry_of": null
+    },
+    {
+      "attempt_id": "FN-WARM_05",
+      "sequence": 6,
+      "arm": "FN",
+      "mode": "FAST_NOISE_ON",
+      "phase": "warm_bootstrap_05",
+      "status": "NOT_RESERVED",
+      "reservation_path": null,
+      "result_path": null,
+      "bootstrap_calls_consumed": 0,
+      "retry_of": null
+    },
+    {
+      "attempt_id": "S-COLD",
+      "sequence": 7,
+      "arm": "S",
+      "mode": "GENUINE_STANDARD",
+      "phase": "first_cold_bootstrap",
+      "status": "NOT_RESERVED",
+      "reservation_path": null,
+      "result_path": null,
+      "bootstrap_calls_consumed": 0,
+      "retry_of": null
+    },
+    {
+      "attempt_id": "S-WARM_01",
+      "sequence": 8,
+      "arm": "S",
+      "mode": "GENUINE_STANDARD",
+      "phase": "warm_bootstrap_01",
+      "status": "NOT_RESERVED",
+      "reservation_path": null,
+      "result_path": null,
+      "bootstrap_calls_consumed": 0,
+      "retry_of": null
+    },
+    {
+      "attempt_id": "S-WARM_02",
+      "sequence": 9,
+      "arm": "S",
+      "mode": "GENUINE_STANDARD",
+      "phase": "warm_bootstrap_02",
+      "status": "NOT_RESERVED",
+      "reservation_path": null,
+      "result_path": null,
+      "bootstrap_calls_consumed": 0,
+      "retry_of": null
+    },
+    {
+      "attempt_id": "S-WARM_03",
+      "sequence": 10,
+      "arm": "S",
+      "mode": "GENUINE_STANDARD",
+      "phase": "warm_bootstrap_03",
+      "status": "NOT_RESERVED",
+      "reservation_path": null,
+      "result_path": null,
+      "bootstrap_calls_consumed": 0,
+      "retry_of": null
+    },
+    {
+      "attempt_id": "S-WARM_04",
+      "sequence": 11,
+      "arm": "S",
+      "mode": "GENUINE_STANDARD",
+      "phase": "warm_bootstrap_04",
+      "status": "NOT_RESERVED",
+      "reservation_path": null,
+      "result_path": null,
+      "bootstrap_calls_consumed": 0,
+      "retry_of": null
+    },
+    {
+      "attempt_id": "S-WARM_05",
+      "sequence": 12,
+      "arm": "S",
+      "mode": "GENUINE_STANDARD",
+      "phase": "warm_bootstrap_05",
+      "status": "NOT_RESERVED",
+      "reservation_path": null,
+      "result_path": null,
+      "bootstrap_calls_consumed": 0,
+      "retry_of": null
+    },
+    {
+      "attempt_id": "F-COLD",
+      "sequence": 13,
+      "arm": "F",
+      "mode": "FAST_NOISE_OFF",
+      "phase": "first_cold_bootstrap",
+      "status": "NOT_RESERVED",
+      "reservation_path": null,
+      "result_path": null,
+      "bootstrap_calls_consumed": 0,
+      "retry_of": null
+    },
+    {
+      "attempt_id": "F-WARM_01",
+      "sequence": 14,
+      "arm": "F",
+      "mode": "FAST_NOISE_OFF",
+      "phase": "warm_bootstrap_01",
+      "status": "NOT_RESERVED",
+      "reservation_path": null,
+      "result_path": null,
+      "bootstrap_calls_consumed": 0,
+      "retry_of": null
+    },
+    {
+      "attempt_id": "F-WARM_02",
+      "sequence": 15,
+      "arm": "F",
+      "mode": "FAST_NOISE_OFF",
+      "phase": "warm_bootstrap_02",
+      "status": "NOT_RESERVED",
+      "reservation_path": null,
+      "result_path": null,
+      "bootstrap_calls_consumed": 0,
+      "retry_of": null
+    },
+    {
+      "attempt_id": "F-WARM_03",
+      "sequence": 16,
+      "arm": "F",
+      "mode": "FAST_NOISE_OFF",
+      "phase": "warm_bootstrap_03",
+      "status": "NOT_RESERVED",
+      "reservation_path": null,
+      "result_path": null,
+      "bootstrap_calls_consumed": 0,
+      "retry_of": null
+    },
+    {
+      "attempt_id": "F-WARM_04",
+      "sequence": 17,
+      "arm": "F",
+      "mode": "FAST_NOISE_OFF",
+      "phase": "warm_bootstrap_04",
+      "status": "NOT_RESERVED",
+      "reservation_path": null,
+      "result_path": null,
+      "bootstrap_calls_consumed": 0,
+      "retry_of": null
+    },
+    {
+      "attempt_id": "F-WARM_05",
+      "sequence": 18,
+      "arm": "F",
+      "mode": "FAST_NOISE_OFF",
+      "phase": "warm_bootstrap_05",
+      "status": "NOT_RESERVED",
+      "reservation_path": null,
+      "result_path": null,
+      "bootstrap_calls_consumed": 0,
+      "retry_of": null
+    }
+  ],
+  "stop_conditions": [
+    "Any failed Bootstrap call consumes its slot and stops the batch; no retry or later arm.",
+    "Any provenance, capacity, representation, Scale, slot-count, decode, non-finite, or evidence validation failure stops before the next arm.",
+    "No LogN16 workload, BTS, hidden warmup, extra Bootstrap, or modification to 001/fast-qprefix."
+  ]
+}
