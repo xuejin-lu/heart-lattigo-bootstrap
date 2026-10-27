@@ -2,15 +2,74 @@
   "schema_version": "fast-bootstrap-noise-fidelity-003-logn16-summary.v1",
   "task_id": "FAST-BOOTSTRAP-NOISE-FIDELITY-003-LOGN16",
   "status": "BATCH_IN_PROGRESS",
-  "checkpoint": "CP-B-PLATFORM-INTEGRATION",
+  "checkpoint": "CP-C-PREBOOTSTRAP-GATES-PASSED",
   "actual_bootstrap_calls": 0,
   "authorized_maximum_bootstrap_calls": 18,
   "retry_budget": 0,
-  "profile": {"log_n":16,"ring_n":65536,"log_slots":15,"slots":32768,"ephemeral_secret_weight":32,"default_scale":"2^45","mod1_scale":"2^60","noise_sigma":4.004280012097432,"noise_root_seed":20261027},
-  "arms": {"FN":{"planned":6,"succeeded":0},"S":{"planned":6,"succeeded":0},"F":{"planned":6,"succeeded":0}},
-  "preflight": {"zero_bootstrap_calls":0,"status":"NOT_RUN"},
-  "source_pins": {"standard":"5dbffbdea05394de2ca3a432ed5318aa832e3f40","fast":"9e540b30898cea74f0fa4acdf03477264344db79","fast_branch":"experiment/fast-bootstrap-noise-fidelity"},
-  "secondary_no_bootstrap_tests": {"ckks_hook":"PASS","fast_hook":"PASS","chebyshev_power_2_4_16":"PASS","mod1_degree30":"PASS","bootstrap_parameters_e32":"PASS"},
-  "primary_targeted_tests": {"perf_fast":"PASS_7_TARGETED_TESTS","perf_standard":"PASS_7_TARGETED_TESTS","synthetic_logn16_triplet":"PASS_OBSERVATIONAL_GATE_MISS_RECORDED","task_worktree_policy":"PASS_2_TESTS"},
-  "result": "No Bootstrap calls or reservations have been made. Secondary LogN16 hook commit is pushed; Primary task-scoped platform integration remains uncommitted and the fresh zero-call pair has not yet been generated. See journal.md for test commands and gates."
+  "profile": {
+    "log_n": 16,
+    "ring_n": 65536,
+    "log_slots": 15,
+    "slots": 32768,
+    "ephemeral_secret_weight": 32,
+    "default_scale": "2^45",
+    "mod1_scale": "2^60",
+    "noise_sigma": 4.004280012097432,
+    "noise_root_seed": 20261027
+  },
+  "arms": {
+    "FN": {
+      "planned": 6,
+      "succeeded": 0
+    },
+    "S": {
+      "planned": 6,
+      "succeeded": 0
+    },
+    "F": {
+      "planned": 6,
+      "succeeded": 0
+    }
+  },
+  "preflight": {
+    "zero_bootstrap_calls": 0,
+    "status": "PASS",
+    "policy": "logn16-original-e32-observed-native-oracle-v1",
+    "conservative_bound_status": "NOT_PROVEN",
+    "observed_native_oracle_status": "PASS_EIGHT_CHECKPOINTS_AND_LEVEL4_TO_LEVEL0_CONTINUITY",
+    "matched_environment": true,
+    "pair_sha256": "c22b3f3029092613537c36aa1db1fadd1432a56e0a9f9d66c17e977d576982fb",
+    "standard_binary_sha256": "4ef94ea446b47c5d9d7a237449905cf00a3e2605ca6b2a798fd68e1f28578c8b",
+    "fast_binary_sha256": "6de2afb652fb99e6de0c9aa2972947e086aea4eb48d3a3978b1be4fa6773b4b7"
+  },
+  "source_pins": {
+    "standard": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+    "fast": "9e540b30898cea74f0fa4acdf03477264344db79",
+    "fast_branch": "experiment/fast-bootstrap-noise-fidelity"
+  },
+  "secondary_no_bootstrap_tests": {
+    "ckks_hook": "PASS",
+    "fast_hook": "PASS",
+    "chebyshev_power_2_4_16": "PASS",
+    "mod1_degree30": "PASS",
+    "bootstrap_parameters_e32": "PASS"
+  },
+  "primary_targeted_tests": {
+    "perf_fast": "PASS_7_TARGETED_TESTS",
+    "perf_standard": "PASS_7_TARGETED_TESTS",
+    "synthetic_logn16_triplet": "PASS_OBSERVATIONAL_GATE_MISS_RECORDED",
+    "task_worktree_policy": "PASS_2_TESTS"
+  },
+  "result": "All no-Bootstrap implementation, targeted tests, clean pinned binary provenance, and exact-profile zero-call preflight gates pass. The 18 immutable call slots and order are frozen; no per-call reservation or Bootstrap has occurred. Evidence: evidence/prebootstrap-provenance.json and evidence/preflight/.",
+  "budget_commitment": {
+    "frozen_authorized_slots": 18,
+    "per_call_reserved": 0,
+    "actual_bootstrap_calls": 0,
+    "order": [
+      "FN",
+      "S",
+      "F"
+    ],
+    "retry_budget": 0
+  }
 }
