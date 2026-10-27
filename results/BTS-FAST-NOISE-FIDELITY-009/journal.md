@@ -1,6 +1,6 @@
 # BTS-FAST-NOISE-FIDELITY-009 journal
 
-Status: `PREFLIGHT_COMPLETE_AWAITING_VERSIONED_CHECKPOINT`
+Status: `BATCH_IN_PROGRESS` — Fast+Noise complete (6/6); Standard and Fast OFF pending.
 
 ## Authorization and separation
 
@@ -88,3 +88,12 @@ No Bootstrap was called. The following targeted tests passed after the bounded s
 - Explicit Hook snapshots: Standard/OFF `{supported:false, enabled:false}`, Fast/OFF `{true,false}`, Fast+Noise `{true,true, sigma:4.004280012097432, root_seed:20261027}`. All run manifests record the same input and correct source and binary pins. No attempt sidecar exists; initial Noise event counters are zero by preflight check.
 - Preflight NewBTS construction time (not Bootstrap time): Standard `39.624367583s`, Fast OFF `43.008429083s`, Fast+Noise `42.768094666s`.
 - At this checkpoint the durable formal ledger still has `reserved/entered/completed/failed=0/0/0/0`. The only three preflight invocations are non-Bootstrap lifecycle checks and do not consume the 18-call budget.
+
+## CP-C Fast+Noise formal arm (2026-10-27)
+
+- Before the first reservation, Primary `main` checkpoint `901c020e2c5752646c7717afc610df1eb0143475` was clean, fetched, and normally pushed; `origin/main` now equals that commit. The pushed checkpoint contains the final v2 source/binary pins, all zero-call preflight evidence, and the unchanged `0/0/0/0` formal counters. Secondary `experiment/fast-bootstrap-noise-fidelity` was clean and equal to `origin` at `be9c42ff23662300769b77f1eead3f12fc53adef`; the original `/Users/xuejinlu/Developer/xuejin-lu/lattigo` checkout remains on untouched `fast-qprefix` at `1e7828293c36f9845e30723ba4e9500d84bb50d2`.
+- Invoked the already pinned Fast binary `/private/tmp/bts009-fast-14a76be` once as a single process with `BTS_NOISE_MODE=on`, `GOMAXPROCS=8`, the frozen profile, σ `4.004280012097432`, and root seed `20261027`. No rebuild, warmup, retry, parameter change, or additional Bootstrap was used. Source pins remain Primary build revision `14a76be8ebb05da9f19d82d78f5d8003f3be8c3c`, Fast `be9c42ff23662300769b77f1eead3f12fc53adef`, genuine Standard `5dbffbdea05394de2ca3a432ed5318aa832e3f40`; Fast binary SHA-256 is `df4b9c9b0dbccb370d081d239f4d0a986c769bdbd077bf83669f93a978de883e`.
+- Run result: `COMPLETE`, six irrevocable attempt reservations, six completed Bootstrap samples, six decoded vectors, and six Noise event files. All six outputs were finite and had ciphertext level 18 / scale 2^32; input SHA-256 remained `5ca151755bd8232e0b581939fb1b2c079fa4451b454c0e1b0ad9f2b1a6198373`. Hook state was supported/enabled, with the pinned σ/root seed.
+- Cold Bootstrap: `6055.017167 ms`, `5,638,742,840` allocated bytes, `29,958,749` allocations. Warm Bootstrap times (ms): `5219.604083`, `5257.089667`, `5543.625958`, `7365.539750`, `19718.835125`; mean `8620.938917`, median `5543.625958`, sample SD `6266.852136`, min `5219.604083`, max `19718.835125`. The long fifth warm sample is retained without exclusion. Warm allocated bytes range `5,608,826,120–5,610,474,712`; allocation counts range `29,958,579–29,958,618` (per-call values remain in `fast-noise/run.json`).
+- Hook evidence totals 84 completed ct×ct events across six Bootstraps: 14 events and 28 separately sampled operand polynomials per call. All 168 sampled vectors have 65,536 coefficients, distinct sampling seeds and coefficient SHA-256 values. Events span levels 19–26 with histogram `{19:6, 20:6, 21:6, 22:12, 23:12, 24:18, 25:18, 26:6}`. Every strict Q-prefix capacity check passed; no event reported a failed multiplication or capacity condition. Full per-event seed/hash/capacity evidence and its per-file SHA-256 are retained in `fast-noise/noise-events-01.json` … `noise-events-06.json`; output vectors and hashes are in `fast-noise/run.json`.
+- The task ledger now records exactly `6 reserved / 6 entered / 6 completed / 0 failed`; Standard and Fast-OFF remain unreserved. This is the only completed formal arm so far. Next authorized step is six genuine Standard calls, then—only if all six pass—six Fast-OFF calls. No Bootstrap retry is authorized.

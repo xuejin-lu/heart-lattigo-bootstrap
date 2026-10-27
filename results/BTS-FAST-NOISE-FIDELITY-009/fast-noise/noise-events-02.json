@@ -1,0 +1,1776 @@
+{
+  "schema_version": "bts-fast-noise-fidelity-009-noise-call.v1",
+  "task": "BTS-FAST-NOISE-FIDELITY-009",
+  "phase": "warm_bootstrap_01",
+  "attempt_index": 2,
+  "sigma_coefficient": 4.004280012097432,
+  "root_seed": 20261027,
+  "operation_start": 15,
+  "operation_end": 28,
+  "events": [
+    {
+      "operation": 15,
+      "level": 26,
+      "scale": "4.398046511104e+12",
+      "left": {
+        "sigma_coefficient": 4.004280012097432,
+        "sampling_seed": -1552130060714346517,
+        "level": 26,
+        "scale": "4.398046511104e+12",
+        "no_op": false,
+        "coefficient_sample_count": 65536,
+        "coefficient_mean": -0.01040649414062503,
+        "coefficient_variance": 16.11302036698908,
+        "coefficient_rms": 4.014116174465977,
+        "coefficient_max_abs": 23,
+        "coefficient_sha256": "c89dc4bd159bf825d5b1aceb588ad1b6c35a9571dd264cd448d9e1f2f4d5aba4",
+        "sampling_algorithm": "Go math/rand.NewSource(seed).NormFloat64(), rounded to nearest integer with math.Round (ties away from zero)",
+        "qprefix_capacity": {
+          "rows": 4,
+          "checked_coefficients": 65536,
+          "max_coefficient_index": 0,
+          "max_abs": "68717802444",
+          "prefix_product": "348246915784587767546753829371582913576961",
+          "strict_fit": true
+        },
+        "dispatch_evidence": "explicit Fast ckks.Evaluator helper; q-prefix signed coefficients transformed per NTT subring and MForm-mapped when target is Montgomery; existing fastcore centered-Q-prefix addition-capacity check; c1/dormant limbs untouched",
+        "phase_measurements": [
+          {
+            "name": "sampling_hash_moments",
+            "elapsed_ns": 1029208,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "coefficient_to_qprefix_ntt",
+            "elapsed_ns": 2025792,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "candidate_c0_add",
+            "elapsed_ns": 221833,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "qprefix_centered_capacity_check",
+            "elapsed_ns": 6583875,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "commit_c0",
+            "elapsed_ns": 83,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          }
+        ]
+      },
+      "right": {
+        "sigma_coefficient": 4.004280012097432,
+        "sampling_seed": 1295285594069494720,
+        "level": 26,
+        "scale": "4.398046511104e+12",
+        "no_op": false,
+        "coefficient_sample_count": 65536,
+        "coefficient_mean": 0.015533447265624872,
+        "coefficient_variance": 16.238070479594146,
+        "coefficient_rms": 4.0296788665572505,
+        "coefficient_max_abs": 16,
+        "coefficient_sha256": "46bf9458108a692705aac79d4cbd55b65847da1a56cec1bd86866e65e15c96f2",
+        "sampling_algorithm": "Go math/rand.NewSource(seed).NormFloat64(), rounded to nearest integer with math.Round (ties away from zero)",
+        "qprefix_capacity": {
+          "rows": 4,
+          "checked_coefficients": 65536,
+          "max_coefficient_index": 0,
+          "max_abs": "68717802441",
+          "prefix_product": "348246915784587767546753829371582913576961",
+          "strict_fit": true
+        },
+        "dispatch_evidence": "explicit Fast ckks.Evaluator helper; q-prefix signed coefficients transformed per NTT subring and MForm-mapped when target is Montgomery; existing fastcore centered-Q-prefix addition-capacity check; c1/dormant limbs untouched",
+        "phase_measurements": [
+          {
+            "name": "sampling_hash_moments",
+            "elapsed_ns": 1126625,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "coefficient_to_qprefix_ntt",
+            "elapsed_ns": 2081000,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "candidate_c0_add",
+            "elapsed_ns": 236458,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "qprefix_centered_capacity_check",
+            "elapsed_ns": 6301417,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "commit_c0",
+            "elapsed_ns": 41,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          }
+        ]
+      },
+      "multiply_completed": true
+    },
+    {
+      "operation": 16,
+      "level": 25,
+      "scale": "4.39803812251099997329716666163860001654e+12",
+      "left": {
+        "sigma_coefficient": 4.004280012097432,
+        "sampling_seed": -6646901066360665915,
+        "level": 25,
+        "scale": "4.39803812251099997329716666163860001654e+12",
+        "no_op": false,
+        "coefficient_sample_count": 65536,
+        "coefficient_mean": -0.029876708984375007,
+        "coefficient_variance": 16.090934774838313,
+        "coefficient_rms": 4.01146200188636,
+        "coefficient_max_abs": 17,
+        "coefficient_sha256": "696a0a622130f448c49b001e21a0553fee65c12abcf92f9b2a4016fbc5f28429",
+        "sampling_algorithm": "Go math/rand.NewSource(seed).NormFloat64(), rounded to nearest integer with math.Round (ties away from zero)",
+        "qprefix_capacity": {
+          "rows": 4,
+          "checked_coefficients": 65536,
+          "max_coefficient_index": 0,
+          "max_abs": "4395890736634",
+          "prefix_product": "348246915784587767546753829371582913576961",
+          "strict_fit": true
+        },
+        "dispatch_evidence": "explicit Fast ckks.Evaluator helper; q-prefix signed coefficients transformed per NTT subring and MForm-mapped when target is Montgomery; existing fastcore centered-Q-prefix addition-capacity check; c1/dormant limbs untouched",
+        "phase_measurements": [
+          {
+            "name": "sampling_hash_moments",
+            "elapsed_ns": 1102917,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "coefficient_to_qprefix_ntt",
+            "elapsed_ns": 2094292,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "candidate_c0_add",
+            "elapsed_ns": 282125,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "qprefix_centered_capacity_check",
+            "elapsed_ns": 6349666,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "commit_c0",
+            "elapsed_ns": 84,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          }
+        ]
+      },
+      "right": {
+        "sigma_coefficient": 4.004280012097432,
+        "sampling_seed": -1320733575206227329,
+        "level": 25,
+        "scale": "4.39803812251099997329716666163860001654e+12",
+        "no_op": false,
+        "coefficient_sample_count": 65536,
+        "coefficient_mean": -0.014694213867187594,
+        "coefficient_variance": 15.996930686524163,
+        "coefficient_rms": 3.999643309902186,
+        "coefficient_max_abs": 17,
+        "coefficient_sha256": "7c0cc7f341313675d3d1ff8569f146692977cf2dc879ce1ef40097d11558b40f",
+        "sampling_algorithm": "Go math/rand.NewSource(seed).NormFloat64(), rounded to nearest integer with math.Round (ties away from zero)",
+        "qprefix_capacity": {
+          "rows": 4,
+          "checked_coefficients": 65536,
+          "max_coefficient_index": 0,
+          "max_abs": "4395890736627",
+          "prefix_product": "348246915784587767546753829371582913576961",
+          "strict_fit": true
+        },
+        "dispatch_evidence": "explicit Fast ckks.Evaluator helper; q-prefix signed coefficients transformed per NTT subring and MForm-mapped when target is Montgomery; existing fastcore centered-Q-prefix addition-capacity check; c1/dormant limbs untouched",
+        "phase_measurements": [
+          {
+            "name": "sampling_hash_moments",
+            "elapsed_ns": 1086541,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "coefficient_to_qprefix_ntt",
+            "elapsed_ns": 2107500,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "candidate_c0_add",
+            "elapsed_ns": 245167,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "qprefix_centered_capacity_check",
+            "elapsed_ns": 6329792,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "commit_c0",
+            "elapsed_ns": 0,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          }
+        ]
+      },
+      "multiply_completed": true
+    },
+    {
+      "operation": 17,
+      "level": 24,
+      "scale": "4.39802173858603488757847232976772935252e+12",
+      "left": {
+        "sigma_coefficient": 4.004280012097432,
+        "sampling_seed": -2493956040207224767,
+        "level": 24,
+        "scale": "4.39802173858603488757847232976772935252e+12",
+        "no_op": false,
+        "coefficient_sample_count": 65536,
+        "coefficient_mean": 0.009826660156249892,
+        "coefficient_variance": 15.91588854417202,
+        "coefficient_rms": 3.9894843159764237,
+        "coefficient_max_abs": 18,
+        "coefficient_sha256": "1e90e65ec1d6b87f541cdf618bb20c758cab43ab4f47b217bb8a8a61488ba8be",
+        "sampling_algorithm": "Go math/rand.NewSource(seed).NormFloat64(), rounded to nearest integer with math.Round (ties away from zero)",
+        "qprefix_capacity": {
+          "rows": 4,
+          "checked_coefficients": 65536,
+          "max_coefficient_index": 0,
+          "max_abs": "4389434324070",
+          "prefix_product": "348246915784587767546753829371582913576961",
+          "strict_fit": true
+        },
+        "dispatch_evidence": "explicit Fast ckks.Evaluator helper; q-prefix signed coefficients transformed per NTT subring and MForm-mapped when target is Montgomery; existing fastcore centered-Q-prefix addition-capacity check; c1/dormant limbs untouched",
+        "phase_measurements": [
+          {
+            "name": "sampling_hash_moments",
+            "elapsed_ns": 1097292,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "coefficient_to_qprefix_ntt",
+            "elapsed_ns": 2150000,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "candidate_c0_add",
+            "elapsed_ns": 266000,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "qprefix_centered_capacity_check",
+            "elapsed_ns": 6335042,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "commit_c0",
+            "elapsed_ns": 41,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          }
+        ]
+      },
+      "right": {
+        "sigma_coefficient": 4.004280012097432,
+        "sampling_seed": -5958914152839330295,
+        "level": 24,
+        "scale": "4.39802173858603488757847232976772935252e+12",
+        "no_op": false,
+        "coefficient_sample_count": 65536,
+        "coefficient_mean": 0.009750366210937432,
+        "coefficient_variance": 16.164226829772915,
+        "coefficient_rms": 4.020487768842739,
+        "coefficient_max_abs": 19,
+        "coefficient_sha256": "cdadb206c61ae2d112210762c064945452bc6eaa82ff5227bb3706207769298a",
+        "sampling_algorithm": "Go math/rand.NewSource(seed).NormFloat64(), rounded to nearest integer with math.Round (ties away from zero)",
+        "qprefix_capacity": {
+          "rows": 4,
+          "checked_coefficients": 65536,
+          "max_coefficient_index": 0,
+          "max_abs": "4389434324056",
+          "prefix_product": "348246915784587767546753829371582913576961",
+          "strict_fit": true
+        },
+        "dispatch_evidence": "explicit Fast ckks.Evaluator helper; q-prefix signed coefficients transformed per NTT subring and MForm-mapped when target is Montgomery; existing fastcore centered-Q-prefix addition-capacity check; c1/dormant limbs untouched",
+        "phase_measurements": [
+          {
+            "name": "sampling_hash_moments",
+            "elapsed_ns": 1099083,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "coefficient_to_qprefix_ntt",
+            "elapsed_ns": 2171917,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "candidate_c0_add",
+            "elapsed_ns": 220083,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "qprefix_centered_capacity_check",
+            "elapsed_ns": 6308417,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "commit_c0",
+            "elapsed_ns": 42,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          }
+        ]
+      },
+      "multiply_completed": true
+    },
+    {
+      "operation": 18,
+      "level": 23,
+      "scale": "4.3979898884097282706291553469412428199e+12",
+      "left": {
+        "sigma_coefficient": 4.004280012097432,
+        "sampling_seed": -2005827062057195558,
+        "level": 23,
+        "scale": "4.3979898884097282706291553469412428199e+12",
+        "no_op": false,
+        "coefficient_sample_count": 65536,
+        "coefficient_mean": 0.016067504882812576,
+        "coefficient_variance": 16.007783217123045,
+        "coefficient_rms": 4.001005046464693,
+        "coefficient_max_abs": 18,
+        "coefficient_sha256": "673c08f44a1da5096e03a2150b6ea50ef756fb22f309a9b19fe09cb482da41b5",
+        "sampling_algorithm": "Go math/rand.NewSource(seed).NormFloat64(), rounded to nearest integer with math.Round (ties away from zero)",
+        "qprefix_capacity": {
+          "rows": 4,
+          "checked_coefficients": 65536,
+          "max_coefficient_index": 0,
+          "max_abs": "4363674014450",
+          "prefix_product": "348246915784587767546753829371582913576961",
+          "strict_fit": true
+        },
+        "dispatch_evidence": "explicit Fast ckks.Evaluator helper; q-prefix signed coefficients transformed per NTT subring and MForm-mapped when target is Montgomery; existing fastcore centered-Q-prefix addition-capacity check; c1/dormant limbs untouched",
+        "phase_measurements": [
+          {
+            "name": "sampling_hash_moments",
+            "elapsed_ns": 1393083,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "coefficient_to_qprefix_ntt",
+            "elapsed_ns": 2504667,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "candidate_c0_add",
+            "elapsed_ns": 243375,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "qprefix_centered_capacity_check",
+            "elapsed_ns": 6260750,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "commit_c0",
+            "elapsed_ns": 42,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          }
+        ]
+      },
+      "right": {
+        "sigma_coefficient": 4.004280012097432,
+        "sampling_seed": 3263714138017598571,
+        "level": 23,
+        "scale": "4.3979898884097282706291553469412428199e+12",
+        "no_op": false,
+        "coefficient_sample_count": 65536,
+        "coefficient_mean": -0.021148681640624965,
+        "coefficient_variance": 16.134776121936508,
+        "coefficient_rms": 4.016867360104373,
+        "coefficient_max_abs": 16,
+        "coefficient_sha256": "30c22da5bea65e9ce3cc054d1b3cf2c4374d2e0e6b98beb1baf836b0469d0233",
+        "sampling_algorithm": "Go math/rand.NewSource(seed).NormFloat64(), rounded to nearest integer with math.Round (ties away from zero)",
+        "qprefix_capacity": {
+          "rows": 4,
+          "checked_coefficients": 65536,
+          "max_coefficient_index": 0,
+          "max_abs": "4363674014452",
+          "prefix_product": "348246915784587767546753829371582913576961",
+          "strict_fit": true
+        },
+        "dispatch_evidence": "explicit Fast ckks.Evaluator helper; q-prefix signed coefficients transformed per NTT subring and MForm-mapped when target is Montgomery; existing fastcore centered-Q-prefix addition-capacity check; c1/dormant limbs untouched",
+        "phase_measurements": [
+          {
+            "name": "sampling_hash_moments",
+            "elapsed_ns": 1388542,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "coefficient_to_qprefix_ntt",
+            "elapsed_ns": 2550459,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "candidate_c0_add",
+            "elapsed_ns": 231500,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "qprefix_centered_capacity_check",
+            "elapsed_ns": 6337459,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "commit_c0",
+            "elapsed_ns": 166,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          }
+        ]
+      },
+      "multiply_completed": true
+    },
+    {
+      "operation": 19,
+      "level": 25,
+      "scale": "4.398046511104e+12",
+      "left": {
+        "sigma_coefficient": 4.004280012097432,
+        "sampling_seed": -1163465360422208296,
+        "level": 26,
+        "scale": "4.398046511104e+12",
+        "no_op": false,
+        "coefficient_sample_count": 65536,
+        "coefficient_mean": 0.011688232421875028,
+        "coefficient_variance": 16.24079966451967,
+        "coefficient_rms": 4.030004501150945,
+        "coefficient_max_abs": 17,
+        "coefficient_sha256": "6d0061e96a81e5e3df45e9917626b9d72b2640941f31fec0101ebe8d811737d1",
+        "sampling_algorithm": "Go math/rand.NewSource(seed).NormFloat64(), rounded to nearest integer with math.Round (ties away from zero)",
+        "qprefix_capacity": {
+          "rows": 4,
+          "checked_coefficients": 65536,
+          "max_coefficient_index": 0,
+          "max_abs": "68717802451",
+          "prefix_product": "348246915784587767546753829371582913576961",
+          "strict_fit": true
+        },
+        "dispatch_evidence": "explicit Fast ckks.Evaluator helper; q-prefix signed coefficients transformed per NTT subring and MForm-mapped when target is Montgomery; existing fastcore centered-Q-prefix addition-capacity check; c1/dormant limbs untouched",
+        "phase_measurements": [
+          {
+            "name": "sampling_hash_moments",
+            "elapsed_ns": 1112333,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "coefficient_to_qprefix_ntt",
+            "elapsed_ns": 2103500,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "candidate_c0_add",
+            "elapsed_ns": 220125,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "qprefix_centered_capacity_check",
+            "elapsed_ns": 6284625,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "commit_c0",
+            "elapsed_ns": 42,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          }
+        ]
+      },
+      "right": {
+        "sigma_coefficient": 4.004280012097432,
+        "sampling_seed": -3572984117723942656,
+        "level": 25,
+        "scale": "4.39803812251099997329716666163860001654e+12",
+        "no_op": false,
+        "coefficient_sample_count": 65536,
+        "coefficient_mean": -0.005630493164062697,
+        "coefficient_variance": 16.11189151532029,
+        "coefficient_rms": 4.013966021003845,
+        "coefficient_max_abs": 18,
+        "coefficient_sha256": "4f0a52a07c4017bfd64383dfb350f01351746660d54b28439e6612f23d8dd81c",
+        "sampling_algorithm": "Go math/rand.NewSource(seed).NormFloat64(), rounded to nearest integer with math.Round (ties away from zero)",
+        "qprefix_capacity": {
+          "rows": 4,
+          "checked_coefficients": 65536,
+          "max_coefficient_index": 0,
+          "max_abs": "4395890736633",
+          "prefix_product": "348246915784587767546753829371582913576961",
+          "strict_fit": true
+        },
+        "dispatch_evidence": "explicit Fast ckks.Evaluator helper; q-prefix signed coefficients transformed per NTT subring and MForm-mapped when target is Montgomery; existing fastcore centered-Q-prefix addition-capacity check; c1/dormant limbs untouched",
+        "phase_measurements": [
+          {
+            "name": "sampling_hash_moments",
+            "elapsed_ns": 1141916,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "coefficient_to_qprefix_ntt",
+            "elapsed_ns": 2065584,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "candidate_c0_add",
+            "elapsed_ns": 249166,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "qprefix_centered_capacity_check",
+            "elapsed_ns": 6275833,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "commit_c0",
+            "elapsed_ns": 41,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          }
+        ]
+      },
+      "multiply_completed": true
+    },
+    {
+      "operation": 20,
+      "level": 24,
+      "scale": "4.39803012714778505367377359828295911532e+12",
+      "left": {
+        "sigma_coefficient": 4.004280012097432,
+        "sampling_seed": -2713717078397242274,
+        "level": 24,
+        "scale": "4.39803012714778505367377359828295911532e+12",
+        "no_op": false,
+        "coefficient_sample_count": 65536,
+        "coefficient_mean": 0.001617431640625088,
+        "coefficient_variance": 16.219357735477395,
+        "coefficient_rms": 4.027326700376132,
+        "coefficient_max_abs": 18,
+        "coefficient_sha256": "d1679bfb7e5a6294012446f61045eaa8bbe5019b3f7472511ed9cf47624aa0d3",
+        "sampling_algorithm": "Go math/rand.NewSource(seed).NormFloat64(), rounded to nearest integer with math.Round (ties away from zero)",
+        "qprefix_capacity": {
+          "rows": 4,
+          "checked_coefficients": 65536,
+          "max_coefficient_index": 0,
+          "max_abs": "206085534636",
+          "prefix_product": "348246915784587767546753829371582913576961",
+          "strict_fit": true
+        },
+        "dispatch_evidence": "explicit Fast ckks.Evaluator helper; q-prefix signed coefficients transformed per NTT subring and MForm-mapped when target is Montgomery; existing fastcore centered-Q-prefix addition-capacity check; c1/dormant limbs untouched",
+        "phase_measurements": [
+          {
+            "name": "sampling_hash_moments",
+            "elapsed_ns": 1398375,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "coefficient_to_qprefix_ntt",
+            "elapsed_ns": 2422167,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "candidate_c0_add",
+            "elapsed_ns": 233208,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "qprefix_centered_capacity_check",
+            "elapsed_ns": 6336667,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "commit_c0",
+            "elapsed_ns": 42,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          }
+        ]
+      },
+      "right": {
+        "sigma_coefficient": 4.004280012097432,
+        "sampling_seed": -5184013829937641258,
+        "level": 24,
+        "scale": "4.39803012714778505367377359828295911532e+12",
+        "no_op": false,
+        "coefficient_sample_count": 65536,
+        "coefficient_mean": -0.004425048828125043,
+        "coefficient_variance": 15.963664500974174,
+        "coefficient_rms": 3.9954579314555736,
+        "coefficient_max_abs": 17,
+        "coefficient_sha256": "d51f559cd306bb54bcb4704d78fa9bcc0f02b0eb8ed4d5beaa27aaabd84d156d",
+        "sampling_algorithm": "Go math/rand.NewSource(seed).NormFloat64(), rounded to nearest integer with math.Round (ties away from zero)",
+        "qprefix_capacity": {
+          "rows": 4,
+          "checked_coefficients": 65536,
+          "max_coefficient_index": 0,
+          "max_abs": "206085534629",
+          "prefix_product": "348246915784587767546753829371582913576961",
+          "strict_fit": true
+        },
+        "dispatch_evidence": "explicit Fast ckks.Evaluator helper; q-prefix signed coefficients transformed per NTT subring and MForm-mapped when target is Montgomery; existing fastcore centered-Q-prefix addition-capacity check; c1/dormant limbs untouched",
+        "phase_measurements": [
+          {
+            "name": "sampling_hash_moments",
+            "elapsed_ns": 1406292,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "coefficient_to_qprefix_ntt",
+            "elapsed_ns": 2393417,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "candidate_c0_add",
+            "elapsed_ns": 225458,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "qprefix_centered_capacity_check",
+            "elapsed_ns": 6310041,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "commit_c0",
+            "elapsed_ns": 83,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          }
+        ]
+      },
+      "multiply_completed": true
+    },
+    {
+      "operation": 21,
+      "level": 22,
+      "scale": "4.39810534639301852349650637944113753403e+12",
+      "left": {
+        "sigma_coefficient": 4.004280012097432,
+        "sampling_seed": -5283656213063046949,
+        "level": 22,
+        "scale": "4.39810534639301852349650637944113753403e+12",
+        "no_op": false,
+        "coefficient_sample_count": 65536,
+        "coefficient_mean": 0.018981933593749972,
+        "coefficient_variance": 16.042303260415743,
+        "coefficient_rms": 4.005329396469003,
+        "coefficient_max_abs": 20,
+        "coefficient_sha256": "835bd005aa6096519a211cb2d94b270b259a0ea6b1e1a31e261a9cd4f39eee57",
+        "sampling_algorithm": "Go math/rand.NewSource(seed).NormFloat64(), rounded to nearest integer with math.Round (ties away from zero)",
+        "qprefix_capacity": {
+          "rows": 4,
+          "checked_coefficients": 65536,
+          "max_coefficient_index": 0,
+          "max_abs": "7892757124086",
+          "prefix_product": "348246915784587767546753829371582913576961",
+          "strict_fit": true
+        },
+        "dispatch_evidence": "explicit Fast ckks.Evaluator helper; q-prefix signed coefficients transformed per NTT subring and MForm-mapped when target is Montgomery; existing fastcore centered-Q-prefix addition-capacity check; c1/dormant limbs untouched",
+        "phase_measurements": [
+          {
+            "name": "sampling_hash_moments",
+            "elapsed_ns": 1088167,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "coefficient_to_qprefix_ntt",
+            "elapsed_ns": 2134541,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "candidate_c0_add",
+            "elapsed_ns": 1753792,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "qprefix_centered_capacity_check",
+            "elapsed_ns": 6394916,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "commit_c0",
+            "elapsed_ns": 83,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          }
+        ]
+      },
+      "right": {
+        "sigma_coefficient": 4.004280012097432,
+        "sampling_seed": 3216224086318649515,
+        "level": 23,
+        "scale": "4.3979898884097282706291553469412428199e+12",
+        "no_op": false,
+        "coefficient_sample_count": 65536,
+        "coefficient_mean": -0.01301574707031264,
+        "coefficient_variance": 16.195158349117193,
+        "coefficient_rms": 4.0243419038134745,
+        "coefficient_max_abs": 17,
+        "coefficient_sha256": "6a3038cf51c26507c215b45b275eaeeb476a060f6589a6c5b45a6c79d74f35d0",
+        "sampling_algorithm": "Go math/rand.NewSource(seed).NormFloat64(), rounded to nearest integer with math.Round (ties away from zero)",
+        "qprefix_capacity": {
+          "rows": 4,
+          "checked_coefficients": 65536,
+          "max_coefficient_index": 0,
+          "max_abs": "4363674014452",
+          "prefix_product": "348246915784587767546753829371582913576961",
+          "strict_fit": true
+        },
+        "dispatch_evidence": "explicit Fast ckks.Evaluator helper; q-prefix signed coefficients transformed per NTT subring and MForm-mapped when target is Montgomery; existing fastcore centered-Q-prefix addition-capacity check; c1/dormant limbs untouched",
+        "phase_measurements": [
+          {
+            "name": "sampling_hash_moments",
+            "elapsed_ns": 1065167,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "coefficient_to_qprefix_ntt",
+            "elapsed_ns": 2145708,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "candidate_c0_add",
+            "elapsed_ns": 261333,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "qprefix_centered_capacity_check",
+            "elapsed_ns": 6469834,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "commit_c0",
+            "elapsed_ns": 208,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          }
+        ]
+      },
+      "multiply_completed": true
+    },
+    {
+      "operation": 22,
+      "level": 25,
+      "scale": "4.39827889133146560231755633453014206525e+12",
+      "left": {
+        "sigma_coefficient": 4.004280012097432,
+        "sampling_seed": -220546817005395472,
+        "level": 25,
+        "scale": "4.39827889133146560231755633453014206525e+12",
+        "no_op": false,
+        "coefficient_sample_count": 65536,
+        "coefficient_mean": -0.005004882812500042,
+        "coefficient_variance": 16.163823828101357,
+        "coefficient_rms": 4.020428941910692,
+        "coefficient_max_abs": 17,
+        "coefficient_sha256": "7fd22612ce03665be085d778154a855b7d5432898b1d433315c76168865abf01",
+        "sampling_algorithm": "Go math/rand.NewSource(seed).NormFloat64(), rounded to nearest integer with math.Round (ties away from zero)",
+        "qprefix_capacity": {
+          "rows": 4,
+          "checked_coefficients": 65536,
+          "max_coefficient_index": 0,
+          "max_abs": "50581",
+          "prefix_product": "348246915784587767546753829371582913576961",
+          "strict_fit": true
+        },
+        "dispatch_evidence": "explicit Fast ckks.Evaluator helper; q-prefix signed coefficients transformed per NTT subring and MForm-mapped when target is Montgomery; existing fastcore centered-Q-prefix addition-capacity check; c1/dormant limbs untouched",
+        "phase_measurements": [
+          {
+            "name": "sampling_hash_moments",
+            "elapsed_ns": 1057500,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "coefficient_to_qprefix_ntt",
+            "elapsed_ns": 2189500,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "candidate_c0_add",
+            "elapsed_ns": 282250,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "qprefix_centered_capacity_check",
+            "elapsed_ns": 5744208,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "commit_c0",
+            "elapsed_ns": 83,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          }
+        ]
+      },
+      "right": {
+        "sigma_coefficient": 4.004280012097432,
+        "sampling_seed": 7711721979905270816,
+        "level": 25,
+        "scale": "4.39803812251099997329716666163860001654e+12",
+        "no_op": false,
+        "coefficient_sample_count": 65536,
+        "coefficient_mean": 0.02709960937500007,
+        "coefficient_variance": 16.121732652187287,
+        "coefficient_rms": 4.015279198389027,
+        "coefficient_max_abs": 17,
+        "coefficient_sha256": "017b5a3025a59283383facb7ad5e79a0d9134a5b0113826f49b9fd637ec900c5",
+        "sampling_algorithm": "Go math/rand.NewSource(seed).NormFloat64(), rounded to nearest integer with math.Round (ties away from zero)",
+        "qprefix_capacity": {
+          "rows": 4,
+          "checked_coefficients": 65536,
+          "max_coefficient_index": 0,
+          "max_abs": "4395890736637",
+          "prefix_product": "348246915784587767546753829371582913576961",
+          "strict_fit": true
+        },
+        "dispatch_evidence": "explicit Fast ckks.Evaluator helper; q-prefix signed coefficients transformed per NTT subring and MForm-mapped when target is Montgomery; existing fastcore centered-Q-prefix addition-capacity check; c1/dormant limbs untouched",
+        "phase_measurements": [
+          {
+            "name": "sampling_hash_moments",
+            "elapsed_ns": 1036250,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "coefficient_to_qprefix_ntt",
+            "elapsed_ns": 2146334,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "candidate_c0_add",
+            "elapsed_ns": 212083,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "qprefix_centered_capacity_check",
+            "elapsed_ns": 6374416,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "commit_c0",
+            "elapsed_ns": 83,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          }
+        ]
+      },
+      "multiply_completed": true
+    },
+    {
+      "operation": 23,
+      "level": 24,
+      "scale": "4.39826250650956916253664072877514124043e+12",
+      "left": {
+        "sigma_coefficient": 4.004280012097432,
+        "sampling_seed": 2551327104348415957,
+        "level": 24,
+        "scale": "4.39826250650956916253664072877514124043e+12",
+        "no_op": false,
+        "coefficient_sample_count": 65536,
+        "coefficient_mean": 0.0025177001953125347,
+        "coefficient_variance": 16.22742591216237,
+        "coefficient_rms": 4.028328716847294,
+        "coefficient_max_abs": 17,
+        "coefficient_sha256": "b1f25926d6e0d9e7596e9822460a6d8e6de3a860c0b7384c6485c1977071e04a",
+        "sampling_algorithm": "Go math/rand.NewSource(seed).NormFloat64(), rounded to nearest integer with math.Round (ties away from zero)",
+        "qprefix_capacity": {
+          "rows": 4,
+          "checked_coefficients": 65536,
+          "max_coefficient_index": 0,
+          "max_abs": "558722",
+          "prefix_product": "348246915784587767546753829371582913576961",
+          "strict_fit": true
+        },
+        "dispatch_evidence": "explicit Fast ckks.Evaluator helper; q-prefix signed coefficients transformed per NTT subring and MForm-mapped when target is Montgomery; existing fastcore centered-Q-prefix addition-capacity check; c1/dormant limbs untouched",
+        "phase_measurements": [
+          {
+            "name": "sampling_hash_moments",
+            "elapsed_ns": 1046083,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "coefficient_to_qprefix_ntt",
+            "elapsed_ns": 2020375,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "candidate_c0_add",
+            "elapsed_ns": 241417,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "qprefix_centered_capacity_check",
+            "elapsed_ns": 6531292,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "commit_c0",
+            "elapsed_ns": 42,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          }
+        ]
+      },
+      "right": {
+        "sigma_coefficient": 4.004280012097432,
+        "sampling_seed": 5028888113290459624,
+        "level": 24,
+        "scale": "4.39802173858603488757847232976772935252e+12",
+        "no_op": false,
+        "coefficient_sample_count": 65536,
+        "coefficient_mean": 0.005920410156250038,
+        "coefficient_variance": 15.97503208741539,
+        "coefficient_rms": 3.9968821772316323,
+        "coefficient_max_abs": 17,
+        "coefficient_sha256": "6e63f8427c92705a8f0c93c0592a8a2d3ab315361fbefd7e29ab1a424fe15b5d",
+        "sampling_algorithm": "Go math/rand.NewSource(seed).NormFloat64(), rounded to nearest integer with math.Round (ties away from zero)",
+        "qprefix_capacity": {
+          "rows": 4,
+          "checked_coefficients": 65536,
+          "max_coefficient_index": 0,
+          "max_abs": "4389434324064",
+          "prefix_product": "348246915784587767546753829371582913576961",
+          "strict_fit": true
+        },
+        "dispatch_evidence": "explicit Fast ckks.Evaluator helper; q-prefix signed coefficients transformed per NTT subring and MForm-mapped when target is Montgomery; existing fastcore centered-Q-prefix addition-capacity check; c1/dormant limbs untouched",
+        "phase_measurements": [
+          {
+            "name": "sampling_hash_moments",
+            "elapsed_ns": 1071917,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "coefficient_to_qprefix_ntt",
+            "elapsed_ns": 2137792,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "candidate_c0_add",
+            "elapsed_ns": 241959,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "qprefix_centered_capacity_check",
+            "elapsed_ns": 6380125,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "commit_c0",
+            "elapsed_ns": 83,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          }
+        ]
+      },
+      "multiply_completed": true
+    },
+    {
+      "operation": 24,
+      "level": 23,
+      "scale": "4.39823065458963750929767806812205836434e+12",
+      "left": {
+        "sigma_coefficient": 4.004280012097432,
+        "sampling_seed": -7840061500620007299,
+        "level": 23,
+        "scale": "4.39823065458963750929767806812205836434e+12",
+        "no_op": false,
+        "coefficient_sample_count": 65536,
+        "coefficient_mean": 0.02377319335937524,
+        "coefficient_variance": 16.092421895824188,
+        "coefficient_rms": 4.0116065435866055,
+        "coefficient_max_abs": 18,
+        "coefficient_sha256": "c02438131d38e56c1dc32454d116030b0946b200e08c1b34b9ef9c09ced3c1f5",
+        "sampling_algorithm": "Go math/rand.NewSource(seed).NormFloat64(), rounded to nearest integer with math.Round (ties away from zero)",
+        "qprefix_capacity": {
+          "rows": 4,
+          "checked_coefficients": 65536,
+          "max_coefficient_index": 0,
+          "max_abs": "72454518",
+          "prefix_product": "348246915784587767546753829371582913576961",
+          "strict_fit": true
+        },
+        "dispatch_evidence": "explicit Fast ckks.Evaluator helper; q-prefix signed coefficients transformed per NTT subring and MForm-mapped when target is Montgomery; existing fastcore centered-Q-prefix addition-capacity check; c1/dormant limbs untouched",
+        "phase_measurements": [
+          {
+            "name": "sampling_hash_moments",
+            "elapsed_ns": 1068417,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "coefficient_to_qprefix_ntt",
+            "elapsed_ns": 2094750,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "candidate_c0_add",
+            "elapsed_ns": 770875,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "qprefix_centered_capacity_check",
+            "elapsed_ns": 6651167,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "commit_c0",
+            "elapsed_ns": 0,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          }
+        ]
+      },
+      "right": {
+        "sigma_coefficient": 4.004280012097432,
+        "sampling_seed": 2146624157520810860,
+        "level": 23,
+        "scale": "4.3979898884097282706291553469412428199e+12",
+        "no_op": false,
+        "coefficient_sample_count": 65536,
+        "coefficient_mean": 0.015411376953124995,
+        "coefficient_variance": 16.12070365156963,
+        "coefficient_rms": 4.015089184826332,
+        "coefficient_max_abs": 18,
+        "coefficient_sha256": "5ff9093752ee2c8c6af8ebc8b7a829302655dcc1f51529a893588d19ab434809",
+        "sampling_algorithm": "Go math/rand.NewSource(seed).NormFloat64(), rounded to nearest integer with math.Round (ties away from zero)",
+        "qprefix_capacity": {
+          "rows": 4,
+          "checked_coefficients": 65536,
+          "max_coefficient_index": 0,
+          "max_abs": "4363674014456",
+          "prefix_product": "348246915784587767546753829371582913576961",
+          "strict_fit": true
+        },
+        "dispatch_evidence": "explicit Fast ckks.Evaluator helper; q-prefix signed coefficients transformed per NTT subring and MForm-mapped when target is Montgomery; existing fastcore centered-Q-prefix addition-capacity check; c1/dormant limbs untouched",
+        "phase_measurements": [
+          {
+            "name": "sampling_hash_moments",
+            "elapsed_ns": 1082417,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "coefficient_to_qprefix_ntt",
+            "elapsed_ns": 2135167,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "candidate_c0_add",
+            "elapsed_ns": 242416,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "qprefix_centered_capacity_check",
+            "elapsed_ns": 6324750,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "commit_c0",
+            "elapsed_ns": 83,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          }
+        ]
+      },
+      "multiply_completed": true
+    },
+    {
+      "operation": 25,
+      "level": 22,
+      "scale": "4.39816800004505856571487315010672546022e+12",
+      "left": {
+        "sigma_coefficient": 4.004280012097432,
+        "sampling_seed": -6893430385644270570,
+        "level": 22,
+        "scale": "4.39816800004505856571487315010672546022e+12",
+        "no_op": false,
+        "coefficient_sample_count": 65536,
+        "coefficient_mean": -0.01875305175781231,
+        "coefficient_variance": 15.973265876760552,
+        "coefficient_rms": 3.996700833651543,
+        "coefficient_max_abs": 20,
+        "coefficient_sha256": "75d4172c770314f43267a869a0f44ea6fcd055eac2b437e674fe76464bbeaf20",
+        "sampling_algorithm": "Go math/rand.NewSource(seed).NormFloat64(), rounded to nearest integer with math.Round (ties away from zero)",
+        "qprefix_capacity": {
+          "rows": 4,
+          "checked_coefficients": 65536,
+          "max_coefficient_index": 0,
+          "max_abs": "225550611839",
+          "prefix_product": "348246915784587767546753829371582913576961",
+          "strict_fit": true
+        },
+        "dispatch_evidence": "explicit Fast ckks.Evaluator helper; q-prefix signed coefficients transformed per NTT subring and MForm-mapped when target is Montgomery; existing fastcore centered-Q-prefix addition-capacity check; c1/dormant limbs untouched",
+        "phase_measurements": [
+          {
+            "name": "sampling_hash_moments",
+            "elapsed_ns": 1116167,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "coefficient_to_qprefix_ntt",
+            "elapsed_ns": 2126833,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "candidate_c0_add",
+            "elapsed_ns": 233083,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "qprefix_centered_capacity_check",
+            "elapsed_ns": 6422500,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "commit_c0",
+            "elapsed_ns": 83,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          }
+        ]
+      },
+      "right": {
+        "sigma_coefficient": 4.004280012097432,
+        "sampling_seed": 1698232965064604381,
+        "level": 22,
+        "scale": "4.39792723729495929767255223746843628778e+12",
+        "no_op": false,
+        "coefficient_sample_count": 65536,
+        "coefficient_mean": 0.029479980468750305,
+        "coefficient_variance": 16.210373606532997,
+        "coefficient_rms": 4.026318749898131,
+        "coefficient_max_abs": 16,
+        "coefficient_sha256": "561c5e854f4ca07a3970690ba8c93460881b17148444231e8b00e1577c9d5559",
+        "sampling_algorithm": "Go math/rand.NewSource(seed).NormFloat64(), rounded to nearest integer with math.Round (ties away from zero)",
+        "qprefix_capacity": {
+          "rows": 4,
+          "checked_coefficients": 65536,
+          "max_coefficient_index": 0,
+          "max_abs": "4261201208032",
+          "prefix_product": "348246915784587767546753829371582913576961",
+          "strict_fit": true
+        },
+        "dispatch_evidence": "explicit Fast ckks.Evaluator helper; q-prefix signed coefficients transformed per NTT subring and MForm-mapped when target is Montgomery; existing fastcore centered-Q-prefix addition-capacity check; c1/dormant limbs untouched",
+        "phase_measurements": [
+          {
+            "name": "sampling_hash_moments",
+            "elapsed_ns": 1085375,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "coefficient_to_qprefix_ntt",
+            "elapsed_ns": 2048167,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "candidate_c0_add",
+            "elapsed_ns": 240667,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "qprefix_centered_capacity_check",
+            "elapsed_ns": 6346125,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "commit_c0",
+            "elapsed_ns": 42,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          }
+        ]
+      },
+      "multiply_completed": true
+    },
+    {
+      "operation": 26,
+      "level": 21,
+      "scale": "4.39804308684865945435553259359486269503e+12",
+      "left": {
+        "sigma_coefficient": 4.004280012097432,
+        "sampling_seed": 4325873435911190415,
+        "level": 21,
+        "scale": "4.39804308684865945435553259359486269503e+12",
+        "no_op": false,
+        "coefficient_sample_count": 65536,
+        "coefficient_mean": -0.006134033203125027,
+        "coefficient_variance": 16.282921358011567,
+        "coefficient_rms": 4.0352148622316255,
+        "coefficient_max_abs": 18,
+        "coefficient_sha256": "f0c7a93f30ffbd409d29a9f38c3b9873ce6ae0e406012906eb2b644f1dc9e192",
+        "sampling_algorithm": "Go math/rand.NewSource(seed).NormFloat64(), rounded to nearest integer with math.Round (ties away from zero)",
+        "qprefix_capacity": {
+          "rows": 4,
+          "checked_coefficients": 65536,
+          "max_coefficient_index": 0,
+          "max_abs": "3428161605270",
+          "prefix_product": "348246915784587767546753829371582913576961",
+          "strict_fit": true
+        },
+        "dispatch_evidence": "explicit Fast ckks.Evaluator helper; q-prefix signed coefficients transformed per NTT subring and MForm-mapped when target is Montgomery; existing fastcore centered-Q-prefix addition-capacity check; c1/dormant limbs untouched",
+        "phase_measurements": [
+          {
+            "name": "sampling_hash_moments",
+            "elapsed_ns": 1097125,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "coefficient_to_qprefix_ntt",
+            "elapsed_ns": 2091042,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "candidate_c0_add",
+            "elapsed_ns": 268917,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "qprefix_centered_capacity_check",
+            "elapsed_ns": 6419042,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "commit_c0",
+            "elapsed_ns": 42,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          }
+        ]
+      },
+      "right": {
+        "sigma_coefficient": 4.004280012097432,
+        "sampling_seed": 2773232626983617307,
+        "level": 21,
+        "scale": "4.39804308684865945435553259359486269503e+12",
+        "no_op": false,
+        "coefficient_sample_count": 65536,
+        "coefficient_mean": -0.001586914062499981,
+        "coefficient_variance": 16.08132682740681,
+        "coefficient_rms": 4.01015328207079,
+        "coefficient_max_abs": 17,
+        "coefficient_sha256": "40d8ed6eca3617ee5782df288cea99549234242d41e87acdd0847205cb0d1bd6",
+        "sampling_algorithm": "Go math/rand.NewSource(seed).NormFloat64(), rounded to nearest integer with math.Round (ties away from zero)",
+        "qprefix_capacity": {
+          "rows": 4,
+          "checked_coefficients": 65536,
+          "max_coefficient_index": 0,
+          "max_abs": "3428161605266",
+          "prefix_product": "348246915784587767546753829371582913576961",
+          "strict_fit": true
+        },
+        "dispatch_evidence": "explicit Fast ckks.Evaluator helper; q-prefix signed coefficients transformed per NTT subring and MForm-mapped when target is Montgomery; existing fastcore centered-Q-prefix addition-capacity check; c1/dormant limbs untouched",
+        "phase_measurements": [
+          {
+            "name": "sampling_hash_moments",
+            "elapsed_ns": 1093583,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "coefficient_to_qprefix_ntt",
+            "elapsed_ns": 2110458,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "candidate_c0_add",
+            "elapsed_ns": 232375,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "qprefix_centered_capacity_check",
+            "elapsed_ns": 6358667,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "commit_c0",
+            "elapsed_ns": 83,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          }
+        ]
+      },
+      "multiply_completed": true
+    },
+    {
+      "operation": 27,
+      "level": 20,
+      "scale": "4.39804398796850354010075262771692790528e+12",
+      "left": {
+        "sigma_coefficient": 4.004280012097432,
+        "sampling_seed": 9025628830382591002,
+        "level": 20,
+        "scale": "4.39804398796850354010075262771692790528e+12",
+        "no_op": false,
+        "coefficient_sample_count": 65536,
+        "coefficient_mean": 0.007583618164062976,
+        "coefficient_variance": 16.312976546352616,
+        "coefficient_rms": 4.038939719482972,
+        "coefficient_max_abs": 19,
+        "coefficient_sha256": "5e531f6086b0ba467aaa7e788e753fd2c53b64ce67c5e32e70fb85876d58609a",
+        "sampling_algorithm": "Go math/rand.NewSource(seed).NormFloat64(), rounded to nearest integer with math.Round (ties away from zero)",
+        "qprefix_capacity": {
+          "rows": 4,
+          "checked_coefficients": 65536,
+          "max_coefficient_index": 0,
+          "max_abs": "2566442027992",
+          "prefix_product": "348246915784587767546753829371582913576961",
+          "strict_fit": true
+        },
+        "dispatch_evidence": "explicit Fast ckks.Evaluator helper; q-prefix signed coefficients transformed per NTT subring and MForm-mapped when target is Montgomery; existing fastcore centered-Q-prefix addition-capacity check; c1/dormant limbs untouched",
+        "phase_measurements": [
+          {
+            "name": "sampling_hash_moments",
+            "elapsed_ns": 1104166,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "coefficient_to_qprefix_ntt",
+            "elapsed_ns": 2104083,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "candidate_c0_add",
+            "elapsed_ns": 291833,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "qprefix_centered_capacity_check",
+            "elapsed_ns": 6409583,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "commit_c0",
+            "elapsed_ns": 83,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          }
+        ]
+      },
+      "right": {
+        "sigma_coefficient": 4.004280012097432,
+        "sampling_seed": 252525594599815328,
+        "level": 20,
+        "scale": "4.39804398796850354010075262771692790528e+12",
+        "no_op": false,
+        "coefficient_sample_count": 65536,
+        "coefficient_mean": -0.005325317382812502,
+        "coefficient_variance": 16.190508140017997,
+        "coefficient_rms": 4.023746574900492,
+        "coefficient_max_abs": 18,
+        "coefficient_sha256": "af69ba51236e46509bcf52d6a0bbe117f48d580e267fe864d7953344b0a02622",
+        "sampling_algorithm": "Go math/rand.NewSource(seed).NormFloat64(), rounded to nearest integer with math.Round (ties away from zero)",
+        "qprefix_capacity": {
+          "rows": 4,
+          "checked_coefficients": 65536,
+          "max_coefficient_index": 0,
+          "max_abs": "2566442027990",
+          "prefix_product": "348246915784587767546753829371582913576961",
+          "strict_fit": true
+        },
+        "dispatch_evidence": "explicit Fast ckks.Evaluator helper; q-prefix signed coefficients transformed per NTT subring and MForm-mapped when target is Montgomery; existing fastcore centered-Q-prefix addition-capacity check; c1/dormant limbs untouched",
+        "phase_measurements": [
+          {
+            "name": "sampling_hash_moments",
+            "elapsed_ns": 1087750,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "coefficient_to_qprefix_ntt",
+            "elapsed_ns": 2101333,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "candidate_c0_add",
+            "elapsed_ns": 227375,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "qprefix_centered_capacity_check",
+            "elapsed_ns": 6324750,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "commit_c0",
+            "elapsed_ns": 83,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          }
+        ]
+      },
+      "multiply_completed": true
+    },
+    {
+      "operation": 28,
+      "level": 19,
+      "scale": "4.39804500377624169930158679918644126027e+12",
+      "left": {
+        "sigma_coefficient": 4.004280012097432,
+        "sampling_seed": 2442075724548431969,
+        "level": 19,
+        "scale": "4.39804500377624169930158679918644126027e+12",
+        "no_op": false,
+        "coefficient_sample_count": 65536,
+        "coefficient_mean": 0.03176879882812482,
+        "coefficient_variance": 16.094907491467882,
+        "coefficient_rms": 4.011971678370483,
+        "coefficient_max_abs": 17,
+        "coefficient_sha256": "01631f99194abb4cc49386c2ce37c74a34e65b11a6724dfc56a6a90f240b1479",
+        "sampling_algorithm": "Go math/rand.NewSource(seed).NormFloat64(), rounded to nearest integer with math.Round (ties away from zero)",
+        "qprefix_capacity": {
+          "rows": 4,
+          "checked_coefficients": 65536,
+          "max_coefficient_index": 0,
+          "max_abs": "1240687151375",
+          "prefix_product": "348246915784587767546753829371582913576961",
+          "strict_fit": true
+        },
+        "dispatch_evidence": "explicit Fast ckks.Evaluator helper; q-prefix signed coefficients transformed per NTT subring and MForm-mapped when target is Montgomery; existing fastcore centered-Q-prefix addition-capacity check; c1/dormant limbs untouched",
+        "phase_measurements": [
+          {
+            "name": "sampling_hash_moments",
+            "elapsed_ns": 1110375,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "coefficient_to_qprefix_ntt",
+            "elapsed_ns": 2973292,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "candidate_c0_add",
+            "elapsed_ns": 614208,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "qprefix_centered_capacity_check",
+            "elapsed_ns": 6365375,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "commit_c0",
+            "elapsed_ns": 41,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          }
+        ]
+      },
+      "right": {
+        "sigma_coefficient": 4.004280012097432,
+        "sampling_seed": -1506546172872367932,
+        "level": 19,
+        "scale": "4.39804500377624169930158679918644126027e+12",
+        "no_op": false,
+        "coefficient_sample_count": 65536,
+        "coefficient_mean": -0.012252807617187498,
+        "coefficient_variance": 16.00590760796337,
+        "coefficient_rms": 4.000757145748516,
+        "coefficient_max_abs": 17,
+        "coefficient_sha256": "a5c22d678473f6b42d41e70360851f66e9de8cd07f4a9825edbdde2a3bbae19e",
+        "sampling_algorithm": "Go math/rand.NewSource(seed).NormFloat64(), rounded to nearest integer with math.Round (ties away from zero)",
+        "qprefix_capacity": {
+          "rows": 4,
+          "checked_coefficients": 65536,
+          "max_coefficient_index": 0,
+          "max_abs": "1240687151367",
+          "prefix_product": "348246915784587767546753829371582913576961",
+          "strict_fit": true
+        },
+        "dispatch_evidence": "explicit Fast ckks.Evaluator helper; q-prefix signed coefficients transformed per NTT subring and MForm-mapped when target is Montgomery; existing fastcore centered-Q-prefix addition-capacity check; c1/dormant limbs untouched",
+        "phase_measurements": [
+          {
+            "name": "sampling_hash_moments",
+            "elapsed_ns": 1088083,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "coefficient_to_qprefix_ntt",
+            "elapsed_ns": 2082083,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "candidate_c0_add",
+            "elapsed_ns": 218583,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "qprefix_centered_capacity_check",
+            "elapsed_ns": 6308542,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          },
+          {
+            "name": "commit_c0",
+            "elapsed_ns": 41,
+            "alloc_bytes": 0,
+            "allocs": 0,
+            "memory_stats_collected": false
+          }
+        ]
+      },
+      "multiply_completed": true
+    }
+  ]
+}

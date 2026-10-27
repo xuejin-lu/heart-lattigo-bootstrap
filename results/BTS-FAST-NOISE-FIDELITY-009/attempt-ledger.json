@@ -1,7 +1,7 @@
 {
   "schema_version": "bts-fast-noise-fidelity-009-attempt-ledger.v1",
   "task": "BTS-FAST-NOISE-FIDELITY-009",
-  "status": "PREFLIGHT_COMPLETE_AWAITING_VERSIONED_CHECKPOINT",
+  "status": "FAST_NOISE_COMPLETE_STANDARD_PENDING",
   "authorization_source": "User-provided task specification pasted 2026-10-27",
   "profile": {
     "log_n": 16,
@@ -73,17 +73,28 @@
       "profile_sha256": "229cb5a28732b755ec66a531a3b643630dee703a2e0d35398f2986a374450b47",
       "environment": "go1.26.4/darwin/arm64/Apple M4/NumCPU=10/GOMAXPROCS=8",
       "hook_states": {
-        "standard_off": {"supported": false, "enabled": false},
-        "fast_off": {"supported": true, "enabled": false},
-        "fast_on": {"supported": true, "enabled": true, "sigma": 4.004280012097432, "root_seed": 20261027}
+        "standard_off": {
+          "supported": false,
+          "enabled": false
+        },
+        "fast_off": {
+          "supported": true,
+          "enabled": false
+        },
+        "fast_on": {
+          "supported": true,
+          "enabled": true,
+          "sigma": 4.004280012097432,
+          "root_seed": 20261027
+        }
       },
       "bootstrap_reservations": 0
     }
   },
   "counters": {
-    "reserved": 0,
-    "entered": 0,
-    "completed": 0,
+    "reserved": 6,
+    "entered": 6,
+    "completed": 6,
     "failed": 0
   },
   "attempts": [
@@ -223,72 +234,139 @@
       "attempt_id": "FN-01",
       "arm": "fast_noise",
       "phase": "cold",
-      "status": "NOT_RESERVED",
-      "reservation_file": null,
-      "result_file": null,
-      "entered_bootstrap": false,
-      "completed": false,
-      "failure": null
+      "status": "COMPLETED",
+      "reservation_file": "fast-noise/attempt.bootstrap-attempt-01.json",
+      "result_file": "fast-noise/attempt.bootstrap-result-01.json",
+      "entered_bootstrap": true,
+      "completed": true,
+      "failure": null,
+      "reservation_sha256": "7e2631ff6bf54f89a17342f60c1a474831956e6c303bd14ad4b47de352d0ba91",
+      "result_sha256": "0b3edaa9120f27e3b07815823363bedd819599e8ce0408a9656e4c0c18d08460",
+      "output_vector_sha256": "9046bab9e52bb5e071126b4b5a77d69102b7313d9e04dcce5eec3ef941d09b53",
+      "noise_evidence_file": "fast-noise/noise-events-01.json",
+      "noise_evidence_sha256": "be314e3c454d2623255651b635100f8951d7d6b07f26155cd014b302533b4600",
+      "noise_event_count": 14,
+      "injected_polynomials": 28
     },
     {
       "attempt_id": "FN-02",
       "arm": "fast_noise",
       "phase": "warm_01",
-      "status": "NOT_RESERVED",
-      "reservation_file": null,
-      "result_file": null,
-      "entered_bootstrap": false,
-      "completed": false,
-      "failure": null
+      "status": "COMPLETED",
+      "reservation_file": "fast-noise/attempt.bootstrap-attempt-02.json",
+      "result_file": "fast-noise/attempt.bootstrap-result-02.json",
+      "entered_bootstrap": true,
+      "completed": true,
+      "failure": null,
+      "reservation_sha256": "2bac6fde1221eca5fbb28a26301d7d2753e75679a84be14ac5008b6c063acdb2",
+      "result_sha256": "7adfb620dab869b11d88ddb2e8b261397f3cf5081d2788f096bd9b7c70f2eabc",
+      "output_vector_sha256": "598e5a081d4612f0ab23e25cc16698191ab9a4b9636c5678f9e2f8667a662d3c",
+      "noise_evidence_file": "fast-noise/noise-events-02.json",
+      "noise_evidence_sha256": "b24f515f285a91d42f4b1904b681155a9ac7d6bcf57e6a8dc8a25eb2ab0eeeec",
+      "noise_event_count": 14,
+      "injected_polynomials": 28
     },
     {
       "attempt_id": "FN-03",
       "arm": "fast_noise",
       "phase": "warm_02",
-      "status": "NOT_RESERVED",
-      "reservation_file": null,
-      "result_file": null,
-      "entered_bootstrap": false,
-      "completed": false,
-      "failure": null
+      "status": "COMPLETED",
+      "reservation_file": "fast-noise/attempt.bootstrap-attempt-03.json",
+      "result_file": "fast-noise/attempt.bootstrap-result-03.json",
+      "entered_bootstrap": true,
+      "completed": true,
+      "failure": null,
+      "reservation_sha256": "55d108dbbb315028ecd90983d2be69535005704b7a2d4c90dd532c042c4c2565",
+      "result_sha256": "20b1df7a5a0b9610b3cc122dd0485946fc542a70fb3898df06f36043ed9f21c5",
+      "output_vector_sha256": "291ca21ad6809cd8bc8541c4d4d8f24816f28699448f9d6b7bf76b80c1f54c6c",
+      "noise_evidence_file": "fast-noise/noise-events-03.json",
+      "noise_evidence_sha256": "f9b1a19644e53c855dbcd1f8480a3f2417b1fde7a532313515a6df58d296d2c9",
+      "noise_event_count": 14,
+      "injected_polynomials": 28
     },
     {
       "attempt_id": "FN-04",
       "arm": "fast_noise",
       "phase": "warm_03",
-      "status": "NOT_RESERVED",
-      "reservation_file": null,
-      "result_file": null,
-      "entered_bootstrap": false,
-      "completed": false,
-      "failure": null
+      "status": "COMPLETED",
+      "reservation_file": "fast-noise/attempt.bootstrap-attempt-04.json",
+      "result_file": "fast-noise/attempt.bootstrap-result-04.json",
+      "entered_bootstrap": true,
+      "completed": true,
+      "failure": null,
+      "reservation_sha256": "6d0dad3c89960a9a6f1b826da08fc4653dfc4ec6404ea4af77c3e1eb273cbe36",
+      "result_sha256": "62e6e616663136e672628e6ae20a2d51de7ad74070e62eafef881fcb7cc7c2c4",
+      "output_vector_sha256": "8c9540ef7769986a4104a3afb624bd6de7d5d49be4761389887e756b0aadb608",
+      "noise_evidence_file": "fast-noise/noise-events-04.json",
+      "noise_evidence_sha256": "058635935924cdb972d8f036ce72d763004d52f49e5c185613eac47b10a2255c",
+      "noise_event_count": 14,
+      "injected_polynomials": 28
     },
     {
       "attempt_id": "FN-05",
       "arm": "fast_noise",
       "phase": "warm_04",
-      "status": "NOT_RESERVED",
-      "reservation_file": null,
-      "result_file": null,
-      "entered_bootstrap": false,
-      "completed": false,
-      "failure": null
+      "status": "COMPLETED",
+      "reservation_file": "fast-noise/attempt.bootstrap-attempt-05.json",
+      "result_file": "fast-noise/attempt.bootstrap-result-05.json",
+      "entered_bootstrap": true,
+      "completed": true,
+      "failure": null,
+      "reservation_sha256": "786ba210d2e4e1bc7db9b253394bef899e393dc3513498b049a1131041b1a2b4",
+      "result_sha256": "347052494306bbeeab4f9f943d89d1f8c7e6ba0f95b74eafde63e0ccc38bd462",
+      "output_vector_sha256": "98780412c0d4d090aca56b58b2a7bc8dd60237189d9aba3f45b1e70200ac2ee0",
+      "noise_evidence_file": "fast-noise/noise-events-05.json",
+      "noise_evidence_sha256": "de5d5d179250c4223253781f7ec97744921765f593cbe3e5419b79e5f334b9b2",
+      "noise_event_count": 14,
+      "injected_polynomials": 28
     },
     {
       "attempt_id": "FN-06",
       "arm": "fast_noise",
       "phase": "warm_05",
-      "status": "NOT_RESERVED",
-      "reservation_file": null,
-      "result_file": null,
-      "entered_bootstrap": false,
-      "completed": false,
-      "failure": null
+      "status": "COMPLETED",
+      "reservation_file": "fast-noise/attempt.bootstrap-attempt-06.json",
+      "result_file": "fast-noise/attempt.bootstrap-result-06.json",
+      "entered_bootstrap": true,
+      "completed": true,
+      "failure": null,
+      "reservation_sha256": "5b1b224e2f9feb2e1f216ee28fafec69ec3962f0710e533a1c8fa8785a62416d",
+      "result_sha256": "42d435d2fb444b37b4d0683462f4a9016180bb2f63ab17b1282b13874346aece",
+      "output_vector_sha256": "4495209aa7cbc62bf2f9d5a76fe8023e29349af00b652f85a01dcc623794030f",
+      "noise_evidence_file": "fast-noise/noise-events-06.json",
+      "noise_evidence_sha256": "bd3cbf9d1bfe2c60524bfe1d0d8900f78f5b041884be89be9e0cb3eea637bf2c",
+      "noise_event_count": 14,
+      "injected_polynomials": 28
     }
   ],
   "historical_non_reusable": {
     "task_003": "18/18 calls spent; captures remain under FAST-BOOTSTRAP-NOISE-FIDELITY-003-LOGN16",
     "task_008": "6 Standard + 6 Fast historical captures; not 009 samples",
     "task_002": "separate historical task/budget; not 009 samples"
+  },
+  "formal_arm_progress": {
+    "fast_noise": {
+      "status": "COMPLETE",
+      "reserved": 6,
+      "entered": 6,
+      "completed": 6,
+      "failed": 0,
+      "run_summary": "fast-noise/run.json",
+      "run_summary_sha256": "334f64fe5b785fc9a6fa945616b8a1b86dd331960b75b8af1a0c480d9bd316db"
+    },
+    "standard": {
+      "status": "NOT_STARTED",
+      "reserved": 0,
+      "entered": 0,
+      "completed": 0,
+      "failed": 0
+    },
+    "fast_off": {
+      "status": "NOT_STARTED",
+      "reserved": 0,
+      "entered": 0,
+      "completed": 0,
+      "failed": 0
+    }
   }
 }
