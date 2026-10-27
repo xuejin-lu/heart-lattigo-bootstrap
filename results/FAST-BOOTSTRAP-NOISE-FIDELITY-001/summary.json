@@ -21,7 +21,7 @@
     "standard_side_gate_expected_fast_commit": "2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f",
     "type": "STANDARD_BOOTSTRAP_PREFLIGHT_FAST_PIN_MISMATCH"
   },
-  "in_progress_checkpoint": "CP-C S/F=1/1 complete; FN actual calls=0, unreserved",
+  "in_progress_checkpoint": "CP-C S/F=1/1 complete; FN reserved once, not started",
   "latest_precompute_stops": [
     {
       "arm": "S",
@@ -136,5 +136,17 @@
     "rmse_vs_input_observation": 1.1795718406445398e-09,
     "status": "COMPLETE_PUBLIC_BOOTSTRAP_ONCE_OBSERVATION",
     "vector_sha256_external": "6b582f202b209ba964c286797c81d29ea7e118cbe0363dc86136f090551a9afe"
+  },
+  "fast_noise_reservation": {
+    "attempt_reservations": 1,
+    "binary_sha256": "c00e6e094292da487a5933ec1d7b46f61f0d69fea9ee31eda821a214f57ad54e",
+    "fixed_sigma": 4.004280012097432,
+    "noise_hook": "ON",
+    "output_base_external": "/private/tmp/fbn001-cp-c-runs-after-FN/fn.json",
+    "preflight_pair_sha256": "0b09e98eedfc1d0e14971a08c4ae5bf7b276f78471bae37307e68d1a554fa854",
+    "reservation_status": "RESERVED_NOT_STARTED_NO_RETRY",
+    "root_seed": 20261027,
+    "time_utc": "2026-10-27T01:05:19Z",
+    "warmups": 0
   }
 }
