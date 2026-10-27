@@ -11,7 +11,7 @@
   "completed_checkpoints": [
     "CP-A",
     "CP-B",
-    "CP-C original zero-call preflight (historical evidence only)"
+    "CP-C fresh source-pinned zero-call preflight"
   ],
   "historical_blocker": {
     "evidence": "preflight/cp-c-stop.json",
@@ -20,20 +20,48 @@
     "standard_side_gate_expected_fast_commit": "2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f",
     "type": "STANDARD_BOOTSTRAP_PREFLIGHT_FAST_PIN_MISMATCH"
   },
-  "in_progress_checkpoint": "CP-C build clean repaired-source binaries and regenerate zero-call pilot pair",
+  "in_progress_checkpoint": "CP-C pre-call freeze commit; S/F/FN calls remain 0/3",
+  "latest_precompute_stops": [
+    {
+      "arm": "S",
+      "bootstrap_calls": 0,
+      "classification": "PRIMARY_PROVENANCE_DIRTY_WORKTREE",
+      "path": "preflight/cp-c-resume-ced6416/standard-dirty-worktree-stop.json",
+      "resolution": "reran unchanged binary/commit from clean detached checkout"
+    },
+    {
+      "arm": "F",
+      "bootstrap_calls": 0,
+      "classification": "UNSUPPORTED_BACKEND_PROFILE_EXACT_PILOT_PIN",
+      "path": "preflight/cp-c-fast-pin-stop.json",
+      "resolution": "added exact mode-scoped pin; generic and legacy pins unchanged"
+    }
+  ],
   "pilot_source_refresh": {
-    "exact_fast_pin_for_resumed_one_call_mode": "715ef5856159f8ae00955f4c8bfbbb43a8692308",
-    "fresh_binaries_and_pair": "PENDING_COMMIT_AND_REBUILD",
-    "historical_cp_b_fast_pin": "b81f54c2e0f98dc2b4a7474fb333fbae79be8c63",
-    "scope": "public-native-bootstrap-once / LogN13 / E32 only; generic and historical modes unchanged"
+    "exact_fast_pin_scope": "one-call LogN13/E32 preflight and capture only",
+    "fast_binary_sha256_shared_by_F_FN": "c00e6e094292da487a5933ec1d7b46f61f0d69fea9ee31eda821a214f57ad54e",
+    "fast_commit": "715ef5856159f8ae00955f4c8bfbbb43a8692308",
+    "fresh_pair_status": "PASS_ZERO_BOOTSTRAP_PILOT_PREFLIGHT_PAIR",
+    "pair_sha256": "0b09e98eedfc1d0e14971a08c4ae5bf7b276f78471bae37307e68d1a554fa854",
+    "primary_commit": "ced64162cd79e039c829a67a31316a237d4cf41a",
+    "primary_source_sha256": "bef8af26f2de7369d0ff8ec0f6ece49882135e8c3b4d67e252abaf20b19b530f",
+    "rejected_unstamped_detached_worktree_builds": "retained externally; never used",
+    "standard_binary_sha256": "987bf4dbcd3456f2ded3bc7045fa23f988fe2ffb1305d0b2de259a50c267a520",
+    "standard_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+    "vcs_metadata": "both binaries report vcs.revision=ced64162cd79e039c829a67a31316a237d4cf41a and vcs.modified=false"
   },
   "preflight": {
-    "compare_public_status": "PASS",
+    "actual_bootstrap_calls": 0,
+    "bootstrap_target_mode": "public-native-bootstrap-once",
     "matched_environment": true,
+    "pair_evidence": "preflight/cp-c-resume-ced6416/preflight-evidence.json",
+    "pair_sha256": "0b09e98eedfc1d0e14971a08c4ae5bf7b276f78471bae37307e68d1a554fa854",
     "plaintext_oracles_passed": true,
+    "preflight_evidence_sha256": "3587615371245837c5e51d6e686605dd4888a6746fad8d8777cf6211f3eb9d1e",
     "same_bootstrap_plaintext_sha256": "c32c0d7b731c0fcd8d82fb9c1182a43a62d120f761c090ce21dc764e9aa1e703",
+    "schema_version": "fast-standard-public-pair.v2",
     "standard_fast_zero_call_checkpoints": 8,
-    "status": "HISTORICAL_D3D5B0A_ONLY_REVALIDATION_REQUIRED",
+    "status": "PASS_FRESH_PILOT_PAIR",
     "strict_capacity_status": "SUFFICIENT"
   },
   "recovery_authorization": {

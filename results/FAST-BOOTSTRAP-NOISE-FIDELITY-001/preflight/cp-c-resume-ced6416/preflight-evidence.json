@@ -1,0 +1,226 @@
+{
+  "actual_bootstrap_calls": 0,
+  "authorization": {
+    "maximum_actual_calls": 3,
+    "per_arm_success_limit": 1,
+    "retry_budget": 0,
+    "warmups": 0
+  },
+  "builds": {
+    "fast_shared_by_F_and_FN": {
+      "binary_path": "/private/tmp/fbn001-repair-ced6416-715ef585/perfprobe-fast-ced6416",
+      "binary_sha256": "c00e6e094292da487a5933ec1d7b46f61f0d69fea9ee31eda821a214f57ad54e",
+      "binary_size_bytes": 14153522,
+      "build_tag": "perf_fast",
+      "fast_qprefix_root_unmodified": true,
+      "go_vcs": "git",
+      "go_vcs_modified": "false",
+      "go_vcs_revision": "ced64162cd79e039c829a67a31316a237d4cf41a",
+      "go_version": "go1.26.4",
+      "go_version_m_file": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-001/preflight/cp-c-resume-ced6416/build-info-fast.txt",
+      "go_version_m_raw_external_path": "/private/tmp/fbn001-go-version-fast-ced6416.raw.txt",
+      "go_version_m_raw_external_sha256": "ed446754ec558903c0f998a267e51cdff5993f6db047e68ecf1bacba965f6bee",
+      "go_version_m_sha256": "1299ef270d5349cacff03ecebf07d93d3cedac70a16845da733a122dbcb1d63a",
+      "goarch": "arm64",
+      "goos": "darwin",
+      "module_replace_path": "/private/tmp/lattigo-fast-bootstrap-noise-fidelity",
+      "secondary_clean": true,
+      "secondary_commit": "715ef5856159f8ae00955f4c8bfbbb43a8692308"
+    },
+    "standard": {
+      "binary_path": "/private/tmp/fbn001-repair-ced6416-715ef585/perfprobe-standard-ced6416",
+      "binary_sha256": "987bf4dbcd3456f2ded3bc7045fa23f988fe2ffb1305d0b2de259a50c267a520",
+      "binary_size_bytes": 13471122,
+      "build_tag": "perf_standard",
+      "go_vcs": "git",
+      "go_vcs_modified": "false",
+      "go_vcs_revision": "ced64162cd79e039c829a67a31316a237d4cf41a",
+      "go_version": "go1.26.4",
+      "go_version_m_file": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-001/preflight/cp-c-resume-ced6416/build-info-standard.txt",
+      "go_version_m_raw_external_path": "/private/tmp/fbn001-go-version-standard-ced6416.raw.txt",
+      "go_version_m_raw_external_sha256": "1f1da5f17f9a0de1324af385afbab3f6a97197b8e19180bf1931fffcdf74df1a",
+      "go_version_m_sha256": "0f89a9921692bd56873cbf2e8ccfa8decde2cd032bac0eea44d2dbbc3c74ae6e",
+      "goarch": "arm64",
+      "goos": "darwin",
+      "module_replace_path": "/private/tmp/lattigo-fast-bootstrap-noise-fidelity-standard-5dbffbdea053",
+      "secondary_clean": true,
+      "secondary_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40"
+    }
+  },
+  "captured_at_utc": "2026-10-27T00:52:05.676053+00:00",
+  "captures": {
+    "fast": {
+      "backend_commit": "715ef5856159f8ae00955f4c8bfbbb43a8692308",
+      "binary_sha256": "c00e6e094292da487a5933ec1d7b46f61f0d69fea9ee31eda821a214f57ad54e",
+      "path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-001/preflight/cp-c-resume-ced6416/fast.json",
+      "sha256": "0b5e5a51be240b264c0e4daaf57f1483ac50a0f42887585be1aa7131e86e7b39"
+    },
+    "pair": {
+      "path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-001/preflight/cp-c-resume-ced6416/compare-public-pair.json",
+      "schema_version": "fast-standard-public-pair.v2",
+      "sha256": "0b09e98eedfc1d0e14971a08c4ae5bf7b276f78471bae37307e68d1a554fa854",
+      "target_mode": "public-native-bootstrap-once"
+    },
+    "standard": {
+      "backend_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+      "binary_sha256": "987bf4dbcd3456f2ded3bc7045fa23f988fe2ffb1305d0b2de259a50c267a520",
+      "path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-001/preflight/cp-c-resume-ced6416/standard.json",
+      "sha256": "78a6d7564e8ea76004d377dbd7365a553ee310020f3ca9a2f38cee0c0aa1faa7"
+    }
+  },
+  "checkpoint": "CP_C_FRESH_PRECALL_SOURCE_FREEZE",
+  "input": {
+    "bootstrap_plaintext_sha256": "c32c0d7b731c0fcd8d82fb9c1182a43a62d120f761c090ce21dc764e9aa1e703",
+    "canonical_original_input_sha256": "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285",
+    "fixed_sigma": 4.004280012097432,
+    "noise_root_seed": 20261027,
+    "same_bootstrap_plaintext_across_arms": true,
+    "workload_sha256": "00b70a2e77887c7d6a41db1859246f6513f2c984915de648734e5dd8c584cf74"
+  },
+  "precompute_stops": [
+    {
+      "actual_bootstrap_calls": 0,
+      "arm": "F",
+      "path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-001/preflight/cp-c-fast-pin-stop.json"
+    },
+    {
+      "actual_bootstrap_calls": 0,
+      "arm": "S",
+      "path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-001/preflight/cp-c-resume-ced6416/standard-dirty-worktree-stop.json"
+    }
+  ],
+  "preflight": {
+    "actual_bootstrap_calls": 0,
+    "all_fast_checkpoint_oracles_pass": true,
+    "all_standard_checkpoint_oracles_pass": true,
+    "bootstrap_target_mode": "public-native-bootstrap-once",
+    "fast_checkpoint_count": 8,
+    "fast_input_c1_nonzero": false,
+    "matched_environment": true,
+    "observed_native_oracle_status": "PASS_EIGHT_CHECKPOINT_PLAINTEXT_ORACLES",
+    "pair_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-001/preflight/cp-c-resume-ced6416/compare-public-pair.json",
+    "pair_schema": "fast-standard-public-pair.v2",
+    "pair_sha256": "0b09e98eedfc1d0e14971a08c4ae5bf7b276f78471bae37307e68d1a554fa854",
+    "pair_status": "PASS",
+    "standard_checkpoint_count": 8,
+    "standard_input_c1_nonzero": true,
+    "strict_capacity_status": "SUFFICIENT"
+  },
+  "primary_source": {
+    "clean_at_build": true,
+    "commit": "ced64162cd79e039c829a67a31316a237d4cf41a",
+    "runtime_primary_path": "/private/tmp/heart-lattigo-bootstrap-noise-fidelity-primary-ced6416",
+    "source_sha256": "bef8af26f2de7369d0ff8ec0f6ece49882135e8c3b4d67e252abaf20b19b530f"
+  },
+  "profile": {
+    "capacity_policy": "strict-sufficient-bound-v1",
+    "config_sha256": "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98",
+    "conservative_bound_status": "SUFFICIENT",
+    "default_scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+    "effective_parameters_sha256": "55a2be5c75f06453382f5318fce8e1cc100fe4db231cc39dc205f23ccfb9dee7",
+    "ephemeral_secret_weight": 32,
+    "input_slots": 4096,
+    "log_n": 13,
+    "log_slots": 12,
+    "name": "logn13",
+    "p_bits": [
+      61,
+      61,
+      62,
+      61,
+      62
+    ],
+    "p_primes": [
+      "2305843009213317121",
+      "2305843009213120513",
+      "2305843009214414849",
+      "2305843009212694529",
+      "2305843009214758913"
+    ],
+    "q_chain_bits": [
+      55,
+      39,
+      40,
+      39,
+      40,
+      60,
+      60,
+      61,
+      60,
+      60,
+      60,
+      61,
+      61,
+      56,
+      57,
+      56,
+      56
+    ],
+    "q_primes": [
+      "36028797018652673",
+      "549755731969",
+      "549756026881",
+      "549755486209",
+      "549756174337",
+      "1152921504606830593",
+      "1152921504606748673",
+      "1152921504606994433",
+      "1152921504606683137",
+      "1152921504606601217",
+      "1152921504606584833",
+      "1152921504607191041",
+      "1152921504607223809",
+      "72057594037616641",
+      "72057594038321153",
+      "72057594037370881",
+      "72057594037338113"
+    ],
+    "qp_sha256": "1f045e603a856968779d62e045a037274bba08cbfce8b1dd3dec2828f1f6a46b",
+    "ring_n": 8192
+  },
+  "rejected_non_capture_builds": [
+    {
+      "arm": "S",
+      "binary_sha256": "c7ed43e5c30d1bb7b2c80a5b4f2c80f613753791b71a8a07fedf00ec0ea0755f",
+      "go_version_m_raw_external_path": "/private/tmp/fbn001-go-version-standard-detached-invalid-ced6416.raw.txt",
+      "go_version_m_raw_external_sha256": "bb778851c3ee099e6e81df6cc22aab5a25803b0c4768004ee05846f439a5bbe1",
+      "reason": "go version -m had no vcs.revision/vcs.modified fields",
+      "usable": false
+    },
+    {
+      "arm": "F",
+      "binary_sha256": "1d2621ee0affd0ce59ba076c2d1fa322ce20b80d0538a919376f3d77c13794c8",
+      "go_version_m_raw_external_path": "/private/tmp/fbn001-go-version-fast-detached-invalid-ced6416.raw.txt",
+      "go_version_m_raw_external_sha256": "b7c7636fe748b146c906c234f8e4e8f9f76d2fc4570b9c738199ddf10f38e695",
+      "reason": "go version -m had no vcs.revision/vcs.modified fields",
+      "usable": false
+    }
+  ],
+  "schema_version": "fast-bootstrap-noise-fidelity-preflight-evidence.v1",
+  "sources": {
+    "fast_branch": "experiment/fast-bootstrap-noise-fidelity",
+    "fast_clean": true,
+    "fast_commit": "715ef5856159f8ae00955f4c8bfbbb43a8692308",
+    "fast_qprefix_unchanged_commit": "1e7828293c36f9845e30723ba4e9500d84bb50d2",
+    "fast_ref": "experiment/fast-bootstrap-noise-fidelity",
+    "standard_clean": true,
+    "standard_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+    "standard_ref": "5dbffbdea05394de2ca3a432ed5318aa832e3f40"
+  },
+  "status": "PASS_ZERO_BOOTSTRAP_PILOT_PREFLIGHT_PAIR",
+  "task": "FAST-BOOTSTRAP-NOISE-FIDELITY-001",
+  "vectors_external_not_versioned": [
+    {
+      "arm": "S",
+      "path": "/private/tmp/fbn001-preflight-standard-ced6416-vectors.json",
+      "sha256": "070bdc6099d91354d6927d26e40786dff07bd96f1f29899bb48593784e91be20",
+      "size_bytes": 4165502
+    },
+    {
+      "arm": "F",
+      "path": "/private/tmp/fbn001-preflight-fast-ced6416-vectors.json",
+      "sha256": "a1ecdfb96f54b5fa5c903461c957a83659c610c0b3c357f0c60fa3d56b830c81",
+      "size_bytes": 4159726
+    }
+  ]
+}

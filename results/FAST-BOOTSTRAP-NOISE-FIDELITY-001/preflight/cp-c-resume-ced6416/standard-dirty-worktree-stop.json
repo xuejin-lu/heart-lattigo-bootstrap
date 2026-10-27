@@ -1,0 +1,20 @@
+{
+  "arm": "S",
+  "binary_primary_vcs_modified": false,
+  "binary_primary_vcs_revision": "ced64162cd79e039c829a67a31316a237d4cf41a",
+  "binary_sha256": "987bf4dbcd3456f2ded3bc7045fa23f988fe2ffb1305d0b2de259a50c267a520",
+  "bootstrap_attempt_reserved": false,
+  "bootstrap_calls_consumed": 0,
+  "error": "Primary provenance: worktree is dirty: ?? results/FAST-BOOTSTRAP-NOISE-FIDELITY-001/preflight/cp-c-resume-ced6416/",
+  "error_class": "PRIMARY_PROVENANCE_DIRTY_WORKTREE",
+  "event": "STANDARD_ZERO_CALL_PREFLIGHT_REJECTED_DIRTY_PRIMARY_CHECKOUT",
+  "git_source_checkout": "/Users/xuejinlu/Developer/xuejin-lu/heart-lattigo-bootstrap",
+  "git_source_commit": "ced64162cd79e039c829a67a31316a237d4cf41a",
+  "key_generation_or_ciphertext_workload_started": false,
+  "phase": "primary-source-cleanliness-check-before-public-native-computation",
+  "resolution": "Run the same immutable binary and commit from the existing clean detached worktree /private/tmp/heart-lattigo-bootstrap-noise-fidelity-primary-ced6416; no code, binary, input, or gate changes.",
+  "result": "PRECOMPUTE_FAILED_NO_CALL",
+  "schema_version": "fast-bootstrap-noise-fidelity-precompute-stop.v1",
+  "task": "FAST-BOOTSTRAP-NOISE-FIDELITY-001",
+  "time_utc": "2026-10-27T00:50:36Z"
+}
