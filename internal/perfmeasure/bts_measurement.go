@@ -17,6 +17,8 @@ type BTSRunDocument struct {
 	NoiseMode                string                     `json:"noise_mode,omitempty"`
 	NoiseSigma               float64                    `json:"noise_sigma,omitempty"`
 	NoiseRootSeed            int64                      `json:"noise_root_seed,omitempty"`
+	NoiseHookSupported       bool                       `json:"noise_hook_supported,omitempty"`
+	NoiseHookEnabled         bool                       `json:"noise_hook_enabled,omitempty"`
 	ProfileSHA256            string                     `json:"profile_sha256,omitempty"`
 	ArmConfigSHA256          string                     `json:"arm_config_sha256,omitempty"`
 	Circuit                  string                     `json:"bootstrap_circuit,omitempty"`

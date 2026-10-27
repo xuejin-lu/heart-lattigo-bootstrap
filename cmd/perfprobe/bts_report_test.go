@@ -53,6 +53,11 @@ func TestBTS009ReportValidatesThreeMatchedArmsAndSharedFastBinary(t *testing.T) 
 	if err := validateMatchedBTS009Runs(standard, fastOff, fastNoise); err == nil {
 		t.Fatal("Fast OFF and Fast+Noise with different binary identities were accepted")
 	}
+	fastNoise = validBTS009ReportRun("fast", "on")
+	fastNoise.NoiseHookEnabled = false
+	if err := validateBTS009Run(&fastNoise, "fast", "on"); err == nil {
+		t.Fatal("Fast+Noise run with an OFF Hook snapshot was accepted")
+	}
 }
 
 func TestBTS009ReportRejectsNoiseCapacityEvidenceThatDoesNotStrictlyFit(t *testing.T) {
@@ -107,6 +112,10 @@ func validBTS009ReportRun(backend, noiseMode string) perfmeasure.BTSRunDocument 
 			InputLevel: 3, InputScale: math.Pow(2, 32), OutputLevel: 18, OutputScale: math.Pow(2, 32),
 		},
 		Input: perfmeasure.BTSVectorArtifact{Encoding: "IEEE754-f64-little-endian", SHA256: bts008ExpectedInputSHA, Slots: 1 << 15, FiniteSlots: 1 << 15, Level: 3, Scale: math.Pow(2, 32)},
+	}
+	if backend == "fast" {
+		run.NoiseHookSupported = true
+		run.NoiseHookEnabled = noiseMode == "on"
 	}
 	if noiseMode == "on" {
 		run.NoiseSigma, run.NoiseRootSeed = 4.004280012097432, 20261027

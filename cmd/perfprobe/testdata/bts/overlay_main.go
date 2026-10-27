@@ -240,6 +240,24 @@ func runBTSMeasurement() error {
 		}
 		run.ArmConfigSHA256 = digest(armBytes)
 	}
+	var noiseSnapshot btsNoiseSnapshot
+	if task == btsTask009 {
+		noiseSnapshot, err = readBTSFixedSigmaNoiseSnapshot(bts.mod1.eval)
+		if err != nil {
+			return failRun(summaryPath, &run, fmt.Errorf("read initial 009 Noise Hook state: %w", err))
+		}
+		run.NoiseHookSupported = noiseSnapshot.Supported
+		run.NoiseHookEnabled = noiseSnapshot.Enabled
+		if noiseSnapshot.CtCtMultiplyCalls != 0 || noiseSnapshot.InjectedPolynomials != 0 || len(noiseSnapshot.Events) != 0 {
+			return failRun(summaryPath, &run, fmt.Errorf("009 Noise Hook must start with empty evidence: %+v", noiseSnapshot))
+		}
+		if noiseMode == btsNoiseOn && (!noiseSnapshot.Supported || !noiseSnapshot.Enabled || noiseSnapshot.Sigma != btsNoiseSigma || noiseSnapshot.RootSeed != btsNoiseRootSeed) {
+			return failRun(summaryPath, &run, fmt.Errorf("009 Fast Noise Hook state mismatch before Bootstrap: %+v", noiseSnapshot))
+		}
+		if noiseMode == btsNoiseOff && noiseSnapshot.Enabled {
+			return failRun(summaryPath, &run, errors.New("009 Noise-OFF evaluator unexpectedly has Noise Hook enabled"))
+		}
+	}
 	if err := persistRunSummary(summaryPath, run, false); err != nil {
 		return err
 	}
@@ -262,19 +280,6 @@ func runBTSMeasurement() error {
 			"measurement_adapter_sha256": adapterSHA, "primary_commit": primaryCommit,
 			"input_vector_sha256": inputSHA, "command": strings.Join(os.Args, " "),
 		},
-	}
-	var noiseSnapshot btsNoiseSnapshot
-	if task == btsTask009 {
-		noiseSnapshot, err = readBTSFixedSigmaNoiseSnapshot(bts.mod1.eval)
-		if err != nil {
-			return failRun(summaryPath, &run, fmt.Errorf("read initial 009 Noise Hook state: %w", err))
-		}
-		if noiseMode == btsNoiseOn && (!noiseSnapshot.Supported || !noiseSnapshot.Enabled || noiseSnapshot.Sigma != btsNoiseSigma || noiseSnapshot.RootSeed != btsNoiseRootSeed) {
-			return failRun(summaryPath, &run, fmt.Errorf("009 Fast Noise Hook state mismatch before Bootstrap: %+v", noiseSnapshot))
-		}
-		if noiseMode == btsNoiseOff && noiseSnapshot.Enabled {
-			return failRun(summaryPath, &run, errors.New("009 Fast-OFF evaluator unexpectedly has Noise Hook enabled"))
-		}
 	}
 	for index := 0; index < btsCallBudget; index++ {
 		phase := fmt.Sprintf("warm_bootstrap_%02d", index)
