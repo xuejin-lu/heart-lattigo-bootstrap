@@ -220,4 +220,5 @@ BTS-008 歷史 Warm 中位：
 - 本任務最終 Fast source pin 為 `experiment/fast-bootstrap-noise-fidelity@be9c42ff23662300769b77f1eead3f12fc53adef`，包含本任務要求的 public CKKS evaluator Noise Hook 接線；Fast OFF 與 Fast+Noise 必須使用同一個以此版本建置的 Binary。
 - Genuine Standard pin 維持 `5dbffbdea05394de2ca3a432ed5318aa832e3f40`。
 - Primary measurement implementation commit 為 `369ce3a84eb072392bacf2359d651413c159e5e8`，零呼叫預檢 Hook-state Gate 修復為 `42b9840a6ea42bb6d9f4ba368b7c161617d4a02d`，並以 `dd077ac69e81192ffaa4b606d305e545d8b50202` 明確序列化 false Hook 狀態。正式 Binary 必須記錄其實際建置時的完整 Primary VCS revision，並以 measurement source SHA-256 證明實作與這些 commit 完全一致；建置後的 evidence-only commit 不得改動任何已連結的 Go source。
+- 已完成的 task-specific dual build 將 Primary VCS revision 固定為 `14a76be8ebb05da9f19d82d78f5d8003f3be8c3c`；Standard binary SHA-256 為 `6502bdc8e8b52c25c6a7afdcd9cb82bb3d09b0ba4c226f697c50e18cacaf97bc`，Fast binary SHA-256 為 `df4b9c9b0dbccb370d081d239f4d0a986c769bdbd077bf83669f93a978de883e`。Fast OFF/ON 共用同一 Binary。這些 preflight identities 於任何正式 Bootstrap 前不得變更。
 - 這些執行 pin 不改變凍結的 BTS profile、σ、seed、18 次總預算或禁止事項，也不改寫 BTS-008、002、003 歷史。

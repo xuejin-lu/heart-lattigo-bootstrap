@@ -1,10 +1,10 @@
 # BTS-FAST-NOISE-FIDELITY-009 execution plan
 
-Status: `ZERO_BOOTSTRAP_PREFLIGHT_PENDING`
+Status: `PREFLIGHT_COMPLETE_AWAITING_VERSIONED_CHECKPOINT`
 
 ## Frozen source and profile
 
-- Primary measurement implementation commits: `369ce3a84eb072392bacf2359d651413c159e5e8`, zero-call Hook-state gate `42b9840a6ea42bb6d9f4ba368b7c161617d4a02d`, and explicit serialization of both true and false Hook state `dd077ac69e81192ffaa4b606d305e545d8b50202`. Rebuild from the clean Primary revision that includes this plan update; its linked measurement-source SHA-256 values must match, and no Go source may change after building.
+- Primary measurement implementation commits: `369ce3a84eb072392bacf2359d651413c159e5e8`, zero-call Hook-state gate `42b9840a6ea42bb6d9f4ba368b7c161617d4a02d`, and explicit serialization of both true and false Hook state `dd077ac69e81192ffaa4b606d305e545d8b50202`. Final clean Primary build VCS revision: `14a76be8ebb05da9f19d82d78f5d8003f3be8c3c`; no Go source changed after build.
 - Genuine Standard Lattigo: `5dbffbdea05394de2ca3a432ed5318aa832e3f40` (clean detached checkout).
 - Fast Lattigo: `experiment/fast-bootstrap-noise-fidelity@be9c42ff23662300769b77f1eead3f12fc53adef` (clean, pushed dedicated worktree).
 - Original BTS manifest SHA-256: `53205b37abd1fb57a960394256b958f5d5e5b1a66f527bfb7cbadabfe3cf0cda`.
@@ -13,7 +13,7 @@ Status: `ZERO_BOOTSTRAP_PREFLIGHT_PENDING`
 ## Gates before a Bootstrap reservation
 
 1. `cmd/perfprobe bts-build --task BTS-FAST-NOISE-FIDELITY-009` builds a Standard binary from the clean pinned Standard checkout and one Fast binary from the clean pinned Fast checkout. Build manifests must prove Primary VCS revision, `vcs.modified=false`, backend source revision/root, original BTS manifest, measurement adapter hashes and binary SHA-256. The same Fast binary is used for Fast OFF and Fast+Noise.
-2. Run exactly three `BTS_PREFLIGHT_ONLY=1` invocations into fresh task-owned `preflight-v2/` directories: Standard/OFF, Fast/OFF, Fast/ON. These construct BTS/evaluator state, generate/encrypt the same frozen input, and record the effective profile and explicit Hook support/enabled booleans, but reserve and execute zero Bootstrap calls. The first `preflight/` artifacts are retained as an earlier zero-call attempt and are superseded because `omitempty` omitted explicit false values.
+2. Run exactly three `BTS_PREFLIGHT_ONLY=1` invocations into fresh task-owned `preflight-v2/` directories: Standard/OFF, Fast/OFF, Fast/ON. These construct BTS/evaluator state, generate/encrypt the same frozen input, and record the effective profile and explicit Hook support/enabled booleans, but reserve and execute zero Bootstrap calls. The first `preflight/` artifacts are retained as an earlier zero-call attempt and are superseded because `omitempty` omitted explicit false values. The `preflight-v2/` run manifests all pass, record zero reservations, match the BTS-008 Q/P and input/profile, and explicitly record Standard `(supported=false, enabled=false)`, Fast OFF `(true,false)`, and Fast+Noise `(true,true)` with the frozen σ/root seed.
 3. Require each preflight status `ZERO_BOOTSTRAP_PREFLIGHT_OK`, bootstrap reservations `0`, matching input SHA and effective Q/P/profile, correct source and binary identities, and Fast Hook disabled/enabled with the frozen σ/root seed as requested. Any mismatch stops before CP-C.
 4. Version and push the preflight manifests/summary and updated ledger with counters still `0/0/0` before starting a formal arm.
 

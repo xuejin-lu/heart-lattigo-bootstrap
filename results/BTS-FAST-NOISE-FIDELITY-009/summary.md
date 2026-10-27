@@ -1,6 +1,6 @@
 # BTS-FAST-NOISE-FIDELITY-009
 
-Status: `CP_AB_IMPLEMENTED_ZERO_BOOTSTRAP_PREFLIGHT_PENDING`
+Status: `PREFLIGHT_COMPLETE_AWAITING_VERSIONED_CHECKPOINT`
 
 - Independent budget: 18 Bootstrap calls (Standard 6, Fast OFF 6, Fast+Noise 6).
 - Reserved / entered / completed / failed: 0 / 0 / 0 / 0.
@@ -11,6 +11,6 @@ Status: `CP_AB_IMPLEMENTED_ZERO_BOOTSTRAP_PREFLIGHT_PENDING`
 - Genuine Standard source: `5dbffbdea05394de2ca3a432ed5318aa832e3f40`.
 - Task-specific Fast source: `experiment/fast-bootstrap-noise-fidelity@be9c42ff23662300769b77f1eead3f12fc53adef`.
 - Targeted Primary perfprobe/perfmeasure/numericalmetrics tests and Secondary public Noise Hook/fast tests passed; these include N13–N16 generic hook and BTS LogN16 helper coverage, but no complete Bootstrap.
-- Three initial zero-call preflights completed with 0 reservations and the same input SHA, but their false Hook booleans were omitted by `omitempty`; those original artifacts remain preserved and are superseded. Clean binaries plus exactly three explicit-state preflights under `preflight-v2/` are pending. Do not start a Bootstrap until the new artifacts are committed and pushed.
+- The first three zero-call preflights and binaries are preserved but superseded. Clean binaries and all three explicit-state `preflight-v2/` checks passed; each has zero reservations, the same original BTS input/profile, and explicit Standard/OFF/ON Hook states. Their hashes and provenance are in the attempt ledger and journal. The v2 build/preflight checkpoint still needs to be committed and pushed before any formal call.
 
 See `journal.md` for source map, synchronization, tests and gates; `experiment-plan.md` specifies the frozen preflight and arm order; `attempt-ledger.json` contains the 18 predeclared, unreserved attempt slots.

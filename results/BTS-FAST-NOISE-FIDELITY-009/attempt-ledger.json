@@ -1,7 +1,7 @@
 {
   "schema_version": "bts-fast-noise-fidelity-009-attempt-ledger.v1",
   "task": "BTS-FAST-NOISE-FIDELITY-009",
-  "status": "ZERO_BOOTSTRAP_PREFLIGHT_PENDING",
+  "status": "PREFLIGHT_COMPLETE_AWAITING_VERSIONED_CHECKPOINT",
   "authorization_source": "User-provided task specification pasted 2026-10-27",
   "profile": {
     "log_n": 16,
@@ -57,7 +57,26 @@
       "fast_noise_run_sha256": "774a83907f09d585f86be09d3bc2efb68804049a2b535b62f317448b87dcd66f"
     },
     "accepted": {
-      "status": "PENDING",
+      "status": "ZERO_BOOTSTRAP_PREFLIGHT_OK",
+      "primary_vcs_revision": "14a76be8ebb05da9f19d82d78f5d8003f3be8c3c",
+      "standard_backend_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+      "standard_binary_sha256": "6502bdc8e8b52c25c6a7afdcd9cb82bb3d09b0ba4c226f697c50e18cacaf97bc",
+      "standard_build_manifest_sha256": "acf659b94e10521c5bd7d81a839e720d181e3ab4a37a9b4ec917267814846246",
+      "fast_backend_commit": "be9c42ff23662300769b77f1eead3f12fc53adef",
+      "fast_binary_sha256": "df4b9c9b0dbccb370d081d239f4d0a986c769bdbd077bf83669f93a978de883e",
+      "fast_build_manifest_sha256": "b8658192274ca5b36666057b7e8b3f846789a3d4984d4810a6e1583f2f4064b0",
+      "measurement_adapter_sha256": "42d7745e75663b886e7eb2e644262095c852a8b0b6f2b32f7176d068a99f01d6",
+      "standard_preflight_run_sha256": "ff8ab3dcbd95a9590d417aee526307c2395fde62fde39d8107aafd0be7e75685",
+      "fast_off_preflight_run_sha256": "56a1e94cf1145705943b26a70992a5b84450d16828ff99eac2c323af22c4f852",
+      "fast_noise_preflight_run_sha256": "f0f0ef08a72571487e48306b83b487d05f13742cffdeff414d3776c821d60250",
+      "input_sha256": "5ca151755bd8232e0b581939fb1b2c079fa4451b454c0e1b0ad9f2b1a6198373",
+      "profile_sha256": "229cb5a28732b755ec66a531a3b643630dee703a2e0d35398f2986a374450b47",
+      "environment": "go1.26.4/darwin/arm64/Apple M4/NumCPU=10/GOMAXPROCS=8",
+      "hook_states": {
+        "standard_off": {"supported": false, "enabled": false},
+        "fast_off": {"supported": true, "enabled": false},
+        "fast_on": {"supported": true, "enabled": true, "sigma": 4.004280012097432, "root_seed": 20261027}
+      },
       "bootstrap_reservations": 0
     }
   },

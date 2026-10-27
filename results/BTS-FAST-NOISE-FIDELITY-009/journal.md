@@ -1,6 +1,6 @@
 # BTS-FAST-NOISE-FIDELITY-009 journal
 
-Status: `CP_AB_IMPLEMENTED_ZERO_BOOTSTRAP_PREFLIGHT_PENDING`
+Status: `PREFLIGHT_COMPLETE_AWAITING_VERSIONED_CHECKPOINT`
 
 ## Authorization and separation
 
@@ -74,6 +74,17 @@ No Bootstrap was called. The following targeted tests passed after the bounded s
 ## Remaining gates and budget
 
 - Current 009 ledger remains 18 declared; reserved/entered/completed/failed = `0/0/0/0`. No formal Bootstrap or attempt reservation has occurred.
-- Still required: build clean pinned Standard and Fast binaries from the refreshed clean Primary plan-checkpoint revision (which includes measurement commits `369ce3a84eb072392bacf2359d651413c159e5e8`, `42b9840a6ea42bb6d9f4ba368b7c161617d4a02d`, and `dd077ac69e81192ffaa4b606d305e545d8b50202`); verify exact VCS/module provenance and SHA; execute exactly three zero-call preflights into `preflight-v2/`; commit/push those manifests and update the ledger while counters remain zero. Subsequent evidence-only commits may not change linked Go source.
+- Clean pinned Standard/Fast binaries and `preflight-v2/` checks have now passed; their compact provenance, hook-state, and input evidence are recorded below. Still required before any Bootstrap: commit/push these final manifests and preflight records, set the formal run paths/ledger links, and confirm the ledger remains at `0/0/0/0`. Subsequent evidence-only commits may not change linked Go source.
 - Only after that checkpoint passes will formal calls begin in order Fast+Noise (FN-01..06), Standard (S-01..06), Fast OFF (F-01..06), with six calls maximum per arm, one cold plus five warm, no retry/warmup. Any failure stops the sequence and permanently consumes reservations already made.
 - Formal vectors and evidence will be saved in this task's result tree. No LogN16 work beyond this authorized original BTS task, no extra benchmark, no BTS/003 budget reuse, and no modification to `fast-qprefix`.
+
+## Accepted source-linked build and zero-call preflight v2 (2026-10-27)
+
+- Primary build VCS revision: `14a76be8ebb05da9f19d82d78f5d8003f3be8c3c`; both build manifests report `primary_dirty=false`, `vcs.modified=false`, Go `go1.26.4`, Darwin/arm64, and the same task adapter SHA-256 `42d7745e75663b886e7eb2e644262095c852a8b0b6f2b32f7176d068a99f01d6`.
+- Genuine Standard pin `5dbffbdea05394de2ca3a432ed5318aa832e3f40`, Binary SHA-256 `6502bdc8e8b52c25c6a7afdcd9cb82bb3d09b0ba4c226f697c50e18cacaf97bc`, build-manifest SHA-256 `acf659b94e10521c5bd7d81a839e720d181e3ab4a37a9b4ec917267814846246`.
+- Fast pin `be9c42ff23662300769b77f1eead3f12fc53adef`, Binary SHA-256 `df4b9c9b0dbccb370d081d239f4d0a986c769bdbd077bf83669f93a978de883e`, build-manifest SHA-256 `b8658192274ca5b36666057b7e8b3f846789a3d4984d4810a6e1583f2f4064b0`. Both Fast OFF and Fast+Noise use this exact same binary.
+- Standard/OFF, Fast/OFF and Fast/ON `preflight-v2` run manifests all returned `ZERO_BOOTSTRAP_PREFLIGHT_OK`; each has zero reservations and zero samples. Their run-manifest SHA-256 values are respectively `ff8ab3dcbd95a9590d417aee526307c2395fde62fde39d8107aafd0be7e75685`, `56a1e94cf1145705943b26a70992a5b84450d16828ff99eac2c323af22c4f852`, and `f0f0ef08a72571487e48306b83b487d05f13742cffdeff414d3776c821d60250`.
+- All three have exact Q/P and effective profile equal to the BTS-008 genuine Standard profile; same profile SHA-256 `229cb5a28732b755ec66a531a3b643630dee703a2e0d35398f2986a374450b47`, input SHA-256 `5ca151755bd8232e0b581939fb1b2c079fa4451b454c0e1b0ad9f2b1a6198373`, and matching environment Go/Darwin/arm64/Apple M4/NumCPU 10/GOMAXPROCS 8. Each raw input is 262144 bytes and hashes to the same input SHA.
+- Explicit Hook snapshots: Standard/OFF `{supported:false, enabled:false}`, Fast/OFF `{true,false}`, Fast+Noise `{true,true, sigma:4.004280012097432, root_seed:20261027}`. All run manifests record the same input and correct source and binary pins. No attempt sidecar exists; initial Noise event counters are zero by preflight check.
+- Preflight NewBTS construction time (not Bootstrap time): Standard `39.624367583s`, Fast OFF `43.008429083s`, Fast+Noise `42.768094666s`.
+- At this checkpoint the durable formal ledger still has `reserved/entered/completed/failed=0/0/0/0`. The only three preflight invocations are non-Bootstrap lifecycle checks and do not consume the 18-call budget.
