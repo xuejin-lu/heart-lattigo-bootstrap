@@ -712,7 +712,11 @@ func summarizePublicTriplet002Noise(doc publicNativeDocument) (publicTriplet002N
 				if phase.Name != wantPhases[index] {
 					return publicTriplet002NoiseEvidence{}, fmt.Errorf("Noise event %d phase order mismatch at %d: got %q want %q", event.Operation, index, phase.Name, wantPhases[index])
 				}
-				if phase.ElapsedNS <= 0 || phase.MemoryStatsCollected {
+				// A named commit_c0 measurement can legitimately round to 0 ns
+				// because the operation is shorter than the timer's nanosecond
+				// resolution. The phase entry and order still prove it was measured;
+				// all other subphases must have a positive duration.
+				if phase.ElapsedNS < 0 || (phase.ElapsedNS == 0 && phase.Name != "commit_c0") || phase.MemoryStatsCollected {
 					return publicTriplet002NoiseEvidence{}, fmt.Errorf("Noise event %d phase %s is absent or collected per-operation MemStats", event.Operation, phase.Name)
 				}
 				result.InjectionSubphaseElapsed[phase.Name] += phase.ElapsedNS

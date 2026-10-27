@@ -317,8 +317,36 @@ func TestNoiseFidelity002SixSampleTripletIsExploratoryAndKeepsLegacyGateStrict(t
 	if result.Arms["S"].Samples[0].NumericalGatePass || result.Arms["S"].Samples[0].Error.PrecisionBits == nil ||
 		result.Arms["F"].Samples[0].Error.RMSE <= result.Arms["FN"].Samples[0].Error.RMSE ||
 		result.NoiseEvidence.RootSeed != publicNoiseFidelity002RootSeed || result.NoiseEvidence.TotalInjectionSubphaseNS == 0 ||
-		result.NoiseColdTimeOverheadRatio <= 0 || result.NoiseWarmMedianAllocOverheadBytes != 0 {
+		result.NoiseColdTimeOverheadRatio <= 0 || result.NoiseWarmMedianAllocOverheadBytes != 0 ||
+		result.NoiseEvidence.InjectionSubphaseElapsed["commit_c0"] != 0 {
 		t.Fatalf("exploratory metrics/Noise accounting missing: %+v", result)
+	}
+	copyNoiseDocument := func(mutate func(*bootstrapNoiseSnapshotEvidence)) publicNativeDocument {
+		t.Helper()
+		var snapshot bootstrapNoiseSnapshotEvidence
+		if err := json.Unmarshal(noise.BootstrapNoiseEvidence, &snapshot); err != nil {
+			t.Fatal(err)
+		}
+		mutate(&snapshot)
+		encoded, err := json.Marshal(snapshot)
+		if err != nil {
+			t.Fatal(err)
+		}
+		copy := noise
+		copy.BootstrapNoiseEvidence = encoded
+		return copy
+	}
+	zeroNonCommitPhase := copyNoiseDocument(func(snapshot *bootstrapNoiseSnapshotEvidence) {
+		snapshot.Events[0].Left.Phases[0].ElapsedNS = 0
+	})
+	if _, err := summarizePublicTriplet002Noise(zeroNonCommitPhase); err == nil {
+		t.Fatal("Noise evidence accepted a zero-duration non-commit subphase")
+	}
+	perOperationMemStats := copyNoiseDocument(func(snapshot *bootstrapNoiseSnapshotEvidence) {
+		snapshot.Events[0].Left.Phases[4].MemoryStatsCollected = true
+	})
+	if _, err := summarizePublicTriplet002Noise(perOperationMemStats); err == nil {
+		t.Fatal("Noise evidence accepted per-operation MemStats collection")
 	}
 	badFastPair := fast
 	badFastPair.PreflightPairSHA256 = "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
@@ -593,7 +621,7 @@ func promoteToNoiseFidelity002Fixture(t *testing.T, doc publicNativeDocument, ve
 
 func makeNoiseFidelity002Snapshot(t *testing.T, parameters perfmeasure.EffectiveParameters) json.RawMessage {
 	t.Helper()
-	phase := []bootstrapNoisePhaseEvidence{{Name: "sampling_hash_moments", ElapsedNS: 10}, {Name: "coefficient_to_qprefix_ntt", ElapsedNS: 20}, {Name: "candidate_c0_add", ElapsedNS: 30}, {Name: "qprefix_centered_capacity_check", ElapsedNS: 40}, {Name: "commit_c0", ElapsedNS: 5}}
+	phase := []bootstrapNoisePhaseEvidence{{Name: "sampling_hash_moments", ElapsedNS: 10}, {Name: "coefficient_to_qprefix_ntt", ElapsedNS: 20}, {Name: "candidate_c0_add", ElapsedNS: 30}, {Name: "qprefix_centered_capacity_check", ElapsedNS: 40}, {Name: "commit_c0", ElapsedNS: 0}}
 	left, right := bootstrapNoiseTestPolynomial(expectedBootstrapNoiseSamplingSeed(publicNoiseFidelity002RootSeed, 1, false)), bootstrapNoiseTestPolynomial(expectedBootstrapNoiseSamplingSeed(publicNoiseFidelity002RootSeed, 1, true))
 	left.SamplingAlgorithm, right.SamplingAlgorithm = "deterministic Gaussian test fixture", "deterministic Gaussian test fixture"
 	left.DispatchEvidence, right.DispatchEvidence = "NTT transform and MForm-mapped Montgomery strict capacity test fixture", "NTT transform and MForm-mapped Montgomery strict capacity test fixture"
