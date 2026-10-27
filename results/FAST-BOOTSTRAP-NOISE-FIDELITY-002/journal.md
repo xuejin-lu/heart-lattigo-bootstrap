@@ -136,3 +136,27 @@ Evaluator construction phases: CKKS evaluator 984375 ns / 2719992 bytes / 16610 
 The six Standard outputs have global RMSE `4.91010460178e-09`, corresponding to 27.601599 global precision bits; this is distinct from the output's median per-slot precision field. Full output hashes and vectors are retained for later comparator recomputation.
 
 The task ledger is now 12/18 calls. FN and Standard are each 6/6 successful; Fast OFF remains 0/6 and must not start until this checkpoint is committed and pushed.
+
+
+## Fast OFF arm capture — complete and validated
+
+Date: 2026-10-27. This arm used the same Fast binary as FN (`311fdca496368f42102192c39c0835454a0c41c3bd1bc4064b32ad4b117745c7`), with the Noise Hook explicitly OFF. It completed exactly one Cold plus five Warm calls. The output document validates the same original plaintext SHA-256 `c32c0d7b731c0fcd8d82fb9c1182a43a62d120f761c090ce21dc764e9aa1e703`, canonical input, Q/P and workload fingerprints as the preflight and other arms; Fast's expected zero-secret `c1=0` mode is recorded. All six outputs are finite, 4096-slot, Level 1/degree 1, NTT non-Montgomery, Scale 2^45, and structurally valid. No Noise evidence is present, as expected.
+
+- Capture document `raw/fast.json`: 45583 bytes, SHA-256 `b5c25af9e1e6f54ae2696be29630e2441c65f80c96325edc4d8e77c897a1d2fb`.
+- Decoded vectors remain outside Git at `/private/tmp/fast-bootstrap-noise-fidelity-002-captures/fast-vectors.json`: 6520359 bytes, SHA-256 `e266aeba87a80f73f0c49e7b11e30e990c837acc4d3a25d089ba68efad99082e`.
+- Six reservation and six result sidecars are under `raw/`; the ledger records paths and SHA-256 values. All six results returned and passed finite/data validation. The six decoded output hashes are identical in this capture, so the samples remain as separate timings rather than being deduplicated.
+
+| # | Phase | Elapsed ns | Allocated bytes | Allocations | RMSE | Global precision bits (`-log2(RMSE)`) | MaxAbs | Decoded output SHA-256 |
+|---:|---|---:|---:|---:|---:|---:|---:|---|
+| 1 | first_cold_bootstrap | 561848875 | 961512376 | 19282518 | 1.17957184064e-09 | 29.659090 | 5.7387742391e-08 | `31cb3bb8b9f7377918ddd7cae659e9851230bd903acdba69bd32ca4a273bc934` |
+| 2 | warm_bootstrap_01 | 70035916 | 7506168 | 8107 | 1.17957184064e-09 | 29.659090 | 5.7387742391e-08 | `31cb3bb8b9f7377918ddd7cae659e9851230bd903acdba69bd32ca4a273bc934` |
+| 3 | warm_bootstrap_02 | 71019167 | 7506624 | 8115 | 1.17957184064e-09 | 29.659090 | 5.7387742391e-08 | `31cb3bb8b9f7377918ddd7cae659e9851230bd903acdba69bd32ca4a273bc934` |
+| 4 | warm_bootstrap_03 | 70619708 | 7506168 | 8107 | 1.17957184064e-09 | 29.659090 | 5.7387742391e-08 | `31cb3bb8b9f7377918ddd7cae659e9851230bd903acdba69bd32ca4a273bc934` |
+| 5 | warm_bootstrap_04 | 70844125 | 7506168 | 8107 | 1.17957184064e-09 | 29.659090 | 5.7387742391e-08 | `31cb3bb8b9f7377918ddd7cae659e9851230bd903acdba69bd32ca4a273bc934` |
+| 6 | warm_bootstrap_05 | 73143792 | 7506168 | 8107 | 1.17957184064e-09 | 29.659090 | 5.7387742391e-08 | `31cb3bb8b9f7377918ddd7cae659e9851230bd903acdba69bd32ca4a273bc934` |
+
+Cold timing/allocation: 561848875 ns, 961512376 bytes, 19282518 allocations. Warm timing (ns): `70035916, 71019167, 70619708, 70844125, 73143792`; mean 71132541.600, median 70844125.000, sample SD 1183929.064, min 70035916, max 73143792. Warm mean allocation: 7506259.2 bytes and 8108.6 allocations.
+
+Evaluator construction phases: CKKS evaluator 1313500 ns / 6195696 bytes / 16682 allocations; bootstrapping evaluator 2651666 ns / 9640608 bytes / 32102 allocations. Combined: 3965166 ns / 15836304 bytes / 48784 allocations; construction plus Cold Bootstrap: 565814041 ns.
+
+This completes the authorized 18/18 calls: FN 6/6, genuine Standard 6/6, and Fast OFF 6/6; no retries, warmups, Bootstrap extras or failures occurred. The ledger records all slots as succeeded and the comparator is the only analysis step remaining.
