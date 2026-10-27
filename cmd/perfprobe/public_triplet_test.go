@@ -163,9 +163,12 @@ func TestRunPublicTripletCompareUsesSameOriginalInputAndValidatesSharedFastBinar
 		t.Fatal(err)
 	}
 	canonical := bootstrapInput["drop_level0"]
-	installPublicTripletOutput(t, &standard, &standardVectors, canonical, 1e-9)
-	installPublicTripletOutput(t, &fast, &fastVectors, canonical, 1e-8)
-	installPublicTripletOutput(t, &noise, &noiseVectors, canonical, 2e-9)
+	// All three outputs stay finite, but their MaxAbs deliberately exceeds the
+	// observational 1e-6 gate. The comparator must preserve the measurements
+	// and report the gate miss instead of rejecting the triplet.
+	installPublicTripletOutput(t, &standard, &standardVectors, canonical, 2e-6)
+	installPublicTripletOutput(t, &fast, &fastVectors, canonical, 4e-6)
+	installPublicTripletOutput(t, &noise, &noiseVectors, canonical, 1.5e-6)
 	noiseSnapshot := bootstrapNoiseSnapshotEvidence{
 		Enabled: true, Sigma: publicBootstrapNoiseSigma, RootSeed: 20261027, CtCtMultiplyCalls: 1, InjectedPolynomials: 2,
 		Events: []bootstrapNoiseEventEvidence{{
@@ -214,13 +217,20 @@ func TestRunPublicTripletCompareUsesSameOriginalInputAndValidatesSharedFastBinar
 	if err := readJSON(paths[6], &result); err != nil {
 		t.Fatal(err)
 	}
-	if result.Status != "TRIPLET_COMPLETE_EXPLORATORY" || len(result.Arms) != 3 || len(result.Pairwise) != 3 ||
+	if result.SchemaVersion != "fast-bootstrap-noise-fidelity-triplet.v2" || result.Status != "TRIPLET_COMPLETE_EXPLORATORY" || len(result.Arms) != 3 || len(result.Pairwise) != 3 ||
 		result.Arms["S"].SuccessfulSlots != 1<<12 || result.Arms["F"].BootstrapTimeNS != 100 || result.NoiseRootSeed == nil || *result.NoiseRootSeed != 20261027 {
 		t.Fatalf("triplet summary is incomplete: %+v", result)
 	}
 	if result.Arms["F"].Error.RMSE <= result.Arms["FN"].Error.RMSE || result.Arms["FN"].CtCtMultiplyCalls != 1 ||
 		result.Arms["FN"].InjectedPolynomials != 2 || result.Arms["FN"].SigmaCoefficient != publicBootstrapNoiseSigma {
 		t.Fatalf("triplet summary lost fixed-sigma or error metrics: %+v", result.Arms)
+	}
+	for _, name := range []string{"S", "F", "FN"} {
+		arm := result.Arms[name]
+		if arm.NumericalGatePass || arm.NumericalGate != publicNumericalGate || arm.NumericalGateMaxAbs <= publicNumericalGate ||
+			arm.Error.Stats.Status != "FINITE" || arm.Error.RMSE <= 0 || arm.Error.PrecisionBits == nil {
+			t.Errorf("arm %s did not preserve finite above-gate observations and report the numerical gate miss: %+v", name, arm)
+		}
 	}
 	if result.PrecisionDistanceImprovement == nil || *result.PrecisionDistanceImprovement <= 0 {
 		t.Fatalf("synthetic FN should be closer in absolute precision bits: %+v", result)
@@ -229,6 +239,29 @@ func TestRunPublicTripletCompareUsesSameOriginalInputAndValidatesSharedFastBinar
 	noise.BinarySHA256 = "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
 	if err := validatePublicBootstrapTripletCompatibility(standard, fast, noise, standardVectors, fastVectors, noiseVectors); err == nil {
 		t.Fatal("triplet accepted Fast and Fast+Noise artifacts from different binaries")
+	}
+}
+
+func TestPublicBootstrapHistoricalModeStillRejectsOracleGateMiss(t *testing.T) {
+	standard, standardVectors := makePublicBootstrapPairArtifactFixture(t, "standard")
+	fast, fastVectors := makePublicBootstrapPairArtifactFixture(t, "fast")
+	oracles, err := publicOracleCheckpoints(standard.InputSlots)
+	if err != nil {
+		t.Fatal(err)
+	}
+	values := decodeComplexValues(standardVectors.BootstrapOutputs["bootstrap_first_cold"])
+	values[0] += 2e-6
+	standardVectors.BootstrapOutputs["bootstrap_first_cold"] = encodeVector(values)
+	checkpoint := &standard.BootstrapResults[0].Output
+	checkpoint.DecodedSHA256 = perfmeasure.Fingerprint(values)
+	checkpoint.Oracle = compareVectors(oracles["drop_level0"], values, publicNumericalGate)
+	checkpoint.OracleSNR = numericalmetrics.Compare(oracles["drop_level0"], values)
+	checkpoint.OraclePass = checkpoint.Oracle.MaxComplexDifference <= publicNumericalGate
+	if checkpoint.OraclePass {
+		t.Fatal("historical-mode fixture did not exceed the strict numerical gate")
+	}
+	if err := validatePublicBootstrapPairArtifacts(standard, fast, standardVectors, fastVectors); err == nil {
+		t.Fatal("legacy two-call Bootstrap mode accepted an output above its strict numerical gate")
 	}
 }
 
@@ -268,7 +301,7 @@ func promotePublicBootstrapFixtureToOnce(t *testing.T, doc publicNativeDocument,
 		t.Fatal(err)
 	}
 	bootstrapInput := oracles["drop_level0"]
-	doc.SchemaVersion, doc.Mode, doc.Status = "fast-standard-public-native-bootstrap-once.v1", "public-native-bootstrap-once", "PASS_PUBLIC_BOOTSTRAP_ONCE"
+	doc.SchemaVersion, doc.Mode, doc.Status = "fast-standard-public-native-bootstrap-once.v2", "public-native-bootstrap-once", publicBootstrapOnceObservedStatus
 	doc.BootstrapBudget, doc.BootstrapCalls = 1, 1
 	doc.BootstrapInputSHA256 = perfmeasure.Fingerprint(bootstrapInput)
 	result := doc.BootstrapResults[0]

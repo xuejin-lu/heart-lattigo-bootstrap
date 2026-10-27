@@ -74,6 +74,18 @@
       "fast_and_fast_noise_started": false,
       "retry_budget_remaining": 0,
       "time_utc": "2026-10-26T23:47:12.520874+00:00"
+    },
+    {
+      "event": "WEB_REVIEW_AUTHORIZED_SCOPED_REPAIR_AND_CP_C_RESUME",
+      "time_utc": "2026-10-27",
+      "actual_bootstrap_calls": 0,
+      "bootstrap_calls_authorized_max": 3,
+      "precompute_pin_failure_preserved": true,
+      "preflight_pair_sha256_current": null,
+      "repair_tests_run_without_bootstrap": true,
+      "allowed_fast_commit": "b81f54c2e0f98dc2b4a7474fb333fbae79be8c63",
+      "details": "Rebuild clean binaries and pass a new zero-call preflight before any one-call CP-C reservation.",
+      "secondary_repair_commit": "715ef5856159f8ae00955f4c8bfbbb43a8692308"
     }
   ],
   "fast_noise_root_seed": 20261027,
@@ -118,12 +130,32 @@
     "primary_source_sha256": "6c02139892f94b5af67f8cf8046be6438cd106a6b5b2be59622d6c78211bd195",
     "standard_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40"
   },
-  "status": "STOPPED_NEEDS_WEB_REVIEW",
+  "status": "CP_C_SCOPED_REPAIR_IN_PROGRESS",
   "stop_conditions": [
     "Do not execute any Bootstrap until post-ledger clean-source builds, go version -m metadata, binary SHA, and zero-call Standard/Fast preflight pair all pass.",
     "If any actual call fails, or provenance, parameters, capacity, input, or output validation fails, stop immediately; do not retry or consume another slot.",
     "No LogN16 workload, BTS, large benchmark, CP-D, or CP-E execution is authorized."
   ],
   "stop_reason": "STANDARD_BOOTSTRAP_PREFLIGHT_FAST_PIN_MISMATCH",
-  "task": "FAST-BOOTSTRAP-NOISE-FIDELITY-001"
+  "task": "FAST-BOOTSTRAP-NOISE-FIDELITY-001",
+  "current_phase": "REPAIR_AND_FRESH_ZERO_CALL_PREFLIGHT",
+  "build_provenance_status": "HISTORICAL_D3D5B0A_PRECHECK_NOT_VALID_FOR_REPAIRED_SOURCE",
+  "resume_authorization": {
+    "ruling": "AUTHORIZED_SCOPED_REPAIR_AND_CP_C_RESUME",
+    "date": "2026-10-27",
+    "fast_pin_scope": "public-native-bootstrap-once / LogN13 / E32 Standard preflight only",
+    "approved_fast_commit": "b81f54c2e0f98dc2b4a7474fb333fbae79be8c63",
+    "output_precision_gate": "OBSERVATIONAL_ONLY_FOR_PUBLIC_BOOTSTRAP_ONCE; structural and finite-data checks remain strict",
+    "bootstrap_budget_unchanged": {
+      "maximum": 3,
+      "standard": 1,
+      "fast": 1,
+      "fast_noise": 1,
+      "actual_calls": 0,
+      "retries": 0,
+      "warmups": 0
+    },
+    "precompute_failure_preserved": "preflight/cp-c-stop.json",
+    "secondary_repair_commit": "715ef5856159f8ae00955f4c8bfbbb43a8692308"
+  }
 }

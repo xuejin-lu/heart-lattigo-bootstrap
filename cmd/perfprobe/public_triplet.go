@@ -30,6 +30,9 @@ type publicTripletArm struct {
 	BootstrapInputSHA256 string                    `json:"bootstrap_plaintext_input_sha256"`
 	OutputSHA256         string                    `json:"output_sha256"`
 	Error                publicTripletErrorMetrics `json:"error_vs_same_original_input"`
+	NumericalGateMaxAbs  float64                   `json:"numerical_gate_max_abs_observed"`
+	NumericalGate        float64                   `json:"numerical_gate_max_abs_threshold"`
+	NumericalGatePass    bool                      `json:"numerical_gate_pass"`
 	BootstrapTimingPhase string                    `json:"bootstrap_timing_phase"`
 	BootstrapTimeNS      int64                     `json:"bootstrap_time_ns"`
 	AllocBytes           uint64                    `json:"bootstrap_alloc_bytes"`
@@ -166,7 +169,7 @@ func runPublicTripletCompare(args []string) error {
 	}
 	rootSeed := bootstrapNoiseRootSeed(fastNoise.BootstrapNoiseEvidence)
 	doc := publicTripletDocument{
-		SchemaVersion: "fast-bootstrap-noise-fidelity-triplet.v1", Status: "TRIPLET_COMPLETE_EXPLORATORY", GeneratedAt: time.Now().UTC(),
+		SchemaVersion: "fast-bootstrap-noise-fidelity-triplet.v2", Status: "TRIPLET_COMPLETE_EXPLORATORY", GeneratedAt: time.Now().UTC(),
 		Profile: standard.Profile, PrimaryCommit: standard.PrimaryCommit, PrimarySourceSHA256: standard.PrimarySourceSHA256,
 		StandardCommit: standard.BackendCommit, FastCommit: fast.BackendCommit, FastBinarySHA256: fast.BinarySHA256,
 		InputSHA256: standard.InputSHA256, BootstrapInputSHA256: standard.BootstrapInputSHA256,
@@ -186,7 +189,7 @@ func runPublicTripletCompare(args []string) error {
 		FastNoiseTimeOverheadNS:    fastNoiseArm.BootstrapTimeNS - fastArm.BootstrapTimeNS,
 		FastNoiseTimeOverheadRatio: float64(fastNoiseArm.BootstrapTimeNS) / float64(fastArm.BootstrapTimeNS),
 		MatchedHost:                publicEnvironmentsMatch(standard, fast) && publicEnvironmentsMatch(standard, fastNoise),
-		Interpretation:             "Each arm's precision is computed against the same canonical plaintext supplied to Bootstrap; pairwise output RMSE is a separate comparison. A complete triplet is exploratory evidence, not proof of general noise fidelity.",
+		Interpretation:             "Each arm's precision is computed against the same canonical plaintext supplied to Bootstrap; pairwise output RMSE is a separate comparison. NumericalGatePass reports the observational MaxAbs gate per arm and does not reject finite structurally valid one-call outputs. A complete triplet is exploratory evidence, not proof of general noise fidelity.",
 	}
 	if err := writeExclusiveJSON(*outPath, doc); err != nil {
 		return err
@@ -195,8 +198,8 @@ func runPublicTripletCompare(args []string) error {
 }
 
 func validatePublicBootstrapTripletArm(doc publicNativeDocument, vectors publicVectorDocument, backend string, noiseEnabled bool) error {
-	if doc.Mode != "public-native-bootstrap-once" || doc.SchemaVersion != "fast-standard-public-native-bootstrap-once.v1" ||
-		doc.Status != "PASS_PUBLIC_BOOTSTRAP_ONCE" || doc.BootstrapBudget != 1 || doc.BootstrapCalls != 1 ||
+	if doc.Mode != "public-native-bootstrap-once" || doc.SchemaVersion != "fast-standard-public-native-bootstrap-once.v2" ||
+		doc.Status != publicBootstrapOnceObservedStatus || doc.BootstrapBudget != 1 || doc.BootstrapCalls != 1 ||
 		len(doc.BootstrapResults) != 1 || doc.Backend != backend || doc.Profile != "logn13" || doc.EphemeralSecretWeight != 32 ||
 		!doc.PrimaryClean || !doc.BackendClean || !validSHA256Hex(doc.BinarySHA256) || doc.PreflightPairSHA256 == "" {
 		return errors.New("artifact does not satisfy the exact one-call LogN13/E32 provenance contract")
@@ -321,8 +324,10 @@ func summarizePublicTripletArm(doc publicNativeDocument, output, input []complex
 		Backend: doc.Backend, BackendCommit: doc.BackendCommit, BinarySHA256: doc.BinarySHA256,
 		BootstrapCalls: doc.BootstrapCalls, SuccessfulSlots: len(output), BootstrapInputSHA256: doc.BootstrapInputSHA256,
 		OutputSHA256: result.Output.DecodedSHA256, BootstrapTimingPhase: result.Phase,
-		Error:           publicTripletErrorMetrics{Stats: stats, Tails: tails, RMSE: stats.RMS, PrecisionBits: precision, PrecisionBitsStatus: precisionStatus},
-		BootstrapTimeNS: result.Timing.ElapsedNS, AllocBytes: result.Timing.AllocBytes, Allocs: result.Timing.Allocs,
+		Error:               publicTripletErrorMetrics{Stats: stats, Tails: tails, RMSE: stats.RMS, PrecisionBits: precision, PrecisionBitsStatus: precisionStatus},
+		NumericalGateMaxAbs: result.Output.Oracle.MaxComplexDifference, NumericalGate: publicNumericalGate,
+		NumericalGatePass: result.Output.OraclePass,
+		BootstrapTimeNS:   result.Timing.ElapsedNS, AllocBytes: result.Timing.AllocBytes, Allocs: result.Timing.Allocs,
 		PeakMemoryStatus: "UNAVAILABLE_NO_PEAK_MEMORY_METRIC_IN_PERFMEASURE",
 	}, nil
 }

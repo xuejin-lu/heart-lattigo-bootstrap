@@ -1,9 +1,12 @@
 {
   "schema_version": "fast-bootstrap-noise-fidelity-summary.v1",
   "task": "FAST-BOOTSTRAP-NOISE-FIDELITY-001",
-  "status": "BATCH_BLOCKED_NEEDS_WEB_REVIEW",
-  "completed_checkpoints": ["CP-A", "CP-B", "CP-C zero-call source and parameter preflight"],
-  "blocked_checkpoint": "CP-C before first Bootstrap reservation",
+  "status": "BATCH_IN_PROGRESS",
+  "completed_checkpoints": [
+    "CP-A",
+    "CP-B",
+    "CP-C original zero-call preflight (historical evidence only)"
+  ],
   "bootstrap_calls": {
     "authorized_maximum": 3,
     "actual": 0,
@@ -18,14 +21,32 @@
     "standard_fast_zero_call_checkpoints": 8,
     "plaintext_oracles_passed": true,
     "strict_capacity_status": "SUFFICIENT",
-    "same_bootstrap_plaintext_sha256": "c32c0d7b731c0fcd8d82fb9c1182a43a62d120f761c090ce21dc764e9aa1e703"
+    "same_bootstrap_plaintext_sha256": "c32c0d7b731c0fcd8d82fb9c1182a43a62d120f761c090ce21dc764e9aa1e703",
+    "status": "HISTORICAL_D3D5B0A_ONLY_REVALIDATION_REQUIRED"
   },
-  "blocker": {
+  "attempt_ledger": "attempt-ledger.json",
+  "in_progress_checkpoint": "CP-C scoped repair and fresh zero-call preflight",
+  "historical_blocker": {
     "type": "STANDARD_BOOTSTRAP_PREFLIGHT_FAST_PIN_MISMATCH",
     "observed_pair_fast_commit": "b81f54c2e0f98dc2b4a7474fb333fbae79be8c63",
     "standard_side_gate_expected_fast_commit": "2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f",
     "source": "cmd/perfprobe/public_native.go:1477-1487",
     "evidence": "preflight/cp-c-stop.json"
   },
-  "attempt_ledger": "attempt-ledger.json"
+  "recovery_authorization": {
+    "ruling": "AUTHORIZED_SCOPED_REPAIR_AND_CP_C_RESUME",
+    "approved_fast_pin": "b81f54c2e0f98dc2b4a7474fb333fbae79be8c63",
+    "rebuild_and_fresh_zero_call_preflight_required": true,
+    "actual_bootstrap_calls_at_resume": 0,
+    "per_arm_success_limit": 1,
+    "retry_limit": 0
+  },
+  "repair_verification": {
+    "primary_targeted_tests": "PASS",
+    "secondary_targeted_logn13_noise_tests": "PASS",
+    "bootstrap_calls_during_tests": 0,
+    "logn16_or_bts": "NOT_RUN",
+    "secondary_commit": "715ef5856159f8ae00955f4c8bfbbb43a8692308",
+    "secondary_push": "PUSHED_TO_EXPERIMENT_BRANCH"
+  }
 }

@@ -63,3 +63,14 @@ Bossuat et al., *Accurate and Composable Noise Estimates for CKKS with Applicati
 ## Activation record — 2026-10-27
 
 The user explicitly activated this versioned task and instructed the work to use `experiment/fast-bootstrap-noise-fidelity`, never `fast-qprefix`, then run the authorized three-arm pilot budget. The Primary `CURRENT_TASK.md` pointer was updated accordingly. This activation authorizes only CP-A, CP-B, and CP-C's single three-arm pilot; it does not activate CP-D or CP-E.
+
+## Web Review recovery ruling — 2026-10-27
+
+`AUTHORIZED_SCOPED_REPAIR_AND_CP_C_RESUME` authorizes the following bounded repair and continuation without changing the original CP-C experiment budget:
+
+- Only `public-native-bootstrap-once` / frozen LogN13 / E32 Standard preflight may bind to the exact task Fast commit `b81f54c2e0f98dc2b4a7474fb333fbae79be8c63`. Existing public Bootstrap and repeatability modes retain `publicCurrentFastSHA`; the new mode must reject every other Fast pin.
+- In the one-call mode only, final output MaxAbs versus `1e-6` is observational. Preserve the measured metrics and accurately record the gate result; all provenance, preflight, input, capacity, representation, decode, slot-count, finite-value, and data-integrity checks remain fail-closed. Historical mode numerical-gate semantics remain strict. A completed one-call observation must not use a status label that claims the numerical gate passed.
+- The new Bootstrap fixed-sigma helper may omit per-phase `runtime.ReadMemStats`; its sampling, capacity, Level/Scale, and event evidence remain. The historical post-Mul/Rescale helper retains its allocation-stat behavior.
+- Rebuild clean source-pinned binaries and establish a fresh zero-call preflight pair after this repair. Earlier `d3d5b0a` preflight and binaries remain historical and are not proof of the repaired source. The precompute pin mismatch remains in the attempt ledger. CP-C remains at most one successful call per arm and three total; no retry, warmup, LogN16, BTS, CP-D, or CP-E is authorized by this ruling.
+
+After every fresh source, binary, preflight, parameter, input, and capacity gate passes, resume S, F, FN sequentially using the already frozen input, sigma, and root seed. Stop on any new failure; do not consume another call.

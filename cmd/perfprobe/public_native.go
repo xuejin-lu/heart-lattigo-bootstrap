@@ -55,6 +55,7 @@ const (
 	publicProfileKindParameterized     = "effective-parameterized-v1"
 	publicStrictOraclePassed           = "PASS_EIGHT_CHECKPOINT_PLAINTEXT_ORACLES"
 	publicObservedOraclePassed         = "PASS_EIGHT_CHECKPOINTS_AND_LEVEL4_TO_LEVEL0_CONTINUITY"
+	publicBootstrapOnceObservedStatus  = "COMPLETE_PUBLIC_BOOTSTRAP_ONCE_OBSERVATION"
 )
 
 type publicProfileContract struct {
@@ -590,9 +591,9 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 	}
 	preflightPairSHA := ""
 	if opts.publicBootstrap || opts.publicBootstrapPilot || opts.publicRepeatability {
-		preflightPairSHA, err = validatePublicNativeBootstrapPreflightContract(
+		preflightPairSHA, err = validatePublicNativeBootstrapPreflightContractForMode(
 			opts.preflightPair, primaryCommit, sourceHash, profile, publicBackendName(), opts.backendCommit,
-			configHash, qpHash, inputHash, workloadHash,
+			configHash, qpHash, inputHash, workloadHash, opts.publicBootstrapPilot,
 		)
 		if err != nil {
 			return fmt.Errorf("public Bootstrap preflight gate: %w", err)
@@ -930,7 +931,7 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 					return publicCheckpoint{}, nil, checkpointErr
 				}
 				checkpoint.DecodePath = decodePath
-				if !checkpoint.OraclePass {
+				if !opts.publicBootstrapPilot && !checkpoint.OraclePass {
 					return publicCheckpoint{}, nil, fmt.Errorf("%s native plaintext oracle max %.12g exceeds %.12g", name, checkpoint.Oracle.MaxComplexDifference, publicNumericalGate)
 				}
 				return checkpoint, decoded, nil
@@ -981,12 +982,13 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 			}
 		}
 		if opts.publicBootstrapPilot {
-			schemaVersion, mode, status = "fast-standard-public-native-bootstrap-once.v1", "public-native-bootstrap-once", "PASS_PUBLIC_BOOTSTRAP_ONCE"
+			schemaVersion, mode, status = "fast-standard-public-native-bootstrap-once.v2", "public-native-bootstrap-once", publicBootstrapOnceObservedStatus
 			vectorSchema = "fast-standard-public-native-bootstrap-once-vectors.v1"
 			limitations = []string{
 				fmt.Sprintf("Exactly one cold Bootstrap call describes only this pinned %s/E32 profile; it is not a statistically stable speed estimate.", profile.Name),
 				"Standard uses genuine native key generation/encryption; Fast uses the pinned intentionally insecure zero-secret mode.",
 				"When enabled, fixed-sigma coefficient noise is an exploratory pre-ct×ct model, not a claim of complete CKKS noise fidelity.",
+				"Final output precision is observational in this one-call mode; each output records whether its MaxAbs met the numerical gate, and a miss does not reject finite structurally valid evidence.",
 			}
 		} else if opts.publicRepeatability {
 			schemaVersion, mode, status = "fast-standard-public-native-repeatability.v1", "public-native-repeatability", "PASS_PUBLIC_BOOTSTRAP_1COLD_5WARM"
@@ -1478,6 +1480,14 @@ func validatePublicNativeBootstrapPreflightContract(
 	path, primaryCommit, sourceSHA256 string, profile publicProfileContract, backendName, backendCommit,
 	configSHA256, qpSHA256, inputSHA256, workloadSHA256 string,
 ) (string, error) {
+	return validatePublicNativeBootstrapPreflightContractForMode(path, primaryCommit, sourceSHA256, profile, backendName, backendCommit,
+		configSHA256, qpSHA256, inputSHA256, workloadSHA256, false)
+}
+
+func validatePublicNativeBootstrapPreflightContractForMode(
+	path, primaryCommit, sourceSHA256 string, profile publicProfileContract, backendName, backendCommit,
+	configSHA256, qpSHA256, inputSHA256, workloadSHA256 string, bootstrapOnce bool,
+) (string, error) {
 	fastCommit := ""
 	switch backendName {
 	case "standard":
@@ -1485,6 +1495,12 @@ func validatePublicNativeBootstrapPreflightContract(
 			return "", fmt.Errorf("Standard backend commit %s differs from pinned Standard %s", backendCommit, publicStandardSHA)
 		}
 		fastCommit = publicCurrentFastSHA
+		if bootstrapOnce {
+			if profile.Name != "logn13" || profile.LogN != 13 {
+				return "", fmt.Errorf("public-native-bootstrap-once Standard preflight supports only the frozen LogN13/E32 profile")
+			}
+			fastCommit = publicBootstrapNoiseFastSHA
+		}
 	case "fast":
 		if err := validatePublicBackendPin("fast", backendCommit, profile.Name); err != nil {
 			return "", err
@@ -2118,7 +2134,7 @@ func validatePublicBootstrapPairArtifacts(standard, fast publicNativeDocument, s
 		"fast-standard-public-native-bootstrap.v1", "PASS_PUBLIC_BOOTSTRAP_COLD_WARM", "fast-standard-public-native-bootstrap-vectors.v1"
 	if standard.Mode == "public-native-bootstrap-once" {
 		wantBudget, wantSchema, wantStatus, wantVectorSchema = 1,
-			"fast-standard-public-native-bootstrap-once.v1", "PASS_PUBLIC_BOOTSTRAP_ONCE", "fast-standard-public-native-bootstrap-once-vectors.v1"
+			"fast-standard-public-native-bootstrap-once.v2", publicBootstrapOnceObservedStatus, "fast-standard-public-native-bootstrap-once-vectors.v1"
 	} else if standard.Mode == "public-native-repeatability" {
 		wantBudget, wantSchema, wantStatus, wantVectorSchema = 6,
 			"fast-standard-public-native-repeatability.v1", "PASS_PUBLIC_BOOTSTRAP_1COLD_5WARM", "fast-standard-public-native-repeatability-vectors.v1"
@@ -2223,7 +2239,8 @@ func validatePublicBootstrapOutputEvidence(doc publicNativeDocument, vectors pub
 		metrics := compareVectors(input, decoded, publicNumericalGate)
 		snr := numericalmetrics.Compare(input, decoded)
 		passed := metrics.MaxComplexDifference <= publicNumericalGate
-		if !passed || checkpoint.OraclePass != passed || !reflect.DeepEqual(checkpoint.Oracle, metrics) || !reflect.DeepEqual(checkpoint.OracleSNR, snr) {
+		if (!passed && doc.Mode != "public-native-bootstrap-once") || checkpoint.OraclePass != passed ||
+			!finitePublicPairMetrics(metrics) || !reflect.DeepEqual(checkpoint.Oracle, metrics) || !reflect.DeepEqual(checkpoint.OracleSNR, snr) {
 			return fmt.Errorf("Bootstrap output %s fails or misreports its native plaintext oracle", checkpoint.Name)
 		}
 		if doc.Backend == "standard" {

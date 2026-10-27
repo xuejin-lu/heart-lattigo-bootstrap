@@ -550,6 +550,60 @@ func TestPublicBootstrapGateBindsTheCurrentFastLogN13Pin(t *testing.T) {
 	}
 }
 
+func TestPublicBootstrapOnceStandardPreflightUsesOnlyApprovedTaskFastPin(t *testing.T) {
+	profile, err := publicProfileFor("logn13")
+	if err != nil {
+		t.Fatal(err)
+	}
+	pair := publicPairDocument{
+		SchemaVersion: "fast-standard-public-native-pair.v1", Status: "PASS", NumericalGate: publicNumericalGate,
+		FastCommit: publicBootstrapNoiseFastSHA, StandardCommit: publicStandardSHA, PrimaryCommit: "primary-sha", SourceSHA256: "source-sha",
+		InputSHA256: publicInputSHA, WorkloadSHA256: publicWorkloadSHA, ConfigSHA256: publicConfigSHA, QPSHA256: publicQPSHA,
+		E: 32, BootstrapCalls: 0, MatchedEnvironment: true,
+	}
+	for _, name := range []string{"encrypt_a_level5", "encrypt_b_level5", "encrypt_c_q5_level5", "add_level5", "mulrelin_level5", "rescale_q5_level4", "rotate_level4", "drop_level0"} {
+		pair.Checkpoints = append(pair.Checkpoints, publicPairCheckpoint{
+			Name: name, Pass: true, StateMatched: true, Metrics: vectorMetrics{MaxComplexDifference: 0},
+		})
+	}
+	path := filepath.Join(t.TempDir(), "bootstrap-once-task-pin-pair.json")
+	writePair := func() {
+		t.Helper()
+		data, err := json.Marshal(pair)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(path, data, 0o600); err != nil {
+			t.Fatal(err)
+		}
+	}
+	writePair()
+	if _, err := validatePublicNativeBootstrapPreflightContractForMode(path, "primary-sha", "source-sha", profile, "standard", publicStandardSHA,
+		publicConfigSHA, publicQPSHA, publicInputSHA, publicWorkloadSHA, true); err != nil {
+		t.Fatalf("one-call LogN13 Standard rejected the exact approved Fast task pin: %v", err)
+	}
+
+	// The same new mode rejects a valid but unrelated current Fast pin.
+	pair.FastCommit = publicCurrentFastSHA
+	writePair()
+	if _, err := validatePublicNativeBootstrapPreflightContractForMode(path, "primary-sha", "source-sha", profile, "standard", publicStandardSHA,
+		publicConfigSHA, publicQPSHA, publicInputSHA, publicWorkloadSHA, true); err == nil {
+		t.Fatal("one-call LogN13 Standard accepted a Fast pin other than the task-approved commit")
+	}
+
+	// Legacy Bootstrap modes retain their pre-existing current-Fast pin.
+	if _, err := validatePublicNativeBootstrapPreflightContractForMode(path, "primary-sha", "source-sha", profile, "standard", publicStandardSHA,
+		publicConfigSHA, publicQPSHA, publicInputSHA, publicWorkloadSHA, false); err != nil {
+		t.Fatalf("legacy Standard preflight no longer accepts its original current Fast pin: %v", err)
+	}
+	pair.FastCommit = publicBootstrapNoiseFastSHA
+	writePair()
+	if _, err := validatePublicNativeBootstrapPreflightContractForMode(path, "primary-sha", "source-sha", profile, "standard", publicStandardSHA,
+		publicConfigSHA, publicQPSHA, publicInputSHA, publicWorkloadSHA, false); err == nil {
+		t.Fatal("legacy Standard preflight accepted the task-specific Fast pin in place of its original current pin")
+	}
+}
+
 func TestPublicBootstrapGateRequiresVersionedLogN16ObservedOracleEvidence(t *testing.T) {
 	profile, err := publicProfileFor("logn16")
 	if err != nil {
