@@ -2,8 +2,8 @@
   "schema_version": "fast-bootstrap-noise-fidelity-003-logn16-summary.v1",
   "task_id": "FAST-BOOTSTRAP-NOISE-FIDELITY-003-LOGN16",
   "status": "BATCH_IN_PROGRESS",
-  "checkpoint": "CP-C-PREBOOTSTRAP-GATES-PASSED",
-  "actual_bootstrap_calls": 0,
+  "checkpoint": "CP-C-FN-COMPLETE",
+  "actual_bootstrap_calls": 6,
   "authorized_maximum_bootstrap_calls": 18,
   "retry_budget": 0,
   "profile": {
@@ -20,15 +20,22 @@
   "arms": {
     "FN": {
       "planned": 6,
-      "succeeded": 0
+      "succeeded": 6,
+      "status": "CAPTURED",
+      "result_sha256": "428b3e92dd6c32ed9f54ad775d65300c72f2a8ef7d5c57d2093a806c63e94d34",
+      "vectors_sha256": "d73295069bbad9ad0f6865983ca214d172eeecc0786db93752dea8abb19e5de3",
+      "binary_sha256": "6de2afb652fb99e6de0c9aa2972947e086aea4eb48d3a3978b1be4fa6773b4b7",
+      "noise_injections": 312
     },
     "S": {
       "planned": 6,
-      "succeeded": 0
+      "succeeded": 0,
+      "status": "NOT_STARTED"
     },
     "F": {
       "planned": 6,
-      "succeeded": 0
+      "succeeded": 0,
+      "status": "NOT_STARTED"
     }
   },
   "preflight": {
@@ -60,7 +67,7 @@
     "synthetic_logn16_triplet": "PASS_OBSERVATIONAL_GATE_MISS_RECORDED",
     "task_worktree_policy": "PASS_2_TESTS"
   },
-  "result": "All no-Bootstrap implementation, targeted tests, clean pinned binary provenance, and exact-profile zero-call preflight gates pass. The 18 immutable call slots and order are frozen; no per-call reservation or Bootstrap has occurred. Evidence: evidence/prebootstrap-provenance.json and evidence/preflight/.",
+  "result": "FN Cold plus five Warm captures completed and passed strict structural/provenance/finite/Q-prefix checks. Standard and Fast OFF remain unstarted. See arms/FN-manifest.json; decoded vectors remain external.",
   "budget_commitment": {
     "frozen_authorized_slots": 18,
     "per_call_reserved": 0,
@@ -70,6 +77,14 @@
       "S",
       "F"
     ],
+    "retry_budget": 0
+  },
+  "attempts": {
+    "reserved": 6,
+    "started": 6,
+    "succeeded": 6,
+    "failed": 0,
+    "remaining_authorized": 12,
     "retry_budget": 0
   }
 }
