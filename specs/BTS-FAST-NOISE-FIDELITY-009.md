@@ -211,3 +211,11 @@ BTS-008 歷史 Warm 中位：
 **請自主執行，不必在一般編譯、測試或版本化步驟反覆詢問我；但不得擴大實驗預算或修改已完成的研究歷史。**
 
 最重要的是：**FAST 跑完整個 BTS 的能力早已驗證成功。這次任務只是在成熟的 FAST BTS 基礎上接入既有 Noise Hook，然後量測三組數值精度與速度。**
+
+## 執行時來源 Pin（2026-10-27）
+
+- `325e501709c42ab5995bf7f36fb8d19621d34131` 是任務建立時的通用 Noise Hook 前置版本，不是 BTS-009 最終量測版本。
+- 本任務最終 Fast source pin 為 `experiment/fast-bootstrap-noise-fidelity@be9c42ff23662300769b77f1eead3f12fc53adef`，包含本任務要求的 public CKKS evaluator Noise Hook 接線；Fast OFF 與 Fast+Noise 必須使用同一個以此版本建置的 Binary。
+- Genuine Standard pin 維持 `5dbffbdea05394de2ca3a432ed5318aa832e3f40`。
+- Primary measurement implementation commit 為 `369ce3a84eb072392bacf2359d651413c159e5e8`。正式 Binary 必須記錄其實際建置時的完整 Primary VCS revision，並以 measurement source SHA-256 證明實作與此 commit 完全一致；建置後的 evidence-only commit 不得改動任何已連結的 Go source。
+- 這些執行 pin 不改變凍結的 BTS profile、σ、seed、18 次總預算或禁止事項，也不改寫 BTS-008、002、003 歷史。
