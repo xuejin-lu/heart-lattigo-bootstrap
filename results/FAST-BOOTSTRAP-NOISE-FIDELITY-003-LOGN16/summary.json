@@ -1,8 +1,8 @@
 {
   "schema_version": "fast-bootstrap-noise-fidelity-003-logn16-summary.v1",
   "task_id": "FAST-BOOTSTRAP-NOISE-FIDELITY-003-LOGN16",
-  "status": "BATCH_IN_PROGRESS",
-  "checkpoint": "CP-C-ALL-ARMS-COMPLETE",
+  "status": "BATCH_BLOCKED_NEEDS_WEB_REVIEW",
+  "checkpoint": "HOOK-GENERALIZED-AND-TARGETED-TESTS-PASS; NEW-SOURCE-PREFLIGHT-PENDING; BOOTSTRAP-BUDGET-EXHAUSTED",
   "actual_bootstrap_calls": 18,
   "authorized_maximum_bootstrap_calls": 18,
   "retry_budget": 0,
@@ -59,15 +59,19 @@
   },
   "source_pins": {
     "standard": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
-    "fast": "9e540b30898cea74f0fa4acdf03477264344db79",
-    "fast_branch": "experiment/fast-bootstrap-noise-fidelity"
+    "fast": "325e501709c42ab5995bf7f36fb8d19621d34131",
+    "fast_branch": "experiment/fast-bootstrap-noise-fidelity",
+    "fast_capture_source": "9e540b30898cea74f0fa4acdf03477264344db79"
   },
   "secondary_no_bootstrap_tests": {
     "ckks_hook": "PASS",
     "fast_hook": "PASS",
     "chebyshev_power_2_4_16": "PASS",
     "mod1_degree30": "PASS",
-    "bootstrap_parameters_e32": "PASS"
+    "bootstrap_parameters_e32": "PASS",
+    "chebyshev_power_2_4_16_after_genericization": "PASS",
+    "mod1_degree30_after_genericization": "PASS",
+    "actual_logn16_e32_parameters_after_genericization": "PASS"
   },
   "primary_targeted_tests": {
     "perf_fast": "PASS_7_TARGETED_TESTS",
@@ -75,17 +79,18 @@
     "synthetic_logn16_triplet": "PASS_OBSERVATIONAL_GATE_MISS_RECORDED",
     "task_worktree_policy": "PASS_2_TESTS"
   },
-  "result": "All 18 authorized full Bootstrap calls are captured: FN 6, genuine Standard 6, Fast OFF 6. All three arms passed strict provenance, capacity, scale/representation, slot-count and finite-output checks. Existing comparator analysis remains pending; no further CKKS calls are authorized or needed.",
+  "result": "The 18/18 authorized full Bootstrap captures and offline triplet analysis remain immutable and attributed to Fast source 9e540b... . The generic Noise Hook repair is committed and passed focused N13\u2013N16 no-Bootstrap tests. The new source pin and fresh zero-call preflight are being established; no full Bootstrap can be rerun because the original hard cap is exhausted.",
   "budget_commitment": {
     "frozen_authorized_slots": 18,
     "per_call_reserved": 0,
-    "actual_bootstrap_calls": 0,
+    "actual_bootstrap_calls": 18,
     "order": [
       "FN",
       "S",
       "F"
     ],
-    "retry_budget": 0
+    "retry_budget": 0,
+    "remaining_authorized": 0
   },
   "attempts": {
     "reserved": 18,
@@ -94,5 +99,33 @@
     "failed": 0,
     "remaining_authorized": 0,
     "retry_budget": 0
+  },
+  "historical_capture_analysis": {
+    "status": "TRIPLET_COMPLETE_EXPLORATORY",
+    "source_fast_commit": "9e540b30898cea74f0fa4acdf03477264344db79",
+    "fast_binary_sha256": "6de2afb652fb99e6de0c9aa2972947e086aea4eb48d3a3978b1be4fa6773b4b7",
+    "summary_path": "evidence/triplet-summary-pre-generalization.json",
+    "summary_sha256": "891328a26cac7cbbccad68b7a13494531066cfdc6e346b2d260666cc749a56e0",
+    "raw_comparator_external_path": "/private/tmp/fast-bootstrap-noise-fidelity-003-execution/triplet-pre-genericization.json",
+    "raw_comparator_sha256": "0b3ffa18ac18f61161010238a30c93aa06130eb368f38a9f9c78e378545de7a5",
+    "attribution": "Only the captures produced by the 9e540b... restricted hook; not new-binary evidence after genericization."
+  },
+  "generic_hook_repair": {
+    "secondary_commit": "325e501709c42ab5995bf7f36fb8d19621d34131",
+    "scope": "Removed LogN whitelist from Bootstrap Noise Hook; preserved historical post-Mul/Rescale LogN13 contract.",
+    "focused_secondary_tests": "PASS",
+    "n_domains": [
+      8192,
+      16384,
+      32768,
+      65536
+    ],
+    "full_bootstrap_calls_added": 0,
+    "primary_zero_call_preflight": "PENDING"
+  },
+  "primary_generic_hook_pin_tests": {
+    "perf_fast": "PASS_4_TARGETED_TESTS",
+    "perf_standard": "PASS_4_TARGETED_TESTS",
+    "bootstrap_calls": 0
   }
 }

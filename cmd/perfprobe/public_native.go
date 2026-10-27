@@ -43,7 +43,7 @@ const (
 	publicNoiseFidelity002FastSHA      = "49b65dd927780cec0d7e05772a3df8554ef58005"
 	publicNoiseFidelity002RootSeed     = int64(20261027)
 	publicNoiseFidelity003TaskID       = "FAST-BOOTSTRAP-NOISE-FIDELITY-003-LOGN16"
-	publicNoiseFidelity003FastSHA      = "9e540b30898cea74f0fa4acdf03477264344db79"
+	publicNoiseFidelity003FastSHA      = "325e501709c42ab5995bf7f36fb8d19621d34131"
 	publicNoiseFidelity003RootSeed     = int64(20261027)
 	publicConfigSHA                    = "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98"
 	publicInputSHA                     = "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285"

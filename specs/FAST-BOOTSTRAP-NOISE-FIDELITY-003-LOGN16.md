@@ -11,7 +11,8 @@ Extend the accepted fixed-sigma Fast Bootstrap fidelity and Cold/Warm cost compa
 - Primary: `xuejin-lu/heart-lattigo-bootstrap`, `main`.
 - Genuine Standard: `xuejin-lu/lattigo@5dbffbdea05394de2ca3a432ed5318aa832e3f40`.
 - Fast/FN: `xuejin-lu/lattigo:experiment/fast-bootstrap-noise-fidelity`, starting from `49b65dd927780cec0d7e05772a3df8554ef58005`; record the final task commit. Do not modify or substitute `fast-qprefix`.
-- The completed pre-experiment LogN16 Noise Hook/test extension is pinned at Secondary commit `9e540b30898cea74f0fa4acdf03477264344db79`; this is the exact 003 Fast/FN source pin unless a later authorized task checkpoint supersedes it.
+- The original 003 captures were produced by Secondary commit `9e540b30898cea74f0fa4acdf03477264344db79`; retain that source and binary attribution in every historical capture and analysis.
+- Following the authorized generic-hook correction, the current 003 Fast/FN validation pin is Secondary commit `325e501709c42ab5995bf7f36fb8d19621d34131`. The old captures are not evidence from this newer source and must not be relabeled or used to satisfy a new-source capture requirement.
 - The same Primary measurement source, public CKKS API sequence, config, effective Q/P, workload, held original input, and plaintext oracle are used in all arms. Standard is compiled against the genuine Standard checkout. F and FN use one identical Fast binary; the explicit Noise switch is the only runtime difference.
 - Frozen profile: LogN=16, N=65536, LogSlots=15, slots=32768, E=32, Default Scale=`2^45`, Mod1 Scale=`2^60`, degree=30, DoubleAngle=3, K=16, `log_message_ratio=10`; sigma=`4.004280012097432`; root seed=`20261027`.
 - Recompute config/input/workload/QP and complete effective parameter fingerprints from the constructed profile and compare to the frozen Task005 LogN16/E32 values. Do not copy historical parameters in place of the current effective values. A mismatch stops before any Bootstrap reservation.
@@ -19,7 +20,15 @@ Extend the accepted fixed-sigma Fast Bootstrap fidelity and Cold/Warm cost compa
 
 ## Secondary Noise Hook scope
 
-Only extend the already accepted explicit hook from its frozen LogN13 research profile to an explicit allowlist of LogN13 and LogN16. Do not change the historical coefficient-only helper or ordinary Fast arithmetic. Before any Bootstrap, test N=65536 NTT+Montgomery coefficient-domain injection, actual N16 Q/P parameter shape, Level 12 / Scale `2^60`, Q-prefix active rows, strict capacity behavior, left/right independent sampling, square alias safety, input immutability, default-off bit-exactness, and exclusion of ct×pt/scalar/rotation. Reject LogN14/15 and mismatched N explicitly. Preserve the strict `CheckQPrefixAdditionCapacity` gate; do not turn a capacity failure into a pass.
+The library hook is generic over structurally valid CKKS ring degrees. It must derive its polynomial length and Q/RNS behavior from the effective CKKS parameters and ciphertext state; it must not contain an experiment LogN allowlist. Retain strict N/LogN/RingQ chain consistency, configured NTT, degree/component metadata, positive Scale, Level, NTT/Montgomery, canonical residues, zero-secret c1, Q-prefix backing, and `CheckQPrefixAdditionCapacity` checks. Keep task-specific LogN restrictions in the Primary measurement layer. Do not change the historical coefficient-only helper or ordinary Fast arithmetic.
+
+Before any Bootstrap, the generic library regression suite must exercise valid N=2^13, 2^14, 2^15 and 2^16 CKKS parameters, including Level 12 / Scale `2^60` NTT+Montgomery coefficient-domain injection, sample length and deterministic evidence, reverse coefficient verification, c0-only mutation, active Q-prefix rows, strict capacity pass/failure, independent left/right samples, square alias safety, input immutability, default-off bit-exactness, and exclusion of ct×pt/scalar/rotation. These focused tests do not invoke full Bootstrap. The 003 experiment remains LogN16/E32 with its frozen Q/P, Scale, input, sigma and seed; this library generalization does not authorize N13/N14/N15 experiment captures. The historical 002 experiment remains LogN13 and unchanged.
+
+### Authorized generic-hook correction — 2026-10-27
+
+- Secondary `325e501709c42ab5995bf7f36fb8d19621d34131` removes the LogN13/16 hook allowlist and replaces enable-time gating with CKKS/RingQ/NTT structural checks. The Bootstrap injection helper retains ciphertext-state and strict Q-prefix capacity validation. The independent post-Mul/Rescale helper retains its historical LogN13 Level3/4 Scale2^45 contract.
+- The exact 003 current-source pin is `325e501709c42ab5995bf7f36fb8d19621d34131`; original 18 captures remain attributed to `9e540b30898cea74f0fa4acdf03477264344db79` and its original binary. A new-source zero-call preflight is required and recorded separately.
+- The immutable 18-call ledger is already exhausted by the original FN/S/F captures. Generic-hook tests and a zero-call preflight do not create or restore Bootstrap budget. No full Bootstrap may be rerun under this task after the correction; any new-source full comparison requires a separately authorized task and budget.
 
 Run focused no-full-Bootstrap N16 Chebyshev power 2/4/16 and required Mod1 regressions. These are narrowly selected tests and must not call `Bootstrap`.
 

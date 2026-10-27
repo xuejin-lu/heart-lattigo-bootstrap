@@ -574,6 +574,7 @@ func TestNoiseFidelity003LogN16PinsPreflightAndCLIContract(t *testing.T) {
 	}
 	for _, test := range []struct{ commit, profile string }{
 		{publicNoiseFidelity002FastSHA, "logn16"},
+		{"9e540b30898cea74f0fa4acdf03477264344db79", "logn16"}, // historical captures are not the current source pin
 		{publicNoiseFidelity003FastSHA, "logn13"},
 		{publicNoiseFidelity003FastSHA, "logn14"},
 	} {
