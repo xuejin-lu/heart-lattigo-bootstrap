@@ -2,8 +2,8 @@
   "schema_version": "fast-bootstrap-noise-fidelity-003-logn16-summary.v1",
   "task_id": "FAST-BOOTSTRAP-NOISE-FIDELITY-003-LOGN16",
   "status": "BATCH_IN_PROGRESS",
-  "checkpoint": "CP-C-FN-COMPLETE",
-  "actual_bootstrap_calls": 6,
+  "checkpoint": "CP-C-STANDARD-COMPLETE",
+  "actual_bootstrap_calls": 12,
   "authorized_maximum_bootstrap_calls": 18,
   "retry_budget": 0,
   "profile": {
@@ -29,8 +29,12 @@
     },
     "S": {
       "planned": 6,
-      "succeeded": 0,
-      "status": "NOT_STARTED"
+      "succeeded": 6,
+      "status": "CAPTURED",
+      "result_sha256": "3512179b74630a245c0a47d7f0b3303c27735412a3def4083f2dec9c353e6d31",
+      "vectors_sha256": "8e17a07fa328a6db6a14f4d1afb2c7403772ad11d041d4add15fff936af96871",
+      "binary_sha256": "4ef94ea446b47c5d9d7a237449905cf00a3e2605ca6b2a798fd68e1f28578c8b",
+      "noise_injections": 0
     },
     "F": {
       "planned": 6,
@@ -67,7 +71,7 @@
     "synthetic_logn16_triplet": "PASS_OBSERVATIONAL_GATE_MISS_RECORDED",
     "task_worktree_policy": "PASS_2_TESTS"
   },
-  "result": "FN Cold plus five Warm captures completed and passed strict structural/provenance/finite/Q-prefix checks. Standard and Fast OFF remain unstarted. See arms/FN-manifest.json; decoded vectors remain external.",
+  "result": "FN and genuine Standard Cold/Warm captures completed (12/18); all six Standard calls passed strict structural/provenance/finite validation. Fast OFF remains unstarted. See arms/FN-manifest.json and arms/S-manifest.json; decoded vectors remain external.",
   "budget_commitment": {
     "frozen_authorized_slots": 18,
     "per_call_reserved": 0,
@@ -80,11 +84,11 @@
     "retry_budget": 0
   },
   "attempts": {
-    "reserved": 6,
-    "started": 6,
-    "succeeded": 6,
+    "reserved": 12,
+    "started": 12,
+    "succeeded": 12,
     "failed": 0,
-    "remaining_authorized": 12,
+    "remaining_authorized": 6,
     "retry_budget": 0
   }
 }
