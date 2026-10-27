@@ -1,0 +1,49 @@
+diff --git a/circuits/ckks/polynomial/fast_test.go b/circuits/ckks/polynomial/fast_test.go
+index d8c9b1f8..c204571b 100644
+--- a/circuits/ckks/polynomial/fast_test.go
++++ b/circuits/ckks/polynomial/fast_test.go
+@@ -143,6 +143,44 @@ func TestFastChebyshevPower2AndPower4WithMontgomeryFixedSigmaNoise(t *testing.T)
+ 	}
+ }
+ 
++func TestFastChebyshevPower16WithMontgomeryFixedSigmaNoise(t *testing.T) {
++	params := fastPolynomialBootstrapNoiseTestParameters(t)
++	eval := NewFastEvaluator(params, nil)
++	require.NoError(t, eval.Evaluator.EnableFixedSigmaBootstrapNoiseDiagnostic(4.004280012097432, 20261027))
++	input := fastPolynomialBootstrapNoiseTestInput(t, params)
++	inputBefore := input.CopyNew()
++	rows, err := fastckks.QPrefixWidth(input.Level())
++	require.NoError(t, err)
++	require.Equal(t, 4, rows)
++	eval.workspace.reset(params, input, rows)
++	pb := fastPowerBasis{basis: bignum.Chebyshev, values: eval.workspace.powers, workspace: &eval.workspace, params: params, eval: eval.Evaluator}
++	require.NoError(t, pb.genPower(16, false))
++
++	got := eval.workspace.powers[16]
++	require.NotNil(t, got)
++	require.Equal(t, 8, got.Level())
++	require.Equal(t, 1, got.Degree())
++	require.True(t, got.IsNTT)
++	require.True(t, got.IsMontgomery)
++	require.Greater(t, got.Scale.Value.Sign(), 0)
++	require.Equal(t, inputBefore, input, "power generation must not mutate the original ciphertext")
++
++	snapshot := eval.Evaluator.FixedSigmaBootstrapNoiseDiagnosticSnapshot()
++	require.Equal(t, uint64(4), snapshot.CtCtMultiplyCalls)
++	require.Equal(t, uint64(8), snapshot.InjectedPolynomials)
++	require.Len(t, snapshot.Events, 4)
++	for index, event := range snapshot.Events {
++		require.Equal(t, uint64(index+1), event.Operation)
++		require.True(t, event.MultiplyCompleted, "level=%d scale=%s failure=%s", event.Level, event.Scale, event.Failure)
++		require.NotEqual(t, event.Left.Seed, event.Right.Seed)
++		require.True(t, event.Left.Capacity.StrictFit)
++		require.True(t, event.Right.Capacity.StrictFit)
++		require.Contains(t, event.Left.DispatchEvidence, "MForm-mapped")
++		require.Contains(t, event.Right.DispatchEvidence, "MForm-mapped")
++	}
++	require.Equal(t, 12, snapshot.Events[0].Level)
++}
++
+ func TestFastPolynomialEvaluatorSmokeAndReuse(t *testing.T) {
+ 	params := fastPolynomialTestParameters(t)
+ 	eval := NewFastEvaluator(params, nil)

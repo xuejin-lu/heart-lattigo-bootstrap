@@ -136,6 +136,7 @@ type cliOptions struct {
 	publicBootstrapPilot    bool
 	bootstrapOncePreflight  bool
 	publicRepeatability     bool
+	noiseFidelity002        bool
 	preflightPair           string
 	traceFixtureOut         string
 	inputSmoke              bool
@@ -237,6 +238,7 @@ func run() error {
 	flag.BoolVar(&opts.publicBootstrapPilot, "public-bootstrap-once", false, "bounded public-native pilot: run exactly one full Bootstrap after validating --preflight-pair")
 	flag.BoolVar(&opts.bootstrapOncePreflight, "bootstrap-once-preflight", false, "zero-Bootstrap public-native preflight pinned for the one-call LogN13 pilot")
 	flag.BoolVar(&opts.publicRepeatability, "public-repeatability", false, "public-native mode: run exactly one cold and five warm Bootstrap calls after validating --preflight-pair")
+	flag.BoolVar(&opts.noiseFidelity002, "noise-fidelity-002", false, "task-scoped LogN13/E32 six-sample Noise Fidelity 002 preflight/measurement contract")
 	flag.StringVar(&opts.preflightPair, "preflight-pair", "", "passing zero-call compare-public pair required for --public-bootstrap")
 	flag.StringVar(&opts.traceFixtureOut, "trace-fixture-out", "", "public-native Fast zero-call preflight: export held ciphertext/parameter manifest for the test-only E32 tracer")
 	flag.BoolVar(&opts.inputSmoke, "input-smoke", false, "bounded input-origin preflight only; no Bootstrap or timing")
@@ -253,7 +255,7 @@ func run() error {
 	flag.IntVar(&opts.repetitions, "repetitions", 7, "timed full Bootstrap repetitions")
 	flag.IntVar(&opts.standardTrials, "standard-trials", 3, "independent Standard secret/evaluation-key numerical trials")
 	flag.BoolVar(&opts.fixedSigmaNoise, "fixed-sigma-noise", false, "public-native Fast-only diagnostic: explicitly inject fixed-sigma noise after each complete MulRelin+Rescale stage")
-	flag.BoolVar(&opts.bootstrapNoiseEnabled, "bootstrap-fixed-sigma-noise", false, "public-native Fast-only pilot: inject the frozen coefficient sigma before each degree-one ct×ct Bootstrap multiplication")
+	flag.BoolVar(&opts.bootstrapNoiseEnabled, "bootstrap-fixed-sigma-noise", false, "Fast-only Bootstrap diagnostic: inject the frozen coefficient sigma before each degree-one ct×ct multiplication")
 	flag.Int64Var(&opts.bootstrapNoiseRootSeed, "bootstrap-noise-root-seed", 0, "explicit deterministic root seed for --bootstrap-fixed-sigma-noise")
 	flag.Float64Var(&opts.fixedSigmaNoiseSigma, "fixed-sigma-noise-sigma", 0, "fixed-sigma diagnostic coefficient-domain standard deviation; requires --fixed-sigma-noise")
 	flag.Int64Var(&opts.fixedSigmaNoiseSeed, "fixed-sigma-noise-seed", 0, "deterministic fixed-sigma sampler seed; required by --fixed-sigma-noise or --fixed-sigma-ablation-arm")
@@ -281,13 +283,8 @@ func run() error {
 	if err := validateFixedSigmaNoiseOptions(opts); err != nil {
 		return err
 	}
-	if opts.bootstrapNoiseEnabled {
-		if !opts.publicBootstrapPilot || opts.mode != "public-native" || publicBackendName() != "fast" || !opts.bootstrapNoiseSeedGiven ||
-			opts.fixedSigmaNoise || opts.mulRescaleChain || opts.publicBootstrap || opts.publicRepeatability {
-			return errors.New("--bootstrap-fixed-sigma-noise requires the Fast public-native --public-bootstrap-once pilot and an explicit --bootstrap-noise-root-seed")
-		}
-	} else if opts.bootstrapNoiseSeedGiven {
-		return errors.New("--bootstrap-noise-root-seed requires --bootstrap-fixed-sigma-noise")
+	if err := validateNoiseFidelity002Options(opts); err != nil {
+		return err
 	}
 	if !opts.inputSmoke && !opts.outputSmoke && opts.vectorsOut == "" {
 		return errors.New("measurement requires --vectors-out")
@@ -557,6 +554,38 @@ func run() error {
 		return err
 	}
 	fmt.Printf("%s %s timing=%s numerical_trials=%d checkpoints=%d\n", opts.profile, backend.Name(), opts.out, len(numericalTrials), len(stages))
+	return nil
+}
+
+func validateNoiseFidelity002Options(opts cliOptions) error {
+	if opts.bootstrapNoiseEnabled {
+		if opts.noiseFidelity002 {
+			if !opts.publicRepeatability || opts.mode != "public-native" || publicBackendName() != "fast" || !opts.bootstrapNoiseSeedGiven ||
+				opts.fixedSigmaNoise || opts.mulRescaleChain || opts.publicBootstrap || opts.publicBootstrapPilot {
+				return errors.New("--bootstrap-fixed-sigma-noise requires the Fast --noise-fidelity-002 --public-repeatability mode and an explicit --bootstrap-noise-root-seed")
+			}
+			if opts.bootstrapNoiseRootSeed != publicNoiseFidelity002RootSeed {
+				return fmt.Errorf("--noise-fidelity-002 freezes --bootstrap-noise-root-seed=%d", publicNoiseFidelity002RootSeed)
+			}
+		} else if !opts.publicBootstrapPilot || opts.mode != "public-native" || publicBackendName() != "fast" || !opts.bootstrapNoiseSeedGiven ||
+			opts.fixedSigmaNoise || opts.mulRescaleChain || opts.publicBootstrap || opts.publicRepeatability {
+			return errors.New("--bootstrap-fixed-sigma-noise requires the Fast public-native --public-bootstrap-once pilot and an explicit --bootstrap-noise-root-seed")
+		}
+	} else if opts.bootstrapNoiseSeedGiven {
+		return errors.New("--bootstrap-noise-root-seed requires --bootstrap-fixed-sigma-noise")
+	}
+	if opts.noiseFidelity002 {
+		if opts.mode != "public-native" || opts.profile != "logn13" || opts.ephemeralSecretWeight != 32 ||
+			opts.publicBootstrap || opts.publicBootstrapPilot || opts.bootstrapOncePreflight || opts.fixedSigmaNoise || opts.fixedSigmaAblationArm != "" ||
+			opts.fixedSigmaSigmaProvided || opts.fixedSigmaSeedProvided || opts.fixedSigmaCVariant != "" || opts.fixedSigmaWorkload != "" ||
+			opts.mulRescaleChain || opts.traceFixtureOut != "" || opts.inputSmoke || opts.outputSmoke || opts.fastBootstrapAcceptance ||
+			!((opts.publicRepeatability && opts.bootstrapBudget == 6) || (!opts.publicRepeatability && opts.bootstrapBudget == 0 && opts.preflightPair == "")) {
+			return errors.New("--noise-fidelity-002 requires LogN13/E32 public-native zero-call preflight or exact six-call --public-repeatability")
+		}
+		if opts.bootstrapNoiseEnabled && publicBackendName() != "fast" {
+			return errors.New("--noise-fidelity-002 Bootstrap Noise is Fast-only")
+		}
+	}
 	return nil
 }
 

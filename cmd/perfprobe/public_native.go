@@ -15,6 +15,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"runtime"
+	"runtime/debug"
 	"slices"
 	"strconv"
 	"strings"
@@ -38,9 +39,13 @@ const (
 	publicBootstrapNoiseFastSHA        = "b81f54c2e0f98dc2b4a7474fb333fbae79be8c63"
 	publicBootstrapNoisePilotFastSHA   = "715ef5856159f8ae00955f4c8bfbbb43a8692308"
 	publicBootstrapNoiseSigma          = 4.004280012097432
+	publicNoiseFidelity002TaskID       = "FAST-BOOTSTRAP-NOISE-FIDELITY-002"
+	publicNoiseFidelity002FastSHA      = "49b65dd927780cec0d7e05772a3df8554ef58005"
+	publicNoiseFidelity002RootSeed     = int64(20261027)
 	publicConfigSHA                    = "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98"
 	publicInputSHA                     = "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285"
 	publicWorkloadSHA                  = "00b70a2e77887c7d6a41db1859246f6513f2c984915de648734e5dd8c584cf74"
+	publicBootstrapInputSHA            = "c32c0d7b731c0fcd8d82fb9c1182a43a62d120f761c090ce21dc764e9aa1e703"
 	publicQPSHA                        = "1f045e603a856968779d62e045a037274bba08cbfce8b1dd3dec2828f1f6a46b"
 	publicLogN16ConfigSHA              = "16e62fdea2dc5ac32240a33cc256cdf60b935aa00b4a16aa004474d2c3033b02"
 	publicLogN16InputSHA               = "659fc59c899341a8253887270f1ae3478528fd864d66aca14bba918550ce8ccf"
@@ -191,6 +196,7 @@ type publicCheckpoint struct {
 
 type publicNativeDocument struct {
 	SchemaVersion              string                                   `json:"schema_version"`
+	TaskID                     string                                   `json:"task_id,omitempty"`
 	Mode                       string                                   `json:"mode"`
 	Status                     string                                   `json:"status"`
 	Timestamp                  time.Time                                `json:"timestamp"`
@@ -205,6 +211,7 @@ type publicNativeDocument struct {
 	BinarySHA256               string                                   `json:"built_binary_sha256"`
 	PrimaryPath                string                                   `json:"primary_path"`
 	PrimaryCommit              string                                   `json:"primary_commit"`
+	PrimaryEvidenceCommit      string                                   `json:"primary_evidence_commit,omitempty"`
 	PrimaryClean               bool                                     `json:"primary_clean"`
 	PrimarySourceSHA256        string                                   `json:"primary_measurement_source_sha256"`
 	BuildTag                   string                                   `json:"build_tag"`
@@ -253,10 +260,12 @@ type publicNativeDocument struct {
 
 type publicVectorDocument struct {
 	SchemaVersion                      string                    `json:"schema_version"`
+	TaskID                             string                    `json:"task_id,omitempty"`
 	Mode                               string                    `json:"mode"`
 	Backend                            string                    `json:"backend"`
 	BackendCommit                      string                    `json:"backend_commit"`
 	PrimaryCommit                      string                    `json:"primary_commit"`
+	PrimaryEvidenceCommit              string                    `json:"primary_evidence_commit,omitempty"`
 	SourceSHA256                       string                    `json:"primary_measurement_source_sha256"`
 	ConfigSHA256                       string                    `json:"config_sha256"`
 	QPSHA256                           string                    `json:"qp_sha256"`
@@ -424,10 +433,12 @@ type publicTraceFixtureManifest struct {
 
 type publicBootstrapFailureDocument struct {
 	SchemaVersion          string                  `json:"schema_version"`
+	TaskID                 string                  `json:"task_id,omitempty"`
 	Status                 string                  `json:"status"`
 	Backend                string                  `json:"backend"`
 	BackendCommit          string                  `json:"backend_commit"`
 	PrimaryCommit          string                  `json:"primary_commit"`
+	PrimaryEvidenceCommit  string                  `json:"primary_evidence_commit,omitempty"`
 	PrimarySourceSHA256    string                  `json:"primary_measurement_source_sha256"`
 	PreflightPairSHA256    string                  `json:"preflight_pair_sha256"`
 	BootstrapNoiseEvidence json.RawMessage         `json:"bootstrap_noise_evidence,omitempty"`
@@ -463,6 +474,7 @@ type publicPairBootstrapComparison struct {
 
 type publicPairDocument struct {
 	SchemaVersion              string                          `json:"schema_version"`
+	TaskID                     string                          `json:"task_id,omitempty"`
 	GeneratedAt                time.Time                       `json:"generated_at"`
 	Mode                       string                          `json:"mode,omitempty"`
 	BootstrapTargetMode        string                          `json:"bootstrap_target_mode,omitempty"`
@@ -471,7 +483,10 @@ type publicPairDocument struct {
 	NumericalGate              float64                         `json:"max_complex_gate"`
 	FastCommit                 string                          `json:"fast_backend_commit"`
 	StandardCommit             string                          `json:"standard_backend_commit"`
+	FastBinarySHA256           string                          `json:"fast_binary_sha256,omitempty"`
+	StandardBinarySHA256       string                          `json:"standard_binary_sha256,omitempty"`
 	PrimaryCommit              string                          `json:"primary_commit"`
+	PrimaryEvidenceCommit      string                          `json:"primary_evidence_commit,omitempty"`
 	SourceSHA256               string                          `json:"primary_measurement_source_sha256"`
 	InputSHA256                string                          `json:"input_sha256"`
 	WorkloadSHA256             string                          `json:"workload_sha256"`
@@ -539,9 +554,18 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 	if err := verifyCompiledBackendSource(opts.secondaryRoot); err != nil {
 		return err
 	}
-	primaryRoot, primaryCommit, err := cleanRepositoryState(".")
+	primaryRoot, currentEvidenceCommit, err := cleanRepositoryState(".")
 	if err != nil {
 		return fmt.Errorf("Primary provenance: %w", err)
+	}
+	primaryIdentity, err := primaryMeasurementIdentityForTask(primaryRoot, currentEvidenceCommit, opts.noiseFidelity002)
+	if err != nil {
+		return fmt.Errorf("Primary source/evidence provenance: %w", err)
+	}
+	primaryCommit, sourceHash := primaryIdentity.SourceCommit, primaryIdentity.SourceSHA256
+	primaryEvidenceCommit := ""
+	if opts.noiseFidelity002 {
+		primaryEvidenceCommit = primaryIdentity.EvidenceCommit
 	}
 	executable, err := os.Executable()
 	if err != nil {
@@ -555,13 +579,9 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 	if err != nil {
 		return fmt.Errorf("backend provenance: %w", err)
 	}
-	if err := validatePublicBackendPinForBootstrapOnce(publicBackendName(), secondaryCommit, profile.Name,
-		opts.publicBootstrapPilot || opts.bootstrapOncePreflight); err != nil {
+	if err := validatePublicBackendPinForTaskMode(publicBackendName(), secondaryCommit, profile.Name,
+		opts.publicBootstrapPilot || opts.bootstrapOncePreflight, opts.noiseFidelity002); err != nil {
 		return fmt.Errorf("UNSUPPORTED_BACKEND_PROFILE: %s for %s: %w", publicBackendName(), profile.Name, err)
-	}
-	sourceHash, err := primaryMeasurementSourceFingerprint(primaryRoot)
-	if err != nil {
-		return err
 	}
 	valuesA, valuesB, valuesC, err := perfmeasure.PublicMulRescaleWorkload(effective.InputSlots)
 	if err != nil {
@@ -594,9 +614,9 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 	}
 	preflightPairSHA := ""
 	if opts.publicBootstrap || opts.publicBootstrapPilot || opts.publicRepeatability {
-		preflightPairSHA, err = validatePublicNativeBootstrapPreflightContractForMode(
+		preflightPairSHA, err = validatePublicNativeBootstrapPreflightContractForTaskMode(
 			opts.preflightPair, primaryCommit, sourceHash, profile, publicBackendName(), opts.backendCommit,
-			configHash, qpHash, inputHash, workloadHash, opts.publicBootstrapPilot,
+			configHash, qpHash, inputHash, workloadHash, opts.publicBootstrapPilot, opts.noiseFidelity002, binarySHA256,
 		)
 		if err != nil {
 			return fmt.Errorf("public Bootstrap preflight gate: %w", err)
@@ -934,7 +954,7 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 					return publicCheckpoint{}, nil, checkpointErr
 				}
 				checkpoint.DecodePath = decodePath
-				if !opts.publicBootstrapPilot && !checkpoint.OraclePass {
+				if !opts.publicBootstrapPilot && !opts.noiseFidelity002 && !checkpoint.OraclePass {
 					return publicCheckpoint{}, nil, fmt.Errorf("%s native plaintext oracle max %.12g exceeds %.12g", name, checkpoint.Oracle.MaxComplexDifference, publicNumericalGate)
 				}
 				return checkpoint, decoded, nil
@@ -951,6 +971,7 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 			}
 			failure := publicBootstrapFailureDocument{
 				SchemaVersion: "fast-standard-public-native-bootstrap-failure.v1", Status: "STOPPED_NO_RETRY",
+				TaskID: taskIDFromOptions(opts), PrimaryEvidenceCommit: primaryEvidenceCommit,
 				Backend: backend.name, BackendCommit: secondaryCommit, PrimaryCommit: primaryCommit,
 				PrimarySourceSHA256: sourceHash, PreflightPairSHA256: preflightPairSHA,
 				ConfigSHA256: configHash, QPSHA256: qpHash, InputSHA256: inputHash, WorkloadSHA256: workloadHash,
@@ -970,6 +991,7 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 			if err := validateBootstrapNoiseSnapshot(bootstrapNoiseEvidence, publicBootstrapNoiseSigma, opts.bootstrapNoiseRootSeed, full.N(), q); err != nil {
 				failure := publicBootstrapFailureDocument{
 					SchemaVersion: "fast-standard-public-native-bootstrap-failure.v1", Status: "STOPPED_NO_RETRY",
+					TaskID: taskIDFromOptions(opts), PrimaryEvidenceCommit: primaryEvidenceCommit,
 					Backend: backend.name, BackendCommit: secondaryCommit, PrimaryCommit: primaryCommit,
 					PrimarySourceSHA256: sourceHash, PreflightPairSHA256: preflightPairSHA,
 					ConfigSHA256: configHash, QPSHA256: qpHash, InputSHA256: inputHash, WorkloadSHA256: workloadHash,
@@ -992,6 +1014,15 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 				"Standard uses genuine native key generation/encryption; Fast uses the pinned intentionally insecure zero-secret mode.",
 				"When enabled, fixed-sigma coefficient noise is an exploratory pre-ct×ct model, not a claim of complete CKKS noise fidelity.",
 				"Final output precision is observational in this one-call mode; each output records whether its MaxAbs met the numerical gate, and a miss does not reject finite structurally valid evidence.",
+			}
+		} else if opts.noiseFidelity002 {
+			schemaVersion, mode, status = "fast-standard-public-native-noise-fidelity-002-repeatability.v1", "public-native-noise-fidelity-002-repeatability", "OBSERVED_PUBLIC_BOOTSTRAP_1COLD_5WARM"
+			vectorSchema = "fast-standard-public-native-noise-fidelity-002-repeatability-vectors.v1"
+			limitations = []string{
+				"One cold plus five warm samples describe only this pinned LogN13/E32 profile and host; they do not establish secure-FHE equivalence or general hardware performance.",
+				"Standard uses genuine native key generation/encryption and Fast uses the pinned intentionally insecure zero-secret mode.",
+				"For this task only, final-output MaxAbs <= 1e-6 is observational; finite structurally valid outputs remain recorded with pass/fail, while representation, capacity, provenance, slot-count, and NaN/Inf checks stay strict.",
+				"Fast internal trace is a separate instrumented diagnostic lane; its timing is not included in these uninstrumented samples.",
 			}
 		} else if opts.publicRepeatability {
 			schemaVersion, mode, status = "fast-standard-public-native-repeatability.v1", "public-native-repeatability", "PASS_PUBLIC_BOOTSTRAP_1COLD_5WARM"
@@ -1022,11 +1053,11 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 		observedOracleStatus = publicObservedOraclePassed
 	}
 	doc := publicNativeDocument{
-		SchemaVersion: schemaVersion, Mode: mode, Status: status,
+		SchemaVersion: schemaVersion, TaskID: taskIDFromOptions(opts), Mode: mode, Status: status,
 		Timestamp: time.Now().UTC(), Profile: opts.profile, ProfileKind: profile.Kind, Backend: backend.name, BackendCommit: secondaryCommit,
 		BackendRef: opts.backendRef, BackendCheckoutRef: secondaryRef, BackendPath: secondaryRoot, BackendClean: true, PrimaryPath: primaryRoot,
 		BinarySHA256:  binarySHA256,
-		PrimaryCommit: primaryCommit, PrimaryClean: true, PrimarySourceSHA256: sourceHash, BuildTag: "perf_" + backend.name,
+		PrimaryCommit: primaryCommit, PrimaryEvidenceCommit: primaryEvidenceCommit, PrimaryClean: true, PrimarySourceSHA256: sourceHash, BuildTag: "perf_" + backend.name,
 		GoVersion: runtime.Version(), OS: runtime.GOOS, Arch: runtime.GOARCH,
 		CPU: cpuModel(), NumCPU: runtime.NumCPU(), GOMAXPROCS: runtime.GOMAXPROCS(0),
 		GOGC: environmentSetting("GOGC"), GOMEMLIMIT: environmentSetting("GOMEMLIMIT"), GODEBUG: environmentSetting("GODEBUG"),
@@ -1045,8 +1076,8 @@ func runPublicNative(opts cliOptions, configHash string, residual ckks.Parameter
 		Limitations: limitations,
 	}
 	vectorDoc := publicVectorDocument{
-		SchemaVersion: vectorSchema, Mode: mode, Backend: backend.name,
-		BackendCommit: secondaryCommit, PrimaryCommit: primaryCommit, SourceSHA256: sourceHash, ConfigSHA256: configHash,
+		SchemaVersion: vectorSchema, TaskID: taskIDFromOptions(opts), Mode: mode, Backend: backend.name,
+		BackendCommit: secondaryCommit, PrimaryCommit: primaryCommit, PrimaryEvidenceCommit: primaryEvidenceCommit, SourceSHA256: sourceHash, ConfigSHA256: configHash,
 		QPSHA256: qpHash, InputSHA256: inputHash, BootstrapInputSHA256: perfmeasure.Fingerprint(expectedRotated),
 		BootstrapPlaintextInput: encodeVector(expectedRotated), WorkloadSHA256: workloadHash, E: params.EphemeralSecretWeight,
 		Checkpoints:                        vectorMap,
@@ -1241,23 +1272,53 @@ func publicBootstrapAttemptSpecs(limit int) ([]struct{ phase, name string }, err
 }
 
 func isPublicBootstrapMode(mode string) bool {
-	return mode == "public-native-bootstrap" || mode == "public-native-bootstrap-once" || mode == "public-native-repeatability"
+	return mode == "public-native-bootstrap" || mode == "public-native-bootstrap-once" || mode == "public-native-repeatability" || mode == "public-native-noise-fidelity-002-repeatability"
+}
+
+func taskIDFromOptions(opts cliOptions) string {
+	if opts.noiseFidelity002 {
+		return publicNoiseFidelity002TaskID
+	}
+	return ""
+}
+
+func taskIDForPreflight(noiseFidelity002 bool) string {
+	if noiseFidelity002 {
+		return publicNoiseFidelity002TaskID
+	}
+	return ""
 }
 
 type bootstrapNoisePolynomialEvidence struct {
-	Sigma             float64                        `json:"sigma_coefficient"`
-	Seed              int64                          `json:"sampling_seed"`
-	Level             int                            `json:"level"`
-	Scale             string                         `json:"scale"`
-	SampleCount       int                            `json:"coefficient_sample_count"`
-	CoefficientRMS    float64                        `json:"coefficient_rms"`
-	CoefficientSHA256 string                         `json:"coefficient_sha256"`
-	Capacity          bootstrapNoiseCapacityEvidence `json:"qprefix_capacity"`
+	Sigma               float64                        `json:"sigma_coefficient"`
+	Seed                int64                          `json:"sampling_seed"`
+	Level               int                            `json:"level"`
+	Scale               string                         `json:"scale"`
+	SampleCount         int                            `json:"coefficient_sample_count"`
+	CoefficientMean     float64                        `json:"coefficient_mean"`
+	CoefficientVariance float64                        `json:"coefficient_variance"`
+	CoefficientRMS      float64                        `json:"coefficient_rms"`
+	CoefficientMaxAbs   uint64                         `json:"coefficient_max_abs"`
+	CoefficientSHA256   string                         `json:"coefficient_sha256"`
+	SamplingAlgorithm   string                         `json:"sampling_algorithm"`
+	DispatchEvidence    string                         `json:"dispatch_evidence"`
+	Phases              []bootstrapNoisePhaseEvidence  `json:"phase_measurements,omitempty"`
+	Capacity            bootstrapNoiseCapacityEvidence `json:"qprefix_capacity"`
+}
+
+type bootstrapNoisePhaseEvidence struct {
+	Name                 string `json:"name"`
+	ElapsedNS            int64  `json:"elapsed_ns"`
+	AllocBytes           uint64 `json:"alloc_bytes"`
+	Allocs               uint64 `json:"allocs"`
+	MemoryStatsCollected bool   `json:"memory_stats_collected"`
 }
 
 type bootstrapNoiseCapacityEvidence struct {
 	Rows                int    `json:"rows"`
 	CheckedCoefficients int    `json:"checked_coefficients"`
+	MaxCoefficientIndex int    `json:"max_coefficient_index"`
+	MaxAbs              string `json:"max_abs"`
 	PrefixProduct       string `json:"prefix_product"`
 	StrictFit           bool   `json:"strict_fit"`
 }
@@ -1325,6 +1386,17 @@ func validateBootstrapNoiseSnapshot(raw json.RawMessage, sigma float64, rootSeed
 		}
 	}
 	return nil
+}
+
+func expectedBootstrapNoiseSamplingSeed(rootSeed int64, operation uint64, right bool) int64 {
+	var input [17]byte
+	binary.LittleEndian.PutUint64(input[:8], uint64(rootSeed))
+	binary.LittleEndian.PutUint64(input[8:16], operation)
+	if right {
+		input[16] = 1
+	}
+	digest := sha256.Sum256(input[:])
+	return int64(binary.LittleEndian.Uint64(digest[:8]))
 }
 
 func parseEffectiveQPrimes(parameters perfmeasure.EffectiveParameters) ([]uint64, error) {
@@ -1491,6 +1563,14 @@ func validatePublicNativeBootstrapPreflightContractForMode(
 	path, primaryCommit, sourceSHA256 string, profile publicProfileContract, backendName, backendCommit,
 	configSHA256, qpSHA256, inputSHA256, workloadSHA256 string, bootstrapOnce bool,
 ) (string, error) {
+	return validatePublicNativeBootstrapPreflightContractForTaskMode(path, primaryCommit, sourceSHA256, profile, backendName, backendCommit,
+		configSHA256, qpSHA256, inputSHA256, workloadSHA256, bootstrapOnce, false, "")
+}
+
+func validatePublicNativeBootstrapPreflightContractForTaskMode(
+	path, primaryCommit, sourceSHA256 string, profile publicProfileContract, backendName, backendCommit,
+	configSHA256, qpSHA256, inputSHA256, workloadSHA256 string, bootstrapOnce, noiseFidelity002 bool, binarySHA256 string,
+) (string, error) {
 	fastCommit := ""
 	switch backendName {
 	case "standard":
@@ -1503,17 +1583,22 @@ func validatePublicNativeBootstrapPreflightContractForMode(
 				return "", fmt.Errorf("public-native-bootstrap-once Standard preflight supports only the frozen LogN13/E32 profile")
 			}
 			fastCommit = publicBootstrapNoisePilotFastSHA
+		} else if noiseFidelity002 {
+			if profile.Name != "logn13" || profile.LogN != 13 {
+				return "", fmt.Errorf("%s Standard preflight supports only the frozen LogN13/E32 profile", publicNoiseFidelity002TaskID)
+			}
+			fastCommit = publicNoiseFidelity002FastSHA
 		}
 	case "fast":
-		if err := validatePublicBackendPinForBootstrapOnce("fast", backendCommit, profile.Name, bootstrapOnce); err != nil {
+		if err := validatePublicBackendPinForTaskMode("fast", backendCommit, profile.Name, bootstrapOnce, noiseFidelity002); err != nil {
 			return "", err
 		}
 		fastCommit = backendCommit
 	default:
 		return "", fmt.Errorf("unsupported public-native backend %q", backendName)
 	}
-	return validatePublicPreflightGateForContractMode(path, primaryCommit, sourceSHA256, profile, fastCommit,
-		configSHA256, qpSHA256, inputSHA256, workloadSHA256, bootstrapOnce)
+	return validatePublicPreflightGateForTaskMode(path, primaryCommit, sourceSHA256, profile, fastCommit,
+		configSHA256, qpSHA256, inputSHA256, workloadSHA256, bootstrapOnce, noiseFidelity002, backendName, binarySHA256)
 }
 
 func validatePublicPreflightGateForProfile(path, primaryCommit, sourceSHA256, profileName, fastCommit, configSHA256, qpSHA256, inputSHA256, workloadSHA256 string) (string, error) {
@@ -1531,6 +1616,11 @@ func validatePublicPreflightGateForContract(path, primaryCommit, sourceSHA256 st
 }
 
 func validatePublicPreflightGateForContractMode(path, primaryCommit, sourceSHA256 string, profile publicProfileContract, fastCommit, configSHA256, qpSHA256, inputSHA256, workloadSHA256 string, bootstrapOnce bool) (string, error) {
+	return validatePublicPreflightGateForTaskMode(path, primaryCommit, sourceSHA256, profile, fastCommit,
+		configSHA256, qpSHA256, inputSHA256, workloadSHA256, bootstrapOnce, false, "", "")
+}
+
+func validatePublicPreflightGateForTaskMode(path, primaryCommit, sourceSHA256 string, profile publicProfileContract, fastCommit, configSHA256, qpSHA256, inputSHA256, workloadSHA256 string, bootstrapOnce, noiseFidelity002 bool, backend, binarySHA256 string) (string, error) {
 	var pair publicPairDocument
 	if err := readJSON(path, &pair); err != nil {
 		return "", fmt.Errorf("read passing compare-public pair %s: %w", path, err)
@@ -1551,6 +1641,18 @@ func validatePublicPreflightGateForContractMode(path, primaryCommit, sourceSHA25
 			return "", errors.New("one-call preflight pair is restricted to frozen LogN13/E32")
 		}
 		wantPairSchema, wantTargetMode = "fast-standard-public-pair.v2", "public-native-bootstrap-once"
+	}
+	if noiseFidelity002 {
+		if bootstrapOnce || profile.Name != "logn13" || profile.LogN != 13 {
+			return "", fmt.Errorf("%s preflight pair is restricted to zero-call LogN13/E32", publicNoiseFidelity002TaskID)
+		}
+		if pair.TaskID != publicNoiseFidelity002TaskID || !validGitCommitSHA(pair.PrimaryCommit) || !validGitCommitSHA(pair.PrimaryEvidenceCommit) ||
+			!validSHA256Hex(pair.StandardBinarySHA256) || !validSHA256Hex(pair.FastBinarySHA256) ||
+			(binarySHA256 != "" && ((backend == "standard" && pair.StandardBinarySHA256 != binarySHA256) || (backend == "fast" && pair.FastBinarySHA256 != binarySHA256))) {
+			return "", fmt.Errorf("%s preflight pair task/binary provenance mismatch", publicNoiseFidelity002TaskID)
+		}
+	} else if pair.TaskID != "" {
+		return "", errors.New("task-scoped preflight pair cannot be used outside its explicit task mode")
 	}
 	if pair.SchemaVersion != wantPairSchema || pair.BootstrapTargetMode != wantTargetMode || pair.Status != "PASS" ||
 		!pair.MatchedEnvironment || pair.BootstrapCalls != 0 || len(pair.Bootstrap) != 0 || pair.E != 32 || pair.NumericalGate != publicNumericalGate {
@@ -1847,6 +1949,7 @@ func runPublicCompare(args []string) error {
 	fastVectorsPath := flags.String("fast-vectors", "", "Fast ephemeral vectors JSON")
 	outPath := flags.String("out", "", "compact paired preflight JSON")
 	bootstrapOncePreflight := flags.Bool("bootstrap-once-preflight", false, "validate and mark this zero-call pair for the exact LogN13 one-call Bootstrap source pin")
+	noiseFidelity002Preflight := flags.Bool("noise-fidelity-002-preflight", false, "validate a zero-call LogN13/E32 pair for FAST-BOOTSTRAP-NOISE-FIDELITY-002 with exact binary provenance")
 	if err := flags.Parse(args); err != nil {
 		return err
 	}
@@ -1868,8 +1971,11 @@ func runPublicCompare(args []string) error {
 		return err
 	}
 	bootstrapMode := isPublicBootstrapMode(standard.Mode) || isPublicBootstrapMode(fast.Mode)
-	if *bootstrapOncePreflight && (standard.Mode != "public-native" || fast.Mode != "public-native") {
-		return errors.New("--bootstrap-once-preflight requires paired zero-call public-native artifacts")
+	if (*bootstrapOncePreflight || *noiseFidelity002Preflight) && (standard.Mode != "public-native" || fast.Mode != "public-native") {
+		return errors.New("task-specific preflight requires paired zero-call public-native artifacts")
+	}
+	if *noiseFidelity002Preflight && (*bootstrapOncePreflight || bootstrapMode) {
+		return errors.New("--noise-fidelity-002-preflight accepts only zero-Bootstrap public-native artifacts")
 	}
 	if *bootstrapOncePreflight && bootstrapMode {
 		return errors.New("--bootstrap-once-preflight accepts only zero-Bootstrap public-native artifacts")
@@ -1882,7 +1988,7 @@ func runPublicCompare(args []string) error {
 		if err := validatePublicFixedSigmaChainPairArtifacts(standard, fast, standardVectors, fastVectors); err != nil {
 			return err
 		}
-	} else if err := validatePublicPairArtifactsForBootstrapOnce(standard, fast, standardVectors, fastVectors, *bootstrapOncePreflight); err != nil {
+	} else if err := validatePublicPairArtifactsForTaskMode(standard, fast, standardVectors, fastVectors, *bootstrapOncePreflight, *noiseFidelity002Preflight); err != nil {
 		return err
 	}
 	standardStates, fastStates := map[string]publicCheckpoint{}, map[string]publicCheckpoint{}
@@ -1901,17 +2007,24 @@ func runPublicCompare(args []string) error {
 		pairSchemaVersion, bootstrapTargetMode = "fast-standard-public-pair.v2", "public-native-bootstrap-once"
 	}
 	pair := publicPairDocument{
-		SchemaVersion: pairSchemaVersion, GeneratedAt: time.Now().UTC(), Mode: standard.Mode,
+		SchemaVersion: pairSchemaVersion, TaskID: taskIDForPreflight(*noiseFidelity002Preflight), GeneratedAt: time.Now().UTC(), Mode: standard.Mode,
 		BootstrapTargetMode: bootstrapTargetMode, Status: "PASS",
 		Profile: standard.Profile, ProfileKind: standard.ProfileKind,
 		NumericalGate: publicNumericalGate, FastCommit: fast.BackendCommit, StandardCommit: standard.BackendCommit,
-		PrimaryCommit: standard.PrimaryCommit, SourceSHA256: standard.PrimarySourceSHA256, InputSHA256: standard.InputSHA256,
+		PrimaryCommit: standard.PrimaryCommit, PrimaryEvidenceCommit: standard.PrimaryEvidenceCommit,
+		SourceSHA256: standard.PrimarySourceSHA256, InputSHA256: standard.InputSHA256,
 		WorkloadSHA256: standard.WorkloadSHA256, ConfigSHA256: standard.ConfigSHA256, QPSHA256: standard.QPSHA256, E: 32,
 		InputSlots: standard.InputSlots, Parameters: standard.Parameters,
 		CapacityEvidenceVersion: standard.CapacityEvidenceVersion, CapacityPolicy: standard.CapacityPolicy,
 		ConservativeBoundStatus: standard.ConservativeBoundStatus, ObservedNativeOracleStatus: standard.ObservedNativeOracleStatus,
 		StandardLevel0Continuity: standard.Level0Continuity, FastLevel0Continuity: fast.Level0Continuity,
 		BootstrapCalls: 0, MatchedEnvironment: publicEnvironmentsMatch(standard, fast),
+	}
+	if *noiseFidelity002Preflight {
+		if standard.PrimaryEvidenceCommit != fast.PrimaryEvidenceCommit {
+			return errors.New("Noise Fidelity 002 preflight artifacts were captured from different Primary evidence commits")
+		}
+		pair.FastBinarySHA256, pair.StandardBinarySHA256 = fast.BinarySHA256, standard.BinarySHA256
 	}
 	if bootstrapMode {
 		pair.BootstrapCalls = standard.BootstrapCalls + fast.BootstrapCalls
@@ -2048,16 +2161,35 @@ func runPublicCompare(args []string) error {
 }
 
 func validatePublicPairArtifacts(standard, fast publicNativeDocument, standardVectors, fastVectors publicVectorDocument) error {
-	return validatePublicPairArtifactsForBootstrapOnce(standard, fast, standardVectors, fastVectors, false)
+	return validatePublicPairArtifactsForTaskMode(standard, fast, standardVectors, fastVectors, false, false)
 }
 
 func validatePublicPairArtifactsForBootstrapOnce(standard, fast publicNativeDocument, standardVectors, fastVectors publicVectorDocument, bootstrapOnce bool) error {
+	return validatePublicPairArtifactsForTaskMode(standard, fast, standardVectors, fastVectors, bootstrapOnce, false)
+}
+
+func validatePublicPairArtifactsForTaskMode(standard, fast publicNativeDocument, standardVectors, fastVectors publicVectorDocument, bootstrapOnce, noiseFidelity002 bool) error {
 	profile, err := publicProfileForNativeDocument(standard)
 	if err != nil {
 		return err
 	}
-	if bootstrapOnce && (standard.Mode != "public-native" || fast.Mode != "public-native" || profile.Name != "logn13" || profile.LogN != 13) {
-		return errors.New("one-call pilot preflight pairing is restricted to public-native LogN13 zero-call artifacts")
+	if (bootstrapOnce || noiseFidelity002) && (standard.Mode != "public-native" || fast.Mode != "public-native" || profile.Name != "logn13" || profile.LogN != 13) {
+		return errors.New("task-scoped preflight pairing is restricted to public-native LogN13 zero-call artifacts")
+	}
+	if bootstrapOnce && noiseFidelity002 {
+		return errors.New("one-call and Noise Fidelity 002 preflight contracts cannot be combined")
+	}
+	if noiseFidelity002 {
+		if standard.TaskID != publicNoiseFidelity002TaskID || fast.TaskID != publicNoiseFidelity002TaskID ||
+			standardVectors.TaskID != publicNoiseFidelity002TaskID || fastVectors.TaskID != publicNoiseFidelity002TaskID {
+			return errors.New("Noise Fidelity 002 preflight artifacts are missing their exact task identity")
+		}
+		if !validGitCommitSHA(standard.PrimaryEvidenceCommit) || !validGitCommitSHA(fast.PrimaryEvidenceCommit) ||
+			standardVectors.PrimaryEvidenceCommit != standard.PrimaryEvidenceCommit || fastVectors.PrimaryEvidenceCommit != fast.PrimaryEvidenceCommit {
+			return errors.New("Noise Fidelity 002 artifacts are missing their Primary evidence-commit provenance")
+		}
+	} else if standard.TaskID != "" || fast.TaskID != "" || standardVectors.TaskID != "" || fastVectors.TaskID != "" {
+		return errors.New("task-scoped preflight artifacts require their explicit comparator mode")
 	}
 	if standard.SchemaVersion != "fast-standard-public-native-preflight.v1" || fast.SchemaVersion != standard.SchemaVersion || standard.Status != "PASS_ZERO_BOOTSTRAP_PREBOOTSTRAP_CHAIN" || fast.Status != standard.Status {
 		return errors.New("paired inputs are not successful public-native preflight artifacts")
@@ -2073,11 +2205,14 @@ func validatePublicPairArtifactsForBootstrapOnce(standard, fast publicNativeDocu
 			return errors.New("paired residual artifacts lack distinct valid Standard/Fast executable SHA-256 identities")
 		}
 	}
-	if err := validatePublicBackendPin(standard.Backend, standard.BackendCommit, profile.Name); err != nil {
+	if err := validatePublicBackendPinForTaskMode(standard.Backend, standard.BackendCommit, profile.Name, bootstrapOnce, noiseFidelity002); err != nil {
 		return err
 	}
-	if err := validatePublicBackendPinForBootstrapOnce(fast.Backend, fast.BackendCommit, profile.Name, bootstrapOnce); err != nil {
+	if err := validatePublicBackendPinForTaskMode(fast.Backend, fast.BackendCommit, profile.Name, bootstrapOnce, noiseFidelity002); err != nil {
 		return err
+	}
+	if noiseFidelity002 && (!validSHA256Hex(standard.BinarySHA256) || !validSHA256Hex(fast.BinarySHA256)) {
+		return errors.New("Noise Fidelity 002 preflight requires valid Standard and Fast binary SHA-256 identities")
 	}
 	if standard.BuildTag != "perf_standard" || fast.BuildTag != "perf_fast" ||
 		standard.PrimaryCommit == "" || standard.PrimaryCommit != fast.PrimaryCommit || standard.PrimarySourceSHA256 == "" || standard.PrimarySourceSHA256 != fast.PrimarySourceSHA256 ||
@@ -2094,6 +2229,7 @@ func validatePublicPairArtifactsForBootstrapOnce(standard, fast publicNativeDocu
 		standardVectors.Mode != "public-native" || fastVectors.Mode != "public-native" ||
 		standardVectors.SourceSHA256 != standard.PrimarySourceSHA256 || fastVectors.SourceSHA256 != fast.PrimarySourceSHA256 ||
 		standardVectors.PrimaryCommit != standard.PrimaryCommit || fastVectors.PrimaryCommit != fast.PrimaryCommit ||
+		standardVectors.PrimaryEvidenceCommit != standard.PrimaryEvidenceCommit || fastVectors.PrimaryEvidenceCommit != fast.PrimaryEvidenceCommit ||
 		standardVectors.BackendCommit != standard.BackendCommit || fastVectors.BackendCommit != fast.BackendCommit ||
 		standardVectors.ConfigSHA256 != standard.ConfigSHA256 || fastVectors.ConfigSHA256 != fast.ConfigSHA256 ||
 		standardVectors.QPSHA256 != standard.QPSHA256 || fastVectors.QPSHA256 != fast.QPSHA256 ||
@@ -2173,6 +2309,15 @@ func validatePublicBootstrapPairArtifacts(standard, fast publicNativeDocument, s
 	} else if standard.Mode == "public-native-repeatability" {
 		wantBudget, wantSchema, wantStatus, wantVectorSchema = 6,
 			"fast-standard-public-native-repeatability.v1", "PASS_PUBLIC_BOOTSTRAP_1COLD_5WARM", "fast-standard-public-native-repeatability-vectors.v1"
+	} else if standard.Mode == "public-native-noise-fidelity-002-repeatability" {
+		wantBudget, wantSchema, wantStatus, wantVectorSchema = 6,
+			"fast-standard-public-native-noise-fidelity-002-repeatability.v1", "OBSERVED_PUBLIC_BOOTSTRAP_1COLD_5WARM", "fast-standard-public-native-noise-fidelity-002-repeatability-vectors.v1"
+		if standard.TaskID != publicNoiseFidelity002TaskID || fast.TaskID != publicNoiseFidelity002TaskID ||
+			standardVectors.TaskID != publicNoiseFidelity002TaskID || fastVectors.TaskID != publicNoiseFidelity002TaskID {
+			return errors.New("Noise Fidelity 002 Bootstrap artifacts are missing their exact task identity")
+		}
+	} else if standard.TaskID != "" || fast.TaskID != "" || standardVectors.TaskID != "" || fastVectors.TaskID != "" {
+		return errors.New("task-scoped Bootstrap artifacts require their explicit contract mode")
 	}
 	if standard.SchemaVersion != wantSchema || fast.SchemaVersion != wantSchema ||
 		standard.Status != wantStatus || fast.Status != wantStatus ||
@@ -2186,7 +2331,7 @@ func validatePublicBootstrapPairArtifacts(standard, fast publicNativeDocument, s
 		standardVectors.Mode != standard.Mode || fastVectors.Mode != standardVectors.Mode {
 		return errors.New("paired Bootstrap vector artifacts have the wrong schema or mode")
 	}
-	if standard.Mode == "public-native-bootstrap-once" &&
+	if (standard.Mode == "public-native-bootstrap-once" || standard.Mode == "public-native-noise-fidelity-002-repeatability") &&
 		(standard.BootstrapInputSHA256 == "" || standard.BootstrapInputSHA256 != fast.BootstrapInputSHA256 ||
 			standardVectors.BootstrapInputSHA256 != standard.BootstrapInputSHA256 || fastVectors.BootstrapInputSHA256 != fast.BootstrapInputSHA256) {
 		return errors.New("paired single-call Bootstrap artifacts do not name the same canonical plaintext input")
@@ -2206,7 +2351,8 @@ func validatePublicBootstrapPairArtifacts(standard, fast publicNativeDocument, s
 		base.Mode = "public-native"
 		base.BootstrapOutputs = nil
 	}
-	if err := validatePublicPairArtifacts(standardBase, fastBase, standardVectorBase, fastVectorBase); err != nil {
+	noiseFidelity002 := standard.Mode == "public-native-noise-fidelity-002-repeatability"
+	if err := validatePublicPairArtifactsForTaskMode(standardBase, fastBase, standardVectorBase, fastVectorBase, false, noiseFidelity002); err != nil {
 		return fmt.Errorf("pre-Bootstrap evidence: %w", err)
 	}
 	if err := validatePublicBootstrapOutputEvidence(standard, standardVectors, standardBase, standardVectorBase); err != nil {
@@ -2239,7 +2385,7 @@ func validatePublicBootstrapOutputEvidence(doc publicNativeDocument, vectors pub
 		return errors.New("held pre-Bootstrap Level0 vector contains NaN or Inf")
 	}
 	input := preBootstrap
-	if doc.Mode == "public-native-bootstrap-once" {
+	if doc.Mode == "public-native-bootstrap-once" || doc.Mode == "public-native-noise-fidelity-002-repeatability" {
 		if vectors.BootstrapInputSHA256 == "" || len(vectors.BootstrapPlaintextInput) != profile.InputSlots {
 			return errors.New("canonical plaintext supplied to Bootstrap is missing")
 		}
@@ -2274,7 +2420,8 @@ func validatePublicBootstrapOutputEvidence(doc publicNativeDocument, vectors pub
 		metrics := compareVectors(input, decoded, publicNumericalGate)
 		snr := numericalmetrics.Compare(input, decoded)
 		passed := metrics.MaxComplexDifference <= publicNumericalGate
-		if (!passed && doc.Mode != "public-native-bootstrap-once") || checkpoint.OraclePass != passed ||
+		observationalGate := doc.Mode == "public-native-bootstrap-once" || doc.Mode == "public-native-noise-fidelity-002-repeatability"
+		if (!passed && !observationalGate) || checkpoint.OraclePass != passed ||
 			!finitePublicPairMetrics(metrics) || !reflect.DeepEqual(checkpoint.Oracle, metrics) || !reflect.DeepEqual(checkpoint.OracleSNR, snr) {
 			return fmt.Errorf("Bootstrap output %s fails or misreports its native plaintext oracle", checkpoint.Name)
 		}
@@ -2862,6 +3009,29 @@ func validatePublicBackendPinForBootstrapOnce(backend, commit, profile string, b
 	return nil
 }
 
+func validatePublicBackendPinForTaskMode(backend, commit, profile string, bootstrapOnce, noiseFidelity002 bool) error {
+	if !noiseFidelity002 {
+		return validatePublicBackendPinForBootstrapOnce(backend, commit, profile, bootstrapOnce)
+	}
+	if bootstrapOnce || profile != "logn13" {
+		return fmt.Errorf("%s source pin is scoped to the LogN13 task repeatability/preflight mode", publicNoiseFidelity002TaskID)
+	}
+	switch backend {
+	case "standard":
+		if commit == publicStandardSHA {
+			return nil
+		}
+		return fmt.Errorf("%s genuine Standard source pin requires %s; got %s", publicNoiseFidelity002TaskID, publicStandardSHA, commit)
+	case "fast":
+		if commit == publicNoiseFidelity002FastSHA {
+			return nil
+		}
+		return fmt.Errorf("%s Fast source pin requires %s; got %s", publicNoiseFidelity002TaskID, publicNoiseFidelity002FastSHA, commit)
+	default:
+		return fmt.Errorf("unsupported %s backend %q", publicNoiseFidelity002TaskID, backend)
+	}
+}
+
 func validatePublicBackendPin(backend, commit string, profileNames ...string) error {
 	profileName := "logn13"
 	if len(profileNames) > 0 {
@@ -2918,16 +3088,81 @@ func measurePublicPhase[T any](name string, operation func() (T, error)) (T, pha
 }
 
 func primaryMeasurementSourceFingerprint(root string) (string, error) {
+	return primaryMeasurementSourceFingerprintAt(root, "HEAD")
+}
+
+func primaryMeasurementSourceFingerprintAt(root, revision string) (string, error) {
 	paths := []string{"cmd/perfprobe", "internal/perfmeasure", "internal/numericalmetrics", "go.mod", "go.sum"}
 	h := sha256.New()
 	for _, path := range paths {
-		object, err := gitOutput(root, "rev-parse", "HEAD:"+path)
+		object, err := gitOutput(root, "rev-parse", revision+":"+path)
 		if err != nil {
 			return "", fmt.Errorf("measurement source fingerprint %s: %w", path, err)
 		}
 		_, _ = h.Write([]byte(path + "\x00" + object + "\x00"))
 	}
 	return hex.EncodeToString(h.Sum(nil)), nil
+}
+
+type primaryMeasurementIdentity struct {
+	SourceCommit   string
+	EvidenceCommit string
+	SourceSHA256   string
+}
+
+func primaryMeasurementIdentityForTask(root, evidenceCommit string, noiseFidelity002 bool) (primaryMeasurementIdentity, error) {
+	if !noiseFidelity002 {
+		sourceSHA, err := primaryMeasurementSourceFingerprintAt(root, evidenceCommit)
+		if err != nil {
+			return primaryMeasurementIdentity{}, err
+		}
+		return primaryMeasurementIdentity{SourceCommit: evidenceCommit, EvidenceCommit: evidenceCommit, SourceSHA256: sourceSHA}, nil
+	}
+	branch, err := gitOutput(root, "branch", "--show-current")
+	if err != nil {
+		return primaryMeasurementIdentity{}, err
+	}
+	if branch != "main" {
+		return primaryMeasurementIdentity{}, fmt.Errorf("%s measurements require Primary main, got branch %q", publicNoiseFidelity002TaskID, branch)
+	}
+	buildInfo, ok := debug.ReadBuildInfo()
+	if !ok {
+		return primaryMeasurementIdentity{}, errors.New("Noise Fidelity 002 requires Go build VCS metadata")
+	}
+	settings := make(map[string]string, len(buildInfo.Settings))
+	for _, setting := range buildInfo.Settings {
+		settings[setting.Key] = setting.Value
+	}
+	return primaryMeasurementIdentityFromVCS(root, evidenceCommit, settings["vcs.revision"], settings["vcs.modified"])
+}
+
+func primaryMeasurementIdentityFromVCS(root, evidenceCommit, buildSourceCommit, vcsModified string) (primaryMeasurementIdentity, error) {
+	if !validGitCommitSHA(buildSourceCommit) || vcsModified != "false" {
+		return primaryMeasurementIdentity{}, errors.New("Noise Fidelity 002 requires a clean binary with exact vcs.revision and vcs.modified=false")
+	}
+	if _, err := gitOutput(root, "merge-base", "--is-ancestor", buildSourceCommit, evidenceCommit); err != nil {
+		return primaryMeasurementIdentity{}, fmt.Errorf("binary source commit %s is not an ancestor of evidence commit %s: %w", buildSourceCommit, evidenceCommit, err)
+	}
+	buildSourceSHA, err := primaryMeasurementSourceFingerprintAt(root, buildSourceCommit)
+	if err != nil {
+		return primaryMeasurementIdentity{}, err
+	}
+	evidenceSourceSHA, err := primaryMeasurementSourceFingerprintAt(root, evidenceCommit)
+	if err != nil {
+		return primaryMeasurementIdentity{}, err
+	}
+	if buildSourceSHA != evidenceSourceSHA {
+		return primaryMeasurementIdentity{}, errors.New("Primary measurement source changed after the task binary was built")
+	}
+	return primaryMeasurementIdentity{SourceCommit: buildSourceCommit, EvidenceCommit: evidenceCommit, SourceSHA256: buildSourceSHA}, nil
+}
+
+func validGitCommitSHA(value string) bool {
+	if len(value) != 40 {
+		return false
+	}
+	_, err := hex.DecodeString(value)
+	return err == nil
 }
 
 func secretPrefixEqual(a, b *rlwe.SecretKey, rows int) bool {

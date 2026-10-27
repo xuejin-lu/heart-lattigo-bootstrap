@@ -2,7 +2,7 @@
   "schema_version": "fast-bootstrap-noise-fidelity-002-summary.v1",
   "task": "FAST-BOOTSTRAP-NOISE-FIDELITY-002",
   "status": "BATCH_IN_PROGRESS",
-  "checkpoint": "CP-A complete; CP-B implementation not started",
+  "checkpoint": "CP-A complete; CP-B implementation, focused tests, and task-scoped code/evidence provenance complete; clean pinned builds and fresh zero-call preflight pending",
   "actual_bootstrap_calls": 0,
   "authorized_maximum_bootstrap_calls": 18,
   "retry_budget": 0,
