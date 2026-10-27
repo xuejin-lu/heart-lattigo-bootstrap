@@ -12,7 +12,8 @@
     "CP-A",
     "CP-B",
     "CP-C fresh source-pinned zero-call preflight",
-    "CP-C genuine Standard and Fast one-call captures"
+    "CP-C genuine Standard and Fast one-call captures",
+    "Montgomery Noise representation repair (no Bootstrap)"
   ],
   "historical_blocker": {
     "evidence": "preflight/cp-c-stop.json",
@@ -21,7 +22,7 @@
     "standard_side_gate_expected_fast_commit": "2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f",
     "type": "STANDARD_BOOTSTRAP_PREFLIGHT_FAST_PIN_MISMATCH"
   },
-  "in_progress_checkpoint": "CP-C blocked: FN consumed its one attempt before completing Bootstrap; no retry",
+  "in_progress_checkpoint": "Original CP-C pilot terminal: 3/3 calls consumed; FN failed before injection. Montgomery representation repair is complete; awaiting independent Web review.",
   "latest_precompute_stops": [
     {
       "arm": "S",
@@ -117,7 +118,7 @@
     "precision_bits": "DEFERRED_TO_SHARED_TRIPLET_COMPARATOR",
     "rmse_vs_input": "DEFERRED_TO_SHARED_TRIPLET_COMPARATOR"
   },
-  "status": "BATCH_BLOCKED_NEEDS_WEB_REVIEW",
+  "status": "READY_FOR_WEB_REVIEW",
   "task": "FAST-BOOTSTRAP-NOISE-FIDELITY-001",
   "fast_observation": {
     "actual_calls": 1,
@@ -166,5 +167,27 @@
     "classification": "SCALE_NTT_REPRESENTATION_COMPATIBILITY",
     "detail": "single_bootstrap Bootstrap attempt: cannot Fast Bootstrap circuit 0: Fast Mod1 polynomial evaluation: Fast power 16: power 8: Fast power 8: power 4: Fast power 4: power 2: Fast power 2: multiply: fixed-sigma Bootstrap Mul target requires a positive Scale and NTT non-Montgomery representation",
     "needs_web_review": true
+  },
+  "pilot_outcome": "CP_C_BUDGET_EXHAUSTED_FN_FAILED_NO_RETRY",
+  "montgomery_noise_representation_repair": {
+    "ruling": "MONTGOMERY_NOISE_REPRESENTATION_REPAIR_REQUIRED",
+    "status": "READY_FOR_WEB_REVIEW",
+    "secondary_branch": "experiment/fast-bootstrap-noise-fidelity",
+    "secondary_commit": "49b65dd927780cec0d7e05772a3df8554ef58005",
+    "pushed": true,
+    "bootstrap_calls_during_repair": 0,
+    "original_bootstrap_calls": {
+      "actual": 3,
+      "authorized_maximum": 3,
+      "retries": 0
+    },
+    "fix": "NTT signed coefficient noise then per-row MForm for Montgomery targets before c0 addition; strict Q-prefix capacity retained",
+    "targeted_tests": {
+      "schemes_ckks_fixed_sigma_helper_and_non_montgomery": "PASS",
+      "schemes_ckks_fast_fixed_sigma_bootstrap_hook": "PASS",
+      "fast_chebyshev_power2_power4_montgomery": "PASS"
+    },
+    "repair_record": "repairs/MONTGOMERY-NOISE-REPRESENTATION-REPAIR-001.md",
+    "binary_rebuilt": false
   }
 }
