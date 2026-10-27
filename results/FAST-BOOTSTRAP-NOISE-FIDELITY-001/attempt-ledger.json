@@ -13,7 +13,7 @@
       "max_actual_calls": 1,
       "precompute_attempts": 3,
       "preflight_pair_sha256": "0b09e98eedfc1d0e14971a08c4ae5bf7b276f78471bae37307e68d1a554fa854",
-      "status": "PRECALL_PREFLIGHT_PASS_WAITING_FOR_COMMITTED_FREEZE"
+      "status": "READY_TO_START_ONE_STANDARD_CALL_AFTER_PRECALL_FREEZE_PUSH"
     },
     {
       "arm": "F",
@@ -27,7 +27,7 @@
       "max_actual_calls": 1,
       "precompute_attempts": 2,
       "preflight_pair_sha256": "0b09e98eedfc1d0e14971a08c4ae5bf7b276f78471bae37307e68d1a554fa854",
-      "status": "PRECALL_PREFLIGHT_PASS_WAITING_FOR_COMMITTED_FREEZE"
+      "status": "WAIT_FOR_STANDARD_ARM_COMPLETION"
     },
     {
       "arm": "FN",
@@ -41,7 +41,7 @@
       "max_actual_calls": 1,
       "precompute_attempts": 0,
       "preflight_pair_sha256": "0b09e98eedfc1d0e14971a08c4ae5bf7b276f78471bae37307e68d1a554fa854",
-      "status": "SHARED_FAST_BINARY_PREFLIGHT_PASS_WAITING_FOR_COMMITTED_FREEZE"
+      "status": "WAIT_FOR_STANDARD_AND_FAST_ARM_COMPLETION"
     }
   ],
   "authorization": {
@@ -71,7 +71,7 @@
   },
   "build_provenance_status": "PASS_CLEAN_VCS_STAMPED_STANDARD_FAST_BINARIES",
   "checkpoint": "CP-C",
-  "current_phase": "PRECALL_FREEZE_COMMIT_REQUIRED",
+  "current_phase": "STANDARD_ARM_READY_NO_RESERVATION",
   "events": [
     {
       "all_attempts_remain_reserved_not_started": true,
@@ -146,11 +146,25 @@
       "standard_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
       "strict_capacity": "SUFFICIENT",
       "time_utc": "2026-10-27T00:50:36Z"
+    },
+    {
+      "actual_bootstrap_calls": 0,
+      "bootstrap_reservations": 0,
+      "commit": "d85ab612b9552817cfa8d9448f5fab3b3c53cf3b",
+      "event": "CP_C_PRECALL_FREEZE_COMMITTED_AND_PUSHED",
+      "preflight_evidence_sha256": "3587615371245837c5e51d6e686605dd4888a6746fad8d8777cf6211f3eb9d1e",
+      "preflight_pair_sha256": "0b09e98eedfc1d0e14971a08c4ae5bf7b276f78471bae37307e68d1a554fa854",
+      "primary_branch": "main",
+      "remote_ref": "origin/main",
+      "status": "READY_FOR_STANDARD_ARM",
+      "time_utc": "2026-10-27T00:55:00Z"
     }
   ],
   "fast_noise_root_seed": 20261027,
   "fixed_sigma": 4.004280012097432,
   "max_actual_bootstrap_calls": 3,
+  "precall_freeze_commit": "d85ab612b9552817cfa8d9448f5fab3b3c53cf3b",
+  "precall_freeze_pushed": true,
   "precompute_attempt_count": 5,
   "precompute_failures": [
     {
@@ -246,13 +260,13 @@
     "primary_source_sha256": "bef8af26f2de7369d0ff8ec0f6ece49882135e8c3b4d67e252abaf20b19b530f",
     "standard_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40"
   },
-  "status": "CP_C_PRECALL_SOURCE_AND_PREFLIGHT_FROZEN",
+  "status": "CP_C_READY_FOR_STANDARD_ARM",
   "stop_conditions": [
     "Do not execute any Bootstrap until post-ledger clean-source builds, go version -m metadata, binary SHA, and zero-call Standard/Fast preflight pair all pass.",
     "If any actual call fails, or provenance, parameters, capacity, input, or output validation fails, stop immediately; do not retry or consume another slot.",
     "No LogN16 workload, BTS, large benchmark, CP-D, or CP-E execution is authorized."
   ],
-  "stop_reason": "NONE_PRECALL_GATES_PASS",
+  "stop_reason": "NONE_ALL_PRECALL_GATES_PASS",
   "superseded_build_provenance": [
     {
       "reason": "Superseded by clean post-repair source-pinned binaries for CP-C resume; previous values retained as history.",

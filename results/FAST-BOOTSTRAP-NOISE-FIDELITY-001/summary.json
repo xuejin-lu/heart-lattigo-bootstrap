@@ -20,7 +20,7 @@
     "standard_side_gate_expected_fast_commit": "2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f",
     "type": "STANDARD_BOOTSTRAP_PREFLIGHT_FAST_PIN_MISMATCH"
   },
-  "in_progress_checkpoint": "CP-C pre-call freeze commit; S/F/FN calls remain 0/3",
+  "in_progress_checkpoint": "CP-C ready for Standard arm; no call reserved yet (0/3)",
   "latest_precompute_stops": [
     {
       "arm": "S",
@@ -49,6 +49,13 @@
     "standard_binary_sha256": "987bf4dbcd3456f2ded3bc7045fa23f988fe2ffb1305d0b2de259a50c267a520",
     "standard_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
     "vcs_metadata": "both binaries report vcs.revision=ced64162cd79e039c829a67a31316a237d4cf41a and vcs.modified=false"
+  },
+  "precall_freeze": {
+    "actual_bootstrap_calls_at_freeze": 0,
+    "commit": "d85ab612b9552817cfa8d9448f5fab3b3c53cf3b",
+    "fresh_pair_sha256": "0b09e98eedfc1d0e14971a08c4ae5bf7b276f78471bae37307e68d1a554fa854",
+    "next_arm": "S",
+    "pushed_to": "origin/main"
   },
   "preflight": {
     "actual_bootstrap_calls": 0,
