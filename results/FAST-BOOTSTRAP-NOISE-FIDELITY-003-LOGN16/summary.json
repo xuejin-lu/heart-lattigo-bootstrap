@@ -2,8 +2,8 @@
   "schema_version": "fast-bootstrap-noise-fidelity-003-logn16-summary.v1",
   "task_id": "FAST-BOOTSTRAP-NOISE-FIDELITY-003-LOGN16",
   "status": "BATCH_IN_PROGRESS",
-  "checkpoint": "CP-C-STANDARD-COMPLETE",
-  "actual_bootstrap_calls": 12,
+  "checkpoint": "CP-C-ALL-ARMS-COMPLETE",
+  "actual_bootstrap_calls": 18,
   "authorized_maximum_bootstrap_calls": 18,
   "retry_budget": 0,
   "profile": {
@@ -38,8 +38,12 @@
     },
     "F": {
       "planned": 6,
-      "succeeded": 0,
-      "status": "NOT_STARTED"
+      "succeeded": 6,
+      "status": "CAPTURED",
+      "result_sha256": "2faf7423fd79dba3125a53e3e54d75ea8a1752bfaa14c5429494e3b6d8e9aaa7",
+      "vectors_sha256": "c187e0443c6fa76dbf6bb01556e4b74ddf3f5d98a0616cb9a45ee0aec5f5ec80",
+      "binary_sha256": "6de2afb652fb99e6de0c9aa2972947e086aea4eb48d3a3978b1be4fa6773b4b7",
+      "noise_injections": 0
     }
   },
   "preflight": {
@@ -71,7 +75,7 @@
     "synthetic_logn16_triplet": "PASS_OBSERVATIONAL_GATE_MISS_RECORDED",
     "task_worktree_policy": "PASS_2_TESTS"
   },
-  "result": "FN and genuine Standard Cold/Warm captures completed (12/18); all six Standard calls passed strict structural/provenance/finite validation. Fast OFF remains unstarted. See arms/FN-manifest.json and arms/S-manifest.json; decoded vectors remain external.",
+  "result": "All 18 authorized full Bootstrap calls are captured: FN 6, genuine Standard 6, Fast OFF 6. All three arms passed strict provenance, capacity, scale/representation, slot-count and finite-output checks. Existing comparator analysis remains pending; no further CKKS calls are authorized or needed.",
   "budget_commitment": {
     "frozen_authorized_slots": 18,
     "per_call_reserved": 0,
@@ -84,11 +88,11 @@
     "retry_budget": 0
   },
   "attempts": {
-    "reserved": 12,
-    "started": 12,
-    "succeeded": 12,
+    "reserved": 18,
+    "started": 18,
+    "succeeded": 18,
     "failed": 0,
-    "remaining_authorized": 6,
+    "remaining_authorized": 0,
     "retry_budget": 0
   }
 }
