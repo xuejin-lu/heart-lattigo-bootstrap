@@ -2,7 +2,7 @@
   "schema_version": "fast-bootstrap-noise-fidelity-003-logn16-summary.v1",
   "task_id": "FAST-BOOTSTRAP-NOISE-FIDELITY-003-LOGN16",
   "status": "BATCH_BLOCKED_NEEDS_WEB_REVIEW",
-  "checkpoint": "HOOK-GENERALIZED-AND-TARGETED-TESTS-PASS; NEW-SOURCE-PREFLIGHT-PENDING; BOOTSTRAP-BUDGET-EXHAUSTED",
+  "checkpoint": "GENERIC-HOOK-VALIDATED; NEW-SOURCE-ZERO-CALL-PREFLIGHT-PASS; BOOTSTRAP-BUDGET-EXHAUSTED",
   "actual_bootstrap_calls": 18,
   "authorized_maximum_bootstrap_calls": 18,
   "retry_budget": 0,
@@ -79,7 +79,7 @@
     "synthetic_logn16_triplet": "PASS_OBSERVATIONAL_GATE_MISS_RECORDED",
     "task_worktree_policy": "PASS_2_TESTS"
   },
-  "result": "The 18/18 authorized full Bootstrap captures and offline triplet analysis remain immutable and attributed to Fast source 9e540b... . The generic Noise Hook repair is committed and passed focused N13\u2013N16 no-Bootstrap tests. The new source pin and fresh zero-call preflight are being established; no full Bootstrap can be rerun because the original hard cap is exhausted.",
+  "result": "The 18/18 authorized full Bootstrap captures and offline triplet analysis remain immutable and attributed to Fast source 9e540b... . Generic Noise Hook support is validated at N=8192, 16384, 32768 and 65536. New Fast source 325e501... and genuine Standard were built from clean, pinned dependencies; the fresh LogN16/E32 zero-call preflight passed with pair SHA b749f1e5... . No new Bootstrap was executed. The full-call budget is exhausted, so captures from the old Fast source cannot be represented as new-source evidence.",
   "budget_commitment": {
     "frozen_authorized_slots": 18,
     "per_call_reserved": 0,
@@ -121,11 +121,39 @@
       65536
     ],
     "full_bootstrap_calls_added": 0,
-    "primary_zero_call_preflight": "PENDING"
+    "primary_zero_call_preflight": "PASS",
+    "primary_source_commit": "18e66b354ac9ba788d3dcca5a7c60bf587dfa3be",
+    "primary_source_sha256": "4b57a890eece95315cd3f222c5e7e4a006fd72a3fe5d26151566b1c6109bef2c",
+    "standard_binary_sha256": "ec6e35b1ef1aaa9ed87bab80274a86e28d1ce066d41368a16df8e483800acb3d",
+    "fast_binary_sha256": "ff3f83d42724de5e7852ab9bd752c9c418af228e6e21aeaf106f4fd11d449f91",
+    "preflight_pair_sha256": "b749f1e523844148a157dac37180ec79059eb7f29e904234e2435869033a47f3",
+    "bootstrap_calls_added": 0
   },
   "primary_generic_hook_pin_tests": {
     "perf_fast": "PASS_4_TARGETED_TESTS",
     "perf_standard": "PASS_4_TARGETED_TESTS",
     "bootstrap_calls": 0
+  },
+  "post_generalization_preflight": {
+    "status": "PASS_ZERO_BOOTSTRAP_PREBOOTSTRAP_CHAIN",
+    "bootstrap_calls": 0,
+    "primary_commit": "18e66b354ac9ba788d3dcca5a7c60bf587dfa3be",
+    "primary_source_sha256": "4b57a890eece95315cd3f222c5e7e4a006fd72a3fe5d26151566b1c6109bef2c",
+    "standard_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+    "fast_commit": "325e501709c42ab5995bf7f36fb8d19621d34131",
+    "standard_binary_sha256": "ec6e35b1ef1aaa9ed87bab80274a86e28d1ce066d41368a16df8e483800acb3d",
+    "fast_binary_sha256": "ff3f83d42724de5e7852ab9bd752c9c418af228e6e21aeaf106f4fd11d449f91",
+    "pair_path": "evidence/preflight-post-genericization/pair.json",
+    "pair_sha256": "b749f1e523844148a157dac37180ec79059eb7f29e904234e2435869033a47f3",
+    "matched_environment": true,
+    "input_slots": 32768,
+    "capacity_policy": "logn16-original-e32-observed-native-oracle-v1",
+    "observed_native_oracle_status": "PASS_EIGHT_CHECKPOINTS_AND_LEVEL4_TO_LEVEL0_CONTINUITY",
+    "artifacts_sha256": {
+      "standard": "9b5fbc846cdf211886603f3acd5bf2a864d622e34f8e77fda436844378b26788",
+      "fast": "acc0897184b6b67cc671b5fd6dbde2075d0a875dd709066e96d91165eed522b3",
+      "pair": "b749f1e523844148a157dac37180ec79059eb7f29e904234e2435869033a47f3",
+      "provenance": "ff27340fef97ef085409a5d8f6a9a46758e2e3055d767321bae396ebbd9e7714"
+    }
   }
 }

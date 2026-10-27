@@ -1,0 +1,195 @@
+{
+  "schema_version": "fast-bootstrap-noise-fidelity-003-logn16-post-generalization-preflight.v1",
+  "task_id": "FAST-BOOTSTRAP-NOISE-FIDELITY-003-LOGN16",
+  "status": "PASS_ZERO_BOOTSTRAP_PREBOOTSTRAP_CHAIN",
+  "bootstrap_calls": 0,
+  "primary": {
+    "commit": "18e66b354ac9ba788d3dcca5a7c60bf587dfa3be",
+    "source_sha256": "4b57a890eece95315cd3f222c5e7e4a006fd72a3fe5d26151566b1c6109bef2c",
+    "clean": true
+  },
+  "secondary": {
+    "standard_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+    "standard_ref": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+    "standard_clean": true,
+    "fast_commit": "325e501709c42ab5995bf7f36fb8d19621d34131",
+    "fast_ref": "experiment/fast-bootstrap-noise-fidelity",
+    "fast_checkout_ref": "experiment/fast-bootstrap-noise-fidelity",
+    "fast_clean": true
+  },
+  "binaries": {
+    "standard": {
+      "path": "/private/tmp/perfprobe-003-standard-generic-18e66b3",
+      "sha256": "ec6e35b1ef1aaa9ed87bab80274a86e28d1ce066d41368a16df8e483800acb3d",
+      "build_tag": "perf_standard",
+      "go_version": "go1.26.4",
+      "os": "darwin",
+      "arch": "arm64",
+      "vcs_revision": "18e66b354ac9ba788d3dcca5a7c60bf587dfa3be",
+      "vcs_modified": false,
+      "go_version_m_path": "evidence/preflight-post-genericization/standard-go-version-m.txt",
+      "go_version_m_sha256": "26501f1ad19f3e32c1d47453b1ec731fceeffbbf4b53efb448c283ef291216ed"
+    },
+    "fast": {
+      "path": "/private/tmp/perfprobe-003-fast-generic-18e66b3",
+      "sha256": "ff3f83d42724de5e7852ab9bd752c9c418af228e6e21aeaf106f4fd11d449f91",
+      "build_tag": "perf_fast",
+      "go_version": "go1.26.4",
+      "os": "darwin",
+      "arch": "arm64",
+      "vcs_revision": "18e66b354ac9ba788d3dcca5a7c60bf587dfa3be",
+      "vcs_modified": false,
+      "go_version_m_path": "evidence/preflight-post-genericization/fast-go-version-m.txt",
+      "go_version_m_sha256": "d6e6ca7e698c49e9d8f33cc3792064e5f559c7be5fa3b4b4ffd3ecfe223b3929"
+    }
+  },
+  "matched_profile": {
+    "log_n": 16,
+    "ring_n": 65536,
+    "log_slots": 15,
+    "input_slots": 32768,
+    "ephemeral_secret_weight": 32,
+    "config_sha256": "16e62fdea2dc5ac32240a33cc256cdf60b935aa00b4a16aa004474d2c3033b02",
+    "qp_sha256": "6c82ca724cbfdce2083b2ef2c18d53f81e658a6f28ff283e9a671d276710ec5f",
+    "canonical_input_sha256": "659fc59c899341a8253887270f1ae3478528fd864d66aca14bba918550ce8ccf",
+    "workload_sha256": "1413c0f0edc3c6b52d7a71e4714efe70280854e1208f87640b741682b65fa2a9",
+    "bootstrap_plaintext_input_sha256": "0ae8245b16cdd3b183a1872676ed691e1463037f47d992d4d2df3831ee9d3432",
+    "capacity_policy": "logn16-original-e32-observed-native-oracle-v1",
+    "conservative_bound_status": "NOT_PROVEN",
+    "observed_native_oracle_status": "PASS_EIGHT_CHECKPOINTS_AND_LEVEL4_TO_LEVEL0_CONTINUITY",
+    "checkpoint_count": 8,
+    "level4_to_level0_continuity": {
+      "standard": {
+        "complex_rmse": 0,
+        "max_complex_difference": 0,
+        "max_real_difference": 0,
+        "max_imag_difference": 0,
+        "worst_slot": 0,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 99.65784284662087
+      },
+      "fast": {
+        "complex_rmse": 0,
+        "max_complex_difference": 0,
+        "max_real_difference": 0,
+        "max_imag_difference": 0,
+        "worst_slot": 0,
+        "real_components_above_threshold": 0,
+        "imag_components_above_threshold": 0,
+        "median_precision_bits": 99.65784284662087
+      }
+    },
+    "effective_parameters": {
+      "ephemeral_secret_weight": 32,
+      "log_n": 16,
+      "log_slots": 15,
+      "input_slots": 32768,
+      "ring_n": 65536,
+      "residual_ring_n": 65536,
+      "q0_config_target_bits": 55,
+      "q0_bits": 56,
+      "q_chain_bits": [
+        56,
+        39,
+        39,
+        39,
+        39,
+        60,
+        61,
+        60,
+        61,
+        61,
+        60,
+        60,
+        61,
+        57,
+        56,
+        56,
+        57
+      ],
+      "p_bits": [
+        61,
+        61,
+        62,
+        61,
+        62
+      ],
+      "q_primes": [
+        "36028797019488257",
+        "549754109953",
+        "549753978881",
+        "549753716737",
+        "549753192449",
+        "1152921504606584833",
+        "1152921504614055937",
+        "1152921504598720513",
+        "1152921504615628801",
+        "1152921504616808449",
+        "1152921504597016577",
+        "1152921504595968001",
+        "1152921504618381313",
+        "72057594038321153",
+        "72057594036879361",
+        "72057594035306497",
+        "72057594040680449"
+      ],
+      "p_primes": [
+        "2305843009211596801",
+        "2305843009210023937",
+        "2305843009218281473",
+        "2305843009208713217",
+        "2305843009218936833"
+      ],
+      "default_scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+      "mod1_log_scale": 60,
+      "mod1_degree": 30,
+      "double_angle": 3,
+      "k": 16,
+      "log_message_ratio": 10,
+      "circuit_order": 0,
+      "q_prefix_rows_at_max_level": 4
+    }
+  },
+  "preflight_artifacts": {
+    "standard": {
+      "path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-003-LOGN16/evidence/preflight-post-genericization/standard.json",
+      "bytes": 29660,
+      "sha256": "9b5fbc846cdf211886603f3acd5bf2a864d622e34f8e77fda436844378b26788"
+    },
+    "fast": {
+      "path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-003-LOGN16/evidence/preflight-post-genericization/fast.json",
+      "bytes": 29959,
+      "sha256": "acc0897184b6b67cc671b5fd6dbde2075d0a875dd709066e96d91165eed522b3"
+    },
+    "pair": {
+      "path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-003-LOGN16/evidence/preflight-post-genericization/pair.json",
+      "bytes": 15896,
+      "sha256": "b749f1e523844148a157dac37180ec79059eb7f29e904234e2435869033a47f3"
+    },
+    "external_vectors": {
+      "standard": {
+        "path": "/private/tmp/fast-bootstrap-noise-fidelity-003-post-genericization-preflight/standard-vectors.json",
+        "bytes": 33325865,
+        "sha256": "ce5bfaa830bed8cc4907b5ae14636b5aafad5b24a1a4917b9b5a4a3fd27ece81"
+      },
+      "fast": {
+        "path": "/private/tmp/fast-bootstrap-noise-fidelity-003-post-genericization-preflight/fast-vectors.json",
+        "bytes": 33315824,
+        "sha256": "df003704f9b102f6b805eac2f50535cba29d5f771b282c852f34bbfca2f973f9"
+      }
+    }
+  },
+  "historical_capture_attribution": {
+    "fast_commit": "9e540b30898cea74f0fa4acdf03477264344db79",
+    "fast_binary_sha256": "6de2afb652fb99e6de0c9aa2972947e086aea4eb48d3a3978b1be4fa6773b4b7",
+    "calls": 18,
+    "reused_as_new_source_capture": false
+  },
+  "budget": {
+    "authorized_maximum": 18,
+    "actual_full_bootstrap_calls": 18,
+    "remaining": 0,
+    "retries": 0
+  }
+}
