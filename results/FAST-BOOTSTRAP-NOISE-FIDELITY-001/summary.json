@@ -20,7 +20,7 @@
     "standard_side_gate_expected_fast_commit": "2cb8bc799ccf5ec2e8e011b84fb9e0dabd77886f",
     "type": "STANDARD_BOOTSTRAP_PREFLIGHT_FAST_PIN_MISMATCH"
   },
-  "in_progress_checkpoint": "CP-C Standard completed once; Fast arm next and not yet reserved",
+  "in_progress_checkpoint": "CP-C F slot reserved; S=1/1 complete, F/FN actual calls=0",
   "latest_precompute_stops": [
     {
       "arm": "S",
@@ -53,6 +53,12 @@
   "precall_freeze": {
     "actual_bootstrap_calls_at_freeze": 0,
     "commit": "d85ab612b9552817cfa8d9448f5fab3b3c53cf3b",
+    "fast_attempt": {
+      "noise_hook_enabled": false,
+      "output_base_external": "/private/tmp/fbn001-cp-c-runs-e45464f/fast.json",
+      "reservation_count": 1,
+      "status": "RESERVED_NOT_STARTED_NO_RETRY"
+    },
     "fresh_pair_sha256": "0b09e98eedfc1d0e14971a08c4ae5bf7b276f78471bae37307e68d1a554fa854",
     "next_arm": "S",
     "pushed_to": "origin/main",
