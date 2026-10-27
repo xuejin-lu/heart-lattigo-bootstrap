@@ -3,6 +3,8 @@
   "attempts": [
     {
       "arm": "S",
+      "attempt_output_base_external": "/private/tmp/fbn001-cp-c-runs-7f4a3d5/standard.json",
+      "attempt_reservations": 1,
       "attempts_used": 0,
       "backend": "genuine-standard",
       "binary_sha256": "987bf4dbcd3456f2ded3bc7045fa23f988fe2ffb1305d0b2de259a50c267a520",
@@ -13,7 +15,10 @@
       "max_actual_calls": 1,
       "precompute_attempts": 3,
       "preflight_pair_sha256": "0b09e98eedfc1d0e14971a08c4ae5bf7b276f78471bae37307e68d1a554fa854",
-      "status": "READY_TO_START_ONE_STANDARD_CALL_AFTER_PRECALL_FREEZE_PUSH"
+      "reservation_status": "RESERVED_NOT_STARTED_NO_RETRY",
+      "reservation_time_utc": "2026-10-27T00:55:28Z",
+      "reserved_preflight_pair_sha256": "0b09e98eedfc1d0e14971a08c4ae5bf7b276f78471bae37307e68d1a554fa854",
+      "status": "STANDARD_CALL_RESERVED_NOT_STARTED"
     },
     {
       "arm": "F",
@@ -71,7 +76,7 @@
   },
   "build_provenance_status": "PASS_CLEAN_VCS_STAMPED_STANDARD_FAST_BINARIES",
   "checkpoint": "CP-C",
-  "current_phase": "STANDARD_ARM_READY_NO_RESERVATION",
+  "current_phase": "STANDARD_ARM_RESERVED_NOT_STARTED",
   "events": [
     {
       "all_attempts_remain_reserved_not_started": true,
@@ -158,6 +163,18 @@
       "remote_ref": "origin/main",
       "status": "READY_FOR_STANDARD_ARM",
       "time_utc": "2026-10-27T00:55:00Z"
+    },
+    {
+      "actual_bootstrap_calls": 0,
+      "arm": "S",
+      "event": "CP_C_STANDARD_ARM_ATTEMPT_RESERVED",
+      "output_base_external": "/private/tmp/fbn001-cp-c-runs-7f4a3d5/standard.json",
+      "preflight_pair_sha256": "0b09e98eedfc1d0e14971a08c4ae5bf7b276f78471bae37307e68d1a554fa854",
+      "reservation_count": 1,
+      "retry_allowed": false,
+      "standard_binary_sha256": "987bf4dbcd3456f2ded3bc7045fa23f988fe2ffb1305d0b2de259a50c267a520",
+      "time_utc": "2026-10-27T00:55:28Z",
+      "warmups": 0
     }
   ],
   "fast_noise_root_seed": 20261027,
@@ -260,13 +277,13 @@
     "primary_source_sha256": "bef8af26f2de7369d0ff8ec0f6ece49882135e8c3b4d67e252abaf20b19b530f",
     "standard_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40"
   },
-  "status": "CP_C_READY_FOR_STANDARD_ARM",
+  "status": "CP_C_STANDARD_ATTEMPT_RESERVED",
   "stop_conditions": [
     "Do not execute any Bootstrap until post-ledger clean-source builds, go version -m metadata, binary SHA, and zero-call Standard/Fast preflight pair all pass.",
     "If any actual call fails, or provenance, parameters, capacity, input, or output validation fails, stop immediately; do not retry or consume another slot.",
     "No LogN16 workload, BTS, large benchmark, CP-D, or CP-E execution is authorized."
   ],
-  "stop_reason": "NONE_ALL_PRECALL_GATES_PASS",
+  "stop_reason": "NONE_PRECALL_GATES_PASS",
   "superseded_build_provenance": [
     {
       "reason": "Superseded by clean post-repair source-pinned binaries for CP-C resume; previous values retained as history.",
