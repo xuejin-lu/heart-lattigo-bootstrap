@@ -234,10 +234,13 @@ func validateBTS009Run(run *perfmeasure.BTSRunDocument, backend, noiseMode strin
 	if run.NoiseMode != noiseMode || run.BTSManifestSHA256 != bts008SourceManifestSHA || run.MeasurementProcesses != 1 || run.BootstrapBudget != 6 || run.BootstrapReservations != 6 || len(run.Samples) != 6 {
 		return errors.New("Noise mode, original BTS manifest, process count, six-call budget, or sample count mismatch")
 	}
-	if backend == "standard" && (run.NoiseHookSupported || run.NoiseHookEnabled) {
+	if run.NoiseHookSupported == nil || run.NoiseHookEnabled == nil {
+		return errors.New("BTS-009 run is missing an explicit Noise Hook supported/enabled snapshot")
+	}
+	if backend == "standard" && (*run.NoiseHookSupported || *run.NoiseHookEnabled) {
 		return errors.New("genuine Standard run unexpectedly exposes or enables the Fast-only Noise Hook")
 	}
-	if backend == "fast" && (!run.NoiseHookSupported || run.NoiseHookEnabled != (noiseMode == "on")) {
+	if backend == "fast" && (!*run.NoiseHookSupported || *run.NoiseHookEnabled != (noiseMode == "on")) {
 		return errors.New("Fast Noise Hook support/enabled state does not match the selected arm")
 	}
 	if run.ProfileSHA256 == "" || run.ArmConfigSHA256 == "" || run.Circuit == "" {

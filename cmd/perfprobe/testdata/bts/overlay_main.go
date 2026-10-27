@@ -246,8 +246,9 @@ func runBTSMeasurement() error {
 		if err != nil {
 			return failRun(summaryPath, &run, fmt.Errorf("read initial 009 Noise Hook state: %w", err))
 		}
-		run.NoiseHookSupported = noiseSnapshot.Supported
-		run.NoiseHookEnabled = noiseSnapshot.Enabled
+		hookSupported, hookEnabled := noiseSnapshot.Supported, noiseSnapshot.Enabled
+		run.NoiseHookSupported = &hookSupported
+		run.NoiseHookEnabled = &hookEnabled
 		if noiseSnapshot.CtCtMultiplyCalls != 0 || noiseSnapshot.InjectedPolynomials != 0 || len(noiseSnapshot.Events) != 0 {
 			return failRun(summaryPath, &run, fmt.Errorf("009 Noise Hook must start with empty evidence: %+v", noiseSnapshot))
 		}
