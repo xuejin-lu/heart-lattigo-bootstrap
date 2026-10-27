@@ -2,7 +2,7 @@
   "schema_version": "fast-bootstrap-noise-fidelity-002-summary.v1",
   "task": "FAST-BOOTSTRAP-NOISE-FIDELITY-002",
   "status": "BATCH_IN_PROGRESS",
-  "checkpoint": "CP-A complete; CP-B implementation, focused tests, and task-scoped code/evidence provenance complete; clean pinned builds and fresh zero-call preflight pending",
+  "checkpoint": "CP-A/CP-B complete; clean pinned builds and fresh zero-call preflight passed; frozen evidence checkpoint pending commit and push before any Bootstrap reservation",
   "actual_bootstrap_calls": 0,
   "authorized_maximum_bootstrap_calls": 18,
   "retry_budget": 0,
@@ -19,9 +19,17 @@
   },
   "fixed_sigma": 4.004280012097432,
   "noise_root_seed": 20261027,
-  "primary_source_code_commit": null,
+  "primary_source_code_commit": "9f3f53ff9639866605ab0dd13da0431cb4c2775f",
+  "primary_source_sha256": "894668dd7efef96e2cf9d17680881be43c14bedf96f2279e5ac552a88f369f54",
+  "standard_binary_sha256": "df76ea83d25c3f428bb4567c6d34bb32af1434189b5918d6246484e3549bdbc8",
+  "fast_binary_sha256_shared_by_F_FN": "311fdca496368f42102192c39c0835454a0c41c3bd1bc4064b32ad4b117745c7",
   "standard_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
   "fast_commit": "49b65dd927780cec0d7e05772a3df8554ef58005",
-  "fresh_preflight": "NOT_RUN",
+  "fresh_preflight": {
+    "status": "PASS_ZERO_BOOTSTRAP_PREFLIGHT",
+    "actual_bootstrap_calls": 0,
+    "pair_sha256": "37ab35c0eb724c381f7b6a78e5ebf17cc391708a596907a8f22e6e59a3cb0ae0",
+    "manifest": "preflight/manifest.json"
+  },
   "results": null
 }

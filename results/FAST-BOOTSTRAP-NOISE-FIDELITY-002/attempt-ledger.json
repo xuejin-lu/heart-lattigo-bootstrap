@@ -45,12 +45,32 @@
     "canonical_input_sha256": "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285",
     "workload_sha256": "00b70a2e77887c7d6a41db1859246f6513f2c984915de648734e5dd8c584cf74",
     "bootstrap_plaintext_sha256": "c32c0d7b731c0fcd8d82fb9c1182a43a62d120f761c090ce21dc764e9aa1e703",
-    "primary_source_code_commit": null,
-    "primary_source_sha256": null,
-    "standard_binary_sha256": null,
-    "fast_binary_sha256_shared_by_F_FN": null,
-    "fresh_zero_call_preflight_pair_sha256": null,
-    "preflight_status": "NOT_RUN"
+    "primary_source_code_commit": "9f3f53ff9639866605ab0dd13da0431cb4c2775f",
+    "primary_source_sha256": "894668dd7efef96e2cf9d17680881be43c14bedf96f2279e5ac552a88f369f54",
+    "standard_binary_sha256": "df76ea83d25c3f428bb4567c6d34bb32af1434189b5918d6246484e3549bdbc8",
+    "fast_binary_sha256_shared_by_F_FN": "311fdca496368f42102192c39c0835454a0c41c3bd1bc4064b32ad4b117745c7",
+    "fresh_zero_call_preflight_pair_sha256": "37ab35c0eb724c381f7b6a78e5ebf17cc391708a596907a8f22e6e59a3cb0ae0",
+    "preflight_status": "PASS_ZERO_BOOTSTRAP_PREFLIGHT"
+  },
+  "preflight_evidence": {
+    "manifest_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-002/preflight/manifest.json",
+    "manifest_sha256": "18db46703a75bdd6daf1744bc208461d25354e12217a21a988dfb3dec1fab3d6",
+    "pair_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-002/preflight/pair.json",
+    "pair_sha256": "37ab35c0eb724c381f7b6a78e5ebf17cc391708a596907a8f22e6e59a3cb0ae0",
+    "actual_bootstrap_calls": 0,
+    "status": "PASS",
+    "standard_document_sha256": "cfef27f713cc7c3dc2b2d1e5b8dd3bad44852d353dbbe85e1344d33bd37a8248",
+    "fast_document_sha256": "76e97e37e1135aad13ae3f7bd5eee8f09cb14ab3508ac9ed310fba0147490b71",
+    "standard_vectors": {
+      "external_path": "/private/tmp/fast-bootstrap-noise-fidelity-002-preflight/standard-vectors.json",
+      "bytes": 4165467,
+      "sha256": "ce90902d3b66cf56442db7cc6fccd9d330ffb2c6f9f08a30977080d3482f7f47"
+    },
+    "fast_vectors": {
+      "external_path": "/private/tmp/fast-bootstrap-noise-fidelity-002-preflight/fast-vectors.json",
+      "bytes": 4159849,
+      "sha256": "66641219e5c9cec380c3a985da01c051cfbf931173a28b1a7bcfda2615427e12"
+    }
   },
   "attempts": [
     {

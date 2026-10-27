@@ -60,4 +60,26 @@ Focused tests passed without invoking a complete Bootstrap:
 - The task source-identity test verified that clean code commit `ca9fc012…` and its result-only descendant `e0e6ade…` have identical maintained-source fingerprints, and that `vcs.modified=true` is rejected.
 - An additional pre-existing `TestFastMod1FormalDegree30PolynomialRegression` was attempted and failed in its purported Standard half when run inside the Fast checkout. That fixture is not genuine Standard: it converts Fast plaintext-like `c1=0` state, then invokes Standard-named evaluator APIs in the Fast module, which dispatch to Fast zero-secret arithmetic and fail on missing active `q4` row. A temporary fixture correction also failed the expected nonzero-`c1` assertion because the Fast capability intentionally remains `c1=0`; all such fixture edits were reverted. This failure does not exercise the accepted Fast P93/E32 Mod1 path; the targeted test above passed. No production arithmetic was changed.
 
-Primary code and focused results are still an uncommitted checkpoint. No binaries have been built, no fresh 002 preflight has run, and the task ledger remains at 0 reservations / 0 actual Bootstrap calls. Under the user-approved charter, the measured batch can start only after the source commit, clean pinned binaries, and fresh zero-call gates are versioned and pass.
+At that earlier checkpoint, Primary code and focused results were still uncommitted, and no binaries or fresh 002 preflight existed. The next section records completion of those gates; actual Bootstrap reservations/calls remain zero.
+
+## Clean builds and fresh zero-call preflight
+
+Date: 2026-10-27
+
+The final Primary measurement source was committed at `9f3f53ff9639866605ab0dd13da0431cb4c2775f`. Its maintained-source fingerprint is `894668dd7efef96e2cf9d17680881be43c14bedf96f2279e5ac552a88f369f54`. Clean source checkouts were used for the binaries: genuine Standard Lattigo `5dbffbdea05394de2ca3a432ed5318aa832e3f40` and Fast `experiment/fast-bootstrap-noise-fidelity@49b65dd927780cec0d7e05772a3df8554ef58005`.
+
+- Standard binary: `/private/tmp/perfprobe-standard-002`, SHA-256 `df76ea83d25c3f428bb4567c6d34bb32af1434189b5918d6246484e3549bdbc8`, `perf_standard`, darwin/arm64, 13,539,874 bytes.
+- Shared Fast/FN binary: `/private/tmp/perfprobe-fast-002`, SHA-256 `311fdca496368f42102192c39c0835454a0c41c3bd1bc4064b32ad4b117745c7`, `perf_fast`, darwin/arm64, 14,222,274 bytes. Fast OFF and Fast+Noise will use this exact same binary.
+- Both binaries report Go `vcs.revision=9f3f53ff9639866605ab0dd13da0431cb4c2775f`, `vcs.modified=false`, the expected build tag and module source in `go version -m`. Temporary modfiles and their checksums are recorded in `preflight/manifest.json`; the repository `go.mod` was not changed. The builds exited successfully. Go emitted an optional module-stat-cache write warning (`operation not permitted`) for its default cache; this did not affect binary creation, VCS metadata, SHA verification, or execution.
+- Environment: Apple M4, darwin/arm64, Go `go1.26.4`, 10 CPUs / `GOMAXPROCS=10`; default GOGC/GODEBUG/GOMEMLIMIT.
+
+The fresh Standard and Fast preflights both returned `PASS_ZERO_BOOTSTRAP_PREBOOTSTRAP_CHAIN`; the existing `compare-public` flow produced `PASS`. Actual Bootstrap calls and reservations remain `0/18`. The pair records 4096 slots, LogN13/E32, effective Bootstrap Scale `2^45`, exact Q/P fingerprint, original-input/workload/oracle fingerprints, matching environment, eight checkpoints, and the pinned Standard/Fast source and binary identities. Pair SHA-256: `37ab35c0eb724c381f7b6a78e5ebf17cc391708a596907a8f22e6e59a3cb0ae0` (15,833 bytes).
+
+Versioned compact documents:
+
+- `preflight/standard.json`: 29,423 bytes, SHA-256 `cfef27f713cc7c3dc2b2d1e5b8dd3bad44852d353dbbe85e1344d33bd37a8248`.
+- `preflight/fast.json`: 29,765 bytes, SHA-256 `76e97e37e1135aad13ae3f7bd5eee8f09cb14ab3508ac9ed310fba0147490b71`.
+- `preflight/pair.json`: 15,833 bytes, SHA-256 above.
+- `preflight/manifest.json` captures the source/build/module/environment identities and all artifact hashes. Both decoded 4096-slot preflight vectors are intentionally outside Git: Standard `/private/tmp/fast-bootstrap-noise-fidelity-002-preflight/standard-vectors.json`, 4,165,467 bytes, SHA-256 `ce90902d3b66cf56442db7cc6fccd9d330ffb2c6f9f08a30977080d3482f7f47`; Fast `/private/tmp/fast-bootstrap-noise-fidelity-002-preflight/fast-vectors.json`, 4,159,849 bytes, SHA-256 `66641219e5c9cec380c3a985da01c051cfbf931173a28b1a7bcfda2615427e12`.
+
+All manifest file sizes and hashes were rechecked against the files, including both binaries and the external vectors. No output-precision threshold was used to waive any preflight structural, capacity, provenance, finite-slot, or oracle checks. No Bootstrap was reserved or invoked. The plan, manifest, ledger, and preflight artifacts must be committed and pushed before the first FN reservation.

@@ -1,0 +1,132 @@
+{
+  "schema_version": "fast-bootstrap-noise-fidelity-002-preflight-manifest.v1",
+  "task": "FAST-BOOTSTRAP-NOISE-FIDELITY-002",
+  "status": "PASS_ZERO_BOOTSTRAP_PREFLIGHT",
+  "actual_bootstrap_calls": 0,
+  "source": {
+    "primary_code_commit": "9f3f53ff9639866605ab0dd13da0431cb4c2775f",
+    "primary_evidence_commit_at_preflight": "9f3f53ff9639866605ab0dd13da0431cb4c2775f",
+    "fast_secondary_commit": "49b65dd927780cec0d7e05772a3df8554ef58005",
+    "standard_secondary_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40"
+  },
+  "frozen_parameters": {
+    "profile": "logn13",
+    "log_n": 13,
+    "log_slots": 12,
+    "input_slots": 4096,
+    "ephemeral_secret_weight": 32,
+    "bootstrap_scale": "3.51843720888320000000000000000000000000000000000000000000000000000000000000000000e+13",
+    "config_sha256": "919a2d9409b8ddeb720458d3112855f87d7a69e0cc39aad825b0ddf794769c98",
+    "qp_sha256": "1f045e603a856968779d62e045a037274bba08cbfce8b1dd3dec2828f1f6a46b",
+    "original_input_sha256": "d9151964e398ae9fb77248394b4b28f84c9e5737c621cf5e5b0570e343dcc285",
+    "workload_sha256": "00b70a2e77887c7d6a41db1859246f6513f2c984915de648734e5dd8c584cf74",
+    "bootstrap_plaintext_sha256": "c32c0d7b731c0fcd8d82fb9c1182a43a62d120f761c090ce21dc764e9aa1e703"
+  },
+  "preflight_pair": {
+    "repo_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-002/preflight/pair.json",
+    "sha256": "37ab35c0eb724c381f7b6a78e5ebf17cc391708a596907a8f22e6e59a3cb0ae0",
+    "bytes": 15833,
+    "status": "PASS",
+    "task_id": "FAST-BOOTSTRAP-NOISE-FIDELITY-002",
+    "actual_bootstrap_calls": 0,
+    "checkpoint_count": 8,
+    "matched_environment": true
+  },
+  "captures": {
+    "standard": {
+      "document": {
+        "repo_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-002/preflight/standard.json",
+        "external_path": null,
+        "bytes": 29423,
+        "sha256": "cfef27f713cc7c3dc2b2d1e5b8dd3bad44852d353dbbe85e1344d33bd37a8248"
+      },
+      "vectors": {
+        "repo_path": null,
+        "external_path": "/private/tmp/fast-bootstrap-noise-fidelity-002-preflight/standard-vectors.json",
+        "bytes": 4165467,
+        "sha256": "ce90902d3b66cf56442db7cc6fccd9d330ffb2c6f9f08a30977080d3482f7f47"
+      },
+      "binary_sha256": "df76ea83d25c3f428bb4567c6d34bb32af1434189b5918d6246484e3549bdbc8",
+      "status": "PASS_ZERO_BOOTSTRAP_PREBOOTSTRAP_CHAIN",
+      "actual_bootstrap_calls": 0
+    },
+    "fast": {
+      "document": {
+        "repo_path": "results/FAST-BOOTSTRAP-NOISE-FIDELITY-002/preflight/fast.json",
+        "external_path": null,
+        "bytes": 29765,
+        "sha256": "76e97e37e1135aad13ae3f7bd5eee8f09cb14ab3508ac9ed310fba0147490b71"
+      },
+      "vectors": {
+        "repo_path": null,
+        "external_path": "/private/tmp/fast-bootstrap-noise-fidelity-002-preflight/fast-vectors.json",
+        "bytes": 4159849,
+        "sha256": "66641219e5c9cec380c3a985da01c051cfbf931173a28b1a7bcfda2615427e12"
+      },
+      "binary_sha256": "311fdca496368f42102192c39c0835454a0c41c3bd1bc4064b32ad4b117745c7",
+      "status": "PASS_ZERO_BOOTSTRAP_PREBOOTSTRAP_CHAIN",
+      "actual_bootstrap_calls": 0
+    }
+  },
+  "binaries": {
+    "standard": {
+      "path": "/private/tmp/perfprobe-standard-002",
+      "bytes": 13539874,
+      "sha256": "df76ea83d25c3f428bb4567c6d34bb32af1434189b5918d6246484e3549bdbc8",
+      "build_tag": "perf_standard",
+      "primary_source_commit": "9f3f53ff9639866605ab0dd13da0431cb4c2775f",
+      "primary_evidence_commit": "9f3f53ff9639866605ab0dd13da0431cb4c2775f",
+      "primary_measurement_source_sha256": "894668dd7efef96e2cf9d17680881be43c14bedf96f2279e5ac552a88f369f54",
+      "go_version": "go1.26.4",
+      "goos": "darwin",
+      "goarch": "arm64",
+      "vcs_revision": "9f3f53ff9639866605ab0dd13da0431cb4c2775f",
+      "vcs_modified": false,
+      "secondary_commit": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+      "secondary_ref": "5dbffbdea05394de2ca3a432ed5318aa832e3f40",
+      "secondary_clean": true,
+      "secondary_path": "/private/tmp/lattigo-fast-bootstrap-noise-fidelity-standard-5dbffbdea053",
+      "module_replacement_path": "/private/tmp/lattigo-fast-bootstrap-noise-fidelity-standard-5dbffbdea053",
+      "modfile_path": "/private/tmp/fast-bootstrap-noise-fidelity-002-standard.mod",
+      "modfile_sha256": "ee472d541256e8d855d22c4c081f6d8d608ab8ece1465b93f60bda2079225e4a",
+      "modfile_sum_path": "/private/tmp/fast-bootstrap-noise-fidelity-002-standard.sum",
+      "modfile_sum_sha256": "ba0b56d4f4d13fd01648402ad271b0c27a6722830ca2f652fcd94e4cfdcb508d"
+    },
+    "fast_shared_by_F_FN": {
+      "path": "/private/tmp/perfprobe-fast-002",
+      "bytes": 14222274,
+      "sha256": "311fdca496368f42102192c39c0835454a0c41c3bd1bc4064b32ad4b117745c7",
+      "build_tag": "perf_fast",
+      "primary_source_commit": "9f3f53ff9639866605ab0dd13da0431cb4c2775f",
+      "primary_evidence_commit": "9f3f53ff9639866605ab0dd13da0431cb4c2775f",
+      "primary_measurement_source_sha256": "894668dd7efef96e2cf9d17680881be43c14bedf96f2279e5ac552a88f369f54",
+      "go_version": "go1.26.4",
+      "goos": "darwin",
+      "goarch": "arm64",
+      "vcs_revision": "9f3f53ff9639866605ab0dd13da0431cb4c2775f",
+      "vcs_modified": false,
+      "secondary_commit": "49b65dd927780cec0d7e05772a3df8554ef58005",
+      "secondary_ref": "experiment/fast-bootstrap-noise-fidelity@49b65dd927780cec0d7e05772a3df8554ef58005",
+      "secondary_clean": true,
+      "secondary_path": "/private/tmp/lattigo-fast-bootstrap-noise-fidelity",
+      "module_replacement_path": "/private/tmp/lattigo-fast-bootstrap-noise-fidelity",
+      "modfile_path": "/private/tmp/fast-bootstrap-noise-fidelity-002.mod",
+      "modfile_sha256": "61ea59671c2c619357152403d3788c8e0eb47659ce82b2f6df6dd600171392b0",
+      "modfile_sum_path": "/private/tmp/fast-bootstrap-noise-fidelity-002.sum",
+      "modfile_sum_sha256": "ba0b56d4f4d13fd01648402ad271b0c27a6722830ca2f652fcd94e4cfdcb508d"
+    }
+  },
+  "environment": {
+    "go_version": "go1.26.4",
+    "os": "darwin",
+    "arch": "arm64",
+    "cpu": "Apple M4",
+    "num_cpu": 10,
+    "gomaxprocs": 10,
+    "gogc": "runtime-default",
+    "gomemlimit": "runtime-default",
+    "godebug": "runtime-default",
+    "matched_between_arms": true
+  },
+  "note": "Large decoded preflight vectors remain outside Git at the recorded paths; task pair and compact raw per-arm documents are versioned. No Bootstrap was reserved or called."
+}
