@@ -1,7 +1,7 @@
 {
   "schema_version": "bts-fast-noise-fidelity-009-attempt-ledger.v1",
   "task": "BTS-FAST-NOISE-FIDELITY-009",
-  "status": "FAST_NOISE_COMPLETE_STANDARD_PENDING",
+  "status": "FAST_NOISE_AND_STANDARD_COMPLETE_FAST_OFF_PENDING",
   "authorization_source": "User-provided task specification pasted 2026-10-27",
   "profile": {
     "log_n": 16,
@@ -92,9 +92,9 @@
     }
   },
   "counters": {
-    "reserved": 6,
-    "entered": 6,
-    "completed": 6,
+    "reserved": 12,
+    "entered": 12,
+    "completed": 12,
     "failed": 0
   },
   "attempts": [
@@ -102,67 +102,85 @@
       "attempt_id": "S-01",
       "arm": "standard",
       "phase": "cold",
-      "status": "NOT_RESERVED",
-      "reservation_file": null,
-      "result_file": null,
-      "entered_bootstrap": false,
-      "completed": false,
-      "failure": null
+      "status": "COMPLETED",
+      "reservation_file": "standard/attempt.bootstrap-attempt-01.json",
+      "result_file": "standard/attempt.bootstrap-result-01.json",
+      "entered_bootstrap": true,
+      "completed": true,
+      "failure": null,
+      "reservation_sha256": "c8f1707f21435996c4e480cb734d3d2280be948ced72c6bd7e43b5d454517c73",
+      "result_sha256": "69b7ce9d6d909d72ccd587b8dde3d955ddf0f757f1e1c51b285d8de16ba03239",
+      "output_vector_sha256": "163349917e656fe69ec303f968c708acc5f555a5f531c59792644abab4eec091"
     },
     {
       "attempt_id": "S-02",
       "arm": "standard",
       "phase": "warm_01",
-      "status": "NOT_RESERVED",
-      "reservation_file": null,
-      "result_file": null,
-      "entered_bootstrap": false,
-      "completed": false,
-      "failure": null
+      "status": "COMPLETED",
+      "reservation_file": "standard/attempt.bootstrap-attempt-02.json",
+      "result_file": "standard/attempt.bootstrap-result-02.json",
+      "entered_bootstrap": true,
+      "completed": true,
+      "failure": null,
+      "reservation_sha256": "3c9f65fbf77ef04f109ae6d9abfee06bb65e08b328b0fb8f7bd60f4ad699b044",
+      "result_sha256": "24b14a3f12bfcddedf5e0d778e37ea3eea743a727cad2ab2f0498193e3ee876a",
+      "output_vector_sha256": "163349917e656fe69ec303f968c708acc5f555a5f531c59792644abab4eec091"
     },
     {
       "attempt_id": "S-03",
       "arm": "standard",
       "phase": "warm_02",
-      "status": "NOT_RESERVED",
-      "reservation_file": null,
-      "result_file": null,
-      "entered_bootstrap": false,
-      "completed": false,
-      "failure": null
+      "status": "COMPLETED",
+      "reservation_file": "standard/attempt.bootstrap-attempt-03.json",
+      "result_file": "standard/attempt.bootstrap-result-03.json",
+      "entered_bootstrap": true,
+      "completed": true,
+      "failure": null,
+      "reservation_sha256": "08ba82ec3876c4fd18cdc959be71a4685d8d70322e8921fe752ffe55bacb3cf0",
+      "result_sha256": "27dc7161b98268bc376c3cf6074530f992309961adf482415c73ef579388fb7b",
+      "output_vector_sha256": "163349917e656fe69ec303f968c708acc5f555a5f531c59792644abab4eec091"
     },
     {
       "attempt_id": "S-04",
       "arm": "standard",
       "phase": "warm_03",
-      "status": "NOT_RESERVED",
-      "reservation_file": null,
-      "result_file": null,
-      "entered_bootstrap": false,
-      "completed": false,
-      "failure": null
+      "status": "COMPLETED",
+      "reservation_file": "standard/attempt.bootstrap-attempt-04.json",
+      "result_file": "standard/attempt.bootstrap-result-04.json",
+      "entered_bootstrap": true,
+      "completed": true,
+      "failure": null,
+      "reservation_sha256": "43fe0b2a4aaead20bfd9bc4224f961f1f235f23a41913fa9212678d6c03eccd8",
+      "result_sha256": "52492ef37326afef9888bdf6a4b3021e48d3a093a441e6ca306ca5a3cb0ef02e",
+      "output_vector_sha256": "163349917e656fe69ec303f968c708acc5f555a5f531c59792644abab4eec091"
     },
     {
       "attempt_id": "S-05",
       "arm": "standard",
       "phase": "warm_04",
-      "status": "NOT_RESERVED",
-      "reservation_file": null,
-      "result_file": null,
-      "entered_bootstrap": false,
-      "completed": false,
-      "failure": null
+      "status": "COMPLETED",
+      "reservation_file": "standard/attempt.bootstrap-attempt-05.json",
+      "result_file": "standard/attempt.bootstrap-result-05.json",
+      "entered_bootstrap": true,
+      "completed": true,
+      "failure": null,
+      "reservation_sha256": "d04f71c6962a7b856e370b02d1513aacc8c923805fc8382e00025d5799b9e23f",
+      "result_sha256": "8715f2527f705435c6207814cf5ebdaede43ee79c490784344e519bb0a14dbbe",
+      "output_vector_sha256": "163349917e656fe69ec303f968c708acc5f555a5f531c59792644abab4eec091"
     },
     {
       "attempt_id": "S-06",
       "arm": "standard",
       "phase": "warm_05",
-      "status": "NOT_RESERVED",
-      "reservation_file": null,
-      "result_file": null,
-      "entered_bootstrap": false,
-      "completed": false,
-      "failure": null
+      "status": "COMPLETED",
+      "reservation_file": "standard/attempt.bootstrap-attempt-06.json",
+      "result_file": "standard/attempt.bootstrap-result-06.json",
+      "entered_bootstrap": true,
+      "completed": true,
+      "failure": null,
+      "reservation_sha256": "c63e06f22b20a4220768ac7e89b7f3b6df813f96bde0a303a09575ef8d342192",
+      "result_sha256": "2dd1c503f81c2731f80bc3edf43b03b3d717ffa55dd5e3b41fb5e91c1dd26c66",
+      "output_vector_sha256": "163349917e656fe69ec303f968c708acc5f555a5f531c59792644abab4eec091"
     },
     {
       "attempt_id": "F-01",
@@ -355,11 +373,13 @@
       "run_summary_sha256": "334f64fe5b785fc9a6fa945616b8a1b86dd331960b75b8af1a0c480d9bd316db"
     },
     "standard": {
-      "status": "NOT_STARTED",
-      "reserved": 0,
-      "entered": 0,
-      "completed": 0,
-      "failed": 0
+      "status": "COMPLETE",
+      "reserved": 6,
+      "entered": 6,
+      "completed": 6,
+      "failed": 0,
+      "run_summary": "standard/run.json",
+      "run_summary_sha256": "388f51c23f1fbdb35c9516c717cedd118960308a112977b0aa63e120b73bb157"
     },
     "fast_off": {
       "status": "NOT_STARTED",
